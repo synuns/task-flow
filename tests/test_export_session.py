@@ -91,6 +91,28 @@ class RedactionAndRenderTests(unittest.TestCase):
             self.assertNotIn(secret, rendered)
         self.assertIn("~/private/project", rendered)
 
+    def test_redacts_complete_quoted_assignment_values(self):
+        source = "\n".join(
+            [
+                'api_key="alpha beta,gamma&delta"; safe=yes',
+                "password='one two,three&four'; safe=yes",
+                '"access_token": "json value,tail&more", "safe": true',
+            ]
+        )
+
+        rendered = export_session.redact(source, Path("/__no_home_match__"))
+
+        self.assertEqual(
+            rendered,
+            "\n".join(
+                [
+                    'api_key="[REDACTED]"; safe=yes',
+                    "password='[REDACTED]'; safe=yes",
+                    '"access_token": "[REDACTED]", "safe": true',
+                ]
+            ),
+        )
+
     def test_render_is_ordered_and_deterministic(self):
         session = export_session.parse_rollout(
             FIXTURE,
@@ -147,6 +169,20 @@ class HookCliTests(unittest.TestCase):
             "turn_id": "turn-2",
         }
 
+    def transcript_with_prompt(self, path, prompt):
+        records = []
+        for line in FIXTURE.read_text(encoding="utf-8").splitlines():
+            record = json.loads(line)
+            payload = record.get("payload", {})
+            if (
+                record.get("type") == "response_item"
+                and payload.get("type") == "message"
+                and payload.get("role") == "user"
+            ):
+                payload["content"][0]["text"] = prompt
+            records.append(json.dumps(record))
+        path.write_text("\n".join(records) + "\n", encoding="utf-8")
+
     def test_success_is_idempotent(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -188,6 +224,42 @@ class HookCliTests(unittest.TestCase):
         self.assertIn("missing_transcript", log)
         self.assertNotIn("secret-name.jsonl", log)
 
+    def test_quoted_secret_suffix_never_reaches_pending_candidate(self):
+        prompt = "\n".join(
+            [
+                'api_key="alpha beta,gamma&delta"; safe=yes',
+                "password='one two,three&four'; safe=yes",
+                '"access_token": "json value,tail&more", "safe": true',
+            ]
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            transcript = root / "rollout.jsonl"
+            self.transcript_with_prompt(transcript, prompt)
+            payload = self.payload(root)
+            payload["transcript_path"] = str(transcript)
+            result = self.run_cli(root, json.dumps(payload))
+            candidate = (
+                root
+                / ".codex"
+                / "review-pending"
+                / "codex-session-session-123.md"
+            ).read_text(encoding="utf-8")
+
+        self.assertEqual(json.loads(result.stdout), {"continue": True})
+        for raw_suffix in (
+            "alpha beta,gamma&delta",
+            "one two,three&four",
+            "json value,tail&more",
+        ):
+            self.assertNotIn(raw_suffix, candidate)
+        self.assertIn('api_key="[REDACTED]"; safe=yes', candidate)
+        self.assertIn("password='[REDACTED]'; safe=yes", candidate)
+        self.assertIn(
+            '"access_token": "[REDACTED]", "safe": true',
+            candidate,
+        )
+
     def test_invalid_stdin_and_unsafe_session_write_nothing(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -195,10 +267,10 @@ class HookCliTests(unittest.TestCase):
             payload = self.payload(root)
             payload["session_id"] = "..."
             unsafe = self.run_cli(root, json.dumps(payload))
-            artifact_directory = root / "artifacts"
+            pending_directory = root / ".codex" / "review-pending"
         self.assertEqual(json.loads(invalid.stdout), {"continue": True})
         self.assertEqual(json.loads(unsafe.stdout), {"continue": True})
-        self.assertFalse(artifact_directory.exists())
+        self.assertFalse(pending_directory.exists())
 
     def test_cwd_outside_repo_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -209,8 +281,10 @@ class HookCliTests(unittest.TestCase):
             log = (root / ".codex" / "hooks" / "export-session.log").read_text(
                 encoding="utf-8"
             )
+            pending_directory = root / ".codex" / "review-pending"
         self.assertEqual(json.loads(result.stdout), {"continue": True})
         self.assertIn("cwd_outside_repo", log)
+        self.assertFalse(pending_directory.exists())
 
 
 class ProjectWiringTests(unittest.TestCase):
@@ -221,6 +295,25 @@ class ProjectWiringTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(result.returncode, 0)
+
+    def test_publisher_temporary_files_are_precisely_ignored(self):
+        for path in (
+            ".reviewed-record-probe.tmp",
+            "artifacts/.reviewed-record-probe.tmp",
+        ):
+            with self.subTest(path=path):
+                result = subprocess.run(
+                    ["git", "check-ignore", "-q", path],
+                    cwd=str(ROOT),
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0)
+        unrelated = subprocess.run(
+            ["git", "check-ignore", "-q", "scripts/.reviewed-record-probe.tmp"],
+            cwd=str(ROOT),
+            check=False,
+        )
+        self.assertNotEqual(unrelated.returncode, 0)
 
     def test_stop_hook(self):
         config = json.loads(

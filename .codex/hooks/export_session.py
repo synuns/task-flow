@@ -14,6 +14,17 @@ from artifact_contract import artifact_filename, safe_session_id
 
 
 REDACTED = "[REDACTED]"
+
+
+def redact_assignment(match):
+    value = match.group("value")
+    if value[:1] in ('"', "'") and value[-1:] == value[:1]:
+        replacement = value[:1] + REDACTED + value[:1]
+    else:
+        replacement = REDACTED
+    return match.group("prefix") + replacement
+
+
 SECRET_PATTERNS = [
     (
         re.compile(r"(?i)(Authorization\s*:\s*(?:Bearer|Basic)\s+)[^\s\"']+"),
@@ -21,10 +32,13 @@ SECRET_PATTERNS = [
     ),
     (
         re.compile(
-            r"(?i)([\"']?(?:api[_-]?key|access[_-]?token|secret|password)"
-            r"[\"']?\s*[:=]\s*[\"']?)[^\s\"'&,]+"
+            r"(?i)(?P<prefix>[\"']?"
+            r"(?:api[_-]?key|access[_-]?token|secret|password)"
+            r"[\"']?\s*[:=]\s*)"
+            r"(?P<value>\"(?:\\.|[^\"\\])*\"|"
+            r"'(?:\\.|[^'\\])*'|[^\s&,;]+)"
         ),
-        r"\1" + REDACTED,
+        redact_assignment,
     ),
     (re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b"), REDACTED),
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"), REDACTED),

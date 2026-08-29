@@ -121,6 +121,9 @@ def main(argv=None):
     artifacts = root / "artifacts"
     destination = artifacts / exporter.artifact_filename(session_id)
     reviewed = reviewed_content(candidate, args.reviewed_by)
+    if exporter.redact(reviewed, Path("/__no_home_match__")) != reviewed:
+        print("reviewed record still contains a sensitive pattern", file=sys.stderr)
+        return 1
     previous = None
     try:
         artifacts.mkdir(parents=True, exist_ok=True)

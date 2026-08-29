@@ -26,7 +26,7 @@ class PublishAiRecordTests(unittest.TestCase):
         self.root.chmod(0o700)
         self.temporary.cleanup()
 
-    def run_publish(self, *extra):
+    def run_publish(self, *extra, reviewer="Human Reviewer"):
         return subprocess.run(
             [
                 str(PUBLISH),
@@ -34,7 +34,7 @@ class PublishAiRecordTests(unittest.TestCase):
                 "--repo-root",
                 str(self.root),
                 "--reviewed-by",
-                "Human Reviewer",
+                reviewer,
                 *extra,
             ],
             text=True,
@@ -63,6 +63,35 @@ class PublishAiRecordTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("sensitive pattern", result.stderr)
         self.assertFalse((self.root / "artifacts").exists())
+
+    def test_unredacted_quoted_secret_blocks_publication(self):
+        self.candidate.write_text(
+            "# Candidate\n"
+            'api_key="alpha beta,gamma&delta"; safe=yes\n'
+            "password='one two,three&four'; safe=yes\n"
+            '"access_token": "json value,tail&more", "safe": true\n',
+            encoding="utf-8",
+        )
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("sensitive pattern", result.stderr)
+        self.assertFalse((self.root / "artifacts").exists())
+
+    def test_secret_bearing_reviewer_blocks_publication(self):
+        result = self.run_publish(
+            "--confirm-sensitive-review",
+            "--confirm-content-review",
+            reviewer='api_key="reviewer secret,tail&more"',
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("sensitive pattern", result.stderr)
+        self.assertFalse((self.root / "artifacts").exists())
+        self.assertEqual(
+            self.usage.read_text(encoding="utf-8"),
+            "AI_USAGE must stay unchanged\n",
+        )
 
     def test_reviewed_candidate_is_published_and_linked(self):
         result = self.run_publish(

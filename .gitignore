@@ -6,5 +6,7 @@
 artifacts/.codex-session-*.tmp
 artifacts/.index.lock
 artifacts/.index-*.tmp
+/.reviewed-record-*.tmp
+/artifacts/.reviewed-record-*.tmp
 __pycache__/
 *.pyc
