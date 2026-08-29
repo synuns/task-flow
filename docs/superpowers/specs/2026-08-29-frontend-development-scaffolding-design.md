@@ -32,7 +32,7 @@
 - Biome lint, read-only format check, 별도 write format
 - Vitest, jsdom, Testing Library matcher smoke test
 - Playwright Chromium scaffold smoke test
-- Tailwind CSS와 shadcn/ui 설정 기반
+- Tailwind CSS 설정과 shadcn CLI 설치
 - CSS Custom Properties 기반 명명된 색상 토큰
 - 로컬 Pretendard font asset과 전역 font 적용
 - `openapi-typescript` 생성 명령과 `src/generated/openapi.ts` 생성 산출물
@@ -50,7 +50,7 @@
 - MSW handler, fixture, API별 mock behavior
 - 인증 token 저장·갱신·만료·보호 경로 정책
 - Golden Journey E2E와 사람 journey checkpoint
-- shadcn/ui component 생성
+- `components.json`과 shadcn/ui component 생성
 
 ## 접근안과 결정
 
@@ -90,7 +90,10 @@ FSD layer와 provider, route placeholder까지 미리 만드는 방식이다. �
 - Vitest setup: jsdom과 Testing Library matcher를 활성화한다.
 - Playwright config: Vite development server를 사용한 Chromium smoke
   실행을 제공한다.
-- `components.json`: shadcn/ui와 Tailwind 연동 정보만 기록한다.
+
+shadcn CLI는 설치하되 `components.json`은 만들지 않는다. 이 파일의
+component, UI, utility, hook alias는 CLI 생성 위치를 결정하므로 후속 FSD
+설계에서 layer와 segment 책임을 승인한 뒤 함께 정한다.
 
 FSD layer별 alias는 만들지 않는다. `@/*` 하나만 사용해 후속 FSD 설계가
 layer 이름과 public API 규칙을 독립적으로 결정할 수 있게 한다.
@@ -189,7 +192,8 @@ AI 검증 상태로 올릴 수 있다. AI는 어떤 항목도 `HUMAN_APPROVED`�
 - 최소 React application이 development와 production mode에서 열린다.
 - OpenAPI type 생성, format check, lint, typecheck, Vitest, build가 통과한다.
 - scaffold browser smoke가 Chromium에서 통과한다.
-- MSW worker와 shadcn/Tailwind 설정이 존재하지만 제품 behavior는 없다.
+- MSW worker와 Tailwind 설정이 존재하지만 제품 behavior는 없다.
+- shadcn CLI는 설치되며 `components.json`과 component는 아직 없다.
 - 기존 AI review command와 lifecycle test가 회귀하지 않는다.
 - `./scripts/verify quick`과 `./scripts/verify full`이 repository를 수정하지
   않고 통과한다.
