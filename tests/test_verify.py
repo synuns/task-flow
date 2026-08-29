@@ -68,13 +68,17 @@ class VerifyCliTests(unittest.TestCase):
 
     def test_read_only_detects_tracked_modified_file_changed_during_stage(self):
         original = Path(__file__).read_bytes()
+        pre_existing_dirty = original + b"\n# pre-existing tracked modification\n"
         verifier = load_verify_module()
 
         def mutate_stage():
-            Path(__file__).write_bytes(original + b"\n# verifier-stage mutation\n")
+            Path(__file__).write_bytes(
+                pre_existing_dirty + b"# verifier-stage mutation\n"
+            )
             return 0
 
         try:
+            Path(__file__).write_bytes(pre_existing_dirty)
             with contextlib.redirect_stderr(io.StringIO()):
                 with mock.patch.object(verifier, "verify_setup", mutate_stage):
                     result = verifier.main(["setup"])

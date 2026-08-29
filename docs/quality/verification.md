@@ -9,8 +9,9 @@
 ./scripts/verify
 ```
 
-No argument means `full`. Every verification mode is read-only and compares
-Git status before and after execution. A mutation makes verification fail.
+No argument means `full`. Every verification mode is read-only and compares a
+repository content fingerprint before and after execution. A mutation makes
+verification fail.
 
 ## Modes
 
