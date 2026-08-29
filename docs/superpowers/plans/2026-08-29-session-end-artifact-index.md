@@ -4,7 +4,7 @@
 
 **Goal:** 메인 Codex 세션 종료 시 transcript 본문을 읽지 않고 안전한 세션 artifact 파일만 찾아 `artifacts/index.md`를 동시성 안전하게 재생성한다.
 
-**Architecture:** 기존 `Stop` Hook은 Git 비추적 pending 후보만 생성한다. 사람은 `scripts/publish-ai-record`로 검토 완료 기록을 게시하며 publisher는 POSIX 파일 잠금 안에서 게시 artifact와 인덱스를 함께 갱신한다. 신규 `SessionEnd` command Hook은 현재 세션 artifact를 요구하지 않고 이미 게시된 허용 파일명만 조회한 뒤 인덱스를 원자적으로 교체한다. `AI_USAGE.md`는 자동 생성 인덱스의 정적 링크만 가지며 사람이 작성하는 내용을 자동화와 분리한다.
+**Architecture:** 기존 `Stop` Hook은 Git 비추적 pending 후보만 생성한다. 사람은 `scripts/publish-ai-record`로 검토 완료 기록을 게시하며 publisher는 POSIX 파일 잠금 안에서 게시 artifact, 인덱스, `AI_USAGE.md` managed 링크를 순서대로 갱신한다. 신규 `SessionEnd` command Hook은 현재 세션 artifact를 요구하지 않고 이미 게시된 허용 파일명만 조회한 뒤 인덱스를 원자적으로 교체하며 `AI_USAGE.md`는 수정하지 않는다.
 
 **Tech Stack:** Codex project hooks, Python 3.9+ standard library, `unittest`, Markdown, POSIX `fcntl.flock`
 
@@ -21,7 +21,7 @@
 - 잠금은 `artifacts/.index.lock`, 임시 파일은 `artifacts/.index-*.tmp`를 사용한다.
 - 잠금 재시도는 50ms 간격, 최대 1초다.
 - 실패 시 기존 `artifacts/index.md`를 보존한다.
-- `AI_USAGE.md`의 작업 범위, 프롬프트 요약, 사람 검증, 자동 검증 내용은 Hook이 수정하지 않는다.
+- `AI_USAGE.md`의 작업 범위, 프롬프트 요약, 사람 검증, 자동 검증 내용은 Hook과 publisher가 수정하지 않으며, explicit publisher만 reviewed-record managed 영역을 수정한다.
 - `Stop`은 `.codex/review-pending/`에만 기록하며 publisher만 `artifacts/`에 쓴다.
 - publisher와 SessionEnd는 같은 `artifacts/.index.lock` 계약을 사용한다.
 - 현재 세션이 아직 pending 상태여도 SessionEnd는 기존 게시 artifact만으로 성공한다.
@@ -33,7 +33,7 @@
 
 - Create `.codex/hooks/artifact_contract.py`: exporter와 indexer가 공유하는 session ID 정제, artifact 파일명 생성·파싱 계약.
 - Modify `.codex/hooks/export_session.py`: 로컬 이름 정제 함수를 공통 계약으로 교체.
-- Modify `scripts/publish-ai-record`: 사람 검토 기록 게시와 인덱스 갱신을 같은 잠금 안에서 수행.
+- Modify `scripts/publish-ai-record`: 사람 검토 기록, 인덱스, AI_USAGE managed 링크 갱신과 역순 rollback을 같은 잠금 안에서 수행.
 - Create `.codex/hooks/render_artifact_index.py`: 파일 선택, 렌더링, 잠금, 원자적 저장, SessionEnd CLI.
 - Create `tests/test_artifact_contract.py`: 파일명 계약 경계 테스트.
 - Create `tests/test_render_artifact_index.py`: 렌더러, 실패 보존, CLI, 잠금 테스트.
@@ -45,8 +45,9 @@
 - Delete `artifacts/.gitkeep`: 추적되는 인덱스가 디렉터리를 유지함.
 
 > 통합 조정: 아래 초기 단계의 “Stop이 artifact를 직접 생성”, “SessionEnd가
-> 현재 세션 artifact를 요구”, “publisher가 AI_USAGE를 직접 수정” 예시는
-> 위 Architecture와 Global Constraints로 대체한다. `index.md`는 게시 ledger며
+> 현재 세션 artifact를 요구” 예시는 위 Architecture와 Global Constraints로
+> 대체한다. publisher의 AI_USAGE 수정은 managed marker 영역에만 한정한다.
+> `index.md`는 게시 ledger며
 > publisher만 신규 링크를 추가한다. SessionEnd는 기존 canonical 링크를
 > 재렌더링하고 누락된 artifact 링크만 정리한다. 이름이 맞아도 index에 없는
 > 파일은 게시 완료로 추정하지 않는다. 초기 TDD 이력은 설계 변경 전 실행

@@ -44,8 +44,9 @@ Stop 훅은 구조적으로 내부 지침과 reasoning을 제외하고, 메모�
 ```
 
 자동 마스킹은 사람 검토를 대체하지 않습니다. `artifacts/`에는 검토 후
-게시된 기록만 추가합니다. 게시 명령과 SessionEnd 훅은 파일명을 기준으로
-인덱스만 갱신하며 세션 Markdown 본문을 다시 해석하지 않습니다.
+게시된 기록만 추가합니다. 게시 명령은 공용 잠금 안에서 검토 artifact,
+인덱스, 아래 managed 링크 순서로 갱신합니다. SessionEnd 훅은 파일명을
+기준으로 인덱스만 검증·정리하며 `AI_USAGE.md`는 수정하지 않습니다.
 
 ### 검토 완료 기록
 
@@ -53,3 +54,10 @@ Stop 훅은 구조적으로 내부 지침과 reasoning을 제외하고, 메모�
 <!-- reviewed-records:end -->
 
 - [전체 프롬프트와 작업 기록](./artifacts/index.md)
+
+### 기존 정책 기록
+
+- [기록 자동화 설계·구현 세션](./artifacts/codex-session-01a04c3e-0a24-7e30-a767-64f1e2c4f3ae.md) — `legacy/pre-policy`, 사람 검토 대기
+
+기존 정책 기록은 별도 사람 검토 전까지 검토 완료 managed 영역과
+`artifacts/index.md`에 포함하지 않습니다.

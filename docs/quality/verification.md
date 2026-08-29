@@ -81,5 +81,7 @@ Setup verification confirms ignored pending storage, Stop hook wiring, exporter
 tests, and reviewed-publication language. The hook creates only structurally
 filtered and redacted pending candidates. A person reviews content and sensitive
 information before running `scripts/publish-ai-record`. Published records alone
-are indexed in `artifacts/index.md`; `AI_USAGE.md` links that index without being
-rewritten by publication automation.
+are indexed in `artifacts/index.md`. The explicit publisher holds the shared index
+lock and writes the reviewed artifact, canonical index, and managed `AI_USAGE.md`
+record link in that order, rolling earlier files back if a later write fails.
+`SessionEnd` validates and prunes the index only; it never rewrites `AI_USAGE.md`.

@@ -1,14 +1,35 @@
 import os
+import importlib.machinery
+import importlib.util
 import subprocess
+import sys
 import tempfile
+import threading
 import unittest
+from contextlib import contextmanager
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLISH = ROOT / "scripts" / "publish-ai-record"
 START = "<!-- reviewed-records:start -->"
 END = "<!-- reviewed-records:end -->"
+LOADER = importlib.machinery.SourceFileLoader("publish_ai_record", str(PUBLISH))
+SPEC = importlib.util.spec_from_loader(LOADER.name, LOADER)
+publish_ai_record = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = publish_ai_record
+SPEC.loader.exec_module(publish_ai_record)
+exporter = publish_ai_record.load_hook_module(
+    ROOT,
+    "export_session.py",
+    "publisher_test_exporter",
+)
+indexer = publish_ai_record.load_hook_module(
+    ROOT,
+    "render_artifact_index.py",
+    "publisher_test_indexer",
+)
 
 
 class PublishAiRecordTests(unittest.TestCase):
@@ -55,6 +76,21 @@ class PublishAiRecordTests(unittest.TestCase):
             capture_output=True,
             check=False,
         )
+
+    def main_args(self, session_id, reviewer="Human Reviewer"):
+        return [
+            session_id,
+            "--repo-root",
+            str(self.root),
+            "--reviewed-by",
+            reviewer,
+            "--confirm-sensitive-review",
+            "--confirm-content-review",
+        ]
+
+    def load_module(self, source_root, filename, module_name):
+        del source_root, module_name
+        return exporter if filename == "export_session.py" else indexer
 
     def test_both_human_confirmations_are_required(self):
         for supplied_flag in (
@@ -132,6 +168,79 @@ class PublishAiRecordTests(unittest.TestCase):
             1,
         )
 
+    def test_concurrent_session_publications_preserve_both_managed_entries(self):
+        for session_id in ("session-a", "session-b"):
+            candidate = (
+                self.root
+                / ".codex"
+                / "review-pending"
+                / "codex-session-{}.md".format(session_id)
+            )
+            candidate.write_text(
+                "# Codex Session `{}`\n".format(session_id),
+                encoding="utf-8",
+            )
+
+        barrier = threading.Barrier(2)
+        serial = threading.Lock()
+
+        class SynchronizedIndexer:
+            def __getattr__(self, name):
+                return getattr(indexer, name)
+
+            @contextmanager
+            def index_lock(self, path):
+                del path
+                barrier.wait(timeout=5)
+                with serial:
+                    yield
+
+        synchronized_indexer = SynchronizedIndexer()
+
+        def load_synchronized(source_root, filename, module_name):
+            del source_root, module_name
+            if filename == "export_session.py":
+                return exporter
+            return synchronized_indexer
+
+        results = {}
+
+        def publish(session_id):
+            results[session_id] = publish_ai_record.main(
+                self.main_args(session_id)
+            )
+
+        with mock.patch.object(
+            publish_ai_record,
+            "load_hook_module",
+            side_effect=load_synchronized,
+        ):
+            threads = [
+                threading.Thread(target=publish, args=(session_id,))
+                for session_id in ("session-a", "session-b")
+            ]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(timeout=6)
+
+        self.assertTrue(all(not thread.is_alive() for thread in threads))
+        self.assertEqual(results, {"session-a": 0, "session-b": 0})
+        usage = self.usage.read_text(encoding="utf-8")
+        artifact_index = (self.root / "artifacts" / "index.md").read_text(
+            encoding="utf-8"
+        )
+        for session_id in ("session-a", "session-b"):
+            self.assertIn("codex-session-{}.md".format(session_id), usage)
+            self.assertIn("codex-session-{}.md".format(session_id), artifact_index)
+            self.assertTrue(
+                (
+                    self.root
+                    / "artifacts"
+                    / "codex-session-{}.md".format(session_id)
+                ).is_file()
+            )
+
     def test_matching_unpublished_file_is_not_added_to_index(self):
         artifacts = self.root / "artifacts"
         artifacts.mkdir()
@@ -183,6 +292,36 @@ class PublishAiRecordTests(unittest.TestCase):
         self.assertEqual(artifact.read_text(encoding="utf-8"), previous)
         self.assertEqual(self.usage.read_text(encoding="utf-8"), self.usage_initial)
 
+    def test_injected_index_write_failure_restores_exact_previous_files(self):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir()
+        artifact = artifacts / "codex-session-session-123.md"
+        artifact.write_text("# Previously reviewed\n", encoding="utf-8")
+        index_path = artifacts / "index.md"
+        index_path.write_text(
+            indexer.render_index([artifact.name]),
+            encoding="utf-8",
+        )
+        expected_artifact = artifact.read_bytes()
+        expected_index = index_path.read_bytes()
+        expected_usage = self.usage.read_bytes()
+
+        with mock.patch.object(
+            publish_ai_record,
+            "load_hook_module",
+            side_effect=self.load_module,
+        ), mock.patch.object(
+            indexer,
+            "atomic_write_index",
+            side_effect=OSError("injected index replacement failure"),
+        ):
+            result = publish_ai_record.main(self.main_args("session-123"))
+
+        self.assertEqual(result, 1)
+        self.assertEqual(artifact.read_bytes(), expected_artifact)
+        self.assertEqual(index_path.read_bytes(), expected_index)
+        self.assertEqual(self.usage.read_bytes(), expected_usage)
+
     def test_managed_markers_must_be_one_ordered_pair(self):
         invalid_documents = {
             "missing-start": END + "\n",
@@ -198,7 +337,14 @@ class PublishAiRecordTests(unittest.TestCase):
                     "--confirm-sensitive-review", "--confirm-content-review"
                 )
                 self.assertNotEqual(result.returncode, 0)
-                self.assertFalse((self.root / "artifacts").exists())
+                self.assertFalse(
+                    (
+                        self.root
+                        / "artifacts"
+                        / "codex-session-session-123.md"
+                    ).exists()
+                )
+                self.assertFalse((self.root / "artifacts" / "index.md").exists())
                 self.assertEqual(self.usage.read_text(encoding="utf-8"), document)
 
     @unittest.skipIf(os.geteuid() == 0, "root bypasses directory write permissions")
@@ -207,6 +353,15 @@ class PublishAiRecordTests(unittest.TestCase):
         artifacts.mkdir()
         artifact = artifacts / "codex-session-session-123.md"
         artifact.write_text("# Previously reviewed\n", encoding="utf-8")
+        other = artifacts / "codex-session-other.md"
+        other.write_text("# Other reviewed\n", encoding="utf-8")
+        index_path = artifacts / "index.md"
+        index_path.write_text(
+            indexer.render_index([artifact.name, other.name]),
+            encoding="utf-8",
+        )
+        expected_artifact = artifact.read_bytes()
+        expected_index = index_path.read_bytes()
         usage_before = self.usage.read_text(encoding="utf-8")
         self.root.chmod(0o555)
 
@@ -215,12 +370,30 @@ class PublishAiRecordTests(unittest.TestCase):
         )
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(
-            artifact.read_text(encoding="utf-8"),
-            "# Previously reviewed\n",
-        )
-        self.assertFalse((artifacts / "index.md").exists())
+        self.assertEqual(artifact.read_bytes(), expected_artifact)
+        self.assertEqual(index_path.read_bytes(), expected_index)
         self.assertEqual(self.usage.read_text(encoding="utf-8"), usage_before)
+
+    def test_rollback_attempts_artifact_restore_after_index_restore_failure(self):
+        with mock.patch.object(
+            publish_ai_record,
+            "restore_index",
+            side_effect=OSError("index rollback failed"),
+        ) as restore_index, mock.patch.object(
+            publish_ai_record,
+            "restore_artifact",
+        ) as restore_artifact:
+            with self.assertRaisesRegex(ValueError, "manual recovery required"):
+                publish_ai_record.rollback_publication(
+                    Path("index.md"),
+                    "old index\n",
+                    Path("artifact.md"),
+                    "old artifact\n",
+                    indexer,
+                )
+
+        restore_index.assert_called_once()
+        restore_artifact.assert_called_once()
 
     @unittest.skipIf(os.geteuid() == 0, "root bypasses directory write permissions")
     def test_usage_write_failure_removes_new_artifact_index_and_link(self):

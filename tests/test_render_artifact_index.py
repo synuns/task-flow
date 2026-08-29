@@ -185,6 +185,24 @@ class SessionEndCliTests(unittest.TestCase):
         self.assertIn("codex-session-reviewed-session.md", index)
         self.assertNotIn("codex-session-pending-session.md", index)
 
+    def test_missing_indexed_artifact_is_removed_while_present_entry_remains(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            present = self.write_artifact(root, "present")
+            missing_name = "codex-session-missing.md"
+            index_path = root / "artifacts" / "index.md"
+            index_path.write_text(
+                render_artifact_index.render_index([present.name, missing_name]),
+                encoding="utf-8",
+            )
+
+            result = self.run_cli(root, json.dumps(self.payload(root)))
+            rendered = index_path.read_text(encoding="utf-8")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(present.name, rendered)
+        self.assertNotIn(missing_name, rendered)
+
     def test_invalid_inputs_preserve_existing_index(self):
         cases = (
             ("not-json", "invalid_hook_input"),

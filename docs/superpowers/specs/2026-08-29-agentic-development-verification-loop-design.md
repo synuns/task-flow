@@ -364,8 +364,8 @@ tool stop event
   -> human reviews candidate
   -> explicit publish command confirms review
   -> atomically write tracked artifacts record
-  -> rebuild artifacts/index.md from reviewed records
-  -> AI_USAGE.md keeps one static link to artifacts/index.md
+  -> under one lock, update artifacts/index.md
+  -> update the managed reviewed-record link in AI_USAGE.md
 ```
 
 Rules:
@@ -380,8 +380,9 @@ Rules:
   `legacy/pre-policy` until separately reviewed; automation never marks them
   reviewed.
 - `AI_USAGE.md` links the reviewed-record index and retains factual, unchecked
-  human-verification items until a person completes them. Publication automation
-  never rewrites `AI_USAGE.md`.
+  human-verification items until a person completes them. Only the explicit
+  publisher rewrites the reviewed-record managed region; SessionEnd and Stop never
+  rewrite `AI_USAGE.md`.
 
 The existing Codex `Stop` hook becomes the first adapter. Other AI tools are
 allowed when their adapter or manual process produces the same reviewed record

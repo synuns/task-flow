@@ -101,6 +101,34 @@ def restore_index(path, previous, indexer):
         pass
 
 
+def rollback_publication(
+    index_path,
+    previous_index,
+    artifact_path,
+    previous_artifact,
+    indexer,
+    restore_index_required=True,
+    restore_artifact_required=True,
+):
+    failures = []
+    if restore_index_required:
+        try:
+            restore_index(index_path, previous_index, indexer)
+        except (OSError, UnicodeError, ValueError) as error:
+            failures.append("index restore failed: {}".format(error))
+    if restore_artifact_required:
+        try:
+            restore_artifact(artifact_path, previous_artifact)
+        except (OSError, UnicodeError, ValueError) as error:
+            failures.append("artifact restore failed: {}".format(error))
+    if failures:
+        raise ValueError(
+            "rollback incomplete ({}); manual recovery required".format(
+                "; ".join(failures)
+            )
+        )
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("session_id")
@@ -154,16 +182,12 @@ def main(argv=None):
         print("reviewed record still contains a sensitive pattern", file=sys.stderr)
         return 1
     usage_path = root / "AI_USAGE.md"
-    try:
-        usage = usage_path.read_text(encoding="utf-8")
-        updated_usage = update_usage(usage, session_id)
-    except (OSError, UnicodeError, ValueError) as error:
-        print("publication failed: {}".format(error), file=sys.stderr)
-        return 1
     previous = None
     try:
         artifacts.mkdir(parents=True, exist_ok=True)
         with indexer.index_lock(artifacts / ".index.lock"):
+            usage = usage_path.read_text(encoding="utf-8")
+            updated_usage = update_usage(usage, session_id)
             index_path = artifacts / "index.md"
             filenames = indexer.list_published_artifact_names(
                 index_path,
@@ -193,10 +217,15 @@ def main(argv=None):
                 index_written = True
                 atomic_write(usage_path, updated_usage)
             except (OSError, UnicodeError, ValueError):
-                if index_written:
-                    restore_index(index_path, previous_index, indexer)
-                if artifact_written:
-                    restore_artifact(destination, previous)
+                rollback_publication(
+                    index_path,
+                    previous_index,
+                    destination,
+                    previous,
+                    indexer,
+                    restore_index_required=index_written,
+                    restore_artifact_required=artifact_written,
+                )
                 raise
     except indexer.IndexLockTimeout:
         print("artifact index lock timeout", file=sys.stderr)

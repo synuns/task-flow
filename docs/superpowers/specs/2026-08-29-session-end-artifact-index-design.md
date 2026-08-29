@@ -4,8 +4,9 @@
 
 Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 `artifacts/index.md`에 자동 반영한다. `AI_USAGE.md`는 이 인덱스에 대한
-정적 링크만 가지며, 작업 범위와 프롬프트 요약, 사람 및 자동 검증 내역은
-사람이 최종 판단하여 작성한다.
+정적 링크와 explicit publisher가 관리하는 검토 완료 링크 영역을 가지며,
+작업 범위와 프롬프트 요약, 사람 및 자동 검증 내역은 사람이 최종 판단하여
+작성한다.
 
 ## 범위
 
@@ -18,6 +19,7 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 - artifact 파일명만으로 `artifacts/index.md` 전체 재렌더링.
 - 동시 실행 잠금과 원자적 파일 교체.
 - `AI_USAGE.md`에서 인덱스 파일로 연결되는 정적 링크.
+- explicit publisher만 갱신하는 `AI_USAGE.md` 검토 완료 managed 링크.
 - Hook 구성, 파일 선택, 잠금, 멱등성, 실패 보존 테스트.
 
 제외:
@@ -56,7 +58,10 @@ pending 디렉터리는 Git에서 제외하며 인덱스를 수정하지 않는�
 실행한다. 검토 metadata를 추가한 기록을
 `artifacts/codex-session-<session-id>.md`로 게시하고 같은 index 잠금 안에서
 `artifacts/index.md`를 갱신한다. 게시 또는 인덱스 갱신 실패 시 기존 게시
-기록을 복구한다. `AI_USAGE.md`는 수정하지 않는다.
+기록을 복구한다. 같은 잠금 안에서 `AI_USAGE.md`를 다시 읽어 managed 링크를
+렌더링하고 artifact, index, `AI_USAGE.md` 순서로 교체한다. 후속 교체 실패 시
+역순으로 기존 index와 artifact를 복구하며 불완전 복구는 수동 복구가 필요한
+명시적 오류로 보고한다.
 
 ### `SessionEnd` Hook
 
@@ -86,10 +91,13 @@ artifact 링크를 파일명 오름차순으로 기록한다.
 ### `AI_USAGE.md`
 
 `SessionEnd`가 수정하지 않는다. `전체 프롬프트와 작업 기록` 절에는 다음
-정적 링크만 둔다.
+정적 index 링크와 publisher 전용 managed marker 쌍을 둔다.
 
 ```markdown
 - [전체 프롬프트와 작업 기록](./artifacts/index.md)
+
+<!-- reviewed-records:start -->
+<!-- reviewed-records:end -->
 ```
 
 다음 내용은 수동 또는 제출 전 최종 검토로 관리한다.
@@ -148,6 +156,8 @@ artifacts/codex-session-<session-id>.md
 - `LOCK_EX | LOCK_NB`로 시도한다.
 - 50ms 간격으로 재시도하되 총 대기 시간은 1초를 넘지 않는다.
 - 잠금은 artifact 조회 직전부터 `index.md` 교체가 끝날 때까지 유지한다.
+- publisher는 잠금을 얻은 뒤 `AI_USAGE.md`를 다시 읽고 managed 링크를
+  렌더링하여 동시 publisher의 lost update를 막는다.
 - 파일 descriptor가 닫히거나 프로세스가 끝나면 커널이 잠금을 해제하므로
   stale lock이 남아 실행을 영구 차단하지 않는다.
 - 1초 안에 잠금을 얻지 못하면 기존 인덱스를 보존하고 실패를 보고한다.
@@ -181,7 +191,8 @@ Stop Hook
   -> .codex/review-pending/ 후보 저장
   -> 사람 검토와 명시적 publish command
   -> artifacts/.index.lock 배타 잠금 획득
-  -> 검토 완료 artifact 게시와 index 갱신
+  -> AI_USAGE.md managed 영역 재읽기와 링크 렌더링
+  -> 검토 완료 artifact, index, AI_USAGE.md 순서로 갱신
 ```
 
 ## 실패 처리
@@ -236,6 +247,8 @@ CLI 및 통합 테스트:
 - 잘못된 JSON, event, session ID, 저장소 밖 cwd 거부.
 - 다른 프로세스가 잠금을 가진 동안 1초 안에 실패하고 기존 인덱스 보존.
 - 쓰기 실패 시 기존 인덱스와 임시 파일 정리 확인.
+- 두 publisher의 동시 게시에서도 두 artifact, index 링크, managed 링크 보존.
+- index 또는 AI_USAGE 쓰기 실패 시 이전 artifact/index/AI_USAGE byte 복원.
 - `.codex/hooks.json`의 기존 `Stop`과 신규 `SessionEnd` handler 확인.
 - `AI_USAGE.md`가 `artifacts/index.md`를 링크하고 필수 수동 절을 유지함을 확인.
 - 기존 exporter 테스트 전체 회귀 확인.
