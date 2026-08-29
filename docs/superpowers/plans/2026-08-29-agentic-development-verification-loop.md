@@ -185,7 +185,7 @@ Expected: 27 checklist rows, four journey headings, and no whitespace errors.
 
 ```bash
 git add docs/quality/requirements.md
-git commit -m "docs: map assignment requirements and journeys"
+git commit -m "docs: 과제 요구사항과 사용자 여정 매핑"
 ```
 
 ---
@@ -194,7 +194,7 @@ git commit -m "docs: map assignment requirements and journeys"
 
 **Files:**
 - Create: `docs/quality/workflow.md`
-- Create: `AGENTS.md`
+- Modify: `AGENTS.md`
 
 **Interfaces:**
 - Consumes: requirement IDs and checkpoints from Task 1
@@ -344,10 +344,21 @@ review complete on a person's behalf. See `verification.md` and `AI_USAGE.md`.
 
 - [ ] **Step 2: Write the root control plane**
 
-Create `AGENTS.md` with this content:
+Preserve the existing commit-message section in `AGENTS.md`, then append the
+control-plane sections so the complete file has this content:
 
 ~~~~markdown
-# Project Agent Rules
+# 프로젝트 작업 규약
+
+## 커밋 메시지
+
+- 모든 커밋 메시지는 Conventional Commits 형식을 따른다.
+- 형식은 `<type>(<scope>): <한글 설명>`이며, `scope`는 필요할 때만 사용한다.
+- `type`과 `scope`는 영문 소문자로 작성하고, 제목·본문·꼬리말의 설명은 한글로 작성한다. 코드 식별자와 고유명사는 예외로 한다.
+- 주요 `type`은 `feat`, `fix`, `docs`, `refactor`, `test`, `chore`를 사용한다.
+- 호환성을 깨는 변경은 `!` 또는 `BREAKING CHANGE:` 꼬리말로 표시한다.
+
+예시: `docs: 과제 원본 명세 추가`
 
 ## Scope
 
@@ -408,7 +419,7 @@ Expected: all risk labels, human boundary, review/QA sections, and required link
 
 ```bash
 git add AGENTS.md docs/quality/workflow.md
-git commit -m "docs: define risk-based agent workflow"
+git commit -m "docs: 위험 기반 AI 작업 흐름 정의"
 ```
 
 ---
@@ -821,7 +832,7 @@ Expected: five verifier tests pass; setup and hook tests pass; quick/full print 
 
 ```bash
 git add .gitignore docs/quality/verification.md scripts/verify tests/test_verify.py
-git commit -m "test: add read-only verification entry point"
+git commit -m "test: 읽기 전용 통합 검증 명령 추가"
 ```
 
 ---
@@ -1283,7 +1294,7 @@ Expected: all exporter and publisher tests pass; `git check-ignore` prints `.cod
 git add .codex/hooks/export_session.py .codex/hooks.json \
   scripts/publish-ai-record tests/test_export_session.py \
   tests/test_publish_ai_record.py AI_USAGE.md
-git commit -m "feat: gate AI record publication on human review"
+git commit -m "feat: AI 기록 게시에 사람 검토 게이트 추가"
 ```
 
 ---
@@ -1406,7 +1417,7 @@ finding in its owning file and rerun Step 2.
 
 ```bash
 git add scripts/verify tests/test_verify.py
-git commit -m "test: verify complete agent workflow setup"
+git commit -m "test: AI 작업 흐름 통합 검증"
 ```
 
 - [ ] **Step 5: Prepare human handoff**

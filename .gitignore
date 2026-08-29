@@ -1,4 +1,5 @@
 .worktrees/
+.superpowers/
 .codex/hooks/export-session.log
 artifacts/.codex-session-*.tmp
 __pycache__/
