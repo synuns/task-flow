@@ -344,10 +344,17 @@ def run_hook(hook_input: object, repo_root: Path) -> None:
             model if isinstance(model, str) and model else "unknown",
             lambda event, line: log_event(repo_root, event, session_id, line),
         )
-        destination = repo_root / "artifacts" / "codex-session-{}.md".format(
-            session_id
+        rendered = render_markdown(session)
+        if redact(rendered, Path("/__no_home_match__")) != rendered:
+            log_event(repo_root, "sensitive_candidate", session_id)
+            return
+        destination = (
+            repo_root
+            / ".codex"
+            / "review-pending"
+            / "codex-session-{}.md".format(session_id)
         )
-        atomic_write(destination, render_markdown(session))
+        atomic_write(destination, rendered)
     except (OSError, UnicodeError, ValueError, TypeError):
         log_event(repo_root, "export_failed", session_id)
 
