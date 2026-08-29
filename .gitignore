@@ -1,1 +1,5 @@
 .worktrees/
+.codex/hooks/export-session.log
+artifacts/.codex-session-*.tmp
+__pycache__/
+*.pyc

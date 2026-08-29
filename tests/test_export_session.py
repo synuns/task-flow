@@ -201,5 +201,30 @@ class HookCliTests(unittest.TestCase):
         self.assertIn("cwd_outside_repo", log)
 
 
+class ProjectWiringTests(unittest.TestCase):
+    def test_stop_hook(self):
+        config = json.loads(
+            (ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8")
+        )
+        handler = config["hooks"]["Stop"][0]["hooks"][0]
+        self.assertEqual(handler["type"], "command")
+        self.assertIn("git rev-parse --show-toplevel", handler["command"])
+        self.assertIn(".codex/hooks/export_session.py", handler["command"])
+        self.assertEqual(handler["timeout"], 30)
+
+    def test_ai_usage_required_sections(self):
+        document = (ROOT / "AI_USAGE.md").read_text(encoding="utf-8")
+        for heading in (
+            "## 사용한 도구와 모델",
+            "## 적용한 작업 범위",
+            "## 핵심 프롬프트 요약",
+            "## 사람이 최종 검증한 내용",
+            "## 전체 프롬프트와 작업 기록",
+        ):
+            self.assertIn(heading, document)
+        self.assertIn("[세션 기록 디렉터리](./artifacts/)", document)
+        self.assertIn("- [ ]", document)
+
+
 if __name__ == "__main__":
     unittest.main()

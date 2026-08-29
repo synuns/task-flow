@@ -1,0 +1,17 @@
+{
+  "description": "Export reviewable Codex session evidence for AI_USAGE.md.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/export_session.py\"",
+            "timeout": 30,
+            "statusMessage": "Exporting Codex session record"
+          }
+        ]
+      }
+    ]
+  }
+}
