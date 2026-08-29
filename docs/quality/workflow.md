@@ -120,16 +120,12 @@ cannot prove; a visible profile action alone is not authentication evidence.
 
 ## Prompt Records
 
-Tool stop hooks may create redacted candidates only. Candidates are not
-submission evidence. A person reviews the exact candidate bytes and sensitive
-information, computes their reviewed SHA-256 digest, then supplies that digest
-and both explicit confirmations to the publication command. The publisher
-opens the candidate through a no-follow descriptor, requires a regular file,
-reads it once, and publishes only the bytes matching the digest. Under the
-shared index lock it regenerates the entire managed `AI_USAGE.md` region from
-the post-publication canonical reviewed index, removing stale or malformed
-entries and restoring missing links while excluding unindexed artifacts. AI
-must not invoke that command or mark review complete on a person's behalf. See
+Lifecycle hooks create pending snapshots and metadata only. A person runs
+`npm run ai:review`; the tool selects candidates risk-first, computes and
+records reviewed SHA-256 digest and reviewer, then asks for exact `y`+Enter.
+Other input, EOF, or signal cancels. Publication uses staging and atomic
+rename, then regenerates public index and managed `AI_USAGE.md`; reruns are
+idempotent. AI must not approve or publish on a person's behalf. See
 `verification.md` and `AI_USAGE.md`.
 
 ## Final QA Checklist

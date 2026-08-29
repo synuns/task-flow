@@ -2,6 +2,7 @@ import contextlib
 import importlib.machinery
 import importlib.util
 import io
+import json
 import subprocess
 import sys
 import tempfile
@@ -121,6 +122,11 @@ class VerifyCliTests(unittest.TestCase):
                 "tests/test_export_session.py",
                 "tests/test_render_artifact_index.py",
                 "tests/test_publish_ai_record.py",
+                "tests/test_transcript_adapter.py",
+                "tests/test_session_records.py",
+                "tests/test_review_scanner.py",
+                "tests/test_review_ai_record.py",
+                "tests/test_review_publisher.py",
                 "-v",
             ],
         )
@@ -129,6 +135,13 @@ class VerifyCliTests(unittest.TestCase):
         result = self.run_verify("quick")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("SKIP frontend not scaffolded", result.stdout)
+
+    def test_tooling_only_package_has_review_shortcut(self):
+        verifier = load_verify_module()
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(package["scripts"]["ai:review"], "./scripts/review-ai-record")
+        self.assertFalse(package["kbhc"]["frontendScaffolded"])
+        self.assertEqual(verifier.verify_review_tooling(ROOT), [])
 
     def test_default_is_full(self):
         result = self.run_verify()

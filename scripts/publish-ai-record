@@ -1,298 +1,38 @@
 #!/usr/bin/env python3
 import argparse
-import datetime
-import hashlib
-import hmac
-import importlib.util
-import os
-import re
-import stat
+import json
 import sys
-import tempfile
 from pathlib import Path
 
 
-DEFAULT_ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[1]
+HOOKS = ROOT / ".codex" / "hooks"
+if str(HOOKS) not in sys.path:
+    sys.path.insert(0, str(HOOKS))
 
-
-def load_hook_module(source_root, filename, module_name):
-    hooks = source_root / ".codex" / "hooks"
-    if str(hooks) not in sys.path:
-        sys.path.insert(0, str(hooks))
-    path = hooks / filename
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-def atomic_write(path, content):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary_name = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            "w",
-            encoding="utf-8",
-            dir=str(path.parent),
-            prefix=".reviewed-record-",
-            suffix=".tmp",
-            delete=False,
-        ) as stream:
-            temporary_name = stream.name
-            stream.write(content)
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(temporary_name, path)
-        temporary_name = None
-    finally:
-        if temporary_name:
-            try:
-                Path(temporary_name).unlink()
-            except OSError:
-                pass
-
-
-def reviewed_content(candidate, reviewer, reviewed_sha256):
-    stamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    safe_reviewer = " ".join(reviewer.replace("`", "'").split())
-    lines = candidate.splitlines()
-    metadata = [
-        "",
-        "- Review status: `human-reviewed`",
-        "- Reviewed by: `{}`".format(safe_reviewer),
-        "- Reviewed at: `{}`".format(stamp),
-        "- Reviewed candidate SHA-256: `{}`".format(reviewed_sha256),
-    ]
-    return "\n".join(lines[:1] + metadata + lines[1:]).rstrip() + "\n"
-
-
-def update_usage(document, filenames, indexer):
-    start = "<!-- reviewed-records:start -->"
-    end = "<!-- reviewed-records:end -->"
-    if document.count(start) != 1 or document.count(end) != 1:
-        raise ValueError("AI_USAGE.md requires exactly one reviewed-record marker pair")
-    start_position = document.index(start)
-    end_position = document.index(end)
-    if start_position >= end_position:
-        raise ValueError("AI_USAGE.md reviewed-record markers are out of order")
-    links = []
-    for filename in sorted(set(filenames)):
-        session_id = indexer.session_id_from_artifact_filename(filename)
-        if session_id is None:
-            raise ValueError("invalid reviewed artifact filename")
-        links.append(
-            "- [검토 완료 세션 `{}`](./artifacts/{})".format(
-                session_id,
-                filename,
-            )
-        )
-    managed = start + "\n"
-    if links:
-        managed += "\n".join(links) + "\n"
-    managed += end
-    return document[:start_position] + managed + document[end_position + len(end) :]
-
-
-def read_reviewed_candidate(path, reviewed_sha256):
-    if not re.fullmatch(r"[0-9A-Fa-f]{64}", reviewed_sha256):
-        raise ValueError("reviewed SHA-256 digest must be 64 hexadecimal characters")
-    no_follow = getattr(os, "O_NOFOLLOW", None)
-    if no_follow is None:
-        raise ValueError("no-follow candidate open is unsupported")
-    flags = os.O_RDONLY | no_follow
-    flags |= getattr(os, "O_CLOEXEC", 0)
-    flags |= getattr(os, "O_NONBLOCK", 0)
-    try:
-        descriptor = os.open(path, flags)
-    except FileNotFoundError as error:
-        raise ValueError("pending candidate not found") from error
-    except OSError as error:
-        raise ValueError("pending candidate must be a regular file") from error
-    try:
-        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
-            raise ValueError("pending candidate must be a regular file")
-        with os.fdopen(descriptor, "rb") as stream:
-            descriptor = None
-            candidate_bytes = stream.read()
-    finally:
-        if descriptor is not None:
-            os.close(descriptor)
-    actual_sha256 = hashlib.sha256(candidate_bytes).hexdigest()
-    normalized_sha256 = reviewed_sha256.lower()
-    if not hmac.compare_digest(actual_sha256, normalized_sha256):
-        raise ValueError("reviewed digest mismatch")
-    try:
-        candidate = candidate_bytes.decode("utf-8")
-    except UnicodeDecodeError as error:
-        raise ValueError("pending candidate must be valid UTF-8") from error
-    return candidate, normalized_sha256
-
-
-def restore_artifact(path, previous):
-    if previous is not None:
-        atomic_write(path, previous)
-        return
-    try:
-        path.unlink()
-    except FileNotFoundError:
-        pass
-
-
-def restore_index(path, previous, indexer):
-    if previous is not None:
-        indexer.atomic_write_index(path, previous)
-        return
-    try:
-        path.unlink()
-    except FileNotFoundError:
-        pass
-
-
-def rollback_publication(
-    index_path,
-    previous_index,
-    artifact_path,
-    previous_artifact,
-    indexer,
-    restore_index_required=True,
-    restore_artifact_required=True,
-):
-    failures = []
-    if restore_index_required:
-        try:
-            restore_index(index_path, previous_index, indexer)
-        except (OSError, UnicodeError, ValueError) as error:
-            failures.append("index restore failed: {}".format(error))
-    if restore_artifact_required:
-        try:
-            restore_artifact(artifact_path, previous_artifact)
-        except (OSError, UnicodeError, ValueError) as error:
-            failures.append("artifact restore failed: {}".format(error))
-    if failures:
-        raise ValueError(
-            "rollback incomplete ({}); manual recovery required".format(
-                "; ".join(failures)
-            )
-        )
-
-
-def parse_args(argv=None):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("session_id")
-    parser.add_argument("--repo-root", type=Path, default=DEFAULT_ROOT)
-    parser.add_argument("--reviewed-by", required=True)
-    parser.add_argument("--reviewed-sha256")
-    parser.add_argument("--confirm-sensitive-review", action="store_true")
-    parser.add_argument("--confirm-content-review", action="store_true")
-    return parser.parse_args(argv)
+from review_publisher import journal_status, resume_journal, rollback_journal
 
 
 def main(argv=None):
-    args = parse_args(argv)
-    if not args.confirm_sensitive_review or not args.confirm_content_review:
-        print("both human review confirmations are required", file=sys.stderr)
-        return 2
-    if args.reviewed_sha256 is None:
-        print("reviewed SHA-256 digest is required", file=sys.stderr)
-        return 2
-    if not args.reviewed_by.strip():
-        print("reviewer name is required", file=sys.stderr)
-        return 2
-    root = args.repo_root.resolve()
-    exporter = load_hook_module(
-        DEFAULT_ROOT,
-        "export_session.py",
-        "record_exporter",
-    )
-    indexer = load_hook_module(
-        DEFAULT_ROOT,
-        "render_artifact_index.py",
-        "record_indexer",
-    )
-    session_id = exporter.safe_session_id(args.session_id)
-    if session_id != args.session_id:
-        print("unsafe session id", file=sys.stderr)
-        return 2
-    candidate_path = (
-        root
-        / ".codex"
-        / "review-pending"
-        / exporter.artifact_filename(session_id)
-    )
+    parser = argparse.ArgumentParser()
+    operations = parser.add_mutually_exclusive_group(required=True)
+    operations.add_argument("--status", action="store_true")
+    operations.add_argument("--recover", action="store_true")
+    operations.add_argument("--rollback", action="store_true")
+    parser.add_argument("record_id")
+    parser.add_argument("--repo-root", type=Path, default=ROOT)
+    args = parser.parse_args(argv)
     try:
-        candidate, reviewed_sha256 = read_reviewed_candidate(
-            candidate_path,
-            args.reviewed_sha256,
-        )
-    except (OSError, UnicodeError, ValueError) as error:
-        print("publication failed: {}".format(error), file=sys.stderr)
+        root = args.repo_root.resolve()
+        if args.status:
+            print(json.dumps(journal_status(root, args.record_id), ensure_ascii=False, sort_keys=True))
+            return 0
+        result = resume_journal(root, args.record_id) if args.recover else rollback_journal(root, args.record_id)
+        print(result.status)
+        return 0 if result.status in {"published", "already_published", "cancelled"} else 1
+    except (OSError, UnicodeError, ValueError):
+        print("recovery_failed", file=sys.stderr)
         return 1
-    if exporter.redact(candidate, Path("/__no_home_match__")) != candidate:
-        print("candidate still contains a sensitive pattern", file=sys.stderr)
-        return 1
-    artifacts = root / "artifacts"
-    destination = artifacts / exporter.artifact_filename(session_id)
-    reviewed = reviewed_content(candidate, args.reviewed_by, reviewed_sha256)
-    if exporter.redact(reviewed, Path("/__no_home_match__")) != reviewed:
-        print("reviewed record still contains a sensitive pattern", file=sys.stderr)
-        return 1
-    usage_path = root / "AI_USAGE.md"
-    previous = None
-    try:
-        artifacts.mkdir(parents=True, exist_ok=True)
-        with indexer.index_lock(artifacts / ".index.lock"):
-            usage = usage_path.read_text(encoding="utf-8")
-            index_path = artifacts / "index.md"
-            filenames = indexer.list_published_artifact_names(
-                index_path,
-                artifacts,
-            )
-            previous_index = (
-                index_path.read_text(encoding="utf-8")
-                if index_path.is_file()
-                else None
-            )
-            if destination.is_symlink():
-                raise ValueError("artifact destination must not be a symlink")
-            if destination.exists() and not destination.is_file():
-                raise ValueError("artifact destination must be a regular file")
-            if destination.is_file():
-                previous = destination.read_text(encoding="utf-8")
-            filenames.append(destination.name)
-            filenames = sorted(set(filenames))
-            updated_index = indexer.render_index(filenames)
-            updated_usage = update_usage(usage, filenames, indexer)
-            artifact_written = False
-            index_written = False
-            try:
-                atomic_write(destination, reviewed)
-                artifact_written = True
-                indexer.atomic_write_index(
-                    index_path,
-                    updated_index,
-                )
-                index_written = True
-                atomic_write(usage_path, updated_usage)
-            except (OSError, UnicodeError, ValueError):
-                rollback_publication(
-                    index_path,
-                    previous_index,
-                    destination,
-                    previous,
-                    indexer,
-                    restore_index_required=index_written,
-                    restore_artifact_required=artifact_written,
-                )
-                raise
-    except indexer.IndexLockTimeout:
-        print("artifact index lock timeout", file=sys.stderr)
-        return 1
-    except (OSError, UnicodeError, ValueError) as error:
-        print("publication failed: {}".format(error), file=sys.stderr)
-        return 1
-    print("published reviewed record: {}".format(destination.relative_to(root)))
-    return 0
 
 
 if __name__ == "__main__":

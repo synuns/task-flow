@@ -1,27 +1,51 @@
 {
-  "description": "Prepare redacted Codex session candidates and index reviewed records.",
+  "description": "Maintain review-pending Codex session records across lifecycle events.",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Creating pending session snapshot"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/export_session.py\"",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session_hook.py\"",
             "timeout": 30,
-            "statusMessage": "Preparing redacted Codex session candidate"
+            "statusMessage": "Updating pending session snapshot"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session_hook.py\"",
+            "timeout": 3,
+            "statusMessage": "Updating session record state"
           }
         ]
       }
     ],
     "SessionEnd": [
       {
-        "matcher": "other",
         "hooks": [
           {
             "type": "command",
-            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/render_artifact_index.py\"",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session_hook.py\"",
             "timeout": 3,
-            "statusMessage": "Updating Codex session index"
+            "statusMessage": "Closing pending session record"
           }
         ]
       }

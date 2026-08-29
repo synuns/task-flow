@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set
 
 from artifact_contract import artifact_filename, safe_session_id
+from transcript_adapter import TranscriptError, read_transcript
 
 
 REDACTED = "[REDACTED]"
@@ -114,7 +115,7 @@ def extract_visible_text(content: object, allowed_types: Set[str]) -> str:
     return "\n".join(parts)
 
 
-def parse_rollout(
+def _legacy_parse_rollout(
     path: Path,
     session_id: str,
     fallback_model: str,
@@ -207,6 +208,16 @@ def parse_rollout(
     return session
 
 
+def parse_rollout(
+    path: Path,
+    session_id: str,
+    fallback_model: str,
+    on_warning: Optional[Callable[[str, int], None]] = None,
+) -> SessionData:
+    del on_warning
+    return read_transcript(path, session_id, fallback_model).session
+
+
 def redact(text: str, home: Optional[Path] = None) -> str:
     result = text
     for pattern, replacement in SECRET_PATTERNS:
@@ -278,6 +289,37 @@ def render_markdown(session: SessionData, home: Optional[Path] = None) -> str:
                 ]
             )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def render_prompt_snapshot(record: str, prompt: str, home: Optional[Path] = None) -> str:
+    return "\n".join(
+        [
+            "# Codex Session `{}`".format(redact(record, home)),
+            "",
+            "> Human review required before submission. Automatic redaction is best-effort.",
+            "",
+            "## Provisional turn",
+            "",
+            "### User prompt",
+            "",
+            redact(prompt, home),
+            "",
+        ]
+    )
+
+
+def append_provisional_prompt(markdown: str, turn_id: str, prompt: str, home: Optional[Path] = None) -> str:
+    return markdown.rstrip() + "\n" + "\n".join(
+        [
+            "",
+            "## Provisional turn `{}`".format(redact(turn_id, home)),
+            "",
+            "### User prompt",
+            "",
+            redact(prompt, home),
+            "",
+        ]
+    )
 
 
 def log_event(

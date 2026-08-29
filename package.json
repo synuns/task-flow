@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "ai:review": "./scripts/review-ai-record"
+  },
+  "kbhc": {
+    "frontendScaffolded": false
+  }
+}
