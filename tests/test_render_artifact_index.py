@@ -1,6 +1,10 @@
+import fcntl
 import importlib.util
+import json
+import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -84,6 +88,113 @@ class ArtifactIndexRenderTests(unittest.TestCase):
                     render_artifact_index.atomic_write_index(target, "new\n")
             self.assertEqual(target.read_text(encoding="utf-8"), "old\n")
             self.assertEqual(list(target.parent.glob(".index-*.tmp")), [])
+
+
+class SessionEndCliTests(unittest.TestCase):
+    def payload(self, root, session_id="session-b"):
+        return {
+            "hook_event_name": "SessionEnd",
+            "session_id": session_id,
+            "transcript_path": str(root / "must-not-be-read.jsonl"),
+            "cwd": str(root),
+            "reason": "other",
+        }
+
+    def run_cli(self, root, stdin_text):
+        return subprocess.run(
+            [sys.executable, str(MODULE_PATH), "--repo-root", str(root)],
+            input=stdin_text,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=3,
+        )
+
+    def write_artifact(self, root, session_id):
+        artifacts = root / "artifacts"
+        artifacts.mkdir(parents=True, exist_ok=True)
+        path = artifacts / "codex-session-{}.md".format(session_id)
+        path.write_text("transcript body must not be read\n", encoding="utf-8")
+        return path
+
+    def test_success_rebuilds_sorted_index_without_transcript(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_artifact(root, "session-b")
+            self.write_artifact(root, "session-a")
+            payload = self.payload(root)
+            first = self.run_cli(root, json.dumps(payload))
+            index_path = root / "artifacts" / "index.md"
+            self.assertTrue(index_path.is_file(), "SessionEnd must create index")
+            first_content = index_path.read_text(encoding="utf-8")
+            second = self.run_cli(root, json.dumps(payload))
+            second_content = index_path.read_text(encoding="utf-8")
+        self.assertEqual(first.returncode, 0)
+        self.assertEqual(first.stdout, "")
+        self.assertEqual(first.stderr, "")
+        self.assertEqual(second.returncode, 0)
+        self.assertEqual(first_content, second_content)
+        self.assertLess(
+            first_content.index("codex-session-session-a.md"),
+            first_content.index("codex-session-session-b.md"),
+        )
+
+    def test_invalid_inputs_preserve_existing_index(self):
+        cases = (
+            ("not-json", "invalid_hook_input"),
+            ({"hook_event_name": "Stop"}, "invalid_hook_event"),
+            (
+                {"hook_event_name": "SessionEnd", "session_id": "-bad"},
+                "invalid_session_id",
+            ),
+            ("outside", "cwd_outside_repo"),
+            ("missing", "missing_current_artifact"),
+        )
+        for value, expected_error in cases:
+            with self.subTest(value=value):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    self.write_artifact(root, "session-b")
+                    index_path = root / "artifacts" / "index.md"
+                    index_path.write_text("existing\n", encoding="utf-8")
+                    if value == "not-json":
+                        stdin_text = value
+                    elif value == "outside":
+                        payload = self.payload(root)
+                        payload["cwd"] = str(root.parent)
+                        stdin_text = json.dumps(payload)
+                    elif value == "missing":
+                        stdin_text = json.dumps(
+                            self.payload(root, "session-missing")
+                        )
+                    else:
+                        stdin_text = json.dumps(value)
+                    result = self.run_cli(root, stdin_text)
+                    preserved = index_path.read_text(encoding="utf-8")
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stderr, expected_error + "\n")
+                self.assertEqual(preserved, "existing\n")
+
+    def test_lock_timeout_preserves_existing_index(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_artifact(root, "session-b")
+            index_path = root / "artifacts" / "index.md"
+            index_path.write_text("existing\n", encoding="utf-8")
+            lock_path = root / "artifacts" / ".index.lock"
+            with lock_path.open("a+") as lock_stream:
+                fcntl.flock(
+                    lock_stream.fileno(),
+                    fcntl.LOCK_EX | fcntl.LOCK_NB,
+                )
+                started = time.monotonic()
+                result = self.run_cli(root, json.dumps(self.payload(root)))
+                elapsed = time.monotonic() - started
+            preserved = index_path.read_text(encoding="utf-8")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stderr, "lock_timeout\n")
+        self.assertLess(elapsed, 2.5)
+        self.assertEqual(preserved, "existing\n")
 
 
 if __name__ == "__main__":
