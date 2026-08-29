@@ -514,4 +514,12 @@ class RecordStore:
             metadata = self.read_metadata(record)
             if not hmac.compare_digest(metadata.get("artifact_sha256", ""), expected_sha256):
                 raise RecordError("snapshot_digest_mismatch")
-            return self._rewrite_state(current, "published", "Publish")
+            return self.mark_published_locked(current, record, expected_sha256)
+
+    def mark_published_locked(self, current, record, expected_sha256):
+        if current is None or current.record_id != record or current.state != "closed":
+            raise RecordError("record_not_closed")
+        metadata = self.read_metadata(record)
+        if not hmac.compare_digest(metadata.get("artifact_sha256", ""), expected_sha256):
+            raise RecordError("snapshot_digest_mismatch")
+        return self._rewrite_state(current, "published", "Publish")
