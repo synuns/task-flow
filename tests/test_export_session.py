@@ -124,5 +124,82 @@ class RedactionAndRenderTests(unittest.TestCase):
         self.assertTrue(block.endswith("\n````"))
 
 
+class HookCliTests(unittest.TestCase):
+    def run_cli(self, repo_root, stdin_text):
+        return subprocess.run(
+            [sys.executable, str(MODULE_PATH), "--repo-root", str(repo_root)],
+            input=stdin_text,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+    def payload(self, repo_root):
+        return {
+            "hook_event_name": "Stop",
+            "session_id": "session-123",
+            "transcript_path": str(FIXTURE),
+            "cwd": str(repo_root),
+            "model": "gpt-5.6-sol",
+            "turn_id": "turn-2",
+        }
+
+    def test_success_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first_result = self.run_cli(root, json.dumps(self.payload(root)))
+            artifact = root / "artifacts" / "codex-session-session-123.md"
+            first = artifact.read_text(encoding="utf-8")
+            second_result = self.run_cli(root, json.dumps(self.payload(root)))
+            second = artifact.read_text(encoding="utf-8")
+        self.assertEqual(first_result.returncode, 0)
+        self.assertEqual(json.loads(first_result.stdout), {"continue": True})
+        self.assertEqual(json.loads(second_result.stdout), {"continue": True})
+        self.assertEqual(first, second)
+        self.assertEqual(first.count("## Turn 1"), 1)
+
+    def test_missing_transcript_preserves_previous_artifact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artifact_path = root / "artifacts" / "codex-session-session-123.md"
+            artifact_path.parent.mkdir()
+            artifact_path.write_text("existing\n", encoding="utf-8")
+            payload = self.payload(root)
+            payload["transcript_path"] = str(root / "secret-name.jsonl")
+            result = self.run_cli(root, json.dumps(payload))
+            artifact = artifact_path.read_text(encoding="utf-8")
+            log = (root / ".codex" / "hooks" / "export-session.log").read_text(
+                encoding="utf-8"
+            )
+        self.assertEqual(json.loads(result.stdout), {"continue": True})
+        self.assertEqual(artifact, "existing\n")
+        self.assertIn("missing_transcript", log)
+        self.assertNotIn("secret-name.jsonl", log)
+
+    def test_invalid_stdin_and_unsafe_session_write_nothing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            invalid = self.run_cli(root, "not-json")
+            payload = self.payload(root)
+            payload["session_id"] = "..."
+            unsafe = self.run_cli(root, json.dumps(payload))
+            artifact_directory = root / "artifacts"
+        self.assertEqual(json.loads(invalid.stdout), {"continue": True})
+        self.assertEqual(json.loads(unsafe.stdout), {"continue": True})
+        self.assertFalse(artifact_directory.exists())
+
+    def test_cwd_outside_repo_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            payload = self.payload(root)
+            payload["cwd"] = str(root.parent)
+            result = self.run_cli(root, json.dumps(payload))
+            log = (root / ".codex" / "hooks" / "export-session.log").read_text(
+                encoding="utf-8"
+            )
+        self.assertEqual(json.loads(result.stdout), {"continue": True})
+        self.assertIn("cwd_outside_repo", log)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
+import argparse
+import datetime
 import json
+import os
 import re
+import sys
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set
@@ -245,3 +250,129 @@ def render_markdown(session: SessionData, home: Optional[Path] = None) -> str:
                 ]
             )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def log_event(
+    repo_root: Path,
+    event: str,
+    session_id: str = "unknown",
+    line: int = 0,
+) -> None:
+    path = repo_root / ".codex" / "hooks" / "export-session.log"
+    stamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(
+                "{} event={} session={} line={}\n".format(
+                    stamp,
+                    event,
+                    safe_session_id(session_id) or "unknown",
+                    line,
+                )
+            )
+    except OSError:
+        pass
+
+
+def atomic_write(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_name = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=str(path.parent),
+            prefix=".codex-session-",
+            suffix=".tmp",
+            delete=False,
+        ) as stream:
+            temporary_name = stream.name
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary_name, path)
+        temporary_name = None
+    finally:
+        if temporary_name:
+            try:
+                Path(temporary_name).unlink()
+            except OSError:
+                pass
+
+
+def cwd_is_inside_repo(cwd: object, repo_root: Path) -> bool:
+    if not isinstance(cwd, str) or not cwd:
+        return False
+    try:
+        root = str(repo_root.resolve())
+        return os.path.commonpath([str(Path(cwd).resolve()), root]) == root
+    except (OSError, ValueError):
+        return False
+
+
+def run_hook(hook_input: object, repo_root: Path) -> None:
+    if not isinstance(hook_input, dict):
+        log_event(repo_root, "invalid_hook_input")
+        return
+    if hook_input.get("hook_event_name") != "Stop":
+        return
+    session_id = safe_session_id(hook_input.get("session_id"))
+    if session_id is None:
+        log_event(repo_root, "invalid_session_id")
+        return
+    if not cwd_is_inside_repo(hook_input.get("cwd"), repo_root):
+        log_event(repo_root, "cwd_outside_repo", session_id)
+        return
+    raw_path = hook_input.get("transcript_path")
+    if not isinstance(raw_path, str) or not raw_path:
+        log_event(repo_root, "missing_transcript", session_id)
+        return
+    transcript = Path(raw_path).expanduser()
+    try:
+        transcript_exists = transcript.is_file()
+    except OSError:
+        transcript_exists = False
+    if not transcript_exists:
+        log_event(repo_root, "missing_transcript", session_id)
+        return
+    model = hook_input.get("model")
+    try:
+        session = parse_rollout(
+            transcript,
+            session_id,
+            model if isinstance(model, str) and model else "unknown",
+            lambda event, line: log_event(repo_root, event, session_id, line),
+        )
+        destination = repo_root / "artifacts" / "codex-session-{}.md".format(
+            session_id
+        )
+        atomic_write(destination, render_markdown(session))
+    except (OSError, UnicodeError, ValueError, TypeError):
+        log_event(repo_root, "export_failed", session_id)
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=Path(__file__).resolve().parents[2],
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None) -> int:
+    args = parse_args(argv)
+    try:
+        hook_input = json.load(sys.stdin)
+    except (json.JSONDecodeError, UnicodeError, TypeError):
+        hook_input = None
+    run_hook(hook_input, args.repo_root.resolve())
+    json.dump({"continue": True}, sys.stdout)
+    sys.stdout.write("\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
