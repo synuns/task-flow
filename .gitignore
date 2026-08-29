@@ -12,3 +12,8 @@ artifacts/.index-*.tmp
 /artifacts/.reviewed-record-*.tmp
 __pycache__/
 *.pyc
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/

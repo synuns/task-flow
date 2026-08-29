@@ -6,7 +6,7 @@
 
 **Architecture:** Vite의 단일 browser entry만 만들고 제품 route, provider, component, FSD layer는 만들지 않는다. 품질 도구, local font, OpenAPI type 생성, MSW worker, browser smoke는 기술 경계별로 격리한다. 후속 FSD 설계가 layer와 shadcn alias를 결정할 수 있도록 `@/*` alias 하나만 제공하고 `components.json`은 만들지 않는다.
 
-**Tech Stack:** React 19.2.8, TypeScript 7.0.2, Vite 8.2.2, pnpm 10.15.1, Tailwind CSS 4.3.3, Biome 2.5.11, Vitest 4.1.11, Testing Library, Playwright 1.62.1, openapi-typescript 7.13.0, MSW 2.15.0, shadcn CLI 4.19.0, Pretendard 1.3.9
+**Tech Stack:** React 19.2.8, TypeScript 5.9.3, Vite 8.2.2, pnpm 10.15.1, Tailwind CSS 4.3.3, Biome 2.5.11, Vitest 4.1.11, Testing Library, Playwright 1.62.1, openapi-typescript 7.13.0, MSW 2.15.0, shadcn CLI 4.19.0, Pretendard 1.3.9
 
 ## Global Constraints
 
@@ -209,7 +209,7 @@ Replace `package.json` with:
     "openapi-typescript": "7.13.0",
     "shadcn": "4.19.0",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2",
+    "typescript": "5.9.3",
     "vite": "8.2.2",
     "vitest": "4.1.11"
   },
@@ -272,7 +272,7 @@ Create `biome.json`:
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
     }
   },
   "javascript": {

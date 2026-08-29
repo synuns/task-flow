@@ -52,7 +52,7 @@ class VerifyCliTests(unittest.TestCase):
             "## 전체 프롬프트와 작업 기록",
             "<!-- reviewed-records:start -->",
             "<!-- reviewed-records:end -->",
-            "--reviewed-sha256",
+            "npm run ai:review",
             "legacy/pre-policy",
         )
         self.assertEqual(
@@ -131,23 +131,34 @@ class VerifyCliTests(unittest.TestCase):
             ],
         )
 
-    def test_quick_skips_frontend_before_scaffolding(self):
+    def test_quick_runs_frontend_after_scaffolding(self):
         result = self.run_verify("quick")
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("SKIP frontend not scaffolded", result.stdout)
+        combined = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 0, combined)
+        self.assertNotIn("SKIP frontend not scaffolded", result.stdout)
+        for stage in ("format:check", "lint", "typecheck", "test"):
+            with self.subTest(stage=stage):
+                self.assertIn("PASS {}".format(stage), result.stdout)
 
-    def test_tooling_only_package_has_review_shortcut(self):
+    def test_frontend_scaffold_activates_required_scripts(self):
         verifier = load_verify_module()
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(package["scripts"]["ai:review"], "./scripts/review-ai-record")
-        self.assertFalse(package["kbhc"]["frontendScaffolded"])
+        self.assertTrue(package["kbhc"]["frontendScaffolded"])
+        self.assertEqual(
+            set(verifier.REQUIRED_PACKAGE_SCRIPTS) - set(package["scripts"]),
+            set(),
+        )
         self.assertEqual(verifier.verify_review_tooling(ROOT), [])
 
-    def test_default_is_full(self):
+    def test_default_runs_full_frontend_verification(self):
         result = self.run_verify()
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        combined = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 0, combined)
         self.assertIn("PASS setup", result.stdout)
-        self.assertIn("SKIP frontend not scaffolded", result.stdout)
+        self.assertIn("PASS build", result.stdout)
+        self.assertIn("PASS test:e2e:core", result.stdout)
+        self.assertNotIn("SKIP frontend not scaffolded", result.stdout)
 
     def test_unknown_mode_fails(self):
         result = self.run_verify("unknown")
