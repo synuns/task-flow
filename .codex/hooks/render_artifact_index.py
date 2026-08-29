@@ -2,6 +2,8 @@
 import argparse
 import datetime
 import fcntl
+import hashlib
+import hmac
 import json
 import os
 import re
@@ -13,7 +15,9 @@ from pathlib import Path
 from typing import Iterator, List
 
 from artifact_contract import (
+    artifact_filename,
     safe_session_id,
+    split_record_id,
     session_id_from_artifact_filename,
 )
 
@@ -54,6 +58,53 @@ def render_index(filenames: List[str]) -> str:
             "- [Codex 세션 `{}`](./{})".format(session_id, filename)
         )
     return "\n".join(lines).rstrip() + "\n"
+
+
+PENDING_INDEX_HEADER = "# Codex 검토 대기 세션 기록 인덱스"
+PENDING_INDEX_NOTICE = "> UserPromptSubmit/Stop Hook이 자동 생성합니다. 게시 전 사람 검토가 필요합니다."
+
+
+def render_pending_index(filenames: List[str]) -> str:
+    lines = [PENDING_INDEX_HEADER, "", PENDING_INDEX_NOTICE, ""]
+    for filename in sorted(set(filenames)):
+        record = session_id_from_artifact_filename(filename)
+        if record is None:
+            raise ValueError("invalid_artifact_filename")
+        lines.append("- [Codex 세션 `{}`](./{})".format(record, filename))
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def list_pending_artifact_names(pending_dir: Path) -> List[str]:
+    names = []
+    for metadata_path in sorted(pending_dir.glob("codex-session-*.json")):
+        if metadata_path.is_symlink() or not metadata_path.is_file():
+            continue
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            record = metadata.get("record_id")
+            if metadata.get("schema_version") != 1 or split_record_id(record) is None:
+                continue
+            if metadata.get("state") not in {"pending", "closed"}:
+                continue
+            markdown = pending_dir / artifact_filename(record)
+            if markdown.is_symlink() or not markdown.is_file():
+                continue
+            digest = hashlib.sha256(markdown.read_bytes()).hexdigest()
+            if not hmac.compare_digest(digest, metadata.get("artifact_sha256", "")):
+                continue
+            names.append(markdown.name)
+        except (OSError, UnicodeError, ValueError, json.JSONDecodeError):
+            continue
+    return sorted(set(names))
+
+
+def rebuild_pending_index(pending_dir: Path) -> None:
+    pending_dir.mkdir(parents=True, exist_ok=True)
+    with index_lock(pending_dir / ".index.lock"):
+        atomic_write_index(
+            pending_dir / "index.md",
+            render_pending_index(list_pending_artifact_names(pending_dir)),
+        )
 
 
 def list_published_artifact_names(
@@ -100,6 +151,11 @@ def atomic_write_index(path: Path, content: str) -> None:
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary_name, path)
+        directory_fd = os.open(str(path.parent), os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
         temporary_name = None
     finally:
         if temporary_name:

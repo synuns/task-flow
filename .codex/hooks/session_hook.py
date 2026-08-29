@@ -11,6 +11,7 @@ from artifact_contract import safe_session_id
 from export_session import append_provisional_prompt, redact, render_markdown, render_prompt_snapshot
 from session_records import RecordError, RecordStore, write_event
 from transcript_adapter import PARSER_VERSION, TranscriptError, read_transcript
+from render_artifact_index import rebuild_pending_index
 
 
 @dataclass(frozen=True)
@@ -81,6 +82,11 @@ def handle_hook(hook_input, repo_root):
             store.session_start(session_id, hook_input.get("source"))
         else:
             store.session_end(session_id)
+        if event in {"UserPromptSubmit", "Stop"}:
+            try:
+                rebuild_pending_index(store.pending)
+            except (OSError, UnicodeError, ValueError):
+                return HookOutcome("error", "index_update_failed", turn_id)
         return HookOutcome("ok", None, turn_id)
     except RecordError as error:
         status = "stale" if error.code.startswith("stale") else "error"

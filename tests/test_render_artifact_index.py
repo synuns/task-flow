@@ -1,5 +1,6 @@
 import fcntl
 import importlib.util
+import hashlib
 import json
 import subprocess
 import sys
@@ -269,6 +270,27 @@ class ProjectArtifactIndexTests(unittest.TestCase):
         self.assertTrue(index_path.is_file(), "tracked artifact index must exist")
         actual = index_path.read_text(encoding="utf-8")
         self.assertEqual(actual, expected)
+
+
+class PendingIndexTests(unittest.TestCase):
+    def test_pending_index_selects_only_valid_pending_and_closed_records(self):
+        with tempfile.TemporaryDirectory() as directory:
+            pending = Path(directory)
+
+            def add(record, state, body, digest=None):
+                raw = body.encode("utf-8")
+                (pending / ("codex-session-{}.md".format(record))).write_bytes(raw)
+                metadata = {"schema_version": 1, "record_id": record, "state": state, "artifact_sha256": digest or hashlib.sha256(raw).hexdigest()}
+                (pending / ("codex-session-{}.json".format(record))).write_text(json.dumps(metadata) + "\n", encoding="utf-8")
+
+            add("session-1.s0001", "pending", "one\n")
+            add("session-1.s0002", "closed", "two\n")
+            add("session-1.s0003", "published", "three\n")
+            add("session-1.s0004", "pending", "four\n", "0" * 64)
+            self.assertEqual(
+                render_artifact_index.list_pending_artifact_names(pending),
+                ["codex-session-session-1.s0001.md", "codex-session-session-1.s0002.md"],
+            )
 
 
 if __name__ == "__main__":
