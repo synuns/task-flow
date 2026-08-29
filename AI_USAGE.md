@@ -47,4 +47,9 @@ Stop 훅은 구조적으로 내부 지침과 reasoning을 제외하고, 메모�
 게시된 기록만 추가합니다. 게시 명령과 SessionEnd 훅은 파일명을 기준으로
 인덱스만 갱신하며 세션 Markdown 본문을 다시 해석하지 않습니다.
 
+### 검토 완료 기록
+
+<!-- reviewed-records:start -->
+<!-- reviewed-records:end -->
+
 - [전체 프롬프트와 작업 기록](./artifacts/index.md)

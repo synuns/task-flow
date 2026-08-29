@@ -62,9 +62,38 @@ def reviewed_content(candidate, reviewer):
     return "\n".join(lines[:1] + metadata + lines[1:]).rstrip() + "\n"
 
 
+def update_usage(document, session_id):
+    start = "<!-- reviewed-records:start -->"
+    end = "<!-- reviewed-records:end -->"
+    if document.count(start) != 1 or document.count(end) != 1:
+        raise ValueError("AI_USAGE.md requires exactly one reviewed-record marker pair")
+    start_position = document.index(start)
+    end_position = document.index(end)
+    if start_position >= end_position:
+        raise ValueError("AI_USAGE.md reviewed-record markers are out of order")
+    link = (
+        "- [검토 완료 세션 `{0}`]"
+        "(./artifacts/codex-session-{0}.md)".format(session_id)
+    )
+    managed = document[start_position + len(start) : end_position]
+    if link in managed:
+        return document
+    return document[:end_position] + link + "\n" + document[end_position:]
+
+
 def restore_artifact(path, previous):
     if previous is not None:
         atomic_write(path, previous)
+        return
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def restore_index(path, previous, indexer):
+    if previous is not None:
+        indexer.atomic_write_index(path, previous)
         return
     try:
         path.unlink()
@@ -124,13 +153,26 @@ def main(argv=None):
     if exporter.redact(reviewed, Path("/__no_home_match__")) != reviewed:
         print("reviewed record still contains a sensitive pattern", file=sys.stderr)
         return 1
+    usage_path = root / "AI_USAGE.md"
+    try:
+        usage = usage_path.read_text(encoding="utf-8")
+        updated_usage = update_usage(usage, session_id)
+    except (OSError, UnicodeError, ValueError) as error:
+        print("publication failed: {}".format(error), file=sys.stderr)
+        return 1
     previous = None
     try:
         artifacts.mkdir(parents=True, exist_ok=True)
         with indexer.index_lock(artifacts / ".index.lock"):
+            index_path = artifacts / "index.md"
             filenames = indexer.list_published_artifact_names(
-                artifacts / "index.md",
+                index_path,
                 artifacts,
+            )
+            previous_index = (
+                index_path.read_text(encoding="utf-8")
+                if index_path.is_file()
+                else None
             )
             if destination.is_symlink():
                 raise ValueError("artifact destination must not be a symlink")
@@ -138,15 +180,23 @@ def main(argv=None):
                 raise ValueError("artifact destination must be a regular file")
             if destination.is_file():
                 previous = destination.read_text(encoding="utf-8")
-            atomic_write(destination, reviewed)
+            artifact_written = False
+            index_written = False
             try:
+                atomic_write(destination, reviewed)
+                artifact_written = True
                 filenames.append(destination.name)
                 indexer.atomic_write_index(
-                    artifacts / "index.md",
+                    index_path,
                     indexer.render_index(filenames),
                 )
+                index_written = True
+                atomic_write(usage_path, updated_usage)
             except (OSError, UnicodeError, ValueError):
-                restore_artifact(destination, previous)
+                if index_written:
+                    restore_index(index_path, previous_index, indexer)
+                if artifact_written:
+                    restore_artifact(destination, previous)
                 raise
     except indexer.IndexLockTimeout:
         print("artifact index lock timeout", file=sys.stderr)

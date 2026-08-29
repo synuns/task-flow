@@ -7,6 +7,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLISH = ROOT / "scripts" / "publish-ai-record"
+START = "<!-- reviewed-records:start -->"
+END = "<!-- reviewed-records:end -->"
 
 
 class PublishAiRecordTests(unittest.TestCase):
@@ -21,7 +23,15 @@ class PublishAiRecordTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.usage = self.root / "AI_USAGE.md"
-        self.usage.write_text("AI_USAGE must stay unchanged\n", encoding="utf-8")
+        self.usage_initial = (
+            "# AI 사용 내역\n\n"
+            + START
+            + "\n"
+            + END
+            + "\n\n"
+            + "- [전체 프롬프트와 작업 기록](./artifacts/index.md)\n"
+        )
+        self.usage.write_text(self.usage_initial, encoding="utf-8")
 
     def tearDown(self):
         self.root.chmod(0o700)
@@ -92,10 +102,7 @@ class PublishAiRecordTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("sensitive pattern", result.stderr)
         self.assertFalse((self.root / "artifacts").exists())
-        self.assertEqual(
-            self.usage.read_text(encoding="utf-8"),
-            "AI_USAGE must stay unchanged\n",
-        )
+        self.assertEqual(self.usage.read_text(encoding="utf-8"), self.usage_initial)
 
     def test_reviewed_candidate_is_published_and_linked(self):
         result = self.run_publish(
@@ -107,9 +114,9 @@ class PublishAiRecordTests(unittest.TestCase):
         self.assertIn("Review status: `human-reviewed`", artifact.read_text())
         self.assertIn("Reviewed by: `Human Reviewer`", artifact.read_text())
         self.assertIn("./codex-session-session-123.md", index)
-        self.assertEqual(
+        self.assertIn(
+            "./artifacts/codex-session-session-123.md",
             self.usage.read_text(encoding="utf-8"),
-            "AI_USAGE must stay unchanged\n",
         )
 
     def test_republication_does_not_duplicate_link(self):
@@ -118,6 +125,12 @@ class PublishAiRecordTests(unittest.TestCase):
         self.assertEqual(self.run_publish(*flags).returncode, 0)
         index = (self.root / "artifacts" / "index.md").read_text(encoding="utf-8")
         self.assertEqual(index.count("./codex-session-session-123.md"), 1)
+        self.assertEqual(
+            self.usage.read_text(encoding="utf-8").count(
+                "./artifacts/codex-session-session-123.md"
+            ),
+            1,
+        )
 
     def test_matching_unpublished_file_is_not_added_to_index(self):
         artifacts = self.root / "artifacts"
@@ -168,10 +181,62 @@ class PublishAiRecordTests(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(artifact.read_text(encoding="utf-8"), previous)
-        self.assertEqual(
-            self.usage.read_text(encoding="utf-8"),
-            "AI_USAGE must stay unchanged\n",
+        self.assertEqual(self.usage.read_text(encoding="utf-8"), self.usage_initial)
+
+    def test_managed_markers_must_be_one_ordered_pair(self):
+        invalid_documents = {
+            "missing-start": END + "\n",
+            "missing-end": START + "\n",
+            "duplicate-start": START + "\n" + START + "\n" + END + "\n",
+            "duplicate-end": START + "\n" + END + "\n" + END + "\n",
+            "reversed": END + "\n" + START + "\n",
+        }
+        for name, document in invalid_documents.items():
+            with self.subTest(name=name):
+                self.usage.write_text(document, encoding="utf-8")
+                result = self.run_publish(
+                    "--confirm-sensitive-review", "--confirm-content-review"
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse((self.root / "artifacts").exists())
+                self.assertEqual(self.usage.read_text(encoding="utf-8"), document)
+
+    @unittest.skipIf(os.geteuid() == 0, "root bypasses directory write permissions")
+    def test_usage_write_failure_restores_previous_artifact_and_index(self):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir()
+        artifact = artifacts / "codex-session-session-123.md"
+        artifact.write_text("# Previously reviewed\n", encoding="utf-8")
+        usage_before = self.usage.read_text(encoding="utf-8")
+        self.root.chmod(0o555)
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
         )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(
+            artifact.read_text(encoding="utf-8"),
+            "# Previously reviewed\n",
+        )
+        self.assertFalse((artifacts / "index.md").exists())
+        self.assertEqual(self.usage.read_text(encoding="utf-8"), usage_before)
+
+    @unittest.skipIf(os.geteuid() == 0, "root bypasses directory write permissions")
+    def test_usage_write_failure_removes_new_artifact_index_and_link(self):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir()
+        usage_before = self.usage.read_text(encoding="utf-8")
+        self.root.chmod(0o555)
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((artifacts / "codex-session-session-123.md").exists())
+        self.assertFalse((artifacts / "index.md").exists())
+        self.assertEqual(self.usage.read_text(encoding="utf-8"), usage_before)
 
     def test_existing_symlink_destination_is_rejected(self):
         artifacts = self.root / "artifacts"

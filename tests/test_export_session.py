@@ -372,8 +372,8 @@ class ProjectWiringTests(unittest.TestCase):
             document,
         )
         self.assertNotIn("[세션 기록 디렉터리](./artifacts/)", document)
-        self.assertNotIn("<!-- reviewed-records:start -->", document)
-        self.assertNotIn("<!-- reviewed-records:end -->", document)
+        self.assertEqual(document.count("<!-- reviewed-records:start -->"), 1)
+        self.assertEqual(document.count("<!-- reviewed-records:end -->"), 1)
         self.assertIn("- [ ]", document)
 
 
