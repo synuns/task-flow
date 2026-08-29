@@ -167,6 +167,34 @@ class SessionEndCliTests(unittest.TestCase):
             first_content.index("codex-session-session-b.md"),
         )
 
+    def test_clear_does_not_export_from_legacy_index_cli(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            payload = self.payload(root, "clear-session")
+            payload["reason"] = "clear"
+            payload["transcript_path"] = str(
+                ROOT / "tests" / "fixtures" / "codex-rollout.jsonl"
+            )
+
+            result = self.run_cli(root, json.dumps(payload))
+            candidate = (
+                root
+                / ".codex"
+                / "review-pending"
+                / "codex-session-clear-session.md"
+            )
+            pending_index = (
+                root / ".codex" / "review-pending" / "index.md"
+            )
+            reviewed_index = root / "artifacts" / "index.md"
+
+            self.assertFalse(candidate.exists())
+            self.assertFalse(pending_index.exists())
+            reviewed_content = reviewed_index.read_text(encoding="utf-8")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("codex-session-clear-session.md", reviewed_content)
+
     def test_current_pending_session_is_not_required(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

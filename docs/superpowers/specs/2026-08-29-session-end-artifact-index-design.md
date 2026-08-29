@@ -13,6 +13,8 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 포함:
 
 - 기존 `Stop` Hook 기반 비추적 pending 세션 Markdown 생성 유지.
+- `SessionEnd`에서 flush된 transcript 기반 pending 후보 최종 갱신.
+- `.codex/review-pending/index.md` 자동 재생성.
 - 사람 검토와 명시적 게시 command 유지.
 - 프로젝트 로컬 `SessionEnd` command Hook 추가.
 - 세션 artifact 파일명 규약 고정.
@@ -24,7 +26,6 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 
 제외:
 
-- `SessionEnd`에서 transcript 내용 읽기.
 - 세션 기록에 대한 의미 추출 또는 요약.
 - 모델이나 네트워크 호출.
 - `AI_USAGE.md`의 작업 범위, 핵심 프롬프트 요약, 사람 검증 내역 자동 수정.
@@ -38,7 +39,7 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 - 메인 스레드가 종료될 때만 실행되며 subagent에는 실행되지 않는다.
 - 동기 실행되며 `async` 설정으로 백그라운드화할 수 없다.
 - 기본 timeout은 1초이고 설정 가능한 최대 timeout은 3초다.
-- Hook 실행 중 transcript를 읽을 수 있지만, 이 기능에서는 사용하지 않는다.
+- Hook 실행 전 transcript가 flush되므로 종료 시 최종 후보 생성에 사용한다.
 - 출력은 Codex 동작을 계속시키거나 세션을 열린 상태로 유지하지 못한다.
 
 따라서 Hook은 로컬 디렉터리 조회와 작은 Markdown 렌더링만 수행하고
@@ -50,7 +51,7 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 
 기존 `.codex/hooks/export_session.py`를 사용하여 현재 transcript를
 `.codex/review-pending/codex-session-<session-id>.md`로 원자적 갱신한다.
-pending 디렉터리는 Git에서 제외하며 인덱스를 수정하지 않는다.
+pending 디렉터리는 Git에서 제외한다.
 
 ### `publish-ai-record` command
 
@@ -65,11 +66,17 @@ pending 디렉터리는 Git에서 제외하며 인덱스를 수정하지 않는�
 
 ### `SessionEnd` Hook
 
-새 `.codex/hooks/render_artifact_index.py` command를 실행한다. 이 command는
-Hook JSON을 검증한 뒤 artifact 디렉터리의 허용된 게시 파일명만 조회하여
-기존 index의 게시 ledger를 전체 재렌더링한다. 종료 중인 현재 세션은 아직
-pending 상태일 수 있으므로 대응하는 게시 artifact 존재를 요구하지 않는다.
-index에 없는 파일은 이름이 규약과 일치해도 게시 완료로 추정하지 않는다.
+`.codex/hooks/render_artifact_index.py` command를 matcher 없이 실행하여
+`clear`를 포함한 모든 종료 reason을 받는다. command는 exporter를 호출해
+flush된 transcript 기반 후보를 최종 갱신하고, 허용된 pending 파일명으로
+`.codex/review-pending/index.md`를 전체 재렌더링한다. 이어서 기존 공개
+index의 게시 ledger를 검증·정리한다. 공개 index에 없는 파일은 이름이
+규약과 일치해도 게시 완료로 추정하지 않는다.
+
+### `.codex/review-pending/index.md`
+
+검토 대기 후보의 자동 생성 index다. pending 후보와 함께 Git에서 제외된다.
+이 index의 존재는 사람 검토나 게시 완료를 뜻하지 않는다.
 
 ### `artifacts/index.md`
 
@@ -174,6 +181,8 @@ artifacts/codex-session-<session-id>.md
 메인 세션 종료
   -> SessionEnd Hook JSON을 stdin으로 전달
   -> hook_event_name, session_id, cwd 검증
+  -> flush된 transcript를 구조 필터링·마스킹하여 pending 후보 최종 교체
+  -> pending index 잠금, 파일명 조회, 원자적 재렌더링
   -> artifacts/.index.lock 배타 잠금 획득
   -> 기존 index의 canonical 게시 링크 검증
   -> 존재하는 허용 artifact 파일명만 유지
@@ -189,6 +198,7 @@ artifacts/codex-session-<session-id>.md
 Stop Hook
   -> 구조 필터링과 마스킹
   -> .codex/review-pending/ 후보 저장
+  -> SessionEnd에서 후보와 pending index 최종 갱신
   -> 사람 검토와 명시적 publish command
   -> artifacts/.index.lock 배타 잠금 획득
   -> AI_USAGE.md managed 영역 재읽기와 링크 렌더링
@@ -222,7 +232,8 @@ event 이름, 정제된 session ID만 포함하며 transcript 내용이나 전�
   인덱스 원자성 테스트.
 - 생성: `artifacts/index.md` — 추적되는 자동 생성 인덱스.
 - 수정: `.codex/hooks.json` — `SessionEnd` command 등록.
-- 수정: `.codex/hooks/export_session.py` — artifact 이름 문법 통일.
+- 수정: `.codex/hooks/export_session.py` — artifact 이름 문법 통일,
+  SessionEnd 지원, redaction audit 오탐 방지.
 - 수정: `tests/test_export_session.py` — 이름 문법과 두 Hook 구성 검증.
 - 수정: `AI_USAGE.md` — 자동 생성 인덱스 정적 링크와 자동 검증 절 추가.
 - 수정: `.gitignore` — 잠금, 임시 파일, indexer 로그 제외.
@@ -241,6 +252,8 @@ event 이름, 정제된 session ID만 포함하며 transcript 내용이나 전�
 CLI 및 통합 테스트:
 
 - 유효한 `SessionEnd` 입력으로 인덱스 최초 생성.
+- `reason: clear`에서 최종 pending 후보와 pending index 생성.
+- pending 후보가 공개 reviewed index에 자동 유입되지 않음.
 - 여러 artifact를 포함한 전체 인덱스 재생성.
 - 현재 세션이 pending 상태여도 기존 게시 artifact만으로 인덱스 생성.
 - index에 없는 matching artifact가 자동 추가되지 않음.
@@ -265,7 +278,8 @@ CLI 및 통합 테스트:
   `AI_USAGE.md`의 managed 검토 완료 영역을 갱신한다. `SessionEnd`는
   `AI_USAGE.md`를 수정하지 않는다.
 - 이름이 맞는 미검토·미등록 파일은 SessionEnd가 index에 추가하지 않는다.
-- 인덱스는 artifact 파일명만 사용하며 transcript 본문을 읽지 않는다.
+- pending 후보 생성만 transcript를 읽으며 두 index 렌더러는 artifact 파일명만
+  사용한다.
 - 동시 `SessionEnd` 실행이 인덱스를 손상시키거나 링크를 잃지 않는다.
 - 실패 시 이전 유효 인덱스가 보존된다.
 - `SessionEnd` 실행은 3초 제한 안에서 끝난다.

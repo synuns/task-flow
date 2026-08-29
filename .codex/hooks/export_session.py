@@ -385,7 +385,7 @@ def run_hook(hook_input: object, repo_root: Path) -> None:
     if not isinstance(hook_input, dict):
         log_event(repo_root, "invalid_hook_input")
         return
-    if hook_input.get("hook_event_name") != "Stop":
+    if hook_input.get("hook_event_name") not in {"Stop", "SessionEnd"}:
         return
     session_id = safe_session_id(hook_input.get("session_id"))
     if session_id is None:
@@ -415,7 +415,7 @@ def run_hook(hook_input: object, repo_root: Path) -> None:
             lambda event, line: log_event(repo_root, event, session_id, line),
         )
         rendered = render_markdown(session)
-        if redact(rendered, Path("/__no_home_match__")) != rendered:
+        if redact(rendered, Path("/")) != rendered:
             log_event(repo_root, "sensitive_candidate", session_id)
             return
         destination = (

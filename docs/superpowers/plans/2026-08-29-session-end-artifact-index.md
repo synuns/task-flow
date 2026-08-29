@@ -1,5 +1,11 @@
 # SessionEnd Artifact Index Implementation Plan
 
+> **후속 보완:** `/clear`가 `matcher: other`에 매칭되지 않는 문제가 확인되어
+> 현재 구현은 matcher 없이 모든 SessionEnd reason을 받고, flush된 transcript로
+> pending 후보와 `.codex/review-pending/index.md`를 최종 갱신한다. 공개
+> `artifacts/index.md`의 사람 검토 게이트는 유지한다. 현재 계약은 설계 문서를
+> 기준으로 한다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 메인 Codex 세션 종료 시 transcript 본문을 읽지 않고 안전한 세션 artifact 파일만 찾아 `artifacts/index.md`를 동시성 안전하게 재생성한다.
