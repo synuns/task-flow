@@ -19,6 +19,7 @@ HIGH-risk human decision.
 
 ## Required Reading
 
+- [기술 스택](docs/tech-stack.md)
 - `docs/quality/requirements.md`
 - `docs/quality/workflow.md`
 - `docs/quality/verification.md`
