@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 import stat
 import subprocess
 import sys
@@ -19,7 +20,14 @@ REQUIRED_FILES = (
     ".codex/hooks/artifact_contract.py",
     ".codex/hooks/export_session.py",
     ".codex/hooks/render_artifact_index.py",
+    ".codex/hooks/transcript_adapter.py",
+    ".codex/hooks/session_records.py",
+    ".codex/hooks/session_hook.py",
+    ".codex/hooks/review_scanner.py",
+    ".codex/hooks/review_publisher.py",
     "scripts/publish-ai-record",
+    "scripts/review-ai-record",
+    "package.json",
     "artifacts/index.md",
     "AI_USAGE.md",
 )
@@ -207,12 +215,19 @@ def verify_setup():
         session_end_command = hook_command("SessionEnd")
     except Exception as error:
         return fail("setup", "validation error: {}".format(error), "./scripts/verify setup")
-    if ".codex/hooks/export_session.py" not in stop_command:
+    if ".codex/hooks/session_hook.py" not in stop_command:
         return fail("setup", "Stop hook exporter missing", "./scripts/verify setup")
-    if ".codex/hooks/render_artifact_index.py" not in session_end_command:
+    if ".codex/hooks/session_hook.py" not in session_end_command:
         return fail(
             "setup",
-            "SessionEnd hook index renderer missing",
+            "SessionEnd hook dispatcher missing",
+            "./scripts/verify setup",
+        )
+    tooling_errors = verify_review_tooling(ROOT)
+    if tooling_errors:
+        return fail(
+            "setup",
+            "review tooling invalid: {}".format(", ".join(tooling_errors)),
             "./scripts/verify setup",
         )
     print("PASS setup")
@@ -226,12 +241,17 @@ def verify_setup():
             "tests/test_export_session.py",
             "tests/test_render_artifact_index.py",
             "tests/test_publish_ai_record.py",
+            "tests/test_transcript_adapter.py",
+            "tests/test_session_records.py",
+            "tests/test_review_scanner.py",
+            "tests/test_review_ai_record.py",
+            "tests/test_review_publisher.py",
             "-v",
         ],
     )
 
 
-def package_scripts():
+def package_document():
     package_path = ROOT / "package.json"
     if not package_path.is_file():
         return None
@@ -241,7 +261,49 @@ def package_scripts():
     scripts = package.get("scripts")
     if not isinstance(scripts, dict):
         raise ValueError("package.json scripts must be an object")
-    return scripts
+    kbhc = package.get("kbhc")
+    if not isinstance(kbhc, dict) or not isinstance(kbhc.get("frontendScaffolded"), bool):
+        raise ValueError("package.json kbhc.frontendScaffolded must be boolean")
+    return package
+
+
+def package_scripts():
+    package = package_document()
+    return None if package is None else package["scripts"]
+
+
+def verify_journal_consistency(root=ROOT):
+    publications = root / ".codex" / "review-pending" / "publications"
+    if not publications.exists():
+        return []
+    errors = []
+    for path in sorted(publications.glob("*.json")):
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+            if value.get("schema_version") != 1 or value.get("state") not in {"prepared", "committing", "rolling_back", "cancelled", "complete"}:
+                errors.append("invalid_journal:{}".format(path.name))
+            if not isinstance(value.get("transaction_key"), str) or not re.fullmatch(r"[^:]+:[0-9a-f]{64}", value["transaction_key"]):
+                errors.append("invalid_journal:{}".format(path.name))
+        except (OSError, UnicodeError, ValueError, json.JSONDecodeError):
+            errors.append("invalid_journal:{}".format(path.name))
+    return sorted(set(errors))
+
+
+def verify_review_tooling(root=ROOT):
+    try:
+        package = json.loads((root / "package.json").read_text(encoding="utf-8"))
+        if package.get("scripts", {}).get("ai:review") != "./scripts/review-ai-record":
+            return ["ai_review_script_mismatch"]
+        if not isinstance(package.get("kbhc", {}).get("frontendScaffolded"), bool):
+            return ["frontend_scaffold_marker_invalid"]
+        executable = root / "scripts" / "review-ai-record"
+        if not executable.is_file() or not os.access(str(executable), os.X_OK):
+            return ["review_executable_missing"]
+    except FileNotFoundError:
+        return []
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError):
+        return ["review_package_invalid"]
+    return verify_journal_consistency(root)
 
 
 def require_frontend_scripts(scripts):
@@ -257,16 +319,20 @@ def require_frontend_scripts(scripts):
 
 def verify_frontend(mode):
     try:
-        scripts = package_scripts()
+        package = package_document()
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as error:
         return fail(
             "frontend-scripts",
             "package.json is unreadable or invalid: {}".format(error),
             "python3 -m json.tool package.json",
         )
-    if scripts is None:
+    if package is None:
         print("SKIP frontend not scaffolded")
         return 0
+    if not package["kbhc"]["frontendScaffolded"]:
+        print("SKIP frontend not scaffolded")
+        return 0
+    scripts = package["scripts"]
     required = require_frontend_scripts(scripts)
     if required:
         return required

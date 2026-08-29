@@ -3,6 +3,8 @@
 .superpowers/
 .codex/hooks/export-session.log
 .codex/hooks/artifact-index.log
+.codex/hooks/session-record-events/
+.codex/hooks/.*.tmp
 artifacts/.codex-session-*.tmp
 artifacts/.index.lock
 artifacts/.index-*.tmp

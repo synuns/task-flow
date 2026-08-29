@@ -485,17 +485,14 @@ class ProjectWiringTests(unittest.TestCase):
             (ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8")
         )
         handler = config["hooks"]["Stop"][0]["hooks"][0]
-        self.assertEqual(
-            config["description"],
-            "Prepare redacted Codex session candidates and index reviewed records.",
-        )
+        self.assertEqual(config["description"], "Maintain review-pending Codex session records across lifecycle events.")
         self.assertEqual(handler["type"], "command")
         self.assertIn("git rev-parse --show-toplevel", handler["command"])
-        self.assertIn(".codex/hooks/export_session.py", handler["command"])
+        self.assertIn(".codex/hooks/session_hook.py", handler["command"])
         self.assertEqual(handler["timeout"], 30)
         self.assertEqual(
             handler["statusMessage"],
-            "Preparing redacted Codex session candidate",
+            "Updating pending session snapshot",
         )
 
     def test_session_end_hook(self):
@@ -505,11 +502,22 @@ class ProjectWiringTests(unittest.TestCase):
         self.assertIn("SessionEnd", config["hooks"])
         group = config["hooks"]["SessionEnd"][0]
         handler = group["hooks"][0]
-        self.assertEqual(group["matcher"], "other")
+        self.assertNotIn("matcher", group)
         self.assertEqual(handler["type"], "command")
         self.assertIn("git rev-parse --show-toplevel", handler["command"])
-        self.assertIn(".codex/hooks/render_artifact_index.py", handler["command"])
+        self.assertIn(".codex/hooks/session_hook.py", handler["command"])
         self.assertEqual(handler["timeout"], 3)
+
+    def test_all_lifecycle_hooks_use_common_dispatcher(self):
+        config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+        expected_timeouts = {"UserPromptSubmit": 5, "Stop": 30, "SessionStart": 3, "SessionEnd": 3}
+        for event, timeout in expected_timeouts.items():
+            with self.subTest(event=event):
+                group = config["hooks"][event][0]
+                handler = group["hooks"][0]
+                self.assertIn(".codex/hooks/session_hook.py", handler["command"])
+                self.assertEqual(handler["timeout"], timeout)
+        self.assertEqual(config["hooks"]["SessionStart"][0]["matcher"], "startup|resume|clear|compact")
 
     def test_ai_usage_required_sections(self):
         document = (ROOT / "AI_USAGE.md").read_text(encoding="utf-8")
