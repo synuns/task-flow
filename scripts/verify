@@ -54,9 +54,10 @@ REQUIRED_MARKERS = {
         "## 적용한 작업 범위",
         "## 핵심 프롬프트 요약",
         "## 사람이 최종 검증한 내용",
-        "## 자동 검증 내역",
         "## 전체 프롬프트와 작업 기록",
-        "./artifacts/index.md",
+        "<!-- reviewed-records:start -->",
+        "<!-- reviewed-records:end -->",
+        "legacy/pre-policy",
     ),
 }
 REQUIRED_PACKAGE_SCRIPTS = (

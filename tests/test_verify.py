@@ -33,11 +33,79 @@ class VerifyCliTests(unittest.TestCase):
             check=False,
         )
 
-    def test_setup_validates_workflow_and_hook(self):
+    def test_setup_covers_review_before_publish_contract(self):
         result = self.run_verify("setup")
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("PASS setup", result.stdout)
-        self.assertIn("PASS hook-tests", result.stdout)
+        combined = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 0, combined)
+        self.assertIn("PASS setup", combined)
+        self.assertIn("PASS hook-tests", combined)
+        self.assertNotIn("FAIL", combined)
+
+    def test_setup_rejects_missing_reviewed_and_legacy_markers(self):
+        verifier = load_verify_module()
+        required_markers = (
+            "## 사용한 도구와 모델",
+            "## 적용한 작업 범위",
+            "## 핵심 프롬프트 요약",
+            "## 사람이 최종 검증한 내용",
+            "## 전체 프롬프트와 작업 기록",
+            "<!-- reviewed-records:start -->",
+            "<!-- reviewed-records:end -->",
+            "legacy/pre-policy",
+        )
+        self.assertEqual(
+            verifier.REQUIRED_MARKERS["AI_USAGE.md"], required_markers
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            temporary_root = Path(directory)
+            usage_path = temporary_root / "AI_USAGE.md"
+            for marker in (
+                "<!-- reviewed-records:start -->",
+                "<!-- reviewed-records:end -->",
+                "legacy/pre-policy",
+            ):
+                with self.subTest(marker=marker):
+                    usage_path.write_text(
+                        "\n".join(required_markers).replace(
+                            marker, "missing-marker", 1
+                        ),
+                        encoding="utf-8",
+                    )
+                    errors = io.StringIO()
+                    with contextlib.redirect_stderr(errors):
+                        with mock.patch.multiple(
+                            verifier,
+                            ROOT=temporary_root,
+                            REQUIRED_FILES=("AI_USAGE.md",),
+                            REQUIRED_MARKERS={"AI_USAGE.md": required_markers},
+                        ):
+                            result = verifier.verify_setup()
+                    self.assertEqual(result, 1, errors.getvalue())
+                    self.assertIn("FAIL setup", errors.getvalue())
+
+    def test_setup_requires_publisher(self):
+        verifier = load_verify_module()
+        self.assertIn("scripts/publish-ai-record", verifier.REQUIRED_FILES)
+
+    def test_setup_runs_pipeline_suites_without_verify_recursion(self):
+        verifier = load_verify_module()
+        with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+            result = verifier.verify_setup()
+
+        self.assertEqual(result, 0)
+        run_stage.assert_called_once_with(
+            "hook-tests",
+            [
+                sys.executable,
+                "-m",
+                "unittest",
+                "tests/test_export_session.py",
+                "tests/test_render_artifact_index.py",
+                "tests/test_publish_ai_record.py",
+                "-v",
+            ],
+        )
 
     def test_quick_skips_frontend_before_scaffolding(self):
         result = self.run_verify("quick")

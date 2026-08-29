@@ -17,7 +17,8 @@ verification fail.
 
 - `setup`: required files, document markers and links, risk/approval rules,
   journey categories, review/final-QA sections, pending-record ignore rule,
-  Stop hook wiring, AI disclosure headings, and exporter unit tests.
+  Stop/SessionEnd hook wiring, AI disclosure headings, and exporter, index, and
+  publisher unit tests.
 - `quick`: `setup`, then `format:check`, `lint`, `typecheck`, and `test` after
   frontend scaffolding.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
