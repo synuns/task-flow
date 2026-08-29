@@ -1,3 +1,4 @@
+import os
 import subprocess
 import tempfile
 import unittest
@@ -24,6 +25,9 @@ class PublishAiRecordTests(unittest.TestCase):
 
     def tearDown(self):
         self.root.chmod(0o700)
+        artifacts = self.root / "artifacts"
+        if artifacts.exists():
+            artifacts.chmod(0o700)
         self.temporary.cleanup()
 
     def run_publish(self, *extra, reviewer="Human Reviewer"):
@@ -127,8 +131,28 @@ class PublishAiRecordTests(unittest.TestCase):
 
         index = (artifacts / "index.md").read_text(encoding="utf-8")
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(unreviewed.read_text(encoding="utf-8"), "unreviewed\n")
         self.assertIn("codex-session-session-123.md", index)
         self.assertNotIn("codex-session-unreviewed.md", index)
+
+    @unittest.skipIf(os.geteuid() == 0, "root bypasses directory write permissions")
+    def test_artifact_write_failure_preserves_existing_files(self):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir()
+        artifact = artifacts / "codex-session-session-123.md"
+        previous = "# Previously reviewed\n"
+        artifact.write_text(previous, encoding="utf-8")
+        (artifacts / ".index.lock").touch()
+        usage_before = self.usage.read_text(encoding="utf-8")
+        artifacts.chmod(0o555)
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(artifact.read_text(encoding="utf-8"), previous)
+        self.assertEqual(self.usage.read_text(encoding="utf-8"), usage_before)
 
     def test_index_write_failure_preserves_previous_reviewed_artifact(self):
         artifacts = self.root / "artifacts"
