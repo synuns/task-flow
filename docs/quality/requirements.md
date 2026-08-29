@@ -15,6 +15,8 @@ Allowed statuses: `NOT_STARTED`, `IN_PROGRESS`, `AI_VERIFIED`,
 AI may set every status except `HUMAN_APPROVED`. Evidence must name a command,
 browser record, or review finding. Text claiming a result without reproducible
 evidence does not satisfy a checklist row.
+Core-journey acceptance, HIGH-risk decisions, exceptions, and final acceptance
+are reserved for human owners.
 
 ## Requirement Checklist
 
