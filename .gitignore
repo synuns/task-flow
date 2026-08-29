@@ -1,4 +1,5 @@
 .worktrees/
+.codex/review-pending/
 .superpowers/
 .codex/hooks/export-session.log
 .codex/hooks/artifact-index.log

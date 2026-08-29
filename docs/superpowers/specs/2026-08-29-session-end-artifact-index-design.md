@@ -11,7 +11,8 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 
 포함:
 
-- 기존 `Stop` Hook 기반 세션 Markdown 생성 유지.
+- 기존 `Stop` Hook 기반 비추적 pending 세션 Markdown 생성 유지.
+- 사람 검토와 명시적 게시 command 유지.
 - 프로젝트 로컬 `SessionEnd` command Hook 추가.
 - 세션 artifact 파일명 규약 고정.
 - artifact 파일명만으로 `artifacts/index.md` 전체 재렌더링.
@@ -46,14 +47,23 @@ Codex 메인 세션이 종료될 때 생성된 세션 기록의 링크를
 ### `Stop` Hook
 
 기존 `.codex/hooks/export_session.py`를 사용하여 현재 transcript를
-`artifacts/codex-session-<session-id>.md`로 원자적 갱신한다. 인덱스를
-수정하지 않는다.
+`.codex/review-pending/codex-session-<session-id>.md`로 원자적 갱신한다.
+pending 디렉터리는 Git에서 제외하며 인덱스를 수정하지 않는다.
+
+### `publish-ai-record` command
+
+사람이 pending 후보의 내용과 민감정보를 확인한 뒤 명시적 확인 flag와 함께
+실행한다. 검토 metadata를 추가한 기록을
+`artifacts/codex-session-<session-id>.md`로 게시하고 같은 index 잠금 안에서
+`artifacts/index.md`를 갱신한다. 게시 또는 인덱스 갱신 실패 시 기존 게시
+기록을 복구한다. `AI_USAGE.md`는 수정하지 않는다.
 
 ### `SessionEnd` Hook
 
 새 `.codex/hooks/render_artifact_index.py` command를 실행한다. 이 command는
-Hook JSON을 검증하고 현재 세션 artifact의 존재를 확인한 뒤 artifact
-디렉터리의 허용된 파일명만 조회하여 인덱스를 전체 재생성한다.
+Hook JSON을 검증한 뒤 artifact 디렉터리의 허용된 게시 파일명만 조회하여
+인덱스를 전체 재생성한다. 종료 중인 현재 세션은 아직 pending 상태일 수
+있으므로 대응하는 게시 artifact 존재를 요구하지 않는다.
 
 ### `artifacts/index.md`
 
@@ -66,7 +76,7 @@ Hook JSON을 검증하고 현재 세션 artifact의 존재를 확인한 뒤 arti
 ```markdown
 # Codex 세션 기록 인덱스
 
-> SessionEnd Hook이 자동 생성합니다. 직접 수정하지 마세요.
+> 게시 명령과 SessionEnd Hook이 자동 생성합니다. 직접 수정하지 마세요.
 
 - [Codex 세션 `<session-id>`](./codex-session-<session-id>.md)
 ```
@@ -118,8 +128,9 @@ artifacts/codex-session-<session-id>.md
 - `index.md`, `.gitkeep`, 임시 파일, 유사 접두사 파일은 제외한다.
 - 파일명 기준 오름차순으로 정렬한다.
 - 파일명 하나당 링크 하나만 렌더링한다.
-- Hook 입력의 정제된 `session_id`에 대응하는 현재 artifact가 반드시 있어야
-  한다. 없으면 기존 인덱스를 변경하지 않는다.
+- pending 디렉터리 파일은 조회하지 않는다.
+- Hook 입력의 현재 `session_id`와 무관하게 이미 게시된 artifact 전체를
+  인덱싱한다.
 
 기존 `safe_session_id`도 같은 문법을 사용하도록 맞춰 exporter와 indexer가
 동일한 파일명 계약을 공유한다.
@@ -148,9 +159,8 @@ artifacts/codex-session-<session-id>.md
 메인 세션 종료
   -> SessionEnd Hook JSON을 stdin으로 전달
   -> hook_event_name, session_id, cwd 검증
-  -> 정제된 session_id의 현재 artifact 존재 확인
   -> artifacts/.index.lock 배타 잠금 획득
-  -> 허용된 artifact 파일명만 조회
+  -> 허용된 게시 artifact 파일명만 조회
   -> 파일명 오름차순으로 index Markdown 렌더링
   -> 임시 파일 쓰기, fsync, os.replace
   -> 잠금 해제
@@ -159,13 +169,21 @@ artifacts/codex-session-<session-id>.md
 
 인덱서는 transcript 경로나 각 Markdown 본문을 열지 않는다.
 
+```text
+Stop Hook
+  -> 구조 필터링과 마스킹
+  -> .codex/review-pending/ 후보 저장
+  -> 사람 검토와 명시적 publish command
+  -> artifacts/.index.lock 배타 잠금 획득
+  -> 검토 완료 artifact 게시와 index 갱신
+```
+
 ## 실패 처리
 
 - 유효하지 않은 stdin JSON: 인덱스 미변경, 안전한 오류 로그, exit `1`.
 - `hook_event_name`이 `SessionEnd`가 아님: 인덱스 미변경, exit `1`.
 - 안전하지 않은 `session_id`: 인덱스 미변경, exit `1`.
 - Hook `cwd`가 저장소 밖임: 인덱스 미변경, exit `1`.
-- 현재 세션 artifact 누락: 인덱스 미변경, exit `1`.
 - 잠금 획득 timeout: 인덱스 미변경, exit `1`.
 - 디렉터리 조회 또는 쓰기 실패: 기존 인덱스 보존, exit `1`.
 - 성공: stdout과 stderr를 비우고 exit `0`.
@@ -180,6 +198,10 @@ event 이름, 정제된 session ID만 포함하며 transcript 내용이나 전�
 - 생성: `.codex/hooks/render_artifact_index.py` — 입력 검증, 잠금, artifact
   선택, 인덱스 렌더링, 원자적 저장, CLI.
 - 생성: `tests/test_render_artifact_index.py` — 렌더러 단위 및 CLI 테스트.
+- 수정: `scripts/publish-ai-record` — 검토 기록 게시와 같은 잠금 안의 인덱스
+  갱신, 실패 복구.
+- 생성: `tests/test_publish_ai_record.py` — 사람 확인, 민감정보 차단, 게시와
+  인덱스 원자성 테스트.
 - 생성: `artifacts/index.md` — 추적되는 자동 생성 인덱스.
 - 수정: `.codex/hooks.json` — `SessionEnd` command 등록.
 - 수정: `.codex/hooks/export_session.py` — artifact 이름 문법 통일.
@@ -202,7 +224,7 @@ CLI 및 통합 테스트:
 
 - 유효한 `SessionEnd` 입력으로 인덱스 최초 생성.
 - 여러 artifact를 포함한 전체 인덱스 재생성.
-- 현재 세션 artifact 누락 시 기존 인덱스 보존.
+- 현재 세션이 pending 상태여도 기존 게시 artifact만으로 인덱스 생성.
 - 잘못된 JSON, event, session ID, 저장소 밖 cwd 거부.
 - 다른 프로세스가 잠금을 가진 동안 1초 안에 실패하고 기존 인덱스 보존.
 - 쓰기 실패 시 기존 인덱스와 임시 파일 정리 확인.
@@ -215,8 +237,11 @@ CLI 및 통합 테스트:
 
 ## 완료 조건
 
-- 정상적인 메인 세션 종료 후 현재 세션을 포함한 모든 허용 artifact 링크가
+- 정상적인 메인 세션 종료 후 모든 게시 완료 artifact 링크가
   `artifacts/index.md`에 정확히 한 번씩 존재한다.
+- Stop Hook은 pending 후보만 만들고 사람 확인 전 추적 artifact를 만들지 않는다.
+- 게시 command는 검토 완료 artifact와 index를 함께 갱신하며 AI_USAGE를
+  수정하지 않는다.
 - 인덱스는 artifact 파일명만 사용하며 transcript 본문을 읽지 않는다.
 - 동시 `SessionEnd` 실행이 인덱스를 손상시키거나 링크를 잃지 않는다.
 - 실패 시 이전 유효 인덱스가 보존된다.

@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+import argparse
+import datetime
+import importlib.util
+import os
+import sys
+import tempfile
+from pathlib import Path
+
+
+DEFAULT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_hook_module(source_root, filename, module_name):
+    hooks = source_root / ".codex" / "hooks"
+    if str(hooks) not in sys.path:
+        sys.path.insert(0, str(hooks))
+    path = hooks / filename
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def atomic_write(path, content):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_name = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=str(path.parent),
+            prefix=".reviewed-record-",
+            suffix=".tmp",
+            delete=False,
+        ) as stream:
+            temporary_name = stream.name
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary_name, path)
+        temporary_name = None
+    finally:
+        if temporary_name:
+            try:
+                Path(temporary_name).unlink()
+            except OSError:
+                pass
+
+
+def reviewed_content(candidate, reviewer):
+    stamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    safe_reviewer = " ".join(reviewer.replace("`", "'").split())
+    lines = candidate.splitlines()
+    metadata = [
+        "",
+        "- Review status: `human-reviewed`",
+        "- Reviewed by: `{}`".format(safe_reviewer),
+        "- Reviewed at: `{}`".format(stamp),
+    ]
+    return "\n".join(lines[:1] + metadata + lines[1:]).rstrip() + "\n"
+
+
+def restore_artifact(path, previous):
+    if previous is not None:
+        atomic_write(path, previous)
+        return
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("session_id")
+    parser.add_argument("--repo-root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--reviewed-by", required=True)
+    parser.add_argument("--confirm-sensitive-review", action="store_true")
+    parser.add_argument("--confirm-content-review", action="store_true")
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    if not args.confirm_sensitive_review or not args.confirm_content_review:
+        print("both human review confirmations are required", file=sys.stderr)
+        return 2
+    if not args.reviewed_by.strip():
+        print("reviewer name is required", file=sys.stderr)
+        return 2
+    root = args.repo_root.resolve()
+    exporter = load_hook_module(
+        DEFAULT_ROOT,
+        "export_session.py",
+        "record_exporter",
+    )
+    indexer = load_hook_module(
+        DEFAULT_ROOT,
+        "render_artifact_index.py",
+        "record_indexer",
+    )
+    session_id = exporter.safe_session_id(args.session_id)
+    if session_id != args.session_id:
+        print("unsafe session id", file=sys.stderr)
+        return 2
+    candidate_path = (
+        root
+        / ".codex"
+        / "review-pending"
+        / exporter.artifact_filename(session_id)
+    )
+    if not candidate_path.is_file():
+        print("pending candidate not found", file=sys.stderr)
+        return 1
+    candidate = candidate_path.read_text(encoding="utf-8")
+    if exporter.redact(candidate, Path("/__no_home_match__")) != candidate:
+        print("candidate still contains a sensitive pattern", file=sys.stderr)
+        return 1
+    artifacts = root / "artifacts"
+    destination = artifacts / exporter.artifact_filename(session_id)
+    reviewed = reviewed_content(candidate, args.reviewed_by)
+    previous = None
+    try:
+        artifacts.mkdir(parents=True, exist_ok=True)
+        with indexer.index_lock(artifacts / ".index.lock"):
+            if destination.is_symlink():
+                raise ValueError("artifact destination must not be a symlink")
+            if destination.exists() and not destination.is_file():
+                raise ValueError("artifact destination must be a regular file")
+            if destination.is_file():
+                previous = destination.read_text(encoding="utf-8")
+            atomic_write(destination, reviewed)
+            try:
+                filenames = indexer.list_artifact_names(artifacts)
+                indexer.atomic_write_index(
+                    artifacts / "index.md",
+                    indexer.render_index(filenames),
+                )
+            except (OSError, UnicodeError, ValueError):
+                restore_artifact(destination, previous)
+                raise
+    except indexer.IndexLockTimeout:
+        print("artifact index lock timeout", file=sys.stderr)
+        return 1
+    except (OSError, UnicodeError, ValueError) as error:
+        print("publication failed: {}".format(error), file=sys.stderr)
+        return 1
+    print("published reviewed record: {}".format(destination.relative_to(root)))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

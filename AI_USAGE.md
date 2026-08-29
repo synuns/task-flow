@@ -17,7 +17,7 @@
 - Codex Stop Hook으로 사용자 프롬프트, 도구 작업, 최종 응답 기록
 - SessionEnd Hook으로 세션 기록 인덱스 자동 생성
 - 시스템·개발자 지침과 내부 reasoning 제외
-- 비밀정보 자동 마스킹 후 사람 검토
+- 비밀정보 자동 마스킹, 비추적 후보 생성, 사람 검토 후 명시적 게시
 
 ## 사람이 최종 검증한 내용
 
@@ -32,8 +32,19 @@
 
 ## 전체 프롬프트와 작업 기록
 
-- [전체 프롬프트와 작업 기록](./artifacts/index.md)
+Stop 훅은 구조적으로 내부 지침과 reasoning을 제외하고, 메모리에서
+민감정보를 마스킹한 뒤 Git 비추적 pending 후보만 생성합니다. 사람이
+후보의 내용과 민감정보를 모두 검토한 후 다음 명령으로 게시합니다.
 
-세션 문서는 `artifacts/codex-session-<session-id>.md` 형식으로 생성합니다.
-`artifacts/index.md`는 SessionEnd Hook이 세션 종료 시 자동 갱신합니다.
-자동 마스킹은 보조 수단이므로 제출 전 사람 검토가 필요합니다.
+```bash
+./scripts/publish-ai-record <session-id> \
+  --reviewed-by "<reviewer>" \
+  --confirm-sensitive-review \
+  --confirm-content-review
+```
+
+자동 마스킹은 사람 검토를 대체하지 않습니다. `artifacts/`에는 검토 후
+게시된 기록만 추가합니다. 게시 명령과 SessionEnd 훅은 파일명을 기준으로
+인덱스만 갱신하며 세션 Markdown 본문을 다시 해석하지 않습니다.
+
+- [전체 프롬프트와 작업 기록](./artifacts/index.md)

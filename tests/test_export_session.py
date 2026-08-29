@@ -151,31 +151,40 @@ class HookCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             first_result = self.run_cli(root, json.dumps(self.payload(root)))
-            artifact = root / "artifacts" / "codex-session-session-123.md"
-            first = artifact.read_text(encoding="utf-8")
+            candidate = (
+                root
+                / ".codex"
+                / "review-pending"
+                / "codex-session-session-123.md"
+            )
+            first = candidate.read_text(encoding="utf-8")
             second_result = self.run_cli(root, json.dumps(self.payload(root)))
-            second = artifact.read_text(encoding="utf-8")
+            second = candidate.read_text(encoding="utf-8")
+            artifacts_exist = (root / "artifacts").exists()
         self.assertEqual(first_result.returncode, 0)
         self.assertEqual(json.loads(first_result.stdout), {"continue": True})
         self.assertEqual(json.loads(second_result.stdout), {"continue": True})
         self.assertEqual(first, second)
         self.assertEqual(first.count("## Turn 1"), 1)
+        self.assertFalse(artifacts_exist)
 
-    def test_missing_transcript_preserves_previous_artifact(self):
+    def test_missing_transcript_preserves_previous_candidate(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            artifact_path = root / "artifacts" / "codex-session-session-123.md"
-            artifact_path.parent.mkdir()
-            artifact_path.write_text("existing\n", encoding="utf-8")
+            candidate_path = (
+                root / ".codex" / "review-pending" / "codex-session-session-123.md"
+            )
+            candidate_path.parent.mkdir(parents=True)
+            candidate_path.write_text("existing\n", encoding="utf-8")
             payload = self.payload(root)
             payload["transcript_path"] = str(root / "secret-name.jsonl")
             result = self.run_cli(root, json.dumps(payload))
-            artifact = artifact_path.read_text(encoding="utf-8")
+            candidate = candidate_path.read_text(encoding="utf-8")
             log = (root / ".codex" / "hooks" / "export-session.log").read_text(
                 encoding="utf-8"
             )
         self.assertEqual(json.loads(result.stdout), {"continue": True})
-        self.assertEqual(artifact, "existing\n")
+        self.assertEqual(candidate, "existing\n")
         self.assertIn("missing_transcript", log)
         self.assertNotIn("secret-name.jsonl", log)
 
@@ -205,15 +214,31 @@ class HookCliTests(unittest.TestCase):
 
 
 class ProjectWiringTests(unittest.TestCase):
+    def test_pending_records_are_ignored(self):
+        result = subprocess.run(
+            ["git", "check-ignore", "-q", ".codex/review-pending/probe.md"],
+            cwd=str(ROOT),
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0)
+
     def test_stop_hook(self):
         config = json.loads(
             (ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8")
         )
         handler = config["hooks"]["Stop"][0]["hooks"][0]
+        self.assertEqual(
+            config["description"],
+            "Prepare redacted Codex session candidates and index reviewed records.",
+        )
         self.assertEqual(handler["type"], "command")
         self.assertIn("git rev-parse --show-toplevel", handler["command"])
         self.assertIn(".codex/hooks/export_session.py", handler["command"])
         self.assertEqual(handler["timeout"], 30)
+        self.assertEqual(
+            handler["statusMessage"],
+            "Preparing redacted Codex session candidate",
+        )
 
     def test_session_end_hook(self):
         config = json.loads(
@@ -244,6 +269,8 @@ class ProjectWiringTests(unittest.TestCase):
             document,
         )
         self.assertNotIn("[세션 기록 디렉터리](./artifacts/)", document)
+        self.assertNotIn("<!-- reviewed-records:start -->", document)
+        self.assertNotIn("<!-- reviewed-records:end -->", document)
         self.assertIn("- [ ]", document)
 
 

@@ -364,7 +364,8 @@ tool stop event
   -> human reviews candidate
   -> explicit publish command confirms review
   -> atomically write tracked artifacts record
-  -> link reviewed record from AI_USAGE.md
+  -> rebuild artifacts/index.md from reviewed records
+  -> AI_USAGE.md keeps one static link to artifacts/index.md
 ```
 
 Rules:
@@ -378,8 +379,9 @@ Rules:
 - Existing tracked records created under the earlier policy are labeled
   `legacy/pre-policy` until separately reviewed; automation never marks them
   reviewed.
-- `AI_USAGE.md` links only reviewed records and retains factual, unchecked
-  human-verification items until a person completes them.
+- `AI_USAGE.md` links the reviewed-record index and retains factual, unchecked
+  human-verification items until a person completes them. Publication automation
+  never rewrites `AI_USAGE.md`.
 
 The existing Codex `Stop` hook becomes the first adapter. Other AI tools are
 allowed when their adapter or manual process produces the same reviewed record

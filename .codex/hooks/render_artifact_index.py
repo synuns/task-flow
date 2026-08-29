@@ -12,14 +12,15 @@ from pathlib import Path
 from typing import Iterator, List
 
 from artifact_contract import (
-    artifact_filename,
     safe_session_id,
     session_id_from_artifact_filename,
 )
 
 
 INDEX_HEADER = "# Codex 세션 기록 인덱스"
-INDEX_NOTICE = "> SessionEnd Hook이 자동 생성합니다. 직접 수정하지 마세요."
+INDEX_NOTICE = (
+    "> 게시 명령과 SessionEnd Hook이 자동 생성합니다. 직접 수정하지 마세요."
+)
 LOCK_TIMEOUT_SECONDS = 1.0
 LOCK_RETRY_SECONDS = 0.05
 
@@ -145,17 +146,11 @@ def run_hook(hook_input: object, repo_root: Path) -> int:
         return fail(repo_root, "cwd_outside_repo", session_id)
 
     artifacts_dir = repo_root / "artifacts"
-    if not artifacts_dir.is_dir():
-        return fail(repo_root, "missing_current_artifact", session_id)
 
     try:
+        artifacts_dir.mkdir(parents=True, exist_ok=True)
         with index_lock(artifacts_dir / ".index.lock"):
-            expected = artifacts_dir / artifact_filename(session_id)
-            if expected.is_symlink() or not expected.is_file():
-                return fail(repo_root, "missing_current_artifact", session_id)
             filenames = list_artifact_names(artifacts_dir)
-            if expected.name not in filenames:
-                return fail(repo_root, "missing_current_artifact", session_id)
             atomic_write_index(
                 artifacts_dir / "index.md",
                 render_index(filenames),

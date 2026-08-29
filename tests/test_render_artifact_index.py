@@ -139,6 +139,19 @@ class SessionEndCliTests(unittest.TestCase):
             first_content.index("codex-session-session-b.md"),
         )
 
+    def test_current_pending_session_is_not_required(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.write_artifact(root, "reviewed-session")
+            result = self.run_cli(
+                root,
+                json.dumps(self.payload(root, "pending-session")),
+            )
+            index = (root / "artifacts" / "index.md").read_text(encoding="utf-8")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("codex-session-reviewed-session.md", index)
+        self.assertNotIn("codex-session-pending-session.md", index)
+
     def test_invalid_inputs_preserve_existing_index(self):
         cases = (
             ("not-json", "invalid_hook_input"),
@@ -148,7 +161,6 @@ class SessionEndCliTests(unittest.TestCase):
                 "invalid_session_id",
             ),
             ("outside", "cwd_outside_repo"),
-            ("missing", "missing_current_artifact"),
         )
         for value, expected_error in cases:
             with self.subTest(value=value):
@@ -163,10 +175,6 @@ class SessionEndCliTests(unittest.TestCase):
                         payload = self.payload(root)
                         payload["cwd"] = str(root.parent)
                         stdin_text = json.dumps(payload)
-                    elif value == "missing":
-                        stdin_text = json.dumps(
-                            self.payload(root, "session-missing")
-                        )
                     else:
                         stdin_text = json.dumps(value)
                     result = self.run_cli(root, stdin_text)
