@@ -19,6 +19,9 @@ HIGH-risk human decision.
 
 ## Required Reading
 
+- [프로젝트 상위 기획](docs/project-plan.md)
+- `TODO.md`
+- [코딩 규약](docs/coding-standards.md)
 - [기술 스택](docs/tech-stack.md)
 - `docs/quality/requirements.md`
 - `docs/quality/workflow.md`
@@ -31,6 +34,11 @@ Select requirement IDs → implement one testable unit → run read-only automat
 verification → verify applicable browser behavior → classify and fix failures →
 record evidence → run lightweight adversarial review at each golden journey →
 request one human checkpoint → run full review and final QA.
+
+작업 시작 시 `TODO.md`에서 의존성이 해소된 작업 하나를 선택하고, 종료 전
+상태와 재현 가능한 evidence를 갱신한다. 상위 목표·범위·단계는
+`docs/project-plan.md`를 따른다. 세부 기능 설계와 구현 순서는 별도
+`docs/superpowers/` 문서에서 구체화한다.
 
 LOW work proceeds continuously. People own golden-journey acceptance, HIGH-risk
 decisions, exceptions, and final completion. AI never marks `HUMAN_APPROVED`.
@@ -50,5 +58,6 @@ review its diff and rerun `./scripts/verify quick` afterward.
 
 Use journey-based browser evidence defined in `workflow.md`. Keep core E2E
 small and prefer unit, component, or integration tests when they prove the risk
-better. Stop hooks create ignored redacted candidates only. A person must review
-and explicitly publish any tracked AI record.
+better. Applicable interactive browser QA uses `agent-browser` and follows
+`docs/coding-standards.md`. Stop hooks create ignored redacted candidates only.
+A person must review and explicitly publish any tracked AI record.
