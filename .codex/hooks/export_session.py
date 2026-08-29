@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set
 
+from artifact_contract import artifact_filename, safe_session_id
+
 
 REDACTED = "[REDACTED]"
 SECRET_PATTERNS = [
@@ -64,13 +66,6 @@ class SessionData:
     started_at: str
     cwd: str
     turns: List[TurnData] = field(default_factory=list)
-
-
-def safe_session_id(raw: object) -> Optional[str]:
-    if not isinstance(raw, str) or not raw:
-        return None
-    value = re.sub(r"[^A-Za-z0-9._-]", "_", raw)[:128].strip(".")
-    return value or None
 
 
 def extract_visible_text(content: object, allowed_types: Set[str]) -> str:
@@ -344,9 +339,7 @@ def run_hook(hook_input: object, repo_root: Path) -> None:
             model if isinstance(model, str) and model else "unknown",
             lambda event, line: log_event(repo_root, event, session_id, line),
         )
-        destination = repo_root / "artifacts" / "codex-session-{}.md".format(
-            session_id
-        )
+        destination = repo_root / "artifacts" / artifact_filename(session_id)
         atomic_write(destination, render_markdown(session))
     except (OSError, UnicodeError, ValueError, TypeError):
         log_event(repo_root, "export_failed", session_id)

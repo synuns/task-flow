@@ -9,7 +9,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "codex-rollout.jsonl"
-MODULE_PATH = ROOT / ".codex" / "hooks" / "export_session.py"
+HOOKS = ROOT / ".codex" / "hooks"
+if str(HOOKS) not in sys.path:
+    sys.path.insert(0, str(HOOKS))
+MODULE_PATH = HOOKS / "export_session.py"
 SPEC = importlib.util.spec_from_file_location("export_session", MODULE_PATH)
 export_session = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = export_session
