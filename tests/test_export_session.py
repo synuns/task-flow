@@ -97,6 +97,8 @@ class RedactionAndRenderTests(unittest.TestCase):
                 'api_key="alpha beta,gamma&delta"; safe=yes',
                 "password='one two,three&four'; safe=yes",
                 '"access_token": "json value,tail&more", "safe": true',
+                'secret="alpha \\"quoted\\",beta&gamma"; safe=yes',
+                "secret='one \\'quoted\\',two&three'; safe=yes",
             ]
         )
 
@@ -109,6 +111,8 @@ class RedactionAndRenderTests(unittest.TestCase):
                     'api_key="[REDACTED]"; safe=yes',
                     "password='[REDACTED]'; safe=yes",
                     '"access_token": "[REDACTED]", "safe": true',
+                    'secret="[REDACTED]"; safe=yes',
+                    "secret='[REDACTED]'; safe=yes",
                 ]
             ),
         )
@@ -230,6 +234,8 @@ class HookCliTests(unittest.TestCase):
                 'api_key="alpha beta,gamma&delta"; safe=yes',
                 "password='one two,three&four'; safe=yes",
                 '"access_token": "json value,tail&more", "safe": true',
+                'secret="alpha \\"quoted\\",beta&gamma"; safe=yes',
+                "secret='one \\'quoted\\',two&three'; safe=yes",
             ]
         )
         with tempfile.TemporaryDirectory() as directory:
@@ -251,6 +257,8 @@ class HookCliTests(unittest.TestCase):
             "alpha beta,gamma&delta",
             "one two,three&four",
             "json value,tail&more",
+            '\\"quoted\\",beta&gamma',
+            "\\'quoted\\',two&three",
         ):
             self.assertNotIn(raw_suffix, candidate)
         self.assertIn('api_key="[REDACTED]"; safe=yes', candidate)
@@ -259,6 +267,8 @@ class HookCliTests(unittest.TestCase):
             '"access_token": "[REDACTED]", "safe": true',
             candidate,
         )
+        self.assertIn('secret="[REDACTED]"; safe=yes', candidate)
+        self.assertIn("secret='[REDACTED]'; safe=yes", candidate)
 
     def test_invalid_stdin_and_unsafe_session_write_nothing(self):
         with tempfile.TemporaryDirectory() as directory:
