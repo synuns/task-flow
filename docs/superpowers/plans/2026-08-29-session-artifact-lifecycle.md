@@ -2,16 +2,28 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 첫 사용자 prompt부터 검토 대기 snapshot을 만들고 `Stop`, `SessionEnd`, `resume`, `clear`, 사람 게시를 revision-safe 상태 전이로 관리한다.
+> **Execution split:** 이 문서에서는 Task 1–6만 실행한다. 아래 historical Task
+> 7–9는 직접 digest·flags 기반 절차라 폐기됐다. Task 1–6 완료 후
+> `docs/superpowers/plans/2026-08-29-human-ai-record-review.md`를 실행한다.
 
-**Architecture:** Git 비추적 pending 영역에 segment별 Markdown, sidecar metadata, session manifest를 저장한다. transcript 형식은 versioned adapter 한 곳에서만 해석하고, lifecycle 저장소는 session lock, compare-and-swap revision, atomic rename, hash 기반 복구를 담당한다. 모든 hook은 공통 dispatcher를 사용하며 공개 `artifacts/`와 공개 index는 사람 검토 publisher만 갱신한다.
+**Goal:** 첫 사용자 prompt부터 검토 대기 snapshot을 만들고 lifecycle을 revision-safe하게 관리하며, 사람은 `npm run ai:review`와 승인 한 번으로 record를 idempotent하게 게시한다.
+
+**Architecture:** Git 비추적 pending 영역에 segment별 Markdown, sidecar metadata, session manifest를 저장한다. transcript 형식은 versioned adapter 한 곳에서만 해석하고, lifecycle 저장소는 session lock, compare-and-swap revision, atomic rename, hash 기반 복구를 담당한다. TTY 전용 review CLI가 risk-first 화면과 단일 승인을 제공하고, journal 기반 publisher가 공개 artifact·index를 crash-safe transaction으로 갱신한다.
 
 **Tech Stack:** Codex project hooks, Python 3.9.6 standard library, POSIX `fcntl.flock`, `unittest`, canonical JSON, SHA-256, Markdown
+
+> **Plan split:** 사람용 interactive review와 idempotent publication UX는 승인된
+> `docs/superpowers/specs/2026-08-29-human-ai-record-review-design.md`에 따라
+> `docs/superpowers/plans/2026-08-29-human-ai-record-review.md`에서 별도
+> bounded plan으로 실행한다. 이 계획의 Task 7–9 publisher/wiring/docs 단계는
+> 새 review plan이 supersede한다. 이 계획의 Task 1–6 lifecycle/storage 단계는
+> review plan의 선행 dependency다.
 
 ## Global Constraints
 
 - Requirement ID는 `TOOLING-SESSION-RECORD-LIFECYCLE`이다. 과제 제품 요구사항과 OpenAPI 동작은 변경하지 않는다.
 - 설계 기준은 `docs/superpowers/specs/2026-08-29-session-artifact-lifecycle-design.md`다.
+- 사람 검토·게시 보완 기준은 `docs/superpowers/specs/2026-08-29-human-ai-record-review-design.md`다.
 - Python 코드는 `/usr/bin/python3` 3.9.6에서 외부 dependency 없이 동작해야 한다.
 - physical session 안에서 `SessionStart(source=clear)`마다 새 logical segment를 만든다.
 - record ID는 `<session-id>.s<4자리 segment 번호>`, segment 범위는 `1..9999`다.
@@ -24,11 +36,15 @@
 - 오래된 hook은 `(generation, segment, revision, state)` compare-and-swap 실패 시 `stale`로 끝난다.
 - parser 실패는 마지막 유효 Markdown, lifecycle state, transcript watermark를 보존한다.
 - 자동 hook은 `.codex/review-pending/`만 갱신한다. `artifacts/`, `artifacts/index.md`, `AI_USAGE.md` reviewed 영역은 publisher만 갱신한다.
-- 사람은 exact candidate SHA-256와 두 review flag를 제공해야 게시할 수 있다.
+- 사람은 `npm run ai:review`에서 risk-first 내용을 확인하고 exact `y`+Enter 한 번만 입력한다. path, digest, reviewer, confirmation flag를 직접 입력하지 않는다.
+- stdin/stdout 비TTY, CI, pipe, redirect, 자동 hook은 새 publication을 만들지 못한다.
+- publication은 per-record journal, same-directory staging, atomic rename, fsync, rollback으로 idempotent해야 한다.
+- catch 가능한 signal, `n`, 빈 Enter, EOF는 publication `complete` 전 취소다.
+- tooling-only `package.json`은 `kbhc.frontendScaffolded=false`로 시작한다.
 - 기존 사용자 파일 `artifacts/codex-session-01a04c77-2685-7013-ad38-d81feba1b2a4.md`는 수정·stage·commit하지 않는다.
 - 현재 worktree의 기존 관련 변경은 보존하고 새 설계에 맞춰 단계별로 흡수한다. 각 commit은 명시된 path만 stage한다.
 - 커밋 메시지는 `<type>(<scope>): <한글 설명>` Conventional Commits 형식을 따른다.
-- hook lifecycle은 브라우저 기능이 아니므로 browser evidence는 `N/A — non-browser TOOLING`으로 기록한다.
+- hook/review lifecycle은 terminal 기능이므로 browser evidence는 `N/A — terminal-only TOOLING`으로 기록한다.
 - AI는 `HUMAN_APPROVED` 또는 최종 완료를 표시하지 않는다.
 
 ## File Map
@@ -40,7 +56,11 @@
 - Create `.codex/hooks/session_hook.py`: hook input validation과 event별 orchestration, pending index 갱신, continuation output.
 - Modify `.codex/hooks/render_artifact_index.py`: metadata/hash/state 기반 pending index와 기존 public index library. SessionEnd entry point 제거.
 - Modify `.codex/hooks.json`: `UserPromptSubmit`, `Stop`, `SessionStart`, `SessionEnd`를 공통 dispatcher에 연결.
-- Modify `scripts/publish-ai-record`: `closed` record ID만 검토 후 게시하고 metadata를 `published`로 전환.
+- Create `.codex/hooks/review_scanner.py`: immutable candidate bytes의 BLOCKING/REVIEW/INFO finding 생성.
+- Create `.codex/hooks/review_publish.py`: review receipt, publication journal, staging, resume, rollback transaction.
+- Create `scripts/review-ai-record`: TTY 후보 선택, reviewer 조회, risk-first 화면, pager, exact 승인.
+- Modify `scripts/publish-ai-record`: 신규 게시 interface를 제거하고 기존 journal status/recover/rollback만 제공.
+- Create `package.json`: `npm run ai:review`와 `kbhc.frontendScaffolded=false` tooling marker.
 - Modify `scripts/verify`: 신규 파일, 네 hook wiring, timeout, matcher, metadata/hash/index 정합성을 read-only 검증.
 - Modify `.gitignore`: atomic event 파일과 hook 임시 파일 제외.
 - Modify `tests/test_artifact_contract.py`: record ID와 legacy 이름 경계.
@@ -49,10 +69,13 @@
 - Modify `tests/test_export_session.py`: renderer/redaction 회귀만 유지하고 lifecycle CLI 테스트는 이동.
 - Modify `tests/test_render_artifact_index.py`: pending metadata/hash/state 필터와 public ledger 회귀.
 - Modify `tests/test_publish_ai_record.py`: closed-only 게시, segment filename, published 전이, reconciliation.
+- Create `tests/test_review_scanner.py`: deterministic risk finding과 context boundary.
+- Create `tests/test_review_publish.py`: transaction idempotency, crash resume, signal rollback.
+- Create `tests/test_review_ai_record.py`: TTY flow, candidate selection, reviewer, pager, exact 승인.
 - Modify `tests/test_verify.py`: 네 hook과 read-only consistency 검증 회귀.
 - Modify `docs/quality/workflow.md`: 자동 후보와 사람 게시의 상태 전이 운영 절차.
 - Modify `docs/quality/verification.md`: lifecycle 집중 검증과 브라우저 N/A 근거.
-- Modify `AI_USAGE.md`: segment record ID를 사용하는 review/publish 명령.
+- Modify `AI_USAGE.md`: `npm run ai:review` 단일 사람 절차.
 - Modify `docs/superpowers/specs/2026-08-29-session-end-artifact-index-design.md`: 새 lifecycle 설계로 대체됐음을 표시.
 - Modify `docs/superpowers/plans/2026-08-29-session-end-artifact-index.md`: 새 구현 계획으로 대체됐음을 표시.
 
@@ -1875,7 +1898,7 @@ git add .codex/hooks/render_artifact_index.py .codex/hooks/session_hook.py tests
 git commit -m "feat(hooks): pending index 상태 기반 갱신"
 ```
 
-### Task 7: Closed-only Human Publisher
+### Historical Task 7: Closed-only Human Publisher — 실행 금지
 
 **Files:**
 - Modify: `scripts/publish-ai-record:1-299`
@@ -2141,7 +2164,7 @@ git add scripts/publish-ai-record .codex/hooks/session_records.py .codex/hooks/r
 git commit -m "feat(artifacts): 검토 완료 session record 게시 지원"
 ```
 
-### Task 8: Project Hook Wiring과 Read-only Verification
+### Historical Task 8: Project Hook Wiring과 Read-only Verification — 실행 금지
 
 **Files:**
 - Modify: `.codex/hooks.json:1-29`
@@ -2307,7 +2330,7 @@ git add .codex/hooks.json .codex/hooks/export_session.py .codex/hooks/render_art
 git commit -m "test(hooks): 세션 생명주기 wiring 검증 추가"
 ```
 
-### Task 9: 운영 문서, 회귀 검증, Human Checkpoint
+### Historical Task 9: 운영 문서, 회귀 검증, Human Checkpoint — 실행 금지
 
 **Files:**
 - Modify: `docs/quality/workflow.md:121-139`
@@ -2441,6 +2464,6 @@ git status --short
 git log --oneline -10
 ```
 
-Expected: full verification passes or frontend scaffold skip is explicit; no runtime pending file, event log, temp file, or user-owned artifact is staged; commit sequence matches Tasks 1–9.
+Expected: full verification passes or frontend scaffold skip is explicit; no runtime pending file, event log, temp file, or user-owned artifact is staged; active commit sequence matches lifecycle Tasks 1–6 and the human-review plan.
 
 Final handoff must list commit hashes, commands and observed results, open human-owned acceptance, and any unrelated dirty paths. It must not auto-publish current session candidate.
