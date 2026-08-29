@@ -125,6 +125,10 @@ def main(argv=None):
     try:
         artifacts.mkdir(parents=True, exist_ok=True)
         with indexer.index_lock(artifacts / ".index.lock"):
+            filenames = indexer.list_published_artifact_names(
+                artifacts / "index.md",
+                artifacts,
+            )
             if destination.is_symlink():
                 raise ValueError("artifact destination must not be a symlink")
             if destination.exists() and not destination.is_file():
@@ -133,7 +137,7 @@ def main(argv=None):
                 previous = destination.read_text(encoding="utf-8")
             atomic_write(destination, reviewed)
             try:
-                filenames = indexer.list_artifact_names(artifacts)
+                filenames.append(destination.name)
                 indexer.atomic_write_index(
                     artifacts / "index.md",
                     indexer.render_index(filenames),

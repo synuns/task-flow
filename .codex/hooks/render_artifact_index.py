@@ -4,6 +4,7 @@ import datetime
 import fcntl
 import json
 import os
+import re
 import sys
 import tempfile
 import time
@@ -23,6 +24,9 @@ INDEX_NOTICE = (
 )
 LOCK_TIMEOUT_SECONDS = 1.0
 LOCK_RETRY_SECONDS = 0.05
+INDEX_LINK_PATTERN = re.compile(
+    r"^- \[Codex 세션 `([^`]+)`\]\(\./([^)]+)\)$"
+)
 
 
 class IndexLockTimeout(Exception):
@@ -50,6 +54,33 @@ def render_index(filenames: List[str]) -> str:
             "- [Codex 세션 `{}`](./{})".format(session_id, filename)
         )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def list_published_artifact_names(
+    index_path: Path,
+    artifacts_dir: Path,
+) -> List[str]:
+    if not index_path.exists():
+        return []
+    if index_path.is_symlink() or not index_path.is_file():
+        raise ValueError("invalid_index_path")
+    content = index_path.read_text(encoding="utf-8")
+    names = []
+    for line in content.splitlines():
+        if not line.startswith("- "):
+            continue
+        match = INDEX_LINK_PATTERN.fullmatch(line)
+        if match is None:
+            raise ValueError("invalid_index_link")
+        session_id, filename = match.groups()
+        if session_id_from_artifact_filename(filename) != session_id:
+            raise ValueError("invalid_index_link")
+        names.append(filename)
+    if render_index(names) != content:
+        raise ValueError("invalid_index_content")
+
+    available = set(list_artifact_names(artifacts_dir))
+    return [filename for filename in names if filename in available]
 
 
 def atomic_write_index(path: Path, content: str) -> None:
@@ -150,7 +181,10 @@ def run_hook(hook_input: object, repo_root: Path) -> int:
     try:
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         with index_lock(artifacts_dir / ".index.lock"):
-            filenames = list_artifact_names(artifacts_dir)
+            filenames = list_published_artifact_names(
+                artifacts_dir / "index.md",
+                artifacts_dir,
+            )
             atomic_write_index(
                 artifacts_dir / "index.md",
                 render_index(filenames),

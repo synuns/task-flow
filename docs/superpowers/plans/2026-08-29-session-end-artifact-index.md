@@ -46,8 +46,11 @@
 
 > 통합 조정: 아래 초기 단계의 “Stop이 artifact를 직접 생성”, “SessionEnd가
 > 현재 세션 artifact를 요구”, “publisher가 AI_USAGE를 직접 수정” 예시는
-> 위 Architecture와 Global Constraints로 대체한다. 초기 TDD 이력은 설계
-> 변경 전 실행 기록으로 남긴다.
+> 위 Architecture와 Global Constraints로 대체한다. `index.md`는 게시 ledger며
+> publisher만 신규 링크를 추가한다. SessionEnd는 기존 canonical 링크를
+> 재렌더링하고 누락된 artifact 링크만 정리한다. 이름이 맞아도 index에 없는
+> 파일은 게시 완료로 추정하지 않는다. 초기 TDD 이력은 설계 변경 전 실행
+> 기록으로 남긴다.
 
 ---
 

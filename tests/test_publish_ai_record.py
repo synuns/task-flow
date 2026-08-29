@@ -86,6 +86,21 @@ class PublishAiRecordTests(unittest.TestCase):
         index = (self.root / "artifacts" / "index.md").read_text(encoding="utf-8")
         self.assertEqual(index.count("./codex-session-session-123.md"), 1)
 
+    def test_matching_unpublished_file_is_not_added_to_index(self):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir()
+        unreviewed = artifacts / "codex-session-unreviewed.md"
+        unreviewed.write_text("unreviewed\n", encoding="utf-8")
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        index = (artifacts / "index.md").read_text(encoding="utf-8")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("codex-session-session-123.md", index)
+        self.assertNotIn("codex-session-unreviewed.md", index)
+
     def test_index_write_failure_preserves_previous_reviewed_artifact(self):
         artifacts = self.root / "artifacts"
         artifacts.mkdir()

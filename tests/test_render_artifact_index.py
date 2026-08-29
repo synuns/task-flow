@@ -75,6 +75,24 @@ class ArtifactIndexRenderTests(unittest.TestCase):
         )
         self.assertTrue(first.endswith("\n"))
 
+    def test_published_selection_ignores_unindexed_contract_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = Path(directory)
+            reviewed = artifacts / "codex-session-reviewed.md"
+            unreviewed = artifacts / "codex-session-unreviewed.md"
+            reviewed.write_text("reviewed\n", encoding="utf-8")
+            unreviewed.write_text("unreviewed\n", encoding="utf-8")
+            index = artifacts / "index.md"
+            index.write_text(
+                render_artifact_index.render_index([reviewed.name]),
+                encoding="utf-8",
+            )
+            selected = render_artifact_index.list_published_artifact_names(
+                index,
+                artifacts,
+            )
+        self.assertEqual(selected, [reviewed.name])
+
     def test_atomic_write_preserves_old_index_and_cleans_temp_on_failure(self):
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory) / "index.md"
@@ -122,6 +140,15 @@ class SessionEndCliTests(unittest.TestCase):
             root = Path(directory)
             self.write_artifact(root, "session-b")
             self.write_artifact(root, "session-a")
+            (root / "artifacts" / "index.md").write_text(
+                render_artifact_index.render_index(
+                    [
+                        "codex-session-session-b.md",
+                        "codex-session-session-a.md",
+                    ]
+                ),
+                encoding="utf-8",
+            )
             payload = self.payload(root)
             first = self.run_cli(root, json.dumps(payload))
             index_path = root / "artifacts" / "index.md"
@@ -143,6 +170,12 @@ class SessionEndCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.write_artifact(root, "reviewed-session")
+            (root / "artifacts" / "index.md").write_text(
+                render_artifact_index.render_index(
+                    ["codex-session-reviewed-session.md"]
+                ),
+                encoding="utf-8",
+            )
             result = self.run_cli(
                 root,
                 json.dumps(self.payload(root, "pending-session")),
@@ -209,7 +242,10 @@ class ProjectArtifactIndexTests(unittest.TestCase):
     def test_tracked_index_matches_current_artifacts(self):
         artifacts = ROOT / "artifacts"
         expected = render_artifact_index.render_index(
-            render_artifact_index.list_artifact_names(artifacts)
+            render_artifact_index.list_published_artifact_names(
+                artifacts / "index.md",
+                artifacts,
+            )
         )
         index_path = artifacts / "index.md"
         self.assertTrue(index_path.is_file(), "tracked artifact index must exist")

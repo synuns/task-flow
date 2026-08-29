@@ -62,14 +62,16 @@ pending 디렉터리는 Git에서 제외하며 인덱스를 수정하지 않는�
 
 새 `.codex/hooks/render_artifact_index.py` command를 실행한다. 이 command는
 Hook JSON을 검증한 뒤 artifact 디렉터리의 허용된 게시 파일명만 조회하여
-인덱스를 전체 재생성한다. 종료 중인 현재 세션은 아직 pending 상태일 수
-있으므로 대응하는 게시 artifact 존재를 요구하지 않는다.
+기존 index의 게시 ledger를 전체 재렌더링한다. 종료 중인 현재 세션은 아직
+pending 상태일 수 있으므로 대응하는 게시 artifact 존재를 요구하지 않는다.
+index에 없는 파일은 이름이 규약과 일치해도 게시 완료로 추정하지 않는다.
 
 ### `artifacts/index.md`
 
-`SessionEnd`가 전부 소유하는 자동 생성 파일이다. 직접 편집할 수 있는
-영역이나 병합 marker를 두지 않는다. 파일 상단에는 자동 생성 파일이라는
-경고를 표시하고, 아래에 artifact 링크를 파일명 오름차순으로 기록한다.
+publisher가 게시 항목을 추가하고 `SessionEnd`가 검증·정리하는 자동 생성
+파일이자 게시 ledger다. 직접 편집할 수 있는 영역이나 병합 marker를 두지
+않는다. 파일 상단에는 자동 생성 파일이라는 경고를 표시하고, 아래에
+artifact 링크를 파일명 오름차순으로 기록한다.
 
 예상 형식:
 
@@ -129,8 +131,11 @@ artifacts/codex-session-<session-id>.md
 - 파일명 기준 오름차순으로 정렬한다.
 - 파일명 하나당 링크 하나만 렌더링한다.
 - pending 디렉터리 파일은 조회하지 않는다.
-- Hook 입력의 현재 `session_id`와 무관하게 이미 게시된 artifact 전체를
-  인덱싱한다.
+- index의 canonical 링크에 이미 등록되고 디스크에 존재하는 일반 파일만
+  게시 artifact로 선택한다.
+- index에 없는 matching 파일은 자동 추가하지 않는다. 신규 게시 링크는
+  사람 확인을 받은 publisher만 추가한다.
+- Hook 입력의 현재 `session_id`와 무관하게 기존 게시 ledger를 렌더링한다.
 
 기존 `safe_session_id`도 같은 문법을 사용하도록 맞춰 exporter와 indexer가
 동일한 파일명 계약을 공유한다.
@@ -160,7 +165,8 @@ artifacts/codex-session-<session-id>.md
   -> SessionEnd Hook JSON을 stdin으로 전달
   -> hook_event_name, session_id, cwd 검증
   -> artifacts/.index.lock 배타 잠금 획득
-  -> 허용된 게시 artifact 파일명만 조회
+  -> 기존 index의 canonical 게시 링크 검증
+  -> 존재하는 허용 artifact 파일명만 유지
   -> 파일명 오름차순으로 index Markdown 렌더링
   -> 임시 파일 쓰기, fsync, os.replace
   -> 잠금 해제
@@ -184,6 +190,7 @@ Stop Hook
 - `hook_event_name`이 `SessionEnd`가 아님: 인덱스 미변경, exit `1`.
 - 안전하지 않은 `session_id`: 인덱스 미변경, exit `1`.
 - Hook `cwd`가 저장소 밖임: 인덱스 미변경, exit `1`.
+- 기존 index 형식이 canonical renderer 출력과 다름: 인덱스 미변경, exit `1`.
 - 잠금 획득 timeout: 인덱스 미변경, exit `1`.
 - 디렉터리 조회 또는 쓰기 실패: 기존 인덱스 보존, exit `1`.
 - 성공: stdout과 stderr를 비우고 exit `0`.
@@ -225,6 +232,7 @@ CLI 및 통합 테스트:
 - 유효한 `SessionEnd` 입력으로 인덱스 최초 생성.
 - 여러 artifact를 포함한 전체 인덱스 재생성.
 - 현재 세션이 pending 상태여도 기존 게시 artifact만으로 인덱스 생성.
+- index에 없는 matching artifact가 자동 추가되지 않음.
 - 잘못된 JSON, event, session ID, 저장소 밖 cwd 거부.
 - 다른 프로세스가 잠금을 가진 동안 1초 안에 실패하고 기존 인덱스 보존.
 - 쓰기 실패 시 기존 인덱스와 임시 파일 정리 확인.
@@ -242,6 +250,7 @@ CLI 및 통합 테스트:
 - Stop Hook은 pending 후보만 만들고 사람 확인 전 추적 artifact를 만들지 않는다.
 - 게시 command는 검토 완료 artifact와 index를 함께 갱신하며 AI_USAGE를
   수정하지 않는다.
+- 이름이 맞는 미검토·미등록 파일은 SessionEnd가 index에 추가하지 않는다.
 - 인덱스는 artifact 파일명만 사용하며 transcript 본문을 읽지 않는다.
 - 동시 `SessionEnd` 실행이 인덱스를 손상시키거나 링크를 잃지 않는다.
 - 실패 시 이전 유효 인덱스가 보존된다.
