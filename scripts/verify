@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
+import hashlib
 import json
+import os
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -60,10 +63,44 @@ REQUIRED_PACKAGE_SCRIPTS = (
 )
 
 
-def status_snapshot():
-    return subprocess.check_output(
-        ["git", "status", "--porcelain=v1", "-z"], cwd=str(ROOT)
-    )
+def git_paths(command):
+    output = subprocess.check_output(command, cwd=str(ROOT))
+    return [path for path in output.split(b"\0") if path]
+
+
+def update_file_fingerprint(hasher, category, relative):
+    path = ROOT / os.fsdecode(relative)
+    hasher.update(category)
+    hasher.update(b"\0")
+    hasher.update(relative)
+    hasher.update(b"\0")
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError:
+        hasher.update(b"missing\0")
+        return
+
+    hasher.update(str(stat.S_IFMT(metadata.st_mode)).encode("ascii"))
+    hasher.update(b"\0")
+    hasher.update(str(stat.S_IMODE(metadata.st_mode)).encode("ascii"))
+    hasher.update(b"\0")
+    if stat.S_ISREG(metadata.st_mode):
+        with path.open("rb") as source:
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                hasher.update(chunk)
+    elif stat.S_ISLNK(metadata.st_mode):
+        hasher.update(os.fsencode(os.readlink(path)))
+
+
+def repository_fingerprint():
+    hasher = hashlib.sha256()
+    tracked = git_paths(["git", "ls-files", "-z"])
+    untracked = git_paths(["git", "ls-files", "--others", "--exclude-standard", "-z"])
+    for relative in tracked:
+        update_file_fingerprint(hasher, b"tracked", relative)
+    for relative in untracked:
+        update_file_fingerprint(hasher, b"untracked", relative)
+    return hasher.digest()
 
 
 def fail(stage, detail, reproduce):
@@ -89,33 +126,65 @@ def run_stage(name, command):
     return 0
 
 
+def stop_hook_command():
+    try:
+        hooks = json.loads((ROOT / ".codex/hooks.json").read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError("hooks.json is unreadable or invalid: {}".format(error)) from error
+    if not isinstance(hooks, dict):
+        raise ValueError("hooks.json root must be an object")
+    hooks_section = hooks.get("hooks")
+    if not isinstance(hooks_section, dict):
+        raise ValueError("hooks.json hooks must be an object")
+    stop_entries = hooks_section.get("Stop")
+    if not isinstance(stop_entries, list) or not stop_entries:
+        raise ValueError("hooks.json Stop must be a non-empty list")
+    first_entry = stop_entries[0]
+    if not isinstance(first_entry, dict):
+        raise ValueError("hooks.json Stop entry must be an object")
+    nested_hooks = first_entry.get("hooks")
+    if not isinstance(nested_hooks, list) or not nested_hooks:
+        raise ValueError("hooks.json Stop hooks must be a non-empty list")
+    first_hook = nested_hooks[0]
+    if not isinstance(first_hook, dict):
+        raise ValueError("hooks.json Stop hook must be an object")
+    command = first_hook.get("command")
+    if not isinstance(command, str):
+        raise ValueError("hooks.json Stop hook command must be a string")
+    return command
+
+
 def verify_setup():
-    for relative in REQUIRED_FILES:
-        path = ROOT / relative
-        if not path.is_file():
-            return fail("setup", "missing {}".format(relative), "./scripts/verify setup")
-    for relative, markers in REQUIRED_MARKERS.items():
-        text = (ROOT / relative).read_text(encoding="utf-8")
-        for marker in markers:
-            if marker not in text:
+    try:
+        for relative in REQUIRED_FILES:
+            path = ROOT / relative
+            if not path.is_file():
                 return fail(
-                    "setup",
-                    "{} missing marker {!r}".format(relative, marker),
-                    "./scripts/verify setup",
+                    "setup", "missing {}".format(relative), "./scripts/verify setup"
                 )
-    ignored = subprocess.run(
-        ["git", "check-ignore", "-q", ".codex/review-pending/probe.md"],
-        cwd=str(ROOT),
-        check=False,
-    )
-    if ignored.returncode:
-        return fail(
-            "setup",
-            ".codex/review-pending/ is not ignored",
-            "git check-ignore .codex/review-pending/probe.md",
+        for relative, markers in REQUIRED_MARKERS.items():
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            for marker in markers:
+                if marker not in text:
+                    return fail(
+                        "setup",
+                        "{} missing marker {!r}".format(relative, marker),
+                        "./scripts/verify setup",
+                    )
+        ignored = subprocess.run(
+            ["git", "check-ignore", "-q", ".codex/review-pending/probe.md"],
+            cwd=str(ROOT),
+            check=False,
         )
-    hooks = json.loads((ROOT / ".codex/hooks.json").read_text(encoding="utf-8"))
-    command = hooks["hooks"]["Stop"][0]["hooks"][0]["command"]
+        if ignored.returncode:
+            return fail(
+                "setup",
+                ".codex/review-pending/ is not ignored",
+                "git check-ignore .codex/review-pending/probe.md",
+            )
+        command = stop_hook_command()
+    except Exception as error:
+        return fail("setup", "validation error: {}".format(error), "./scripts/verify setup")
     if ".codex/hooks/export_session.py" not in command:
         return fail("setup", "Stop hook exporter missing", "./scripts/verify setup")
     print("PASS setup")
@@ -130,8 +199,12 @@ def package_scripts():
     if not package_path.is_file():
         return None
     package = json.loads(package_path.read_text(encoding="utf-8"))
+    if not isinstance(package, dict):
+        raise ValueError("package.json root must be an object")
     scripts = package.get("scripts")
-    return scripts if isinstance(scripts, dict) else {}
+    if not isinstance(scripts, dict):
+        raise ValueError("package.json scripts must be an object")
+    return scripts
 
 
 def require_frontend_scripts(scripts):
@@ -148,10 +221,10 @@ def require_frontend_scripts(scripts):
 def verify_frontend(mode):
     try:
         scripts = package_scripts()
-    except (OSError, json.JSONDecodeError):
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as error:
         return fail(
             "frontend-scripts",
-            "package.json is unreadable or invalid",
+            "package.json is unreadable or invalid: {}".format(error),
             "python3 -m json.tool package.json",
         )
     if scripts is None:
@@ -179,17 +252,45 @@ def main(argv=None):
         print("usage: ./scripts/verify [setup|quick|full]", file=sys.stderr)
         return 2
     mode = args[0] if args else "full"
-    before = status_snapshot()
-    result = verify_setup()
-    if not result and mode != "setup":
-        result = verify_frontend(mode)
-    after = status_snapshot()
-    if after != before:
+    try:
+        before = repository_fingerprint()
+    except Exception as error:
         return fail(
             "read-only",
-            "repository changed during verification",
+            "repository fingerprint could not start: {}".format(error),
             "git status --short",
         )
+    result = 0
+    try:
+        result = verify_setup()
+        if not result and mode != "setup":
+            result = verify_frontend(mode)
+    except Exception as error:
+        result = fail(
+            "verification",
+            "unexpected stage error: {}".format(error),
+            "./scripts/verify {}".format(mode),
+        )
+    finally:
+        try:
+            after = repository_fingerprint()
+        except Exception as error:
+            read_only_result = fail(
+                "read-only",
+                "repository fingerprint could not finish: {}".format(error),
+                "git status --short",
+            )
+            if not result:
+                result = read_only_result
+        else:
+            if after != before:
+                read_only_result = fail(
+                    "read-only",
+                    "repository changed during verification",
+                    "git status --short",
+                )
+                if not result:
+                    result = read_only_result
     return result
 
 
