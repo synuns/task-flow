@@ -1,6 +1,9 @@
 .worktrees/
 .superpowers/
 .codex/hooks/export-session.log
+.codex/hooks/artifact-index.log
 artifacts/.codex-session-*.tmp
+artifacts/.index.lock
+artifacts/.index-*.tmp
 __pycache__/
 *.pyc

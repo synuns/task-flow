@@ -197,5 +197,17 @@ class SessionEndCliTests(unittest.TestCase):
         self.assertEqual(preserved, "existing\n")
 
 
+class ProjectArtifactIndexTests(unittest.TestCase):
+    def test_tracked_index_matches_current_artifacts(self):
+        artifacts = ROOT / "artifacts"
+        expected = render_artifact_index.render_index(
+            render_artifact_index.list_artifact_names(artifacts)
+        )
+        index_path = artifacts / "index.md"
+        self.assertTrue(index_path.is_file(), "tracked artifact index must exist")
+        actual = index_path.read_text(encoding="utf-8")
+        self.assertEqual(actual, expected)
+
+
 if __name__ == "__main__":
     unittest.main()

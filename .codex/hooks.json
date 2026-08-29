@@ -1,5 +1,5 @@
 {
-  "description": "Export reviewable Codex session evidence for AI_USAGE.md.",
+  "description": "Export and index reviewable Codex session evidence for AI_USAGE.md.",
   "hooks": {
     "Stop": [
       {
@@ -9,6 +9,19 @@
             "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/export_session.py\"",
             "timeout": 30,
             "statusMessage": "Exporting Codex session record"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "other",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/render_artifact_index.py\"",
+            "timeout": 3,
+            "statusMessage": "Updating Codex session index"
           }
         ]
       }
