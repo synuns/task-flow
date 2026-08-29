@@ -62,6 +62,26 @@ class ArtifactContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             artifact_contract.artifact_filename("-bad")
 
+    def test_record_id_round_trip(self):
+        value = artifact_contract.record_id("thr_123.A-b", 7)
+        self.assertEqual(value, "thr_123.A-b.s0007")
+        self.assertEqual(artifact_contract.split_record_id(value), ("thr_123.A-b", 7))
+        self.assertEqual(artifact_contract.artifact_filename(value), "codex-session-thr_123.A-b.s0007.md")
+        self.assertEqual(artifact_contract.metadata_filename(value), "codex-session-thr_123.A-b.s0007.json")
+
+    def test_record_id_rejects_segment_boundaries(self):
+        for segment in (0, -1, 10000, True):
+            with self.subTest(segment=segment):
+                with self.assertRaises(ValueError):
+                    artifact_contract.record_id("thr_123", segment)
+        for value in ("thr_123", "thr_123.s0000", "thr_123.s10000"):
+            with self.subTest(value=value):
+                self.assertIsNone(artifact_contract.split_record_id(value))
+
+    def test_maximum_session_id_has_valid_segment_filename(self):
+        value = artifact_contract.record_id("a" * 128, 9999)
+        self.assertEqual(artifact_contract.record_id_from_artifact_filename(artifact_contract.artifact_filename(value)), value)
+
 
 if __name__ == "__main__":
     unittest.main()
