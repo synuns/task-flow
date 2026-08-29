@@ -28,6 +28,7 @@
 ## 전체 프롬프트와 작업 기록
 
 - [세션 기록 디렉터리](./artifacts/)
+- [기록 자동화 설계·구현 세션](./artifacts/codex-session-01a04c3e-0a24-7e30-a767-64f1e2c4f3ae.md)
 
 세션 문서는 `artifacts/codex-session-<session-id>.md` 형식으로 생성합니다.
 자동 마스킹은 보조 수단이므로 제출 전 사람 검토가 필요합니다.
