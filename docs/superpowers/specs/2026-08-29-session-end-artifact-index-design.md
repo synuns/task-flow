@@ -261,8 +261,9 @@ CLI 및 통합 테스트:
 - 정상적인 메인 세션 종료 후 모든 게시 완료 artifact 링크가
   `artifacts/index.md`에 정확히 한 번씩 존재한다.
 - Stop Hook은 pending 후보만 만들고 사람 확인 전 추적 artifact를 만들지 않는다.
-- 게시 command는 검토 완료 artifact와 index를 함께 갱신하며 AI_USAGE를
-  수정하지 않는다.
+- explicit reviewed publisher는 검토 완료 artifact와 index를 교체한 뒤
+  `AI_USAGE.md`의 managed 검토 완료 영역을 갱신한다. `SessionEnd`는
+  `AI_USAGE.md`를 수정하지 않는다.
 - 이름이 맞는 미검토·미등록 파일은 SessionEnd가 index에 추가하지 않는다.
 - 인덱스는 artifact 파일명만 사용하며 transcript 본문을 읽지 않는다.
 - 동시 `SessionEnd` 실행이 인덱스를 손상시키거나 링크를 잃지 않는다.
