@@ -808,13 +808,14 @@ describe("generated OpenAPI contract", () => {
 });
 ```
 
-Run:
+Run the test once to confirm its runtime assertions, then run the type contract gate:
 
 ```bash
 pnpm test src/test/openapi-contract.test.ts
+pnpm typecheck
 ```
 
-Expected: FAIL because `src/generated/openapi.ts` does not exist.
+Expected: the Vitest runtime assertions pass because the type-only import is erased, then `pnpm typecheck` fails because `src/generated/openapi.ts` does not exist.
 
 - [ ] **Step 2: worker asset browser assertion을 먼저 추가**
 

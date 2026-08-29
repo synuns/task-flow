@@ -16,6 +16,10 @@ test("@scaffold loads the React root and local Pretendard without browser errors
   await page.goto("/");
 
   await expect(page.locator("#root")).toHaveCount(1);
+  const workerResponse = await page.request.get("/mockServiceWorker.js");
+
+  expect(workerResponse.ok()).toBe(true);
+  expect(workerResponse.headers()["content-type"]).toContain("javascript");
 
   const fontLoaded = await page.evaluate(async () => {
     const loadedFonts = await document.fonts.load('16px "Pretendard"');
