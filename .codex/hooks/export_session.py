@@ -25,6 +25,21 @@ def redact_assignment(match):
     return match.group("prefix") + replacement
 
 
+COOKIE_TOKEN_PATTERN = re.compile(
+    r"(?i)(?P<prefix>(?:^|;)\s*token\s*=\s*)"
+    r"(?P<value>\"(?:\\.|[^\"\\])*\"|"
+    r"'(?:\\.|[^'\\])*'|[^;,\s\"'\r\n]+)"
+)
+COOKIE_HEADER_PATTERN = re.compile(
+    r"(?im)(?P<prefix>\bCookie\s*:\s*)(?P<value>[^\r\n]*)"
+)
+
+
+def redact_cookie_header(match):
+    cookies = COOKIE_TOKEN_PATTERN.sub(redact_assignment, match.group("value"))
+    return match.group("prefix") + cookies
+
+
 SECRET_PATTERNS = [
     (
         re.compile(r"(?i)(Authorization\s*:\s*(?:Bearer|Basic)\s+)[^\s\"']+"),
@@ -41,12 +56,8 @@ SECRET_PATTERNS = [
         redact_assignment,
     ),
     (
-        re.compile(
-            r"(?i)(?P<prefix>\bCookie\s*:\s*[^\r\n]*?\btoken\s*=\s*)"
-            r"(?P<value>\"(?:\\.|[^\"\\])*\"|"
-            r"'(?:\\.|[^'\\])*'|[^;\s,\r\n]+)"
-        ),
-        redact_assignment,
+        COOKIE_HEADER_PATTERN,
+        redact_cookie_header,
     ),
     (re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b"), REDACTED),
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"), REDACTED),

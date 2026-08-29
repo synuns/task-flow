@@ -257,6 +257,26 @@ class PublishAiRecordTests(unittest.TestCase):
                 self.assertIn("sensitive pattern", result.stderr)
                 self.assertFalse((self.root / "artifacts").exists())
 
+    def test_repeated_unredacted_refresh_cookies_block_publication(self):
+        values = (
+            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImZpcnN0In0.publisher-first_suffix",
+            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InNlY29uZCJ9.publisher-second_suffix",
+        )
+        self.candidate.write_text(
+            "# Candidate\n"
+            "Cookie: token=[REDACTED]; token={}; token={}\n".format(*values),
+            encoding="utf-8",
+        )
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("sensitive pattern", result.stderr)
+        self.assertFalse((self.root / "artifacts").exists())
+        self.assertEqual(self.usage.read_text(encoding="utf-8"), self.usage_initial)
+
     def test_secret_bearing_reviewer_blocks_publication(self):
         result = self.run_publish(
             "--confirm-sensitive-review",

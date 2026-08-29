@@ -150,6 +150,37 @@ class RedactionAndRenderTests(unittest.TestCase):
             ),
         )
 
+    def test_redacts_every_repeated_refresh_cookie_token(self):
+        values = (
+            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImZpcnN0In0.repeated-first_suffix",
+            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InNlY29uZCJ9.repeated-second_suffix",
+        )
+        source = "\n".join(
+            [
+                "Cookie: theme=dark; token={}; token={}; safe=yes".format(
+                    *values
+                ),
+                "Cookie: token=[REDACTED]; token={}; token={}".format(*values),
+            ]
+        )
+
+        rendered = export_session.redact(source, Path("/__no_home_match__"))
+
+        for value in values:
+            self.assertNotIn(value, rendered)
+            self.assertNotIn(value.rsplit(".", 1)[1], rendered)
+        self.assertEqual(
+            rendered,
+            "\n".join(
+                [
+                    "Cookie: theme=dark; token=[REDACTED]; "
+                    "token=[REDACTED]; safe=yes",
+                    "Cookie: token=[REDACTED]; token=[REDACTED]; "
+                    "token=[REDACTED]",
+                ]
+            ),
+        )
+
     def test_render_is_ordered_and_deterministic(self):
         session = export_session.parse_rollout(
             FIXTURE,
@@ -338,6 +369,41 @@ class HookCliTests(unittest.TestCase):
             self.assertNotIn(value, candidate)
             self.assertNotIn(value.rsplit(".", 1)[1], candidate)
         self.assertEqual(candidate.count("[REDACTED]"), 8)
+
+    def test_repeated_refresh_cookie_suffix_never_reaches_pending_candidate(self):
+        raw_values = (
+            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImZpcnN0In0.pending-first_suffix",
+            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InNlY29uZCJ9.pending-second_suffix",
+        )
+        prompt = (
+            "Cookie: token=[REDACTED]; token={}; token={}; theme=dark".format(
+                *raw_values
+            )
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            transcript = root / "rollout.jsonl"
+            self.transcript_with_prompt(transcript, prompt)
+            payload = self.payload(root)
+            payload["transcript_path"] = str(transcript)
+
+            result = self.run_cli(root, json.dumps(payload))
+            candidate = (
+                root
+                / ".codex"
+                / "review-pending"
+                / "codex-session-session-123.md"
+            ).read_text(encoding="utf-8")
+
+        self.assertEqual(json.loads(result.stdout), {"continue": True})
+        for value in raw_values:
+            self.assertNotIn(value, candidate)
+            self.assertNotIn(value.rsplit(".", 1)[1], candidate)
+        self.assertIn(
+            "Cookie: token=[REDACTED]; token=[REDACTED]; "
+            "token=[REDACTED]; theme=dark",
+            candidate,
+        )
 
     def test_invalid_stdin_and_unsafe_session_write_nothing(self):
         with tempfile.TemporaryDirectory() as directory:
