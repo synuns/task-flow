@@ -40,6 +40,11 @@ def request_cancel(signum=None, frame=None):
     del signum, frame
     global cancel_requested
     cancel_requested = True
+    try:
+        import review_publisher
+        review_publisher.request_cancel()
+    except ImportError:
+        pass
 
 
 def clear_cancel():
@@ -141,7 +146,9 @@ def list_closed_records(repo_root: Path) -> List[RecordRef]:
             return store.read_metadata(ref.record_id).get("updated_at", ""), ref.record_id
         except (OSError, ValueError):
             return "", ref.record_id
-    return sorted(records, key=sort_key, reverse=True)
+    records.sort(key=lambda ref: ref.record_id)
+    records.sort(key=sort_key, reverse=True)
+    return records
 
 
 def choose_record(records, input_stream, output_stream):
@@ -185,6 +192,11 @@ def open_pager(raw, repo_root):
 
 def run_review(repo_root: Path, input_stream=sys.stdin, output_stream=sys.stdout) -> int:
     require_tty(input_stream, output_stream)
+    try:
+        from review_publisher import clear_cancel as clear_publisher_cancel
+        clear_publisher_cancel()
+    except ImportError:
+        pass
     check_cancel()
     store = RecordStore(repo_root)
     records = list_closed_records(repo_root)
