@@ -61,5 +61,68 @@ class ParseRolloutTests(unittest.TestCase):
         self.assertEqual(self.warnings, [("malformed_json", 5)])
 
 
+class RedactionAndRenderTests(unittest.TestCase):
+    def test_redacts_all_supported_shapes(self):
+        source = "\n".join(
+            [
+                "Authorization: Bearer bearer-secret",
+                "api_key=plain-secret",
+                '"access_token": "json-secret"',
+                "OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456",
+                "GITHUB_TOKEN=ghp_abcdefghijklmnopqrstuvwxyz123456",
+                "https://example.test/?token=query-secret&safe=yes",
+                "-----BEGIN PRIVATE KEY-----\nprivate-material\n-----END PRIVATE KEY-----",
+                "/Users/example/private/project",
+            ]
+        )
+        rendered = export_session.redact(source, Path("/Users/example"))
+        for secret in (
+            "bearer-secret",
+            "plain-secret",
+            "json-secret",
+            "sk-abcdefghijklmnopqrstuvwxyz123456",
+            "ghp_abcdefghijklmnopqrstuvwxyz123456",
+            "query-secret",
+            "private-material",
+        ):
+            self.assertNotIn(secret, rendered)
+        self.assertIn("~/private/project", rendered)
+
+    def test_render_is_ordered_and_deterministic(self):
+        session = export_session.parse_rollout(
+            FIXTURE,
+            "session-123",
+            "fallback-model",
+            lambda event, line: None,
+        )
+        first = export_session.render_markdown(session)
+        second = export_session.render_markdown(session)
+        self.assertEqual(first, second)
+        expected = [
+            "Human review required before submission",
+            "## Turn 1",
+            "### User prompt",
+            "Create structure",
+            "### Tool activity",
+            "#### `exec`",
+            '{"cmd":"pwd"}',
+            "/workspace/kbhc-assgn",
+            "### Assistant response",
+            "Structure created",
+            "## Turn 2",
+            "Add tests",
+            "Tests added",
+        ]
+        position = -1
+        for value in expected:
+            position = first.index(value, position + 1)
+        self.assertTrue(first.endswith("\n"))
+
+    def test_fence_expands_for_embedded_backticks(self):
+        block = export_session.fenced("before ``` after")
+        self.assertTrue(block.startswith("````text\n"))
+        self.assertTrue(block.endswith("\n````"))
+
+
 if __name__ == "__main__":
     unittest.main()

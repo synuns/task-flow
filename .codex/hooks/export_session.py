@@ -6,6 +6,35 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set
 
 
+REDACTED = "[REDACTED]"
+SECRET_PATTERNS = [
+    (
+        re.compile(r"(?i)(Authorization\s*:\s*(?:Bearer|Basic)\s+)[^\s\"']+"),
+        r"\1" + REDACTED,
+    ),
+    (
+        re.compile(
+            r"(?i)([\"']?(?:api[_-]?key|access[_-]?token|secret|password)"
+            r"[\"']?\s*[:=]\s*[\"']?)[^\s\"'&,]+"
+        ),
+        r"\1" + REDACTED,
+    ),
+    (re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b"), REDACTED),
+    (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"), REDACTED),
+    (
+        re.compile(
+            r"(?s)-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----.*?"
+            r"-----END (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"
+        ),
+        REDACTED,
+    ),
+    (
+        re.compile(r"(?i)([?&](?:api_key|access_token|token|key)=)[^&\s]+"),
+        r"\1" + REDACTED,
+    ),
+]
+
+
 @dataclass
 class ToolActivity:
     call_id: str
@@ -143,3 +172,76 @@ def parse_rollout(
                         payload.get("output"), {"input_text", "output_text"}
                     )
     return session
+
+
+def redact(text: str, home: Optional[Path] = None) -> str:
+    result = text
+    for pattern, replacement in SECRET_PATTERNS:
+        result = pattern.sub(replacement, result)
+    home_text = str(home or Path.home())
+    if home_text and home_text != "/":
+        result = result.replace(home_text, "~")
+    return result
+
+
+def fenced(text: str) -> str:
+    fence = chr(96) * 3
+    while fence in text:
+        fence += chr(96)
+    return "{0}text\n{1}\n{0}".format(fence, text, fence)
+
+
+def render_markdown(session: SessionData, home: Optional[Path] = None) -> str:
+    lines = [
+        "# Codex Session `{}`".format(redact(session.session_id, home)),
+        "",
+        "> Human review required before submission. Automatic redaction is best-effort.",
+        "",
+        "- Model: `{}`".format(redact(session.model, home)),
+        "- Started: `{}`".format(redact(session.started_at, home)),
+        "- Working directory: `{}`".format(redact(session.cwd, home)),
+        "",
+    ]
+    for index, turn in enumerate(session.turns, 1):
+        lines.extend(["## Turn {}".format(index), ""])
+        if turn.prompts:
+            lines.extend(
+                [
+                    "### User prompt",
+                    "",
+                    redact("\n\n".join(turn.prompts), home),
+                    "",
+                ]
+            )
+        if turn.tools:
+            lines.extend(["### Tool activity", ""])
+            for tool in turn.tools:
+                lines.extend(
+                    [
+                        "#### `{}`".format(redact(tool.name, home)),
+                        "",
+                        "- Call ID: `{}`".format(redact(tool.call_id, home)),
+                        "- Status: `{}`".format(
+                            redact(tool.status or "unknown", home)
+                        ),
+                        "",
+                        "**Input**",
+                        "",
+                        fenced(redact(tool.input_text, home)),
+                        "",
+                        "**Output**",
+                        "",
+                        fenced(redact(tool.output_text, home)),
+                        "",
+                    ]
+                )
+        if turn.responses:
+            lines.extend(
+                [
+                    "### Assistant response",
+                    "",
+                    redact("\n\n".join(turn.responses), home),
+                    "",
+                ]
+            )
+    return "\n".join(lines).rstrip() + "\n"
