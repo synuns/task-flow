@@ -3,9 +3,10 @@ import hashlib
 import math
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List
 
-from export_session import SECRET_PATTERNS
+from export_session import SECRET_PATTERNS, redact
 
 
 SCANNER_VERSION = "session-review-v1"
@@ -42,8 +43,8 @@ def context_for(text: str, start: int, end: int) -> str:
     context = text[left:right]
     raw = context.encode("utf-8")
     if len(raw) <= 2048:
-        return context
-    return raw[:2048].decode("utf-8", "ignore") + "\n[context truncated]"
+        return redact(context, Path("/"))
+    return redact(raw[:2048].decode("utf-8", "ignore"), Path("/")) + "\n[context truncated]"
 
 
 def scan_candidate(candidate: bytes, metadata: Dict[str, object]) -> ReviewSummary:

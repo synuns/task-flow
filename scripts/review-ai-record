@@ -1,0 +1,263 @@
+#!/usr/bin/env python3
+import argparse
+import datetime
+import hashlib
+import hmac
+import os
+import pydoc
+import shlex
+import shutil
+import signal
+import stat
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import List, Optional
+
+
+ROOT = Path(__file__).resolve().parents[1]
+HOOKS = ROOT / ".codex" / "hooks"
+if str(HOOKS) not in sys.path:
+    sys.path.insert(0, str(HOOKS))
+
+from artifact_contract import split_record_id
+from export_session import redact
+from render_artifact_index import list_pending_artifact_names
+from review_scanner import scan_candidate, format_summary, SCANNER_VERSION
+from session_records import RecordError, RecordRef, RecordStore
+
+
+class ReviewCancelled(Exception):
+    pass
+
+
+cancel_requested = False
+publish_receipt = None
+
+
+def request_cancel(signum=None, frame=None):
+    del signum, frame
+    global cancel_requested
+    cancel_requested = True
+
+
+def clear_cancel():
+    global cancel_requested
+    cancel_requested = False
+
+
+def check_cancel():
+    if cancel_requested:
+        raise ReviewCancelled("review_cancelled")
+
+
+def require_tty(input_stream, output_stream):
+    if not input_stream.isatty() or not output_stream.isatty():
+        raise ReviewCancelled("interactive TTY required")
+
+
+def read_candidate_once(path):
+    no_follow = getattr(os, "O_NOFOLLOW", None)
+    if no_follow is None:
+        raise ReviewCancelled("no-follow open unsupported")
+    try:
+        descriptor = os.open(str(path), os.O_RDONLY | no_follow | getattr(os, "O_CLOEXEC", 0))
+    except OSError as error:
+        raise ReviewCancelled("candidate is not a regular file") from error
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise ReviewCancelled("candidate is not a regular file")
+        chunks = []
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            chunks.append(chunk)
+        after = os.fstat(descriptor)
+    finally:
+        os.close(descriptor)
+    raw = b"".join(chunks)
+    if (before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_ino, after.st_size, after.st_mtime_ns) or len(raw) != after.st_size:
+        raise ReviewCancelled("candidate_changed")
+    return raw, after
+
+
+def git_config_name(root):
+    result = subprocess.run(["git", "-C", str(root), "config", "--get", "user.name"], text=True, capture_output=True, check=False)
+    value = result.stdout.strip()
+    return value or None
+
+
+def save_git_config_name(root, value):
+    subprocess.run(["git", "-C", str(root), "config", "--local", "user.name", value], check=True)
+
+
+def load_reviewer(root, input_stream, output_stream):
+    configured = git_config_name(root)
+    if configured:
+        return configured
+    output_stream.write("Reviewer name: ")
+    output_stream.flush()
+    value = input_stream.readline().strip()
+    if not value or redact(value, Path("/")) != value:
+        return None
+    save_git_config_name(root, value)
+    return value
+
+
+def read_approval(input_stream, output_stream):
+    output_stream.write("게시할까요? 정확히 y 입력 후 Enter: ")
+    output_stream.flush()
+    try:
+        return input_stream.readline() == "y\n"
+    except (EOFError, KeyboardInterrupt):
+        return False
+
+
+def list_closed_records(repo_root: Path) -> List[RecordRef]:
+    store = RecordStore(repo_root)
+    records = []
+    if not store.pending.exists():
+        return records
+    for metadata_path in store.pending.glob("codex-session-*.json"):
+        try:
+            metadata = store.read_json(metadata_path)
+            record = metadata.get("record_id")
+            parsed = split_record_id(record)
+            if metadata.get("state") != "closed" or parsed is None:
+                continue
+            paths = store.paths(record)
+            if not paths.markdown.is_file() or paths.markdown.is_symlink():
+                continue
+            if not hmac.compare_digest(hashlib.sha256(paths.markdown.read_bytes()).hexdigest(), metadata.get("artifact_sha256", "")):
+                continue
+            records.append(RecordRef(metadata["session_id"], metadata["generation"], metadata["segment"], metadata["revision"], "closed"))
+        except (OSError, UnicodeError, ValueError, KeyError):
+            continue
+    def sort_key(ref):
+        try:
+            return store.read_metadata(ref.record_id).get("updated_at", ""), ref.record_id
+        except (OSError, ValueError):
+            return "", ref.record_id
+    return sorted(records, key=sort_key, reverse=True)
+
+
+def choose_record(records, input_stream, output_stream):
+    if not records:
+        output_stream.write("검토 가능한 closed record가 없습니다.\n")
+        return None
+    if len(records) == 1:
+        return records[0]
+    for number, record in enumerate(records, 1):
+        output_stream.write("{}. {}\n".format(number, record.record_id))
+    output_stream.write("Select [1-{}]: ".format(len(records)))
+    output_stream.flush()
+    try:
+        number = int(input_stream.readline().strip())
+    except (ValueError, EOFError, KeyboardInterrupt):
+        return None
+    return records[number - 1] if 1 <= number <= len(records) else None
+
+
+def open_pager(raw, repo_root):
+    view_dir = repo_root / ".codex" / "review-pending" / "review-views"
+    view_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode="wb", prefix=".review-view-", suffix=".md", dir=str(view_dir), delete=False) as stream:
+        os.chmod(stream.name, 0o600)
+        stream.write(raw)
+        stream.flush()
+        os.fsync(stream.fileno())
+        path = stream.name
+    try:
+        pager = shlex.split(os.environ["PAGER"]) if os.environ.get("PAGER") else ["/usr/bin/less", "-R"]
+        if not pager or shutil.which(pager[0]) is None:
+            pydoc.pager(raw.decode("utf-8"))
+            return
+        subprocess.run(pager + [path], check=True)
+    finally:
+        try:
+            os.unlink(path)
+        except FileNotFoundError:
+            pass
+
+
+def run_review(repo_root: Path, input_stream=sys.stdin, output_stream=sys.stdout) -> int:
+    require_tty(input_stream, output_stream)
+    check_cancel()
+    store = RecordStore(repo_root)
+    records = list_closed_records(repo_root)
+    selected = choose_record(records, input_stream, output_stream)
+    if selected is None:
+        return 0
+    check_cancel()
+    raw, _stat = read_candidate_once(store.paths(selected.record_id).markdown)
+    metadata = store.read_metadata(selected.record_id)
+    summary = scan_candidate(raw, metadata)
+    output_stream.write(format_summary(summary))
+    output_stream.flush()
+    if summary.blocking:
+        return 1
+    if summary.review:
+        while True:
+            output_stream.write("[v] 전체 본문  [c] 계속  [q] 취소\n")
+            output_stream.flush()
+            choice = input_stream.readline()
+            if choice in {"q\n", "\n", ""} or cancel_requested:
+                return 0
+            if choice == "v\n":
+                open_pager(raw, repo_root)
+                continue
+            if choice == "c\n":
+                break
+            return 0
+    check_cancel()
+    reviewer = load_reviewer(repo_root, input_stream, output_stream)
+    if not reviewer:
+        return 0
+    check_cancel()
+    if not read_approval(input_stream, output_stream):
+        return 0
+    check_cancel()
+    global publish_receipt
+    if publish_receipt is None:
+        from review_publisher import ReviewReceipt, publish_receipt as publish
+        publish_receipt = publish
+    from review_publisher import ReviewReceipt
+    receipt = ReviewReceipt(
+        selected.record_id,
+        selected.session_id,
+        selected.revision,
+        hashlib.sha256(raw).hexdigest(),
+        reviewer,
+        datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        SCANNER_VERSION,
+        len(summary.blocking),
+        len(summary.review),
+        True,
+        "interactive-tty",
+    )
+    result = publish_receipt(repo_root, receipt)
+    output_stream.write("{}\n".format(result.status))
+    return 0 if result.status in {"published", "already_published"} else 1
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repo-root", type=Path, default=ROOT)
+    args = parser.parse_args(argv)
+    for name in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(name, request_cancel)
+    try:
+        return run_review(args.repo_root.resolve())
+    except ReviewCancelled as error:
+        print(str(error), file=sys.stderr)
+        return 1
+    except (OSError, UnicodeError, ValueError, RecordError):
+        print("review_failed", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

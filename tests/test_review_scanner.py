@@ -31,6 +31,7 @@ class ReviewScannerTests(unittest.TestCase):
         summary = review_scanner.scan_candidate(body, self.metadata(body))
         self.assertEqual([item.code for item in summary.blocking], ["unredacted_secret"])
         self.assertLessEqual(len(summary.blocking[0].context.encode("utf-8")), 2080)
+        self.assertNotIn("exposed-secret", summary.blocking[0].context)
 
     def test_tool_and_large_block_are_review_findings(self):
         body = ("# Candidate\n\n## Turn 1\n\n### Tool activity\n\n**Output**\n\n```text\n" + ("a" * 33000) + "\n```\n").encode("utf-8")
