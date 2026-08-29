@@ -68,7 +68,7 @@ REQUIRED_MARKERS = {
         "## 전체 프롬프트와 작업 기록",
         "<!-- reviewed-records:start -->",
         "<!-- reviewed-records:end -->",
-        "--reviewed-sha256",
+        "npm run ai:review",
         "legacy/pre-policy",
     ),
 }

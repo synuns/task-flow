@@ -87,12 +87,12 @@ insufficient.
 
 Setup verification confirms ignored pending storage, Stop hook wiring, exporter
 tests, and reviewed-publication language. The hook creates only structurally
-filtered and redacted pending candidates. A person reviews content and sensitive
-information in the exact candidate bytes and supplies their
-reviewed SHA-256 digest plus both review confirmations to
-`scripts/publish-ai-record`. The publisher opens the candidate with no-follow
-semantics, requires a regular file, reads it once, rejects a digest mismatch,
-and publishes from those bytes.
+filtered and redacted pending candidates. `npm run ai:review` presents them
+risk-first; a person reviews content and sensitive information, then confirms
+with exact `y`+Enter. Reviewer and reviewed SHA-256 digest are recorded by the
+tool. `n`, blank input, EOF, or signal cancels. The publisher opens the
+candidate with no-follow semantics, requires a regular file, reads it once,
+rejects a digest mismatch, and publishes from those bytes.
 Published records alone are indexed in `artifacts/index.md`. The explicit
 publisher holds the shared index lock and writes the reviewed artifact,
 canonical index, and fully regenerated managed `AI_USAGE.md` region in that
