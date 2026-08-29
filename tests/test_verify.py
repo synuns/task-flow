@@ -51,6 +51,7 @@ class VerifyCliTests(unittest.TestCase):
             "## 전체 프롬프트와 작업 기록",
             "<!-- reviewed-records:start -->",
             "<!-- reviewed-records:end -->",
+            "--reviewed-sha256",
             "legacy/pre-policy",
         )
         self.assertEqual(
@@ -63,6 +64,7 @@ class VerifyCliTests(unittest.TestCase):
             for marker in (
                 "<!-- reviewed-records:start -->",
                 "<!-- reviewed-records:end -->",
+                "--reviewed-sha256",
                 "legacy/pre-policy",
             ):
                 with self.subTest(marker=marker):
@@ -88,6 +90,21 @@ class VerifyCliTests(unittest.TestCase):
         verifier = load_verify_module()
         self.assertIn("scripts/publish-ai-record", verifier.REQUIRED_FILES)
 
+    def test_setup_requires_digest_and_auth_evidence_contracts(self):
+        verifier = load_verify_module()
+        self.assertIn(
+            "reviewed SHA-256 digest",
+            verifier.REQUIRED_MARKERS["docs/quality/workflow.md"],
+        )
+        self.assertIn(
+            "reviewed SHA-256 digest",
+            verifier.REQUIRED_MARKERS["docs/quality/verification.md"],
+        )
+        self.assertIn(
+            "Authorization: Bearer <accessToken>",
+            verifier.REQUIRED_MARKERS["docs/quality/requirements.md"],
+        )
+
     def test_setup_runs_pipeline_suites_without_verify_recursion(self):
         verifier = load_verify_module()
         with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
@@ -100,6 +117,7 @@ class VerifyCliTests(unittest.TestCase):
                 sys.executable,
                 "-m",
                 "unittest",
+                "tests/test_artifact_contract.py",
                 "tests/test_export_session.py",
                 "tests/test_render_artifact_index.py",
                 "tests/test_publish_ai_record.py",

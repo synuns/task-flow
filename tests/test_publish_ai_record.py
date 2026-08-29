@@ -1,3 +1,4 @@
+import hashlib
 import os
 import importlib.machinery
 import importlib.util
@@ -61,29 +62,54 @@ class PublishAiRecordTests(unittest.TestCase):
             artifacts.chmod(0o700)
         self.temporary.cleanup()
 
-    def run_publish(self, *extra, reviewer="Human Reviewer"):
+    def candidate_digest(self, session_id="session-123"):
+        candidate = (
+            self.root
+            / ".codex"
+            / "review-pending"
+            / "codex-session-{}.md".format(session_id)
+        )
+        return hashlib.sha256(candidate.read_bytes()).hexdigest()
+
+    def run_publish(
+        self,
+        *extra,
+        reviewer="Human Reviewer",
+        include_digest=True,
+        reviewed_digest=None,
+    ):
+        command = [
+            str(PUBLISH),
+            "session-123",
+            "--repo-root",
+            str(self.root),
+            "--reviewed-by",
+            reviewer,
+        ]
+        if include_digest:
+            command.extend(
+                [
+                    "--reviewed-sha256",
+                    reviewed_digest or self.candidate_digest(),
+                ]
+            )
+        command.extend(extra)
         return subprocess.run(
-            [
-                str(PUBLISH),
-                "session-123",
-                "--repo-root",
-                str(self.root),
-                "--reviewed-by",
-                reviewer,
-                *extra,
-            ],
+            command,
             text=True,
             capture_output=True,
             check=False,
         )
 
-    def main_args(self, session_id, reviewer="Human Reviewer"):
+    def main_args(self, session_id, reviewer="Human Reviewer", reviewed_digest=None):
         return [
             session_id,
             "--repo-root",
             str(self.root),
             "--reviewed-by",
             reviewer,
+            "--reviewed-sha256",
+            reviewed_digest or self.candidate_digest(session_id),
             "--confirm-sensitive-review",
             "--confirm-content-review",
         ]
@@ -101,6 +127,88 @@ class PublishAiRecordTests(unittest.TestCase):
                 result = self.run_publish(supplied_flag)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertFalse((self.root / "artifacts").exists())
+
+    def test_reviewed_digest_is_required(self):
+        result = self.run_publish(
+            "--confirm-sensitive-review",
+            "--confirm-content-review",
+            include_digest=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("reviewed SHA-256 digest is required", result.stderr)
+        self.assertFalse((self.root / "artifacts").exists())
+
+    def test_digest_mismatch_rejects_replaced_candidate(self):
+        reviewed_digest = self.candidate_digest()
+        self.candidate.write_text(
+            "# Replaced after review\n\n- Model: `other-model`\n",
+            encoding="utf-8",
+        )
+
+        result = self.run_publish(
+            "--confirm-sensitive-review",
+            "--confirm-content-review",
+            reviewed_digest=reviewed_digest,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("reviewed digest mismatch", result.stderr)
+        self.assertFalse((self.root / "artifacts").exists())
+
+    def test_open_descriptor_binds_publication_to_reviewed_bytes(self):
+        original = self.candidate.read_bytes()
+        reviewed_digest = hashlib.sha256(original).hexdigest()
+        real_open = os.open
+        real_replace = os.replace
+        candidate_opened = False
+
+        def replace_path_after_open(path, flags, *args, **kwargs):
+            nonlocal candidate_opened
+            descriptor = real_open(path, flags, *args, **kwargs)
+            if Path(path) == self.candidate and not candidate_opened:
+                candidate_opened = True
+                replacement = self.candidate.with_name("replacement.md")
+                replacement.write_text(
+                    "# Unreviewed replacement\n",
+                    encoding="utf-8",
+                )
+                real_replace(replacement, self.candidate)
+            return descriptor
+
+        with mock.patch.object(
+            publish_ai_record.os,
+            "open",
+            side_effect=replace_path_after_open,
+        ):
+            result = publish_ai_record.main(
+                self.main_args("session-123", reviewed_digest=reviewed_digest)
+            )
+
+        artifact = self.root / "artifacts" / "codex-session-session-123.md"
+        self.assertEqual(result, 0)
+        self.assertIn("# Codex Session `session-123`", artifact.read_text())
+        self.assertNotIn("Unreviewed replacement", artifact.read_text())
+
+    def test_pending_candidate_symlink_is_rejected(self):
+        outside = self.root / "outside-candidate.md"
+        outside.write_text("# Outside candidate\n", encoding="utf-8")
+        reviewed_digest = hashlib.sha256(outside.read_bytes()).hexdigest()
+        self.candidate.unlink()
+        try:
+            self.candidate.symlink_to(outside)
+        except OSError:
+            self.skipTest("symlinks unavailable")
+
+        result = self.run_publish(
+            "--confirm-sensitive-review",
+            "--confirm-content-review",
+            reviewed_digest=reviewed_digest,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("pending candidate must be a regular file", result.stderr)
+        self.assertFalse((self.root / "artifacts").exists())
 
     def test_unredacted_secret_blocks_publication(self):
         self.candidate.write_text(
@@ -128,6 +236,26 @@ class PublishAiRecordTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("sensitive pattern", result.stderr)
         self.assertFalse((self.root / "artifacts").exists())
+
+    def test_unredacted_refresh_tokens_and_cookie_block_publication(self):
+        cases = (
+            "refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNhbWVsIn0.publisher-camel_suffix",
+            "refresh_token='eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InNuYWtlIn0.publisher-snake_suffix'",
+            '\"refresh-token\": \"eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImtlYmFiIn0.publisher-kebab_suffix\"',
+            "Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNvb2tpZSJ9.publisher-cookie_suffix; theme=dark",
+        )
+        for exposed in cases:
+            with self.subTest(exposed=exposed.split("=", 1)[0]):
+                self.candidate.write_text(
+                    "# Candidate\n{}\n".format(exposed),
+                    encoding="utf-8",
+                )
+                result = self.run_publish(
+                    "--confirm-sensitive-review", "--confirm-content-review"
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("sensitive pattern", result.stderr)
+                self.assertFalse((self.root / "artifacts").exists())
 
     def test_secret_bearing_reviewer_blocks_publication(self):
         result = self.run_publish(
@@ -167,6 +295,82 @@ class PublishAiRecordTests(unittest.TestCase):
             ),
             1,
         )
+
+    def write_indexed_artifact(self, session_id):
+        artifacts = self.root / "artifacts"
+        artifacts.mkdir(exist_ok=True)
+        artifact = artifacts / "codex-session-{}.md".format(session_id)
+        artifact.write_text("# Reviewed {}\n".format(session_id), encoding="utf-8")
+        return artifact
+
+    def set_managed_region(self, *lines):
+        managed = "\n".join(lines)
+        document = self.usage_initial.replace(
+            START + "\n" + END,
+            START + "\n" + (managed + "\n" if managed else "") + END,
+        )
+        self.usage.write_text(document, encoding="utf-8")
+
+    def managed_region(self):
+        document = self.usage.read_text(encoding="utf-8")
+        return document.split(START, 1)[1].split(END, 1)[0]
+
+    def test_managed_region_adds_link_missing_for_indexed_artifact(self):
+        other = self.write_indexed_artifact("other")
+        index_path = other.parent / "index.md"
+        index_path.write_text(indexer.render_index([other.name]), encoding="utf-8")
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        managed = self.managed_region()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("codex-session-other.md", managed)
+        self.assertIn("codex-session-session-123.md", managed)
+
+    def test_managed_region_removes_stale_missing_artifact_link(self):
+        self.set_managed_region(
+            "- [검토 완료 세션 `missing`](./artifacts/codex-session-missing.md)"
+        )
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        managed = self.managed_region()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("codex-session-missing.md", managed)
+        self.assertIn("codex-session-session-123.md", managed)
+
+    def test_managed_region_removes_malformed_entry(self):
+        self.set_managed_region("- malformed reviewed record link")
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        managed = self.managed_region()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("malformed", managed)
+        self.assertIn("codex-session-session-123.md", managed)
+
+    def test_managed_region_removes_unindexed_artifact_link(self):
+        unindexed = self.write_indexed_artifact("unindexed")
+        self.set_managed_region(
+            "- [검토 완료 세션 `unindexed`]"
+            "(./artifacts/codex-session-unindexed.md)"
+        )
+
+        result = self.run_publish(
+            "--confirm-sensitive-review", "--confirm-content-review"
+        )
+
+        managed = self.managed_region()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(unindexed.is_file())
+        self.assertNotIn("codex-session-unindexed.md", managed)
+        self.assertIn("codex-session-session-123.md", managed)
 
     def test_concurrent_session_publications_preserve_both_managed_entries(self):
         for session_id in ("session-a", "session-b"):

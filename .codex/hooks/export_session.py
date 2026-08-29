@@ -33,10 +33,18 @@ SECRET_PATTERNS = [
     (
         re.compile(
             r"(?i)(?P<prefix>[\"']?"
-            r"(?:api[_-]?key|access[_-]?token|secret|password)"
+            r"(?:api[_-]?key|access[_-]?token|refresh[_-]?token|secret|password)"
             r"[\"']?\s*[:=]\s*)"
             r"(?P<value>\"(?:\\.|[^\"\\])*\"|"
             r"'(?:\\.|[^'\\])*'|[^\s&,;]+)"
+        ),
+        redact_assignment,
+    ),
+    (
+        re.compile(
+            r"(?i)(?P<prefix>\bCookie\s*:\s*[^\r\n]*?\btoken\s*=\s*)"
+            r"(?P<value>\"(?:\\.|[^\"\\])*\"|"
+            r"'(?:\\.|[^'\\])*'|[^;\s,\r\n]+)"
         ),
         redact_assignment,
     ),

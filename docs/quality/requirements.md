@@ -37,7 +37,7 @@ are reserved for human owners.
 | AUTH-04 | Submit state | requirement: 로그인 | Submit is enabled only when email and password both satisfy validation. | LOW | component | — | — | auth-entry | NOT_STARTED |
 | AUTH-05 | Sign-in request | requirement: 로그인; OAS `/api/sign-in` | Valid submit sends email/password JSON to `POST /api/sign-in`. | MEDIUM | integration | — | — | auth-entry | NOT_STARTED |
 | AUTH-06 | Sign-in failure | requirement: 로그인; OAS `ErrorResponse` | Any non-200 sign-in response displays returned `errorMessage` in a modal. | MEDIUM | integration/browser | — | — | auth-entry | NOT_STARTED |
-| AUTH-07 | Authentication state | OAS auth schemas | Successful sign-in establishes approved access-token state and protected requests use it; refresh behavior follows approved design. | HIGH | integration/browser | — | — | auth-entry | NOT_STARTED |
+| AUTH-07 | Authentication state | OAS auth schemas | Successful sign-in establishes approved access-token state. Integration evidence proves a protected request sends `Authorization: Bearer <accessToken>` and exercises the human-approved refresh/expiry behavior; browser evidence is reserved for a credential or network boundary integration tests cannot prove. | HIGH | integration + targeted browser/network checkpoint | — | — | auth-entry | NOT_STARTED |
 | TASK-LIST-01 | Page request | requirement: 목록; OAS `/api/task` | `/task` requests `GET /api/task?page=1` and renders returned data. | MEDIUM | integration | — | — | task-discovery | NOT_STARTED |
 | TASK-LIST-02 | Card content | requirement: 목록 | Each rendered task card shows title and memo. | LOW | component | — | — | task-discovery | NOT_STARTED |
 | TASK-LIST-03 | Virtual rendering | requirement: 목록 | Growing list renders only visible or near-visible items rather than every fetched item. | MEDIUM | integration/browser | — | — | task-discovery | NOT_STARTED |
@@ -57,13 +57,19 @@ are reserved for human owners.
 Requirements: `NAV-02`, `AUTH-01` through `AUTH-07`.
 
 - Preconditions: signed out; sign-in API can return deterministic success and
-  error responses.
+  error responses; protected and refresh endpoints can exercise the approved
+  access-token expiry behavior deterministically.
 - Actions: open `/sign-in`; submit invalid fields; submit valid fields against
   error response; dismiss error; submit valid fields against success response;
-  inspect authenticated navigation.
+  trigger a protected request; inspect captured integration or browser-network
+  evidence for `Authorization: Bearer <accessToken>`; exercise and inspect the
+  approved refresh/expiry path; inspect authenticated navigation.
 - Expected: labels remain usable, invalid values cannot submit, server
   `errorMessage` appears in modal, success establishes authenticated state, and
-  navigation switches from sign-in to profile.
+  navigation switches from sign-in to profile. The protected request carries
+  the access token as a bearer credential, and expiry follows exactly the
+  human-approved refresh behavior. The human checkpoint reviews both pieces of
+  auth evidence rather than inferring them from the navigation change.
 
 ### work-overview
 

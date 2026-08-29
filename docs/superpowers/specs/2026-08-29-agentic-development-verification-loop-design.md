@@ -253,7 +253,7 @@ Canonical commands:
   groups, journey categories, and final-QA checklist.
 - Read-only verification rules and separate formatting mutation rules.
 - Codex hook configuration, prompt exporter tests, pending-record ignore rule,
-  and reviewed-publication contract.
+  artifact-contract/index/publisher tests, and reviewed-publication contract.
 - `AI_USAGE.md` required headings and review language.
 
 ### Quick Mode
@@ -361,11 +361,14 @@ tool stop event
   -> structurally exclude internal instructions and reasoning
   -> redact and scan sensitive values
   -> write only a redacted candidate to ignored pending storage
-  -> human reviews candidate
-  -> explicit publish command confirms review
+  -> human reviews exact candidate bytes and records their SHA-256 digest
+  -> explicit publish command supplies the digest and both review confirmations
+  -> publisher opens a no-follow regular-file descriptor and reads once
+  -> reject unless the opened bytes match the reviewed digest
   -> atomically write tracked artifacts record
   -> under one lock, update artifacts/index.md
-  -> update the managed reviewed-record link in AI_USAGE.md
+  -> regenerate the full managed reviewed-record region in AI_USAGE.md from the
+     post-publication canonical index filenames
 ```
 
 Rules:
@@ -374,15 +377,17 @@ Rules:
 - Never write pre-redaction content to pending or tracked project files.
 - Pending candidates are ignored by Git and are not submission evidence.
 - Automated redaction is necessary but cannot grant publication approval.
-- The publish command fails without explicit human-review confirmation.
+- The publish command fails without the reviewed SHA-256 digest and both
+  explicit human-review confirmations.
 - `artifacts/` contains reviewed records only.
 - Existing tracked records created under the earlier policy are labeled
   `legacy/pre-policy` until separately reviewed; automation never marks them
   reviewed.
 - `AI_USAGE.md` links the reviewed-record index and retains factual, unchecked
   human-verification items until a person completes them. Only the explicit
-  publisher rewrites the reviewed-record managed region; SessionEnd and Stop never
-  rewrite `AI_USAGE.md`.
+  publisher rewrites the reviewed-record managed region, replacing it from the
+  canonical reviewed index so stale, malformed, missing, or unindexed links do
+  not retain trust; SessionEnd and Stop never rewrite `AI_USAGE.md`.
 
 The existing Codex `Stop` hook becomes the first adapter. Other AI tools are
 allowed when their adapter or manual process produces the same reviewed record

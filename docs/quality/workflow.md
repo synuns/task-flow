@@ -112,12 +112,25 @@ Request human action only for:
 While a checkpoint is pending, evidence preparation and unrelated LOW analysis
 may continue. Do not implement beyond the unapproved journey boundary.
 
+For the `auth-entry` checkpoint, the person reviews focused integration
+evidence that a protected request uses `Authorization: Bearer <accessToken>`
+and that the approved refresh/expiry path was exercised. Add core browser
+evidence only for credential or network behavior that the integration boundary
+cannot prove; a visible profile action alone is not authentication evidence.
+
 ## Prompt Records
 
 Tool stop hooks may create redacted candidates only. Candidates are not
-submission evidence. A person reviews content and sensitive information, then
-runs the explicit publication command. AI must not invoke that command or mark
-review complete on a person's behalf. See `verification.md` and `AI_USAGE.md`.
+submission evidence. A person reviews the exact candidate bytes and sensitive
+information, computes their reviewed SHA-256 digest, then supplies that digest
+and both explicit confirmations to the publication command. The publisher
+opens the candidate through a no-follow descriptor, requires a regular file,
+reads it once, and publishes only the bytes matching the digest. Under the
+shared index lock it regenerates the entire managed `AI_USAGE.md` region from
+the post-publication canonical reviewed index, removing stale or malformed
+entries and restoring missing links while excluding unindexed artifacts. AI
+must not invoke that command or mark review complete on a person's behalf. See
+`verification.md` and `AI_USAGE.md`.
 
 ## Final QA Checklist
 

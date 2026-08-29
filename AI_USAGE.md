@@ -34,19 +34,28 @@
 
 Stop 훅은 구조적으로 내부 지침과 reasoning을 제외하고, 메모리에서
 민감정보를 마스킹한 뒤 Git 비추적 pending 후보만 생성합니다. 사람이
-후보의 내용과 민감정보를 모두 검토한 후 다음 명령으로 게시합니다.
+후보의 정확한 바이트와 민감정보를 모두 검토한 후 SHA-256 digest를
+계산하고 다음 명령으로 게시합니다.
 
 ```bash
+shasum -a 256 .codex/review-pending/codex-session-<session-id>.md
 ./scripts/publish-ai-record <session-id> \
   --reviewed-by "<reviewer>" \
+  --reviewed-sha256 "<reviewed-sha256>" \
   --confirm-sensitive-review \
   --confirm-content-review
 ```
 
+`--reviewed-sha256`에는 위 명령이 출력한 64자리 digest를 입력합니다.
 자동 마스킹은 사람 검토를 대체하지 않습니다. `artifacts/`에는 검토 후
-게시된 기록만 추가합니다. 게시 명령은 공용 잠금 안에서 검토 artifact,
-인덱스, 아래 managed 링크 순서로 갱신합니다. SessionEnd 훅은 파일명을
-기준으로 인덱스만 검증·정리하며 `AI_USAGE.md`는 수정하지 않습니다.
+게시된 기록만 추가합니다. 게시 명령은 pending 후보를 심볼릭 링크를
+따르지 않는 descriptor로 열어 regular file인지 확인하고 한 번 읽은 뒤,
+검토 digest와 일치하는 바이트만 게시 입력으로 사용합니다. 공용 잠금
+안에서는 검토 artifact, 정규 인덱스, 아래 managed 영역 순서로 갱신하고,
+managed 영역 전체를 게시 후 인덱스 파일명에서 재생성하여 오래되거나
+잘못되었거나 누락·미인덱스된 링크를 제거합니다. SessionEnd 훅은
+파일명을 기준으로 인덱스만 검증·정리하며 `AI_USAGE.md`는 수정하지
+않습니다.
 
 ### 검토 완료 기록
 

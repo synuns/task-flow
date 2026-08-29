@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import datetime
+import hashlib
+import hmac
 import importlib.util
 import os
+import re
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -49,7 +53,7 @@ def atomic_write(path, content):
                 pass
 
 
-def reviewed_content(candidate, reviewer):
+def reviewed_content(candidate, reviewer, reviewed_sha256):
     stamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
     safe_reviewer = " ".join(reviewer.replace("`", "'").split())
     lines = candidate.splitlines()
@@ -58,11 +62,12 @@ def reviewed_content(candidate, reviewer):
         "- Review status: `human-reviewed`",
         "- Reviewed by: `{}`".format(safe_reviewer),
         "- Reviewed at: `{}`".format(stamp),
+        "- Reviewed candidate SHA-256: `{}`".format(reviewed_sha256),
     ]
     return "\n".join(lines[:1] + metadata + lines[1:]).rstrip() + "\n"
 
 
-def update_usage(document, session_id):
+def update_usage(document, filenames, indexer):
     start = "<!-- reviewed-records:start -->"
     end = "<!-- reviewed-records:end -->"
     if document.count(start) != 1 or document.count(end) != 1:
@@ -71,14 +76,57 @@ def update_usage(document, session_id):
     end_position = document.index(end)
     if start_position >= end_position:
         raise ValueError("AI_USAGE.md reviewed-record markers are out of order")
-    link = (
-        "- [검토 완료 세션 `{0}`]"
-        "(./artifacts/codex-session-{0}.md)".format(session_id)
-    )
-    managed = document[start_position + len(start) : end_position]
-    if link in managed:
-        return document
-    return document[:end_position] + link + "\n" + document[end_position:]
+    links = []
+    for filename in sorted(set(filenames)):
+        session_id = indexer.session_id_from_artifact_filename(filename)
+        if session_id is None:
+            raise ValueError("invalid reviewed artifact filename")
+        links.append(
+            "- [검토 완료 세션 `{}`](./artifacts/{})".format(
+                session_id,
+                filename,
+            )
+        )
+    managed = start + "\n"
+    if links:
+        managed += "\n".join(links) + "\n"
+    managed += end
+    return document[:start_position] + managed + document[end_position + len(end) :]
+
+
+def read_reviewed_candidate(path, reviewed_sha256):
+    if not re.fullmatch(r"[0-9A-Fa-f]{64}", reviewed_sha256):
+        raise ValueError("reviewed SHA-256 digest must be 64 hexadecimal characters")
+    no_follow = getattr(os, "O_NOFOLLOW", None)
+    if no_follow is None:
+        raise ValueError("no-follow candidate open is unsupported")
+    flags = os.O_RDONLY | no_follow
+    flags |= getattr(os, "O_CLOEXEC", 0)
+    flags |= getattr(os, "O_NONBLOCK", 0)
+    try:
+        descriptor = os.open(path, flags)
+    except FileNotFoundError as error:
+        raise ValueError("pending candidate not found") from error
+    except OSError as error:
+        raise ValueError("pending candidate must be a regular file") from error
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise ValueError("pending candidate must be a regular file")
+        with os.fdopen(descriptor, "rb") as stream:
+            descriptor = None
+            candidate_bytes = stream.read()
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+    actual_sha256 = hashlib.sha256(candidate_bytes).hexdigest()
+    normalized_sha256 = reviewed_sha256.lower()
+    if not hmac.compare_digest(actual_sha256, normalized_sha256):
+        raise ValueError("reviewed digest mismatch")
+    try:
+        candidate = candidate_bytes.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise ValueError("pending candidate must be valid UTF-8") from error
+    return candidate, normalized_sha256
 
 
 def restore_artifact(path, previous):
@@ -134,6 +182,7 @@ def parse_args(argv=None):
     parser.add_argument("session_id")
     parser.add_argument("--repo-root", type=Path, default=DEFAULT_ROOT)
     parser.add_argument("--reviewed-by", required=True)
+    parser.add_argument("--reviewed-sha256")
     parser.add_argument("--confirm-sensitive-review", action="store_true")
     parser.add_argument("--confirm-content-review", action="store_true")
     return parser.parse_args(argv)
@@ -143,6 +192,9 @@ def main(argv=None):
     args = parse_args(argv)
     if not args.confirm_sensitive_review or not args.confirm_content_review:
         print("both human review confirmations are required", file=sys.stderr)
+        return 2
+    if args.reviewed_sha256 is None:
+        print("reviewed SHA-256 digest is required", file=sys.stderr)
         return 2
     if not args.reviewed_by.strip():
         print("reviewer name is required", file=sys.stderr)
@@ -168,16 +220,20 @@ def main(argv=None):
         / "review-pending"
         / exporter.artifact_filename(session_id)
     )
-    if not candidate_path.is_file():
-        print("pending candidate not found", file=sys.stderr)
+    try:
+        candidate, reviewed_sha256 = read_reviewed_candidate(
+            candidate_path,
+            args.reviewed_sha256,
+        )
+    except (OSError, UnicodeError, ValueError) as error:
+        print("publication failed: {}".format(error), file=sys.stderr)
         return 1
-    candidate = candidate_path.read_text(encoding="utf-8")
     if exporter.redact(candidate, Path("/__no_home_match__")) != candidate:
         print("candidate still contains a sensitive pattern", file=sys.stderr)
         return 1
     artifacts = root / "artifacts"
     destination = artifacts / exporter.artifact_filename(session_id)
-    reviewed = reviewed_content(candidate, args.reviewed_by)
+    reviewed = reviewed_content(candidate, args.reviewed_by, reviewed_sha256)
     if exporter.redact(reviewed, Path("/__no_home_match__")) != reviewed:
         print("reviewed record still contains a sensitive pattern", file=sys.stderr)
         return 1
@@ -187,7 +243,6 @@ def main(argv=None):
         artifacts.mkdir(parents=True, exist_ok=True)
         with indexer.index_lock(artifacts / ".index.lock"):
             usage = usage_path.read_text(encoding="utf-8")
-            updated_usage = update_usage(usage, session_id)
             index_path = artifacts / "index.md"
             filenames = indexer.list_published_artifact_names(
                 index_path,
@@ -204,15 +259,18 @@ def main(argv=None):
                 raise ValueError("artifact destination must be a regular file")
             if destination.is_file():
                 previous = destination.read_text(encoding="utf-8")
+            filenames.append(destination.name)
+            filenames = sorted(set(filenames))
+            updated_index = indexer.render_index(filenames)
+            updated_usage = update_usage(usage, filenames, indexer)
             artifact_written = False
             index_written = False
             try:
                 atomic_write(destination, reviewed)
                 artifact_written = True
-                filenames.append(destination.name)
                 indexer.atomic_write_index(
                     index_path,
-                    indexer.render_index(filenames),
+                    updated_index,
                 )
                 index_written = True
                 atomic_write(usage_path, updated_usage)

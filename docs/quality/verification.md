@@ -17,8 +17,8 @@ verification fail.
 
 - `setup`: required files, document markers and links, risk/approval rules,
   journey categories, review/final-QA sections, pending-record ignore rule,
-  Stop/SessionEnd hook wiring, AI disclosure headings, and exporter, index, and
-  publisher unit tests.
+  Stop/SessionEnd hook wiring, AI disclosure headings, and the four focused
+  artifact-contract, exporter, index, and publisher unit-test suites.
 - `quick`: `setup`, then `format:check`, `lint`, `typecheck`, and `test` after
   frontend scaffolding.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
@@ -76,13 +76,27 @@ trace, verdict, failure class, correction, and rerun result.
 
 Browser automation failure is `ENVIRONMENT` or `TOOLING`, never product pass.
 
+For `AUTH-07`, focused integration evidence proves that a protected request
+sends `Authorization: Bearer <accessToken>` and exercises the human-approved
+refresh/expiry behavior. Core E2E covers only a credential or browser-network
+boundary that integration evidence cannot prove. The human `auth-entry`
+checkpoint reviews both artifacts; authenticated navigation alone is
+insufficient.
+
 ## Prompt Candidate Verification
 
 Setup verification confirms ignored pending storage, Stop hook wiring, exporter
 tests, and reviewed-publication language. The hook creates only structurally
 filtered and redacted pending candidates. A person reviews content and sensitive
-information before running `scripts/publish-ai-record`. Published records alone
-are indexed in `artifacts/index.md`. The explicit publisher holds the shared index
-lock and writes the reviewed artifact, canonical index, and managed `AI_USAGE.md`
-record link in that order, rolling earlier files back if a later write fails.
-`SessionEnd` validates and prunes the index only; it never rewrites `AI_USAGE.md`.
+information in the exact candidate bytes and supplies their
+reviewed SHA-256 digest plus both review confirmations to
+`scripts/publish-ai-record`. The publisher opens the candidate with no-follow
+semantics, requires a regular file, reads it once, rejects a digest mismatch,
+and publishes from those bytes.
+Published records alone are indexed in `artifacts/index.md`. The explicit
+publisher holds the shared index lock and writes the reviewed artifact,
+canonical index, and fully regenerated managed `AI_USAGE.md` region in that
+order, rolling earlier files back if a later write fails. The region is derived
+only from post-publication canonical index filenames, so stale, malformed,
+missing, and unindexed links are removed. `SessionEnd` validates and prunes the
+index only; it never rewrites `AI_USAGE.md`.
