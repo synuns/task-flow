@@ -178,8 +178,8 @@ Replace `package.json` with:
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e:core": "playwright test --grep @core --pass-with-no-tests",
-    "test:e2e:smoke": "playwright test e2e/scaffold.smoke.spec.ts",
+    "test:e2e:core": "env -u NO_COLOR playwright test --grep @core --pass-with-no-tests",
+    "test:e2e:smoke": "env -u NO_COLOR playwright test e2e/scaffold.smoke.spec.ts",
     "api:types": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts",
     "ai:review": "./scripts/review-ai-record"
   },
@@ -340,7 +340,7 @@ Create `tsconfig.node.json`:
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "skipLibCheck": true,
@@ -384,7 +384,7 @@ Create `vitest.config.ts`:
 
 ```ts
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -393,7 +393,11 @@ export default defineConfig({
     },
   },
   test: {
+    css: {
+      include: [/.+/],
+    },
     environment: "jsdom",
+    exclude: [...configDefaults.exclude, "e2e/**"],
     setupFiles: ["./src/test/setup.ts"],
   },
 });
@@ -653,7 +657,7 @@ Expected checksums:
 
 ```text
 9599f12fd42fc0bce1cd50b47a0c022e108d7aa64dd0d1bb0ed44f3282d900b4  public/fonts/PretendardVariable.woff2
-d31ddd9f2bed32fd7e302a205cf2380ba0de6529152d239ef99cfb6f261bfc04  public/fonts/LICENSE-Pretendard.txt
+85fce85e25260b03777bf10373d3bd9363b9da96d9e0ca86a280dd37ed7667a0  public/fonts/LICENSE-Pretendard.txt
 ```
 
 - [ ] **Step 5: Tailwind plugin과 global token stylesheet 구현**
