@@ -291,6 +291,37 @@ def render_markdown(session: SessionData, home: Optional[Path] = None) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def render_prompt_snapshot(record: str, prompt: str, home: Optional[Path] = None) -> str:
+    return "\n".join(
+        [
+            "# Codex Session `{}`".format(redact(record, home)),
+            "",
+            "> Human review required before submission. Automatic redaction is best-effort.",
+            "",
+            "## Provisional turn",
+            "",
+            "### User prompt",
+            "",
+            redact(prompt, home),
+            "",
+        ]
+    )
+
+
+def append_provisional_prompt(markdown: str, turn_id: str, prompt: str, home: Optional[Path] = None) -> str:
+    return markdown.rstrip() + "\n" + "\n".join(
+        [
+            "",
+            "## Provisional turn `{}`".format(redact(turn_id, home)),
+            "",
+            "### User prompt",
+            "",
+            redact(prompt, home),
+            "",
+        ]
+    )
+
+
 def log_event(
     repo_root: Path,
     event: str,

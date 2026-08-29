@@ -13,6 +13,7 @@ HOOKS = ROOT / ".codex" / "hooks"
 if str(HOOKS) not in sys.path:
     sys.path.insert(0, str(HOOKS))
 import session_records
+import session_hook
 
 
 class RecordStorageTests(unittest.TestCase):
@@ -145,6 +146,60 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(migrated.record_id, "session-123.s0001")
         self.assertFalse(legacy.exists())
         self.assertEqual(self.store.paths(migrated.record_id).markdown.read_bytes(), b"legacy bytes\n")
+
+
+class HookDispatcherTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.transcript = ROOT / "tests" / "fixtures" / "codex-rollout.jsonl"
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def payload(self, event, **extra):
+        value = {"hook_event_name": event, "session_id": "session-123", "cwd": str(self.root), "turn_id": "turn-1"}
+        value.update(extra)
+        return value
+
+    def test_user_prompt_creates_minimum_snapshot(self):
+        outcome = session_hook.handle_hook(self.payload("UserPromptSubmit", prompt="api_key=secret"), self.root)
+        store = session_records.RecordStore(self.root)
+        metadata = store.read_metadata("session-123.s0001")
+        candidate = store.paths("session-123.s0001").markdown.read_text(encoding="utf-8")
+        self.assertEqual(outcome.status, "ok")
+        self.assertEqual(metadata["snapshot_kind"], "prompt_minimum")
+        self.assertIn("api_key=[REDACTED]", candidate)
+        self.assertNotIn("secret", candidate)
+
+    def test_stop_replaces_provisional_snapshot(self):
+        session_hook.handle_hook(self.payload("UserPromptSubmit", prompt="Create structure"), self.root)
+        outcome = session_hook.handle_hook(self.payload("Stop", transcript_path=str(self.transcript), model="gpt-5.6-sol"), self.root)
+        store = session_records.RecordStore(self.root)
+        metadata = store.read_metadata("session-123.s0001")
+        candidate = store.paths("session-123.s0001").markdown.read_text(encoding="utf-8")
+        self.assertEqual(outcome.status, "ok")
+        self.assertEqual(metadata["snapshot_kind"], "turn_complete")
+        self.assertIn("Structure created", candidate)
+        self.assertEqual(len(metadata["transcript"]["sha256"]), 64)
+
+    def test_parse_failure_preserves_previous_candidate(self):
+        session_hook.handle_hook(self.payload("UserPromptSubmit", prompt="safe"), self.root)
+        store = session_records.RecordStore(self.root)
+        before = store.paths("session-123.s0001").markdown.read_bytes()
+        broken = self.root / "broken.jsonl"
+        broken.write_text("{bad\n", encoding="utf-8")
+        outcome = session_hook.handle_hook(self.payload("Stop", transcript_path=str(broken)), self.root)
+        self.assertEqual(outcome.status, "error")
+        self.assertEqual(outcome.error, "malformed_json")
+        self.assertEqual(store.paths("session-123.s0001").markdown.read_bytes(), before)
+
+    def test_session_end_does_not_call_parser(self):
+        session_hook.handle_hook(self.payload("UserPromptSubmit", prompt="safe"), self.root)
+        with mock.patch.object(session_hook, "read_transcript", side_effect=AssertionError("parser called")):
+            outcome = session_hook.handle_hook(self.payload("SessionEnd", transcript_path=str(self.transcript)), self.root)
+        self.assertEqual(outcome.status, "ok")
+        self.assertEqual(session_records.RecordStore(self.root).read_metadata("session-123.s0001")["state"], "closed")
 
 
 if __name__ == "__main__":
