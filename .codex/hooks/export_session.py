@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set
 
 from artifact_contract import artifact_filename, safe_session_id
+from transcript_adapter import TranscriptError, read_transcript
 
 
 REDACTED = "[REDACTED]"
@@ -114,7 +115,7 @@ def extract_visible_text(content: object, allowed_types: Set[str]) -> str:
     return "\n".join(parts)
 
 
-def parse_rollout(
+def _legacy_parse_rollout(
     path: Path,
     session_id: str,
     fallback_model: str,
@@ -205,6 +206,16 @@ def parse_rollout(
                         payload.get("output"), {"input_text", "output_text"}
                     )
     return session
+
+
+def parse_rollout(
+    path: Path,
+    session_id: str,
+    fallback_model: str,
+    on_warning: Optional[Callable[[str, int], None]] = None,
+) -> SessionData:
+    del on_warning
+    return read_transcript(path, session_id, fallback_model).session
 
 
 def redact(text: str, home: Optional[Path] = None) -> str:

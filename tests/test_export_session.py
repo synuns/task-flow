@@ -53,15 +53,15 @@ class ParseRolloutTests(unittest.TestCase):
         for hidden in ("internal instruction", "private reasoning", "Working", "must not render"):
             self.assertNotIn(hidden, visible)
 
-    def test_malformed_line_is_skipped(self):
+    def test_malformed_line_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "rollout.jsonl"
             lines = FIXTURE.read_text(encoding="utf-8").splitlines()
             lines.insert(4, "{not-json")
             path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-            session = self.parse(path)
-        self.assertEqual(len(session.turns), 2)
-        self.assertEqual(self.warnings, [("malformed_json", 5)])
+            with self.assertRaises(export_session.TranscriptError) as raised:
+                self.parse(path)
+        self.assertEqual(raised.exception.code, "malformed_json")
 
 
 class RedactionAndRenderTests(unittest.TestCase):
