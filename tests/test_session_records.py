@@ -85,5 +85,67 @@ class RecordStorageTests(unittest.TestCase):
         self.assertEqual(self.store.read_metadata(first.record_id)["revision"], 1)
 
 
+class LifecycleTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.store = session_records.RecordStore(self.root, clock=lambda: "2026-08-29T12:00:00Z")
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def test_prompt_stop_end_resume_clear_flow(self):
+        prompt = self.store.record_prompt("session-123", "turn-1", b"prompt\n", "codex-rollout-v1")
+        self.assertEqual((prompt.segment, prompt.revision, prompt.state), (1, 1, "pending"))
+        base = self.store.begin_stop("session-123")
+        stopped = self.store.commit_stop(base, "turn-1", b"complete\n", {"size": 9, "mtime_ns": 10, "observed_at": "2026-08-29T12:00:00Z", "last_record_timestamp": "2026-08-29T11:59:59Z", "sha256": "a" * 64}, "codex-rollout-v1")
+        self.assertEqual((stopped.revision, stopped.state), (2, "pending"))
+        closed = self.store.session_end("session-123")
+        self.assertEqual((closed.revision, closed.state), (3, "closed"))
+        resumed = self.store.session_start("session-123", "resume")
+        self.assertEqual((resumed.revision, resumed.state), (4, "pending"))
+        reserved = self.store.session_start("session-123", "clear")
+        next_prompt = self.store.record_prompt("session-123", "turn-2", b"new topic\n", "codex-rollout-v1")
+        self.assertEqual((reserved.segment, next_prompt.segment, next_prompt.generation), (2, 2, 2))
+        self.assertEqual(self.store.read_metadata("session-123.s0001")["state"], "closed")
+
+    def test_old_stop_cannot_overwrite_new_prompt(self):
+        self.store.record_prompt("session-123", "turn-1", b"first\n", "codex-rollout-v1")
+        old_base = self.store.begin_stop("session-123")
+        newest = self.store.record_prompt("session-123", "turn-2", b"second\n", "codex-rollout-v1")
+        with self.assertRaises(session_records.RecordError) as raised:
+            self.store.commit_stop(old_base, "turn-1", b"stale\n", None, "codex-rollout-v1")
+        self.assertEqual(raised.exception.code, "stale_revision")
+        self.assertEqual(self.store.paths(newest.record_id).markdown.read_bytes(), b"second\n")
+
+    def test_parser_error_preserves_snapshot(self):
+        current = self.store.record_prompt("session-123", "turn-1", b"valid\n", "codex-rollout-v1")
+        base = self.store.begin_stop("session-123")
+        status = self.store.record_stop_error(base, "turn-1", "malformed_json")
+        metadata = self.store.read_metadata(current.record_id)
+        self.assertEqual(status, "error")
+        self.assertEqual(metadata["last_error"]["code"], "malformed_json")
+        self.assertEqual(self.store.paths(current.record_id).markdown.read_bytes(), b"valid\n")
+
+    def test_published_record_is_not_reopened(self):
+        current = self.store.record_prompt("session-123", "turn-1", b"valid\n", "codex-rollout-v1")
+        closed = self.store.session_end("session-123")
+        digest = self.store.read_metadata(closed.record_id)["artifact_sha256"]
+        self.store.mark_published(closed.record_id, digest)
+        reopened = self.store.session_start("session-123", "resume")
+        self.assertEqual(reopened.segment, 2)
+        self.assertEqual(self.store.read_metadata(current.record_id)["state"], "published")
+
+    def test_legacy_candidate_migrates_byte_for_byte(self):
+        pending = self.root / ".codex" / "review-pending"
+        pending.mkdir(parents=True)
+        legacy = pending / "codex-session-session-123.md"
+        legacy.write_bytes(b"legacy bytes\n")
+        migrated = self.store.migrate_legacy("session-123")
+        self.assertEqual(migrated.record_id, "session-123.s0001")
+        self.assertFalse(legacy.exists())
+        self.assertEqual(self.store.paths(migrated.record_id).markdown.read_bytes(), b"legacy bytes\n")
+
+
 if __name__ == "__main__":
     unittest.main()
