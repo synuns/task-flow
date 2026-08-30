@@ -248,7 +248,7 @@
   Pretendard, font/worker network와 console/page error 재확인; 상세 기록
   `docs/quality/evidence/frontend-scaffolding.md`
 
-### [ ] SCF-05 KB올라케어 semantic color theme
+### [x] SCF-05 KB올라케어 semantic color theme
 
 - Requirements: `SYS-02`
 - Risk: LOW — 기존 CSS Custom Properties와 Tailwind token 체계 확장
@@ -262,11 +262,30 @@
   `./scripts/verify quick`, `pnpm build`
 - Browser verification: `/`, light/dark computed background·foreground,
   console/page error 없음
-- Status: IN_PROGRESS
-- Evidence: 2026-08-30 Codex `/root`; 사용자 KB 기준 전체 변경 승인;
-  `docs/superpowers/specs/2026-08-30-kb-ollacare-color-theme-design.md` 작성;
-  `docs/superpowers/plans/2026-08-30-kb-ollacare-color-theme.md` 구현 계획 작성;
-  구현·검증 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`
+  - Requirement/Journey: `SYS-02` / `SCF-05`
+  - Commit: `7b08a42`
+  - RED: `pnpm vitest run src/test/theme-contract.test.ts` — `.dark` block
+    미정의로 1 failed, literal·Pretendard 2 passed
+  - Automatic: focused Vitest 1 file/3 tests PASS; global token source 밖 color
+    literal scan no matches; `./scripts/verify quick` PASS — setup 79 tests,
+    format, lint, typecheck, Vitest 7 files/20 tests; `pnpm build` PASS
+  - Agent-browser session: `scf-05`, 종료 확인
+  - Route/Viewport: `/`, 1280×720
+  - Precondition/Actions: Vite DEV에서 light 계산값 확인 후 `html.dark` 적용
+  - Expected: light KB Yellow Positive와 dark KB Yellow Negative primary,
+    background·foreground 전환
+  - Actual: light `background oklch(0.991 0.014 92.978)`, `foreground
+    oklch(0.232 0.006 78.196)`, `primary oklch(0.835 0.172 82.565)`;
+    dark `background oklch(0.219 0.007 78.185)`, `foreground
+    oklch(0.979 0.008 91.482)`, `primary oklch(0.865 0.177 90.382)`
+  - Console/Network: console error와 page error 없음; color 검증에 API 요청
+    적용 없음
+  - Screenshot/Trace: `/tmp/kbhc-scf-05-light.png`,
+    `/tmp/kbhc-scf-05-dark.png`
+  - Failure class: TEST — Biome이 test regex 선언 formatting 차이를 탐지
+  - Correction/Rerun: 요구 format으로 한 줄 교정 후 같은 quick gate PASS
 
 ## 2. 애플리케이션 구조·공통 경계
 
