@@ -139,7 +139,9 @@
 - Deliverable: FSD layer, public API, import 방향, provider composition,
   route/API/test 경계를 확정한 별도 설계 문서
 - Acceptance: 각 module의 책임·소비·제공 interface가 명확하고 scaffold 및
-  `docs/tech-stack.md`와 일치하며 사람이 승인한다.
+  `docs/tech-stack.md`와 일치하며 사람이 승인한다. FSD directory와 public API는
+  실제 소비 시점에만 생성하고 generated contract는 `shared/api` 내부 소비로
+  제한하며 auth provider placeholder를 포함하지 않는다.
 - Automatic verification: 설계 self-review, dependency 방향과 requirement
   coverage 정적 검토
 - Browser verification: 구현 전 적용 없음
@@ -213,11 +215,13 @@
 - Requirements: 전체 기능 requirement의 구조 기반
 - Risk: LOW — `DEC-ARCH-01` 승인안 실행
 - Depends on: `DEC-ARCH-01`, `SCF-04`
-- Deliverable: 승인된 app/pages/widgets/features/entities/shared/mocks 경계와
-  import restriction
-- Acceptance: placeholder 업무 UI 없이 layer import 방향이 정적 검사되고 public
-  export 밖 deep import가 차단된다.
-- Automatic verification: architecture lint/type test, `./scripts/verify quick`
+- Deliverable: 승인된 app/pages/widgets/features/entities/shared/mocks 경계 중
+  실제 소비자가 있는 directory와 public API, Biome import restriction
+- Acceptance: placeholder 업무 UI, auth provider placeholder, 빈 layer, 소비자 없는
+  빈 `index.ts` 없이 layer import 방향이 정적 검사된다. generated contract는
+  `shared/api`만 직접 import하고 public API로 노출하지 않는다.
+- Automatic verification: architecture lint/type test,
+  Biome `noRestrictedImports` 허용·차단 fixture, `./scripts/verify quick`
 - Browser verification: 적용 없음
 - Status: NOT_STARTED
 - Evidence: 미실행
