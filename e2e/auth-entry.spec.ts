@@ -18,6 +18,8 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
   await expect(page).toHaveURL(/\/sign-in$/);
   await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "할 일 상세" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "로그인" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "회원정보" })).toHaveCount(0);
 
   await page.getByRole("textbox", { name: "이메일" }).fill("user@example.com");
   await page.getByLabel("비밀번호").fill("Password1");
@@ -26,10 +28,14 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
   await expect(page).toHaveURL(/\/task\/task-1$/);
   await expect(page.getByRole("heading", { name: "할 일 상세" })).toBeVisible();
   await expect(page.getByRole("link", { name: "회원정보" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "로그인" })).toHaveCount(0);
   await page.reload();
   await expect(page).toHaveURL(/\/task\/task-1$/);
   await expect(page.getByRole("heading", { name: "할 일 상세" })).toBeVisible();
   expect(refreshRequests).toHaveLength(2);
+  await page.getByRole("link", { name: "회원정보" }).click();
+  await expect(page).toHaveURL(/\/user$/);
+  await expect(page.getByRole("heading", { name: "회원정보" })).toBeVisible();
   expect(consoleErrors).toEqual([
     "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
   ]);
