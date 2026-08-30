@@ -84,6 +84,7 @@
   access token memory 저장, MSW refresh cookie, session generation, single-flight
   refresh, 최대 한 번 replay, late 401와 이전 session 격리, 내부 route allowlist,
   app callback 주입과 router-owned navigation을 확정하고 사용자 대화 승인;
+  `docs/superpowers/plans/2026-08-30-authentication-policy.md` 실행 계획 자체 검토;
   `./scripts/verify quick` PASS, `git diff --check` PASS, 원본 문서 diff 없음;
   tracked `HUMAN_APPROVED` 표시는 사람 직접 확인 대기
 
@@ -143,7 +144,9 @@
   server-authoritative 비낙관적 삭제, attempt당 auth replay 포함 DELETE 최대 2회,
   200-only redirect, 404 non-success, outcome-unknown detail 재조회, 단일 fixture
   store와 cache 일관성을 확정하고 사용자 대화 승인; tracked `HUMAN_APPROVED`
-  표시는 사람 직접 확인 대기; `./scripts/verify quick` PASS,
+  표시는 사람 직접 확인 대기;
+  `docs/superpowers/plans/2026-08-30-delete-consistency-policy.md` 실행 계획 자체 검토;
+  `./scripts/verify quick` PASS,
   `git diff --check` PASS, 원본 문서 diff 없음
 
 ### [ ] DEC-ARCH-01 애플리케이션 구조 상세 설계
@@ -339,7 +342,8 @@
   integration tests, `./scripts/verify quick`
 - Browser verification: integration에서 증명 못한 cookie/network boundary만 대상
 - Status: BLOCKED
-- Evidence: blocker `DEC-AUTH-01` 사람 승인 없음
+- Evidence: `DEC-AUTH-01` 설계와 문서의 사용자 대화 승인은 완료; tracked
+  `HUMAN_APPROVED` 사람 직접 표시와 선행 `AUTH-API-01`, `ARCH-03` 구현 대기
 
 ### [ ] AUTH-NAV-01 비로그인/로그인 navigation 전환
 
@@ -520,13 +524,15 @@
 - Depends on: `TASK-DELETE-01`, `DEC-DELETE-01`
 - Deliverable: exact route ID DELETE, in-flight guard, error 표시, success cache 처리와
   `/task` navigation
-- Acceptance: guard 전 요청 0회, submit 후 exact endpoint 1회, 200 success에서만
-  redirect하며 승인된 목록/dashboard/detail 일관성을 유지한다.
+- Acceptance: guard 전 요청 0회, 사용자 submit은 1회이며 exact endpoint 전송은
+  최초 요청과 auth replay를 합쳐 최대 2회, 200 success에서만 redirect하며 승인된
+  목록/dashboard/detail 일관성을 유지한다.
 - Automatic verification: MSW integration tests와 request count/cache assertions,
   `./scripts/verify quick`
 - Browser verification: wrong/exact ID, network request, failure stay, success redirect
 - Status: BLOCKED
-- Evidence: 선행 구현과 삭제 일관성 검토 미완료
+- Evidence: `DEC-DELETE-01` 설계와 문서의 사용자 대화 승인은 완료; tracked
+  `HUMAN_APPROVED` 사람 직접 표시와 선행 `TASK-DELETE-01` 구현 대기
 
 ### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 검증·review·checkpoint
 
