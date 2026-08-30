@@ -229,6 +229,25 @@
   Pretendard, font/worker network와 console/page error 재확인; 상세 기록
   `docs/quality/evidence/frontend-scaffolding.md`
 
+### [ ] SCF-05 KB올라케어 semantic color theme
+
+- Requirements: `SYS-02`
+- Risk: LOW — 기존 CSS Custom Properties와 Tailwind token 체계 확장
+- Depends on: `SCF-02`
+- Deliverable: KB올라케어 시각 근거를 반영한 light/dark shadcn semantic token,
+  전체 Tailwind 연결과 color literal 계약
+- Acceptance: KB Yellow와 warm neutral 중심의 모든 token이 light/dark에서
+  정의되고 UI 색상은 semantic token만 소비하며 Pretendard와 기존 전역 기반은
+  유지된다.
+- Automatic verification: theme contract test, color literal 정적 검사,
+  `./scripts/verify quick`, `pnpm build`
+- Browser verification: `/`, light/dark computed background·foreground,
+  console/page error 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 Codex `/root`; 사용자 KB 기준 전체 변경 승인;
+  `docs/superpowers/specs/2026-08-30-kb-ollacare-color-theme-design.md` 작성;
+  구현·검증 미실행
+
 ## 2. 애플리케이션 구조·공통 경계
 
 ### [x] ARCH-01 FSD directory와 public boundary
