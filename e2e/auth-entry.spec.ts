@@ -49,10 +49,29 @@ test("@core @auth reports a credential failure in a modal and restores focus", a
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/sign-in");
-  await page.getByRole("textbox", { name: "이메일" }).fill("user@example.com");
-  await page.getByLabel("비밀번호").fill("Password2");
-  await page.getByRole("button", { name: "로그인" }).click();
+  const email = page.getByRole("textbox", { name: "이메일" });
+  const password = page.getByLabel("비밀번호");
+  const submit = page.getByRole("button", { name: "로그인" });
+  await expect(email).toBeVisible();
+  await expect(password).toBeVisible();
+  await expect(submit).toBeDisabled();
+
+  for (const navigationName of ["대시보드", "할 일", "로그인"]) {
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: navigationName })).toBeFocused();
+  }
+  await page.keyboard.press("Tab");
+  await expect(email).toBeFocused();
+  await email.fill("user@example.com");
+  await page.keyboard.press("Tab");
+  await expect(password).toBeFocused();
+  await password.fill("Password2");
+  await page.keyboard.press("Tab");
+  await expect(submit).toBeFocused();
+  await expect(submit).toBeEnabled();
+  await page.keyboard.press("Enter");
 
   const dialog = page.getByRole("dialog", { name: "로그인 실패" });
   await expect(dialog).toBeVisible();
@@ -61,7 +80,8 @@ test("@core @auth reports a credential failure in a modal and restores focus", a
 
   await dialog.getByRole("button", { name: "닫기" }).click();
   await expect(dialog).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "로그인" })).toBeFocused();
+  await expect(submit).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(consoleErrors).toEqual([
     "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
     "Failed to load resource: the server responded with a status of 400 (Bad Request)",
