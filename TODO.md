@@ -98,7 +98,7 @@
   FSD, shadcn-first, SOLID, 기존 code 보존, browser QA heading·명령 정적 검사
   PASS; shadcn `search`, `view`, `add` 명령은 공식 CLI 문서와 대조
 
-### [ ] SCN-01 Golden Journey 통합 시나리오 재작성
+### [x] SCN-01 Golden Journey 통합 시나리오 재작성
 
 - Requirements: 전체 Golden Journey requirement
 - Risk: LOW — accepted behavior를 바꾸지 않는 원본·OpenAPI trace 정교화
@@ -111,10 +111,14 @@
 - Automatic verification: requirement/API trace self-review,
   `./scripts/verify setup`, `git diff --check`
 - Browser verification: 문서 설계에는 적용 없음
-- Status: IN_PROGRESS
-- Evidence: 2026-08-30 사용자 구조 승인; 설계
-  `docs/superpowers/specs/2026-08-30-golden-journey-scenarios-design.md` 작성 및
-  `./scripts/verify setup`, `git diff --check` PASS
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `c4c7fdef010cbb1246b2cef74f28a5d5b23e4546`,
+  `65d6a1927ab5f28258d74dbe6b63a2cef1e977c4`; Master Journey와 네 독립 Journey
+  정상·핵심 예외 경로 및 `DEC-AUTH-01`·`DEC-DELETE-01` gate trace; RED
+  `test_setup_requires_integrated_journey_contract_markers` 5 marker 누락 FAIL,
+  `test_fsd_creation_constraints_are_recorded` 6 constraint 누락 FAIL; GREEN 두
+  focused unittest, `./scripts/verify setup`, `git diff --check` PASS;
+  `assignment-original/` diff 없음
 
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
