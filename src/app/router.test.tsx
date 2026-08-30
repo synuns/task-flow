@@ -32,10 +32,13 @@ const apiClient: ApiClient = {
     _init: RequestInit,
     isSuccess: (value: unknown) => value is T,
   ) => {
+    const pathname = new URL(String(input)).pathname;
     const body: unknown =
-      new URL(String(input)).pathname === "/api/dashboard"
+      pathname === "/api/dashboard"
         ? { numOfTask: 3, numOfRestTask: 2, numOfDoneTask: 1 }
-        : {};
+        : pathname === "/api/user"
+          ? { name: "김담당", memo: "오늘도 차근차근" }
+          : {};
     if (!isSuccess(body)) throw new Error("router test API fixture is missing");
     return body;
   },

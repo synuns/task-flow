@@ -17,3 +17,4 @@ export {
   type SignInCredentials,
 } from "./auth";
 export { type DashboardMetrics, getDashboard } from "./dashboard";
+export { getUser, type UserProfileData } from "./user";
