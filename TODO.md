@@ -41,8 +41,8 @@
 | 단계 | Exit gate | 상태 |
 | --- | --- | --- |
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
-| 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | NOT_STARTED |
-| 2. 공통 구조 | provider/router/API/test 경계 검증 | NOT_STARTED |
+| 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
+| 2. 공통 구조 | provider/router/API/test 경계 검증 | AI_VERIFIED |
 | 3. auth-entry | evidence·review 후 사람 checkpoint | BLOCKED — auth 정책 결정 필요 |
 | 4. work-overview | evidence·review 후 사람 checkpoint | NOT_STARTED |
 | 5. task-discovery | evidence·review 후 사람 checkpoint | NOT_STARTED |
@@ -126,6 +126,25 @@
   focused unittest, `./scripts/verify setup`, `git diff --check` PASS;
   `assignment-original/` diff 없음
 
+### [ ] FLOW-REVIEW-01 계획 완료 적대적 리뷰 계약 보강
+
+- Requirements: 전체 계획 기반 작업과 Golden Journey
+- Risk: HIGH — 사람 gate와 완료 상태 의미 변경
+- Depends on: `PLAN-01`
+- Deliverable: 계획 구현 완료 후 독립 adversarial review, 공통 review evidence,
+  HIGH 결정 완료 상태, 병렬 TODO 원장 갱신 규칙을 연결한 workflow 계약
+- Acceptance: 계획의 구현·자동/browser 검증이 끝난 뒤 final task를 완료 처리하기
+  전에 fresh reviewer가 누락·회귀·evidence를 검토하고, 동일 범위 Journey review와
+  중복하지 않으며, HIGH 결정은 사람 결정 evidence가 있을 때 `AI_VERIFIED`로
+  닫히고, 병렬 작업은 소유하지 않은 TODO block을 갱신하지 않는다.
+- Automatic verification: workflow marker와 TODO 상태/dependency 정적 test,
+  `./scripts/verify setup`, `git diff --check`
+- Browser verification: 정책 문서에는 적용 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 Codex `/root`; 사용자 회고 후 계획 완료 review와 개선안
+  반영 요청; `docs/superpowers/specs/2026-08-30-plan-completion-adversarial-review-design.md`
+  작성 및 placeholder·모순·범위·상태 전이 자체 검토; 사용자 문서 검토 대기
+
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`
@@ -175,7 +194,7 @@
 
 ## 1. 검증 가능한 개발 기반
 
-### [ ] SCF-01 package와 toolchain 기반
+### [x] SCF-01 package와 toolchain 기반
 
 - Requirements: `SYS-01`
 - Risk: LOW — 이미 채택된 stack 적용
@@ -187,10 +206,12 @@
 - Automatic verification: package script test, install reproducibility,
   `pnpm format:check`, `pnpm lint`, `pnpm typecheck`
 - Browser verification: 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `pnpm install --frozen-lockfile` PASS;
+  `pnpm format:check`, `pnpm lint`, `pnpm typecheck` PASS; 필수 frontend script와
+  `ai:review` 유지 확인; `pnpm-lock.yaml` 외 package manager lockfile 없음
 
-### [ ] SCF-02 최소 React 진입점과 style 기반
+### [x] SCF-02 최소 React 진입점과 style 기반
 
 - Requirements: `SYS-01`, `SYS-02`, `SYS-03`
 - Risk: LOW
@@ -202,10 +223,14 @@
 - Automatic verification: component smoke, typecheck, build, token/literal 정적 검사
 - Browser verification: `/`, desktop viewport, console/page error 없음, font
   network 200, computed `Pretendard`, screenshot 또는 trace
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `pnpm vitest run src/test/scaffold.test.tsx
+  src/test/theme-contract.test.ts` PASS, 2 tests; `./scripts/verify full` build PASS;
+  agent-browser `/` 1280x720 computed font `Pretendard`, font request
+  `/fonts/PretendardVariable.woff2`, console/page error 없음; 상세 기록
+  `docs/quality/evidence/frontend-scaffolding.md`
 
-### [ ] SCF-03 OpenAPI type 생성과 MSW 기반
+### [x] SCF-03 OpenAPI type 생성과 MSW 기반
 
 - Requirements: `SYS-04`
 - Risk: LOW — 승인된 대체 방식의 기반만 구성
@@ -216,10 +241,13 @@
   없고 아직 feature handler나 독자 behavior를 추가하지 않는다.
 - Automatic verification: OpenAPI 재생성 비교, typecheck, MSW smoke
 - Browser verification: worker asset 요청 성공과 예상하지 않은 network error 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `pnpm api:types:check` PASS;
+  `pnpm vitest run src/test/openapi-contract.test.ts` PASS; `pnpm test:e2e:smoke`
+  PASS; agent-browser `/mockServiceWorker.js` 200 `text/javascript`, 예상하지 않은
+  console/page error 없음; feature handler와 독자 behavior 없음
 
-### [ ] SCF-04 개발 기반 통합 검증
+### [x] SCF-04 개발 기반 통합 검증
 
 - Requirements: `SYS-01`, `SYS-02`, `SYS-03`, `SYS-04`
 - Risk: MEDIUM
@@ -230,12 +258,36 @@
   `SYS-02`, `SYS-04`를 과대 완료 처리하지 않는다.
 - Automatic verification: `./scripts/verify quick`, `./scripts/verify full`
 - Browser verification: root render, font, console/network, trace 확인
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `./scripts/verify full` PASS — setup 79 tests,
+  format, lint, typecheck, Vitest 3 tests, build, core E2E selection; repository
+  mutation 없음; `pnpm test:e2e:smoke` PASS, 1 Chromium test; agent-browser root,
+  Pretendard, font/worker network와 console/page error 재확인; 상세 기록
+  `docs/quality/evidence/frontend-scaffolding.md`
+
+### [ ] SCF-05 KB올라케어 semantic color theme
+
+- Requirements: `SYS-02`
+- Risk: LOW — 기존 CSS Custom Properties와 Tailwind token 체계 확장
+- Depends on: `SCF-02`
+- Deliverable: KB올라케어 시각 근거를 반영한 light/dark shadcn semantic token,
+  전체 Tailwind 연결과 color literal 계약
+- Acceptance: KB Yellow와 warm neutral 중심의 모든 token이 light/dark에서
+  정의되고 UI 색상은 semantic token만 소비하며 Pretendard와 기존 전역 기반은
+  유지된다.
+- Automatic verification: theme contract test, color literal 정적 검사,
+  `./scripts/verify quick`, `pnpm build`
+- Browser verification: `/`, light/dark computed background·foreground,
+  console/page error 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 Codex `/root`; 사용자 KB 기준 전체 변경 승인;
+  `docs/superpowers/specs/2026-08-30-kb-ollacare-color-theme-design.md` 작성;
+  `docs/superpowers/plans/2026-08-30-kb-ollacare-color-theme.md` 구현 계획 작성;
+  구현·검증 미실행
 
 ## 2. 애플리케이션 구조·공통 경계
 
-### [ ] ARCH-01 FSD directory와 public boundary
+### [x] ARCH-01 FSD directory와 public boundary
 
 - Requirements: 전체 기능 requirement의 구조 기반
 - Risk: LOW — `DEC-ARCH-01` 승인안 실행
@@ -248,10 +300,15 @@
 - Automatic verification: architecture lint/type test,
   Biome `noRestrictedImports` 허용·차단 fixture, `./scripts/verify quick`
 - Browser verification: 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`; `pnpm vitest run
+  src/test/architecture-contract.test.ts` RED — `test/openapi-contract.test.ts`의
+  generated 직접 import 1건 탐지; 계약 test를 `shared/api`로 이동 후 focused
+  Vitest 2 files/3 tests GREEN; Biome fixture는 public API import 허용·deep import
+  차단 확인; `./scripts/verify quick` PASS — setup 79 tests, format, lint, typecheck,
+  Vitest 4 files/5 tests; browser 적용 없음
 
-### [ ] ARCH-02 app provider와 router composition
+### [x] ARCH-02 app provider와 router composition
 
 - Requirements: `NAV-01`, route 기반 전체 requirement
 - Risk: MEDIUM
@@ -263,10 +320,29 @@
 - Automatic verification: provider/router integration tests,
   `./scripts/verify quick`
 - Browser verification: 다섯 route 직접 진입, page/console error 기록
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`
+  - Requirement/Journey: `NAV-01` / architecture route composition
+  - Commit: `f482330`
+  - Agent-browser session: `arch-02-evidence`, 종료 확인
+  - Route/Viewport: `/` → `/task` link action, `/task/task-1` 직접 진입;
+    1280×720
+  - Precondition: Vite DEV, 인증 provider와 API handler 없음
+  - Actions: 다섯 route Playwright 순회, navigation click, 상세 route 직접 진입,
+    service worker registration/fetch, console/errors, screenshot 확인
+  - Expected: 고유 heading과 공통 navigation, active DEV worker, 오류 없음
+  - Actual: unit RED는 미구현 module, E2E RED는 heading 부재; 구현 후 Vitest
+    2 files/7 tests와 Playwright 1 Chromium test PASS
+  - Console/Network: console error와 page error 없음; active
+    `/mockServiceWorker.js`, fetch 200 `text/javascript`
+  - Screenshot/Trace: `/tmp/kbhc-arch-02-evidence.png`; Playwright 결과 attachment
+  - Failure class: TEST — render cleanup 누락; IMPLEMENTATION — app 단일 layer를
+    slice로 오인한 architecture contract
+  - Correction: test별 cleanup, app 내부 상대 import 예외를 계약에 반영
+  - Rerun verdict: `./scripts/verify quick` PASS — setup 79 tests, format, lint,
+    typecheck, Vitest 6 files/12 tests
 
-### [ ] ARCH-03 typed API client와 test 경계
+### [x] ARCH-03 typed API client와 test 경계
 
 - Requirements: 모든 API requirement
 - Risk: MEDIUM
@@ -280,8 +356,20 @@
   `./scripts/verify quick`
 - Browser verification: 독립 UI 없음; 첫 실제 화면 소비 작업에서
   loading/error/success의 accessible output 검증
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`; request test RED — `./request` 미구현;
+  구현 후 success/http/invalid JSON/schema/network/abort 6 tests GREEN; focused
+  Vitest 3 files/9 tests와 `./scripts/verify quick` PASS — setup 79 tests,
+  format, lint, typecheck, Vitest 7 files/18 tests; raw fetch는 `request.ts`만,
+  generated import는 `shared/api`만 확인; public barrel, endpoint adapter, handler,
+  상태 UI, auth/delete behavior 없음; abort는 transport control flow만 존재;
+  browser는 독립 UI가 없어 첫 화면 소비 작업으로 이관. Node 25에서 MSW
+  cookie store의 `--localstorage-file` 환경 경고 1건을 추적했고 API test에만
+  lifecycle을 한정함; `./scripts/verify full` PASS — setup 79 tests, format,
+  lint, typecheck, Vitest 7 files/18 tests, production build, core E2E selection;
+  architecture 적대적 재검토에서 reverse/deep import, generated leakage, static
+  mocks, auth placeholder, route error 과대책임, aborted UI, 빈 layer/public API,
+  dashboard entity 위반 0건
 
 ## 3. auth-entry Journey
 

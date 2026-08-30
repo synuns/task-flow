@@ -1,5 +1,5 @@
-import type { components, paths } from "@/generated/openapi";
 import { describe, expect, it } from "vitest";
+import type { components, paths } from "@/generated/openapi";
 
 describe("generated OpenAPI contract", () => {
   it("exposes authoritative paths and schema shapes", () => {

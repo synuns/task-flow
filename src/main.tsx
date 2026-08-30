@@ -1,11 +1,24 @@
 import "@/styles/globals.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { App } from "@/app";
 
-const rootElement = document.getElementById("root");
+async function bootstrap() {
+  if (import.meta.env.DEV) {
+    const { startWorker } = await import("@/mocks/browser");
+    await startWorker();
+  }
 
-if (!rootElement) {
-  throw new Error("React root element is missing");
+  const rootElement = document.getElementById("root");
+  if (!rootElement) {
+    throw new Error("React root element is missing");
+  }
+
+  createRoot(rootElement).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
 }
 
-createRoot(rootElement).render(<StrictMode />);
+void bootstrap();

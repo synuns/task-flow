@@ -1,0 +1,3 @@
+export function UserPage() {
+  return <h1>회원정보</h1>;
+}
