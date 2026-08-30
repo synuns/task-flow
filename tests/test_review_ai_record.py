@@ -31,22 +31,37 @@ class ReviewCliTests(unittest.TestCase):
             with self.subTest(value=repr(value)):
                 self.assertEqual(review_ai_record.read_approval(io.StringIO(value), io.StringIO()), expected)
 
-    def test_reviewer_uses_config_without_prompt(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            with mock.patch.object(review_ai_record, "git_config_name", return_value="Configured User") as git_name:
-                result = review_ai_record.load_reviewer(root, io.StringIO("unexpected\n"), io.StringIO())
-        self.assertEqual(result, "Configured User")
-        git_name.assert_called_once_with(root)
+    def test_review_pending_list_shows_session_id_and_requires_selection(self):
+        record = review_ai_record.RecordRef("session-123", 1, 1, 7, "closed")
+        output = TtyStringIO()
 
-    def test_missing_reviewer_is_saved_after_input(self):
+        selected = review_ai_record.choose_record([record], TtyStringIO("1\n"), output)
+
+        self.assertEqual(selected, record)
+        self.assertIn("검수 완료할 review-pending 세션:", output.getvalue())
+        self.assertIn("1. session-123", output.getvalue())
+        self.assertNotIn("session-123.s0001", output.getvalue())
+        self.assertIn("Select [1-1]:", output.getvalue())
+
+    def test_missing_reviewer_stops_without_prompt_or_publication(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            store = review_ai_record.RecordStore(root, clock=lambda: "2026-08-29T12:00:00Z")
+            base = store.initialize_session("session-123")
+            body = b"# Candidate\n"
+            store.commit_snapshot(base, body, {"last_turn_id": "turn-1", "snapshot_kind": "turn_complete", "last_hook_event": "Stop", "parser_version": "codex-rollout-v1", "transcript": None})
+            store.session_end("session-123")
+            output = TtyStringIO()
             with mock.patch.object(review_ai_record, "git_config_name", return_value=None):
-                with mock.patch.object(review_ai_record, "save_git_config_name") as save:
-                    result = review_ai_record.load_reviewer(root, io.StringIO("Human Reviewer\n"), io.StringIO())
-        self.assertEqual(result, "Human Reviewer")
-        save.assert_called_once_with(root, "Human Reviewer")
+                with mock.patch.object(review_ai_record.subprocess, "run") as run:
+                    with mock.patch.object(review_ai_record, "publish_receipt") as publish:
+                        result = review_ai_record.run_review(root, TtyStringIO("1\ny\n"), output)
+
+            self.assertEqual(result, 1)
+            self.assertIn("reviewer_not_configured", output.getvalue())
+            self.assertNotIn("Reviewer name", output.getvalue())
+            run.assert_not_called()
+            publish.assert_not_called()
 
     def test_non_tty_process_cannot_publish(self):
         with self.assertRaises(review_ai_record.ReviewCancelled):
@@ -59,14 +74,15 @@ class ReviewCliTests(unittest.TestCase):
             base = store.initialize_session("session-123")
             body = b"# Candidate\nAuthorization: Bearer exposed-secret\n"
             store.commit_snapshot(base, body, {"last_turn_id": "turn-1", "snapshot_kind": "turn_complete", "last_hook_event": "Stop", "parser_version": "codex-rollout-v1", "transcript": None})
-            closed = store.session_end("session-123")
+            store.session_end("session-123")
             output = TtyStringIO()
-            result = review_ai_record.run_review(root, TtyStringIO(""), output)
+            result = review_ai_record.run_review(root, TtyStringIO("1\n"), output)
         self.assertEqual(result, 1)
-        self.assertIn("BLOCKING", output.getvalue())
+        self.assertIn("review_blocked", output.getvalue())
+        self.assertNotIn("BLOCKING", output.getvalue())
         self.assertNotIn("exposed-secret", output.getvalue())
 
-    def test_one_clean_record_needs_only_y_enter_and_publishes(self):
+    def test_one_clean_record_needs_selection_and_y_to_publish(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             store = review_ai_record.RecordStore(root, clock=lambda: "2026-08-29T12:00:00Z")
@@ -80,9 +96,32 @@ class ReviewCliTests(unittest.TestCase):
             (root / "AI_USAGE.md").write_text("<!-- reviewed-records:start -->\n<!-- reviewed-records:end -->\n", encoding="utf-8")
             output = TtyStringIO()
             with mock.patch.object(review_ai_record, "git_config_name", return_value="Human Reviewer"):
-                result = review_ai_record.run_review(root, TtyStringIO("y\n"), output)
+                result = review_ai_record.run_review(root, TtyStringIO("1\ny\n"), output)
             self.assertEqual(result, 0)
+            self.assertIn("선택한 세션: session-123", output.getvalue())
             self.assertIn("published", output.getvalue())
+            self.assertEqual(store.read_metadata(closed.record_id)["state"], "published")
+
+    def test_review_finding_needs_only_selection_and_confirmation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = review_ai_record.RecordStore(root, clock=lambda: "2026-08-29T12:00:00Z")
+            base = store.initialize_session("session-123")
+            body = b"# Candidate\n\n### Tool activity\n"
+            store.commit_snapshot(base, body, {"last_turn_id": "turn-1", "snapshot_kind": "turn_complete", "last_hook_event": "Stop", "parser_version": "codex-rollout-v1", "transcript": None})
+            closed = store.session_end("session-123")
+            artifacts = root / "artifacts"
+            artifacts.mkdir()
+            (artifacts / "index.md").write_text(render_artifact_index.render_index([]), encoding="utf-8")
+            (root / "AI_USAGE.md").write_text("<!-- reviewed-records:start -->\n<!-- reviewed-records:end -->\n", encoding="utf-8")
+            output = TtyStringIO()
+            with mock.patch.object(review_ai_record, "git_config_name", return_value="Human Reviewer"):
+                result = review_ai_record.run_review(root, TtyStringIO("1\ny\n"), output)
+
+            self.assertEqual(result, 0)
+            self.assertIn("선택한 세션: session-123", output.getvalue())
+            self.assertNotIn("REVIEW", output.getvalue())
+            self.assertNotIn("[v]", output.getvalue())
             self.assertEqual(store.read_metadata(closed.record_id)["state"], "published")
 
 

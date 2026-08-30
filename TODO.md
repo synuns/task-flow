@@ -139,6 +139,23 @@
   candidate read-only 재검사 `blocking=0`, `review=4`; raw secret 차단 test 유지;
   `./scripts/verify quick` PASS, hook tests 80개·frontend tests 3개
 
+### [ ] TOOL-AI-REVIEW-02 검수 완료 게시 흐름 단순화
+
+- Requirements: `SYS-05`
+- Risk: HIGH — 사람 publication 승인 흐름 변경
+- Depends on: `TOOL-AI-REVIEW-01`
+- Deliverable: review-pending session ID 목록, 선택, exact 확인, 기존 publisher
+  게시만 수행하는 CLI
+- Acceptance: risk summary·pager·reviewer 입력 없이 유효한 `closed` session만
+  선택하고, BLOCKING audit와 TTY/exact-y 경계를 유지한 채 artifact를 게시한다.
+- Automatic verification: review CLI unit tests, hook test suite,
+  `./scripts/verify quick`
+- Browser verification: 적용 없음 — terminal-only tooling
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 사용자 승인;
+  `docs/superpowers/specs/2026-08-30-ai-review-completion-flow-design.md`;
+  구현·검증 진행 중
+
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`

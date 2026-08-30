@@ -4,16 +4,12 @@ import datetime
 import hashlib
 import hmac
 import os
-import pydoc
-import shlex
-import shutil
 import signal
 import stat
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,9 +18,7 @@ if str(HOOKS) not in sys.path:
     sys.path.insert(0, str(HOOKS))
 
 from artifact_contract import split_record_id
-from export_session import redact
-from render_artifact_index import list_pending_artifact_names
-from review_scanner import scan_candidate, format_summary, SCANNER_VERSION
+from review_scanner import scan_candidate, SCANNER_VERSION
 from session_records import RecordError, RecordRef, RecordStore
 
 
@@ -95,25 +89,8 @@ def git_config_name(root):
     return value or None
 
 
-def save_git_config_name(root, value):
-    subprocess.run(["git", "-C", str(root), "config", "--local", "user.name", value], check=True)
-
-
-def load_reviewer(root, input_stream, output_stream):
-    configured = git_config_name(root)
-    if configured:
-        return configured
-    output_stream.write("Reviewer name: ")
-    output_stream.flush()
-    value = input_stream.readline().strip()
-    if not value or redact(value, Path("/")) != value:
-        return None
-    save_git_config_name(root, value)
-    return value
-
-
 def read_approval(input_stream, output_stream):
-    output_stream.write("게시할까요? 정확히 y 입력 후 Enter: ")
+    output_stream.write("검수 완료하고 게시할까요? 정확히 y 입력 후 Enter: ")
     output_stream.flush()
     try:
         return input_stream.readline() == "y\n"
@@ -121,7 +98,7 @@ def read_approval(input_stream, output_stream):
         return False
 
 
-def list_closed_records(repo_root: Path) -> List[RecordRef]:
+def list_review_pending_records(repo_root: Path) -> List[RecordRef]:
     store = RecordStore(repo_root)
     records = []
     if not store.pending.exists():
@@ -153,12 +130,11 @@ def list_closed_records(repo_root: Path) -> List[RecordRef]:
 
 def choose_record(records, input_stream, output_stream):
     if not records:
-        output_stream.write("검토 가능한 closed record가 없습니다.\n")
+        output_stream.write("검수 완료할 review-pending 세션이 없습니다.\n")
         return None
-    if len(records) == 1:
-        return records[0]
+    output_stream.write("검수 완료할 review-pending 세션:\n")
     for number, record in enumerate(records, 1):
-        output_stream.write("{}. {}\n".format(number, record.record_id))
+        output_stream.write("{}. {}\n".format(number, record.session_id))
     output_stream.write("Select [1-{}]: ".format(len(records)))
     output_stream.flush()
     try:
@@ -166,28 +142,6 @@ def choose_record(records, input_stream, output_stream):
     except (ValueError, EOFError, KeyboardInterrupt):
         return None
     return records[number - 1] if 1 <= number <= len(records) else None
-
-
-def open_pager(raw, repo_root):
-    view_dir = repo_root / ".codex" / "review-pending" / "review-views"
-    view_dir.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(mode="wb", prefix=".review-view-", suffix=".md", dir=str(view_dir), delete=False) as stream:
-        os.chmod(stream.name, 0o600)
-        stream.write(raw)
-        stream.flush()
-        os.fsync(stream.fileno())
-        path = stream.name
-    try:
-        pager = shlex.split(os.environ["PAGER"]) if os.environ.get("PAGER") else ["/usr/bin/less", "-R"]
-        if not pager or shutil.which(pager[0]) is None:
-            pydoc.pager(raw.decode("utf-8"))
-            return
-        subprocess.run(pager + [path], check=True)
-    finally:
-        try:
-            os.unlink(path)
-        except FileNotFoundError:
-            pass
 
 
 def run_review(repo_root: Path, input_stream=sys.stdin, output_stream=sys.stdout) -> int:
@@ -199,35 +153,23 @@ def run_review(repo_root: Path, input_stream=sys.stdin, output_stream=sys.stdout
         pass
     check_cancel()
     store = RecordStore(repo_root)
-    records = list_closed_records(repo_root)
+    records = list_review_pending_records(repo_root)
     selected = choose_record(records, input_stream, output_stream)
     if selected is None:
         return 0
+    output_stream.write("선택한 세션: {}\n".format(selected.session_id))
+    output_stream.flush()
     check_cancel()
     raw, _stat = read_candidate_once(store.paths(selected.record_id).markdown)
     metadata = store.read_metadata(selected.record_id)
     summary = scan_candidate(raw, metadata)
-    output_stream.write(format_summary(summary))
-    output_stream.flush()
     if summary.blocking:
+        output_stream.write("review_blocked\n")
         return 1
-    if summary.review:
-        while True:
-            output_stream.write("[v] 전체 본문  [c] 계속  [q] 취소\n")
-            output_stream.flush()
-            choice = input_stream.readline()
-            if choice in {"q\n", "\n", ""} or cancel_requested:
-                return 0
-            if choice == "v\n":
-                open_pager(raw, repo_root)
-                continue
-            if choice == "c\n":
-                break
-            return 0
-    check_cancel()
-    reviewer = load_reviewer(repo_root, input_stream, output_stream)
+    reviewer = git_config_name(repo_root)
     if not reviewer:
-        return 0
+        output_stream.write("reviewer_not_configured\n")
+        return 1
     check_cancel()
     if not read_approval(input_stream, output_stream):
         return 0
