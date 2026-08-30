@@ -42,7 +42,7 @@
 | --- | --- | --- |
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
 | 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
-| 2. 공통 구조 | provider/router/API/test 경계 검증 | NOT_STARTED |
+| 2. 공통 구조 | provider/router/API/test 경계 검증 | AI_VERIFIED |
 | 3. auth-entry | evidence·review 후 사람 checkpoint | BLOCKED — auth 정책 결정 필요 |
 | 4. work-overview | evidence·review 후 사람 checkpoint | NOT_STARTED |
 | 5. task-discovery | evidence·review 후 사람 checkpoint | NOT_STARTED |
@@ -267,7 +267,7 @@
 - Status: AI_VERIFIED
 - Evidence: 2026-08-30 Codex `/root`
   - Requirement/Journey: `NAV-01` / architecture route composition
-  - Commit: ARCH-02 candidate, `1449d8c` base
+  - Commit: `f482330`
   - Agent-browser session: `arch-02-evidence`, 종료 확인
   - Route/Viewport: `/` → `/task` link action, `/task/task-1` 직접 진입;
     1280×720
@@ -286,7 +286,7 @@
   - Rerun verdict: `./scripts/verify quick` PASS — setup 79 tests, format, lint,
     typecheck, Vitest 6 files/12 tests
 
-### [ ] ARCH-03 typed API client와 test 경계
+### [x] ARCH-03 typed API client와 test 경계
 
 - Requirements: 모든 API requirement
 - Risk: MEDIUM
@@ -300,8 +300,20 @@
   `./scripts/verify quick`
 - Browser verification: 독립 UI 없음; 첫 실제 화면 소비 작업에서
   loading/error/success의 accessible output 검증
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`; request test RED — `./request` 미구현;
+  구현 후 success/http/invalid JSON/schema/network/abort 6 tests GREEN; focused
+  Vitest 3 files/9 tests와 `./scripts/verify quick` PASS — setup 79 tests,
+  format, lint, typecheck, Vitest 7 files/18 tests; raw fetch는 `request.ts`만,
+  generated import는 `shared/api`만 확인; public barrel, endpoint adapter, handler,
+  상태 UI, auth/delete behavior 없음; abort는 transport control flow만 존재;
+  browser는 독립 UI가 없어 첫 화면 소비 작업으로 이관. Node 25에서 MSW
+  cookie store의 `--localstorage-file` 환경 경고 1건을 추적했고 API test에만
+  lifecycle을 한정함; `./scripts/verify full` PASS — setup 79 tests, format,
+  lint, typecheck, Vitest 7 files/18 tests, production build, core E2E selection;
+  architecture 적대적 재검토에서 reverse/deep import, generated leakage, static
+  mocks, auth placeholder, route error 과대책임, aborted UI, 빈 layer/public API,
+  dashboard entity 위반 0건
 
 ## 3. auth-entry Journey
 
