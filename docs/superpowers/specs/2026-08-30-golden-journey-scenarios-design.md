@@ -70,6 +70,27 @@ Requirement checklist의 ID, acceptance, risk, status는 시나리오 재작성�
 변경하지 않는다. 시나리오가 원본과 checklist의 모순을 발견하면 acceptance를
 조용히 바꾸지 않고 `REQUIREMENT` finding과 결정 gate를 기록한다.
 
+## 후속 FSD 구현 조건
+
+현재 repository는 frontend scaffold 검증을 마쳤으므로 실제 기능 소비자가
+생기는 시점에는 FSD layer를 만들 수 있다. 이번 시나리오 문서 작업은 source
+구조를 만들지 않으며, 후속 `DEC-ARCH-01`과 `ARCH-01`은 다음 승인 조건을
+그대로 적용한다.
+
+- `src/generated/openapi.ts`는 `src/shared/api` 내부에서만 직접 import한다.
+- `src/shared/api`는 generated type이나 generated module을 외부로 re-export하지
+  않고 필요한 좁은 client·model interface만 제공한다.
+- 실제 인증 기능 전에 auth provider placeholder를 만들지 않는다.
+- 빈 layer directory와 소비자 없는 빈 `index.ts`를 만들지 않는다.
+- directory와 public API는 실제 소비자가 생기는 testable unit에서 함께 만든다.
+- Biome import 경계 규칙은 `src/generated/**` 직접 import를
+  `src/shared/api/**`에만 허용하도록 검증한다. 현재 `biome.json`의 recommended
+  preset만으로는 이 경계가 검증되지 않으므로, 첫 API boundary 구현에서
+  `noRestrictedImports` 설정과 허용·차단 case 검증을 함께 추가한다.
+
+이 조건은 FSD 전체 구조나 auth provider 구성을 선승인하지 않는다. 미확정
+architecture와 인증 정책은 기존 HIGH-risk gate를 유지한다.
+
 ## 공통 시나리오 형식
 
 각 독립 Journey는 다음 항목을 가진다.
