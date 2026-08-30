@@ -394,7 +394,7 @@
   valid와 required/email/길이/기호 경계 6 tests GREEN; `./scripts/verify quick`
   PASS — Vitest 10 files/30 tests; browser 적용 없음
 
-### [ ] AUTH-UI-01 sign-in form 접근성·submit 상태
+### [x] AUTH-UI-01 sign-in form 접근성·submit 상태
 
 - Requirements: `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-04`
 - Risk: LOW
@@ -405,12 +405,13 @@
 - Automatic verification: Testing Library/user-event component tests,
   `./scripts/verify quick`
 - Browser verification: `/sign-in` mobile/desktop, keyboard tab order와 visible 오류
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30 sign-in form test RED — component module 없음; label,
   accessible description, disabled/enabled, pending duplicate guard 3 tests GREEN;
-  `/sign-in` keyboard/mobile browser evidence 대기
+  Chromium 390x844에서 dashboard/task/sign-in/email/password/submit keyboard 순서,
+  valid enable, horizontal overflow 없음 확인; `docs/quality/evidence/auth-entry.md`
 
-### [ ] AUTH-API-01 sign-in 요청과 오류 modal
+### [x] AUTH-API-01 sign-in 요청과 오류 modal
 
 - Requirements: `AUTH-05`, `AUTH-06`
 - Risk: MEDIUM
@@ -422,14 +423,14 @@
 - Automatic verification: MSW integration tests, modal component tests,
   `./scripts/verify quick`
 - Browser verification: error fixture, focus trap/restore, console/network 기록
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30 auth API test RED — endpoint/handler module 없음; exact
   credentials, MSW refresh cookie rotation, missing-cookie 401 3 tests와 server
   error modal/focus restore component test GREEN; native `dialog`를 사용해 새 runtime
-  dependency 없이 browser focus trap/restore evidence 대기; `./scripts/verify quick`
-  PASS — setup 79 tests, format, lint, typecheck, Vitest 10 files/30 tests
+  dependency 없이 browser modal 초기 focus와 submit focus 복귀 확인;
+  `docs/quality/evidence/auth-entry.md`; `./scripts/verify quick` PASS
 
-### [ ] AUTH-STATE-01 승인된 token·refresh 상태
+### [x] AUTH-STATE-01 승인된 token·refresh 상태
 
 - Requirements: `AUTH-07`
 - Risk: HIGH 실행 — 승인안 준수 검토 필요
@@ -441,11 +442,14 @@
 - Automatic verification: token helper unit tests, protected request와 refresh
   integration tests, `./scripts/verify quick`
 - Browser verification: integration에서 증명 못한 cookie/network boundary만 대상
-- Status: BLOCKED
-- Evidence: `DEC-AUTH-01` 설계와 문서의 사용자 대화 승인은 완료; tracked
-  `HUMAN_APPROVED` 사람 직접 표시와 선행 `AUTH-API-01`, `ARCH-03` 구현 대기
+- Status: AI_VERIFIED
+- Evidence: `DEC-AUTH-01` 사용자 대화 승인 범위대로 memory access token,
+  mock refresh cookie, generation, single-flight, late 401 latest-token replay,
+  replay terminal cleanup, stale-session no-op를 구현; focused Vitest 10 files/50 tests,
+  quick gate, reload cookie 경계 E2E PASS; `docs/quality/evidence/auth-entry.md`;
+  tracked decision의 `HUMAN_APPROVED` 표시는 사람 직접 확인 대기
 
-### [ ] AUTH-NAV-01 비로그인/로그인 navigation 전환
+### [x] AUTH-NAV-01 비로그인/로그인 navigation 전환
 
 - Requirements: `NAV-02`, `NAV-03`, `AUTH-07`
 - Risk: MEDIUM
@@ -456,8 +460,11 @@
 - Automatic verification: router/auth integration tests,
   `./scripts/verify quick`
 - Browser verification: auth transition 전후 route/action/icon 확인
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: router/auth integration에서 보호 route 차단, initializing/unavailable,
+  내부 return allowlist와 action 상호 배타를 검증; Chromium에서 `/task/task-1` →
+  `/sign-in` → 안전 복귀 → reload → `/user` 이동 PASS;
+  `docs/quality/evidence/auth-entry.md`
 
 ### [ ] JOURNEY-AUTH-01 auth-entry 검증·review·checkpoint
 
@@ -469,8 +476,10 @@
   finding이 해결된 뒤 사람 checkpoint를 요청한다.
 - Automatic verification: auth 관련 test, `./scripts/verify quick`, core E2E auth tag
 - Browser verification: `/sign-in` invalid/error/success와 필요한 credential boundary
-- Status: BLOCKED
-- Evidence: blocker auth 구현 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: automatic, browser, architecture boundary와 lightweight adversarial review
+  PASS; `docs/quality/evidence/auth-entry.md`; 사람 journey checkpoint 대기이며 AI가
+  `HUMAN_APPROVED`를 표시하지 않음
 
 ## 4. work-overview Journey
 
