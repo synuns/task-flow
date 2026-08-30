@@ -478,12 +478,12 @@
 - Browser verification: `/sign-in` invalid/error/success와 필요한 credential boundary
 - Status: IN_PROGRESS
 - Evidence: automatic, browser, architecture boundary와 lightweight adversarial review
-  PASS; `docs/quality/evidence/auth-entry.md`; 사람 journey checkpoint 대기이며 AI가
-  `HUMAN_APPROVED`를 표시하지 않음
+  PASS; `docs/quality/evidence/auth-entry.md`; 2026-08-31 사용자 대화 checkpoint 승인;
+  규약에 따라 AI가 tracked `HUMAN_APPROVED`를 직접 표시하지 않음
 
 ## 4. work-overview Journey
 
-### [ ] NAV-PRIMARY-01 공통 dashboard/task navigation
+### [x] NAV-PRIMARY-01 공통 dashboard/task navigation
 
 - Requirements: `NAV-01`
 - Risk: LOW
@@ -494,10 +494,12 @@
 - Automatic verification: shell/router integration tests,
   `./scripts/verify quick`
 - Browser verification: 다섯 route와 mobile/desktop navigation
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: router Vitest와 Chromium desktop/mobile에서 dashboard/task action 유지,
+  distinct Lucide icon, `aria-current`, route 이동 확인;
+  `docs/quality/evidence/work-overview.md`
 
-### [ ] DASH-01 dashboard metrics
+### [x] DASH-01 dashboard metrics
 
 - Requirements: `DASH-01`
 - Risk: MEDIUM
@@ -508,10 +510,12 @@
 - Automatic verification: MSW integration tests, component state tests,
   `./scripts/verify quick`
 - Browser verification: `/` fixture 비교와 console/network 기록
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: endpoint guard와 loading/error/retry/success component RED→GREEN 4 tests;
+  단일 task store handler 일관성 6 tests; Chromium bearer request와 fixture `3/2/1`
+  확인; `docs/quality/evidence/work-overview.md`
 
-### [ ] USER-01 profile data
+### [x] USER-01 profile data
 
 - Requirements: `USER-01`
 - Risk: MEDIUM
@@ -521,8 +525,9 @@
 - Automatic verification: MSW integration tests, component state tests,
   `./scripts/verify quick`
 - Browser verification: `/user` fixture 비교와 console/network 기록
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: user endpoint/handler/query UI RED→GREEN 6 tests; Chromium bearer request와
+  `김담당`/`오늘도 차근차근` 확인; `docs/quality/evidence/work-overview.md`
 
 ### [ ] JOURNEY-WORK-01 work-overview 검증·review·checkpoint
 
@@ -534,8 +539,10 @@
   accessibility가 증명되고 finding 해결 후 사람 checkpoint를 요청한다.
 - Automatic verification: 관련 test, `./scripts/verify quick`, core E2E work tag
 - Browser verification: dashboard/task/profile navigation과 fixture 비교
-- Status: BLOCKED
-- Evidence: 선행 작업 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: focused 7 files/22 tests, quick 24 files/85 tests, core E2E, agent-browser
+  desktop/mobile와 lightweight adversarial review PASS;
+  `docs/quality/evidence/work-overview.md`; 사람 checkpoint 대기
 
 ## 5. task-discovery Journey
 
