@@ -21,6 +21,13 @@
 - `assignment-original/`은 수정하지 않는다.
 - AI는 실제 검수 완료 publication이나 `HUMAN_APPROVED`를 대신 실행·기록하지 않는다.
 
+## Approved Full-Review Amendment (2026-08-30)
+
+- 선택 뒤 exact record ID도 표시해 사전 검수 파일과 승인 대상을 연결한다.
+- publisher는 session lock 안에서 current closed record와 revision을 public write
+  전에 검증한다.
+- receipt는 출력 가능한 Unicode reviewer를 허용하고 제어 문자를 거부한다.
+
 ## Current Worktree Precondition
 
 현재 worktree에는 이전 testable unit `TOOL-AI-REVIEW-01`의 미커밋 변경이 있다.

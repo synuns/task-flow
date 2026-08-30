@@ -57,8 +57,15 @@ def scan_candidate(candidate: bytes, metadata: Dict[str, object]) -> ReviewSumma
         blocking.append(Finding("BLOCKING", "incomplete_snapshot", record, "metadata error state"))
     if hashlib.sha256(candidate).hexdigest() != metadata.get("artifact_sha256"):
         blocking.append(Finding("BLOCKING", "snapshot_hash_mismatch", record, "metadata digest mismatch"))
-    for pattern, _replacement in SECRET_PATTERNS:
-        match = pattern.search(text)
+    for pattern, replacement in SECRET_PATTERNS:
+        match = next(
+            (
+                match
+                for match in pattern.finditer(text)
+                if pattern.sub(replacement, match.group(0), count=1) != match.group(0)
+            ),
+            None,
+        )
         if match:
             blocking.append(Finding("BLOCKING", "unredacted_secret", record, context_for(text, match.start(), match.end())))
             break

@@ -12,7 +12,8 @@ review-pending 세션 목록, 선택, 최종 확인, 게시 결과로 제한한�
 2. `pnpm run ai:review`를 실제 terminal TTY에서 실행한다.
 3. 명령은 게시 가능한 review-pending 세션 ID 목록을 보여준다.
 4. 사람은 번호로 세션 하나를 선택한다.
-5. 명령은 선택한 세션 ID를 다시 보여주고 정확히 `y`+Enter로 확인받는다.
+5. 명령은 선택한 세션 ID와 exact record ID를 다시 보여주고 정확히
+   `y`+Enter로 확인받는다.
 6. 확인된 record를 기존 publisher로 게시한다.
 7. 성공 시 artifact, public index, `AI_USAGE.md`, lifecycle metadata가 기존
    transaction 규칙에 따라 함께 갱신된다.
@@ -27,9 +28,10 @@ review-pending 세션 목록, 선택, 최종 확인, 게시 결과로 제한한�
 제외한다.
 
 목록에는 record ID 대신 session ID를 표시한다. lifecycle상 한 session에는
-현재 게시 가능한 `closed` record가 최대 하나이며, 선택 결과는 내부의 exact
-`RecordRef`와 결합한다. artifact filename과 metadata에는 기존 segment가 포함된
-record ID를 그대로 사용한다.
+현재 게시 가능한 `closed` record가 최대 하나이며, 선택 뒤에는 사람이 사전
+검수한 파일과 승인 대상을 연결할 수 있도록 exact record ID도 표시한다.
+artifact filename과 metadata에는 기존 segment가 포함된 record ID를 그대로
+사용한다.
 
 예상 UI는 다음과 같다.
 
@@ -39,6 +41,7 @@ record ID를 그대로 사용한다.
 2. 01a04ddf-5be6-7322-838c-12e18fc2d714
 Select [1-2]: 1
 선택한 세션: 01a04ddf-4d15-74f3-8568-99bf5272814e
+검수 대상 기록: 01a04ddf-4d15-74f3-8568-99bf5272814e.s0001
 검수 완료하고 게시할까요? 정확히 y 입력 후 Enter: y
 published
 ```
@@ -54,7 +57,8 @@ CLI에서 다음 사람 상호작용을 제거한다.
 
 reviewer는 기존 `git config --get user.name`에서만 읽는다. 값이 없으면
 `reviewer_not_configured`로 게시 전 종료하며, 정상 검수 완료 흐름 안에서 별도
-질문이나 설정 변경을 하지 않는다.
+질문이나 설정 변경을 하지 않는다. 출력 가능한 Unicode 이름은 허용하고 제어
+문자는 receipt 경계에서 거부한다.
 
 ## 유지할 안전 경계
 
@@ -70,8 +74,9 @@ reviewer는 기존 `git config --get user.name`에서만 읽는다. 값이 없�
   사람의 사전 마크다운 검수와 최종 `y` 확인이 승인 근거다.
 - reviewer, candidate SHA-256, scanner version, finding count는 receipt에 기존대로
   기록한다.
-- publisher의 no-follow open, exact-byte digest, state/revision 재검증, lock,
-  staging, atomic rename, rollback, idempotency는 변경하지 않는다.
+- publisher는 session lock 안에서 current closed record와 revision을 public write
+  전에 재검증한다. 기존 no-follow open, exact-byte digest, staging, atomic rename,
+  rollback, idempotency는 유지한다.
 - hook, CI, pipe, AI는 검수 완료나 publication을 실행할 수 없다.
 
 ## 오류 처리
@@ -93,8 +98,8 @@ secret 원문, exception 원문, filesystem 절대 경로는 terminal과 journal
 - `scripts/review-ai-record`: session ID 목록, 선택, 확인, receipt 조합만 담당한다.
 - `.codex/hooks/review_scanner.py`: 선택된 immutable bytes의 BLOCKING audit와
   receipt count를 제공한다.
-- `.codex/hooks/review_publisher.py`: 변경하지 않고 기존 publication transaction을
-  수행한다.
+- `.codex/hooks/review_publisher.py`: public write 전 current record guard와 Unicode
+  reviewer validation을 수행하고 기존 publication transaction을 유지한다.
 - lifecycle store와 artifact index contract는 변경하지 않는다.
 
 새 dependency, 새 state, 새 publication path를 추가하지 않는다.
@@ -106,12 +111,14 @@ TDD로 다음을 증명한다.
 - 목록에는 유효한 `closed` record의 session ID만 보인다.
 - `pending`, `published`, invalid metadata, hash mismatch, symlink는 목록에서
   제외된다.
-- 선택 후 같은 session ID가 확인 prompt에 표시된다.
+- 선택 후 같은 session ID와 exact record ID가 확인 prompt에 표시된다.
 - exact `y\n`만 publish receipt를 전달한다.
 - non-TTY, 잘못된 선택, 취소, reviewer 누락, BLOCKING finding은 publish를
   호출하지 않는다.
 - REVIEW finding은 pager나 추가 menu 없이 최종 확인으로 진행한다.
 - 게시 성공과 idempotent 재실행은 기존 publisher contract를 유지한다.
+- 승인 대기 중 session이 전환되면 public file과 journal을 쓰지 않는다.
+- 출력 가능한 Unicode reviewer는 허용하고 제어 문자는 거부한다.
 - `./scripts/verify quick`이 read-only로 통과한다.
 
 browser verification은 적용하지 않는다. 이 변경은 terminal-only tooling이다.

@@ -140,6 +140,47 @@
   작성 및 placeholder·모순·범위·상태 전이 자체 검토; 사용자 설계 승인;
   `docs/superpowers/plans/2026-08-30-plan-completion-adversarial-review.md` 구현 계획
 
+### [x] TOOL-AI-REVIEW-01 redaction audit 오탐 수정
+
+- Requirements: `SYS-05`
+- Risk: LOW — 기존 review scanner 판정 규칙의 구현 오류 수정
+- Depends on: `PLAN-01`
+- Deliverable: 이미 `[REDACTED]`인 값은 REVIEW로 유지하고 실제 미마스킹
+  secret만 BLOCKING하는 scanner와 회귀 test
+- Acceptance: secret pattern 재적용 결과가 원문과 다를 때만
+  `unredacted_secret`이며 실제 secret 차단과 TTY 사람 승인 경계는 유지된다.
+- Automatic verification: focused scanner test, 실제 closed candidate read-only
+  재검사, `./scripts/verify quick`
+- Browser verification: 적용 없음 — terminal-only tooling
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 RED
+  `python3 -m unittest tests.test_review_scanner.ReviewScannerTests.test_redacted_secret_is_review_only -v`
+  예상한 `unredacted_secret` 오탐 FAIL; GREEN scanner 5 tests PASS; 실제 선택
+  candidate read-only 재검사 `blocking=0`, `review=4`; raw secret 차단 test 유지;
+  `./scripts/verify quick` PASS, hook tests 80개·frontend tests 3개
+
+### [x] TOOL-AI-REVIEW-02 검수 완료 게시 흐름 단순화
+
+- Requirements: `SYS-05`
+- Risk: HIGH — 사람 publication 승인 흐름 변경
+- Depends on: `TOOL-AI-REVIEW-01`
+- Deliverable: review-pending session ID 목록, 선택, exact 확인, 기존 publisher
+  게시만 수행하는 CLI
+- Acceptance: risk summary·pager·reviewer 입력 없이 유효한 `closed` session만
+  선택하고, BLOCKING audit와 TTY/exact-y 경계를 유지한 채 artifact를 게시한다.
+- Automatic verification: review CLI unit tests, hook test suite,
+  `./scripts/verify quick`
+- Browser verification: 적용 없음 — terminal-only tooling
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 사용자 승인, spec commit `752582c`; RED focused
+  tests가 기존 자동 선택·risk menu·reviewer prompt를 재현; 전체 리뷰에서
+  superseded closed segment 노출을 RED로 재현하고 current manifest filter로 수정;
+  review CLI 9개·scanner 5개 PASS; 문서 변경 후 setup marker 실패를 TOOLING으로
+  분류하고 reviewed SHA-256 audit 문구 복원 후 재검증; `./scripts/verify setup`,
+  `./scripts/verify quick`, `git diff --check` PASS; 전체 리뷰에서 session 전환 시
+  publisher 부분 게시 race, Unicode reviewer 계약 불일치, exact record 식별 누락을
+  발견하고 2026-08-30 사람 승인 후 각각 RED→GREEN; focused 22개, hook tests
+  86개·frontend tests 3개 PASS; 실제 TTY publication은 사람 checkpoint 대기
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`

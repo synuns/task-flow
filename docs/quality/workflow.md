@@ -120,13 +120,23 @@ cannot prove; a visible profile action alone is not authentication evidence.
 
 ## Prompt Records
 
-Lifecycle hooks create pending snapshots and metadata only. A person runs
-`npm run ai:review`; the tool selects candidates risk-first, computes and
-records reviewed SHA-256 digest and reviewer, then asks for exact `y`+Enter.
-Other input, EOF, or signal cancels. Publication uses staging and atomic
-rename, then regenerates public index and managed `AI_USAGE.md`; reruns are
-idempotent. AI must not approve or publish on a person's behalf. See
-`verification.md` and `AI_USAGE.md`.
+Lifecycle hooks create pending snapshots and metadata only. A person first
+reviews the Markdown under `.codex/review-pending/`, then runs
+`pnpm run ai:review`. The TTY command lists valid review-pending session IDs,
+accepts one numbered selection, repeats the selected session ID and exact record
+ID, and requires exact `y`+Enter before publication. Any other input, EOF, or
+signal cancels.
+
+The scanner remains a publication safety gate for metadata/hash errors and
+unredacted secrets, but REVIEW findings, context, and pager interaction are not
+part of this completion command. Reviewer identity comes only from
+`git config user.name`; a missing value stops with `reviewer_not_configured`.
+Printable Unicode reviewer names are accepted and control characters are
+rejected. Reviewer identity and reviewed SHA-256 digest remain bound to the
+receipt. Under the session lock, publication revalidates the current closed
+record before public writes. Publication remains atomic and idempotent. AI never
+selects, confirms, or publishes a record for a person. See `verification.md` and
+`AI_USAGE.md`.
 
 ## Final QA Checklist
 
