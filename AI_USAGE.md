@@ -32,18 +32,20 @@
 
 ## 전체 프롬프트와 작업 기록
 
-Lifecycle 훅은 pending 후보와 metadata만 생성합니다. 사람 게시 절차는
-후보 선택, 위험 우선 미리보기, digest 계산, reviewer 기록을 한 명령에서
-처리합니다.
+Lifecycle 훅은 pending 후보와 metadata만 생성합니다. 사람은 먼저
+`.codex/review-pending/`의 세션 Markdown을 검수한 뒤 아래 명령을 실행합니다.
 
 ```bash
-npm run ai:review
+pnpm run ai:review
 ```
 
-자동 마스킹은 사람 검토를 대체하지 않습니다. `y`+Enter만 승인이고,
-`n`, 빈 입력, EOF, signal은 취소입니다. 게시 transaction은 staging,
-artifact atomic rename, public index 갱신 순서로 실행되며 재실행해도
-동일 결과를 냅니다. `artifacts/`에는 사람 승인 기록만 추가합니다.
+명령은 검수 대기 세션 ID 목록을 보여주고 번호 선택 후 선택한 ID를 다시
+표시합니다. 정확히 `y`+Enter로 확인한 record만 artifact로 게시합니다.
+다른 입력, EOF, signal은 취소되며 AI와 non-TTY 실행은 게시할 수 없습니다.
+reviewer는 `git config user.name`에서만 읽습니다. 자동 마스킹은 사람 검토를
+대체하지 않습니다. 게시 transaction은 staging, artifact atomic rename, public
+index 갱신 순서로 실행되며 재실행해도 동일 결과를 냅니다.
+`artifacts/`에는 사람 승인 기록만 추가합니다.
 
 ### 검토 완료 기록
 

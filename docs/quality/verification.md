@@ -85,14 +85,15 @@ insufficient.
 
 ## Prompt Candidate Verification
 
-Setup verification confirms ignored pending storage, Stop hook wiring, exporter
-tests, and reviewed-publication language. The hook creates only structurally
-filtered and redacted pending candidates. `npm run ai:review` presents them
-risk-first; a person reviews content and sensitive information, then confirms
-with exact `y`+Enter. Reviewer and reviewed SHA-256 digest are recorded by the
-tool. `n`, blank input, EOF, or signal cancels. The publisher opens the
-candidate with no-follow semantics, requires a regular file, reads it once,
-rejects a digest mismatch, and publishes from those bytes.
+Setup verification confirms ignored pending storage, Stop hook wiring,
+exporter tests, and reviewed-publication language. A person reviews a pending
+Markdown file before running `pnpm run ai:review`. The TTY command lists only
+valid closed records as review-pending session IDs, requires a numbered
+selection and exact `y`+Enter, and records reviewer plus reviewed SHA-256 digest.
+Non-TTY execution, invalid selection, missing Git reviewer, BLOCKING scanner
+findings, other confirmation input, EOF, or signal cannot publish. The
+publisher opens the candidate with no-follow semantics, requires a regular
+file, reads it once, rejects a digest mismatch, and publishes from those bytes.
 Published records alone are indexed in `artifacts/index.md`. The explicit
 publisher holds the shared index lock and writes the reviewed artifact,
 canonical index, and fully regenerated managed `AI_USAGE.md` region in that
