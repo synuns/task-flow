@@ -27,6 +27,11 @@ domain field로 승격하지 않는다.
 각각 `DEC-AUTH-01`, `DEC-DELETE-01` 결정 gate로 남긴다. 시나리오가 gate를
 대신 결정하지 않는다.
 
+`assignment-original/` 아래 원본 문서는 모두 읽기 전용이다. 시나리오 작업은
+원본을 대조 기준으로만 사용하며 해당 directory의 파일을 수정, 이동, 삭제,
+재format하지 않는다. 재작성 대상은 추적·검증용 파생 문서인
+`docs/quality/requirements.md`뿐이다.
+
 ## 현재 Golden Journey 검토 결과
 
 현재 네 Journey는 requirement 묶음, 공통 precondition, action, expected를
@@ -269,8 +274,8 @@ Core E2E는 Journey마다 대표 success 하나와 critical failure 하나 이�
 
 ## 완료 조건
 
-- Master Journey와 네 독립 Journey가 `requirements.md`에서 단일 시나리오
-  기준으로 읽힌다.
+- Master Journey와 네 독립 Journey가 `docs/quality/requirements.md`에서 단일
+  시나리오 기준으로 읽힌다.
 - 각 Journey의 정상·핵심 예외 경로가 requirement와 OpenAPI에 trace된다.
 - 정책 미확정 행동은 명시적 결정 gate로 남는다.
 - 시나리오만 읽고도 독립 test의 초기 상태, 행동, observable 종료 조건,
