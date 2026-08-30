@@ -106,6 +106,19 @@ class VerifyCliTests(unittest.TestCase):
             verifier.REQUIRED_MARKERS["docs/quality/requirements.md"],
         )
 
+    def test_setup_requires_integrated_journey_contract_markers(self):
+        verifier = load_verify_module()
+        markers = verifier.REQUIRED_MARKERS["docs/quality/requirements.md"]
+        for marker in (
+            "## Scenario Execution Rules",
+            "## Master Journey",
+            "## Independent Journey Contract",
+            "Decision gate: `DEC-AUTH-01`",
+            "Decision gate: `DEC-DELETE-01`",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, markers)
+
     def test_setup_runs_pipeline_suites_without_verify_recursion(self):
         verifier = load_verify_module()
         with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
