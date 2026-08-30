@@ -143,8 +143,12 @@
 - Automatic verification: 설계 self-review, dependency 방향과 requirement
   coverage 정적 검토
 - Browser verification: 구현 전 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행; 사람 승인 필요
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 Codex `/root`; 사용자 설계 내용 최종 승인;
+  `docs/superpowers/specs/2026-08-30-application-architecture-design.md` 작성 및
+  placeholder·모순·범위·module 책임·dependency 방향·requirement trace 자체 검토;
+  `./scripts/verify setup` PASS, 79 tests; `git diff --check` PASS; 작성된 문서
+  사람 검토 필요
 
 ## 1. 검증 가능한 개발 기반
 
