@@ -252,7 +252,7 @@
   차단 확인; `./scripts/verify quick` PASS — setup 79 tests, format, lint, typecheck,
   Vitest 4 files/5 tests; browser 적용 없음
 
-### [ ] ARCH-02 app provider와 router composition
+### [x] ARCH-02 app provider와 router composition
 
 - Requirements: `NAV-01`, route 기반 전체 requirement
 - Risk: MEDIUM
@@ -264,8 +264,27 @@
 - Automatic verification: provider/router integration tests,
   `./scripts/verify quick`
 - Browser verification: 다섯 route 직접 진입, page/console error 기록
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`
+  - Requirement/Journey: `NAV-01` / architecture route composition
+  - Commit: ARCH-02 candidate, `1449d8c` base
+  - Agent-browser session: `arch-02-evidence`, 종료 확인
+  - Route/Viewport: `/` → `/task` link action, `/task/task-1` 직접 진입;
+    1280×720
+  - Precondition: Vite DEV, 인증 provider와 API handler 없음
+  - Actions: 다섯 route Playwright 순회, navigation click, 상세 route 직접 진입,
+    service worker registration/fetch, console/errors, screenshot 확인
+  - Expected: 고유 heading과 공통 navigation, active DEV worker, 오류 없음
+  - Actual: unit RED는 미구현 module, E2E RED는 heading 부재; 구현 후 Vitest
+    2 files/7 tests와 Playwright 1 Chromium test PASS
+  - Console/Network: console error와 page error 없음; active
+    `/mockServiceWorker.js`, fetch 200 `text/javascript`
+  - Screenshot/Trace: `/tmp/kbhc-arch-02-evidence.png`; Playwright 결과 attachment
+  - Failure class: TEST — render cleanup 누락; IMPLEMENTATION — app 단일 layer를
+    slice로 오인한 architecture contract
+  - Correction: test별 cleanup, app 내부 상대 import 예외를 계약에 반영
+  - Rerun verdict: `./scripts/verify quick` PASS — setup 79 tests, format, lint,
+    typecheck, Vitest 6 files/12 tests
 
 ### [ ] ARCH-03 typed API client와 test 경계
 

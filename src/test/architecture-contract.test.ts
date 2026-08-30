@@ -111,7 +111,7 @@ function violations(): string[] {
         failures.push(`${relative(sourceRoot, file)} reverses layer direction via ${specifier}`);
       }
 
-      if (sourceLayer === targetLayer && source[1] !== target[1]) {
+      if (source[0] !== "app" && sourceLayer === targetLayer && source[1] !== target[1]) {
         failures.push(`${relative(sourceRoot, file)} crosses same-layer slices via ${specifier}`);
       }
 
