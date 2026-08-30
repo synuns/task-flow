@@ -120,6 +120,25 @@
   focused unittest, `./scripts/verify setup`, `git diff --check` PASS;
   `assignment-original/` diff 없음
 
+### [ ] FLOW-REVIEW-01 계획 완료 적대적 리뷰 계약 보강
+
+- Requirements: 전체 계획 기반 작업과 Golden Journey
+- Risk: HIGH — 사람 gate와 완료 상태 의미 변경
+- Depends on: `PLAN-01`
+- Deliverable: 계획 구현 완료 후 독립 adversarial review, 공통 review evidence,
+  HIGH 결정 완료 상태, 병렬 TODO 원장 갱신 규칙을 연결한 workflow 계약
+- Acceptance: 계획의 구현·자동/browser 검증이 끝난 뒤 final task를 완료 처리하기
+  전에 fresh reviewer가 누락·회귀·evidence를 검토하고, 동일 범위 Journey review와
+  중복하지 않으며, HIGH 결정은 사람 결정 evidence가 있을 때 `AI_VERIFIED`로
+  닫히고, 병렬 작업은 소유하지 않은 TODO block을 갱신하지 않는다.
+- Automatic verification: workflow marker와 TODO 상태/dependency 정적 test,
+  `./scripts/verify setup`, `git diff --check`
+- Browser verification: 정책 문서에는 적용 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 Codex `/root`; 사용자 회고 후 계획 완료 review와 개선안
+  반영 요청; `docs/superpowers/specs/2026-08-30-plan-completion-adversarial-review-design.md`
+  설계 중
+
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`
@@ -246,6 +265,7 @@
 - Status: IN_PROGRESS
 - Evidence: 2026-08-30 Codex `/root`; 사용자 KB 기준 전체 변경 승인;
   `docs/superpowers/specs/2026-08-30-kb-ollacare-color-theme-design.md` 작성;
+  `docs/superpowers/plans/2026-08-30-kb-ollacare-color-theme.md` 구현 계획 작성;
   구현·검증 미실행
 
 ## 2. 애플리케이션 구조·공통 경계
