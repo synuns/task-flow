@@ -41,7 +41,7 @@
 | 단계 | Exit gate | 상태 |
 | --- | --- | --- |
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
-| 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | NOT_STARTED |
+| 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
 | 2. 공통 구조 | provider/router/API/test 경계 검증 | NOT_STARTED |
 | 3. auth-entry | evidence·review 후 사람 checkpoint | BLOCKED — auth 정책 결정 필요 |
 | 4. work-overview | evidence·review 후 사람 checkpoint | NOT_STARTED |
@@ -158,7 +158,7 @@
 
 ## 1. 검증 가능한 개발 기반
 
-### [ ] SCF-01 package와 toolchain 기반
+### [x] SCF-01 package와 toolchain 기반
 
 - Requirements: `SYS-01`
 - Risk: LOW — 이미 채택된 stack 적용
@@ -170,10 +170,12 @@
 - Automatic verification: package script test, install reproducibility,
   `pnpm format:check`, `pnpm lint`, `pnpm typecheck`
 - Browser verification: 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `pnpm install --frozen-lockfile` PASS;
+  `pnpm format:check`, `pnpm lint`, `pnpm typecheck` PASS; 필수 frontend script와
+  `ai:review` 유지 확인; `pnpm-lock.yaml` 외 package manager lockfile 없음
 
-### [ ] SCF-02 최소 React 진입점과 style 기반
+### [x] SCF-02 최소 React 진입점과 style 기반
 
 - Requirements: `SYS-01`, `SYS-02`, `SYS-03`
 - Risk: LOW
@@ -185,10 +187,14 @@
 - Automatic verification: component smoke, typecheck, build, token/literal 정적 검사
 - Browser verification: `/`, desktop viewport, console/page error 없음, font
   network 200, computed `Pretendard`, screenshot 또는 trace
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `pnpm vitest run src/test/scaffold.test.tsx
+  src/test/theme-contract.test.ts` PASS, 2 tests; `./scripts/verify full` build PASS;
+  agent-browser `/` 1280x720 computed font `Pretendard`, font request
+  `/fonts/PretendardVariable.woff2`, console/page error 없음; 상세 기록
+  `docs/quality/evidence/frontend-scaffolding.md`
 
-### [ ] SCF-03 OpenAPI type 생성과 MSW 기반
+### [x] SCF-03 OpenAPI type 생성과 MSW 기반
 
 - Requirements: `SYS-04`
 - Risk: LOW — 승인된 대체 방식의 기반만 구성
@@ -199,10 +205,13 @@
   없고 아직 feature handler나 독자 behavior를 추가하지 않는다.
 - Automatic verification: OpenAPI 재생성 비교, typecheck, MSW smoke
 - Browser verification: worker asset 요청 성공과 예상하지 않은 network error 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `pnpm api:types:check` PASS;
+  `pnpm vitest run src/test/openapi-contract.test.ts` PASS; `pnpm test:e2e:smoke`
+  PASS; agent-browser `/mockServiceWorker.js` 200 `text/javascript`, 예상하지 않은
+  console/page error 없음; feature handler와 독자 behavior 없음
 
-### [ ] SCF-04 개발 기반 통합 검증
+### [x] SCF-04 개발 기반 통합 검증
 
 - Requirements: `SYS-01`, `SYS-02`, `SYS-03`, `SYS-04`
 - Risk: MEDIUM
@@ -213,8 +222,12 @@
   `SYS-02`, `SYS-04`를 과대 완료 처리하지 않는다.
 - Automatic verification: `./scripts/verify quick`, `./scripts/verify full`
 - Browser verification: root render, font, console/network, trace 확인
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `fac27d1`; `./scripts/verify full` PASS — setup 79 tests,
+  format, lint, typecheck, Vitest 3 tests, build, core E2E selection; repository
+  mutation 없음; `pnpm test:e2e:smoke` PASS, 1 Chromium test; agent-browser root,
+  Pretendard, font/worker network와 console/page error 재확인; 상세 기록
+  `docs/quality/evidence/frontend-scaffolding.md`
 
 ## 2. 애플리케이션 구조·공통 경계
 
