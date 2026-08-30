@@ -127,6 +127,14 @@ slice가 서로 직접 의존하지 않게 composition을 위 layer로 올린다
 - 한 file에 route, network, state, presentation 책임을 함께 두지 않는다.
 - 아직 실제 소비자가 없는 slice, helper, generic abstraction을 미리 만들지
   않는다.
+- Frontend scaffold 이후에도 실제 소비자가 생기는 testable unit에서만 layer
+  directory와 public API를 함께 만든다.
+- `src/generated/openapi.ts`는 `src/shared/api` 내부에서만 직접 import한다.
+  generated type 또는 module을 public API로 re-export하지 않는다.
+- 실제 인증 기능 전에는 auth provider placeholder를 만들지 않는다.
+- 빈 layer directory와 소비자 없는 빈 `index.ts`를 만들지 않는다.
+- 첫 API boundary 구현은 Biome `noRestrictedImports`로 `src/generated/**` 직접
+  import를 `src/shared/api/**`에만 허용하고 허용·차단 fixture를 자동 검증한다.
 
 ### module 생성 기준
 

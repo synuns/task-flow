@@ -106,6 +106,33 @@ class VerifyCliTests(unittest.TestCase):
             verifier.REQUIRED_MARKERS["docs/quality/requirements.md"],
         )
 
+    def test_setup_requires_integrated_journey_contract_markers(self):
+        verifier = load_verify_module()
+        markers = verifier.REQUIRED_MARKERS["docs/quality/requirements.md"]
+        for marker in (
+            "## Scenario Execution Rules",
+            "## Master Journey",
+            "## Independent Journey Contract",
+            "Decision gate: `DEC-AUTH-01`",
+            "Decision gate: `DEC-DELETE-01`",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, markers)
+
+    def test_fsd_creation_constraints_are_recorded(self):
+        standards = (ROOT / "docs/coding-standards.md").read_text(encoding="utf-8")
+        todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
+        for marker in (
+            "`src/generated/openapi.ts`는 `src/shared/api` 내부에서만 직접 import한다.",
+            "generated type 또는 module을 public API로 re-export하지 않는다.",
+            "auth provider placeholder를 만들지 않는다.",
+            "빈 layer directory와 소비자 없는 빈 `index.ts`를 만들지 않는다.",
+            "Biome `noRestrictedImports`",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, standards)
+        self.assertIn("Biome `noRestrictedImports` 허용·차단 fixture", todo)
+
     def test_setup_runs_pipeline_suites_without_verify_recursion(self):
         verifier = load_verify_module()
         with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:

@@ -98,7 +98,7 @@
   FSD, shadcn-first, SOLID, 기존 code 보존, browser QA heading·명령 정적 검사
   PASS; shadcn `search`, `view`, `add` 명령은 공식 CLI 문서와 대조
 
-### [ ] SCN-01 Golden Journey 통합 시나리오 재작성
+### [x] SCN-01 Golden Journey 통합 시나리오 재작성
 
 - Requirements: 전체 Golden Journey requirement
 - Risk: LOW — accepted behavior를 바꾸지 않는 원본·OpenAPI trace 정교화
@@ -111,10 +111,14 @@
 - Automatic verification: requirement/API trace self-review,
   `./scripts/verify setup`, `git diff --check`
 - Browser verification: 문서 설계에는 적용 없음
-- Status: IN_PROGRESS
-- Evidence: 2026-08-30 사용자 구조 승인; 설계
-  `docs/superpowers/specs/2026-08-30-golden-journey-scenarios-design.md` 작성 및
-  `./scripts/verify setup`, `git diff --check` PASS
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `c4c7fdef010cbb1246b2cef74f28a5d5b23e4546`,
+  `65d6a1927ab5f28258d74dbe6b63a2cef1e977c4`; Master Journey와 네 독립 Journey
+  정상·핵심 예외 경로 및 `DEC-AUTH-01`·`DEC-DELETE-01` gate trace; RED
+  `test_setup_requires_integrated_journey_contract_markers` 5 marker 누락 FAIL,
+  `test_fsd_creation_constraints_are_recorded` 6 constraint 누락 FAIL; GREEN 두
+  focused unittest, `./scripts/verify setup`, `git diff --check` PASS;
+  `assignment-original/` diff 없음
 
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
@@ -139,7 +143,9 @@
 - Deliverable: FSD layer, public API, import 방향, provider composition,
   route/API/test 경계를 확정한 별도 설계 문서
 - Acceptance: 각 module의 책임·소비·제공 interface가 명확하고 scaffold 및
-  `docs/tech-stack.md`와 일치하며 사람이 승인한다.
+  `docs/tech-stack.md`와 일치하며 사람이 승인한다. FSD directory와 public API는
+  실제 소비 시점에만 생성하고 generated contract는 `shared/api` 내부 소비로
+  제한하며 auth provider placeholder를 포함하지 않는다.
 - Automatic verification: 설계 self-review, dependency 방향과 requirement
   coverage 정적 검토
 - Browser verification: 구현 전 적용 없음
@@ -217,11 +223,13 @@
 - Requirements: 전체 기능 requirement의 구조 기반
 - Risk: LOW — `DEC-ARCH-01` 승인안 실행
 - Depends on: `DEC-ARCH-01`, `SCF-04`
-- Deliverable: 승인된 app/pages/widgets/features/entities/shared/mocks 경계와
-  import restriction
-- Acceptance: placeholder 업무 UI 없이 layer import 방향이 정적 검사되고 public
-  export 밖 deep import가 차단된다.
-- Automatic verification: architecture lint/type test, `./scripts/verify quick`
+- Deliverable: 승인된 app/pages/widgets/features/entities/shared/mocks 경계 중
+  실제 소비자가 있는 directory와 public API, Biome import restriction
+- Acceptance: placeholder 업무 UI, auth provider placeholder, 빈 layer, 소비자 없는
+  빈 `index.ts` 없이 layer import 방향이 정적 검사된다. generated contract는
+  `shared/api`만 직접 import하고 public API로 노출하지 않는다.
+- Automatic verification: architecture lint/type test,
+  Biome `noRestrictedImports` 허용·차단 fixture, `./scripts/verify quick`
 - Browser verification: 적용 없음
 - Status: NOT_STARTED
 - Evidence: 미실행
