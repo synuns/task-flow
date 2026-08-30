@@ -306,7 +306,10 @@
   generated 직접 import 1건 탐지; 계약 test를 `shared/api`로 이동 후 focused
   Vitest 2 files/3 tests GREEN; Biome fixture는 public API import 허용·deep import
   차단 확인; `./scripts/verify quick` PASS — setup 79 tests, format, lint, typecheck,
-  Vitest 4 files/5 tests; browser 적용 없음
+  Vitest 4 files/5 tests; browser 적용 없음; 2026-08-30 mock handler 첫 소비에서
+  기존 contract가 `mocks` 내부 import까지 차단하는 INTEGRATION failure를 재현,
+  production→mocks 금지는 유지하고 mocks 내부 composition만 허용한 뒤 focused
+  architecture 2 tests와 `./scripts/verify quick` 재통과
 
 ### [x] ARCH-02 app provider와 router composition
 
@@ -373,7 +376,7 @@
 
 ## 3. auth-entry Journey
 
-### [ ] AUTH-UNIT-01 sign-in schema
+### [x] AUTH-UNIT-01 sign-in schema
 
 - Requirements: `AUTH-02`, `AUTH-03`
 - Risk: LOW
@@ -385,8 +388,11 @@
 - Automatic verification: schema boundary table unit tests,
   `./scripts/verify quick`
 - Browser verification: 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `pnpm vitest run
+  src/features/sign-in/model/sign-in-schema.test.ts` RED — schema module 없음;
+  valid와 required/email/길이/기호 경계 6 tests GREEN; `./scripts/verify quick`
+  PASS — Vitest 10 files/30 tests; browser 적용 없음
 
 ### [ ] AUTH-UI-01 sign-in form 접근성·submit 상태
 
@@ -399,8 +405,10 @@
 - Automatic verification: Testing Library/user-event component tests,
   `./scripts/verify quick`
 - Browser verification: `/sign-in` mobile/desktop, keyboard tab order와 visible 오류
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 sign-in form test RED — component module 없음; label,
+  accessible description, disabled/enabled, pending duplicate guard 3 tests GREEN;
+  `/sign-in` keyboard/mobile browser evidence 대기
 
 ### [ ] AUTH-API-01 sign-in 요청과 오류 modal
 
@@ -414,8 +422,12 @@
 - Automatic verification: MSW integration tests, modal component tests,
   `./scripts/verify quick`
 - Browser verification: error fixture, focus trap/restore, console/network 기록
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 auth API test RED — endpoint/handler module 없음; exact
+  credentials, MSW refresh cookie rotation, missing-cookie 401 3 tests와 server
+  error modal/focus restore component test GREEN; native `dialog`를 사용해 새 runtime
+  dependency 없이 browser focus trap/restore evidence 대기; `./scripts/verify quick`
+  PASS — setup 79 tests, format, lint, typecheck, Vitest 10 files/30 tests
 
 ### [ ] AUTH-STATE-01 승인된 token·refresh 상태
 
