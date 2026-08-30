@@ -53,9 +53,9 @@ public API를 만든다. 현재 scaffold 이후 기능 구현 단계이므로 �
 
 | 작업 | 실제 생성 대상 | 만들지 않는 대상 |
 | --- | --- | --- |
-| `ARCH-01` | Biome import 규칙과 architecture contract test | 빈 FSD directory |
-| `ARCH-02` | 실제 route를 구성하는 `app`, `pages`, `widgets/app-shell` | 인증 provider, 기능 UI |
-| `ARCH-03` | 실제 client와 test가 사용하는 `shared/api`, `mocks`, test support | 미사용 endpoint adapter |
+| `ARCH-01` | Biome import 규칙, architecture contract test, 기존 generated 계약 test가 실제 소비하는 `shared/api` test 위치 | 빈 FSD directory와 public API |
+| `ARCH-02` | 실제 route를 구성하는 `app`, `pages`, `widgets/app-shell`, `main.tsx`가 소비하는 `mocks/browser` | 인증 provider, API handler |
+| `ARCH-03` | 실제 client와 test가 사용하는 `shared/api` transport, `mocks/server`, test support | 미사용 endpoint adapter와 공통 상태 UI |
 | 기능 작업 | 해당 page가 실제 소비하는 widget, feature, entity | 다른 journey의 slice |
 
 ## 목표 구조와 의존 방향
@@ -177,6 +177,9 @@ feature / entity / widget
 - endpoint adapter는 첫 실제 기능 소비 시 추가한다. 예상 공개 함수는
   `signIn`, `getDashboard`, `getTasks`, `getTaskDetail`, `deleteTask`, `getUser`이며
   미사용 함수를 한꺼번에 만들지 않는다.
+- loading, empty, error UI도 첫 실제 화면 소비 시 해당 feature, entity, widget에
+  semantic markup으로 만들고 두 번째 소비가 생기기 전에는 `shared/ui`로
+  추출하지 않는다.
 - bearer header, refresh, bounded replay는 같은 transport 경계 안에서 처리할
   수 있어야 하지만 exact interface와 구현은 `DEC-AUTH-01` 승인 후 정한다.
 - sign-in과 delete mutation은 feature가 소유한다. Task와 user 읽기 query는

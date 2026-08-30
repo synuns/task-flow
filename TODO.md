@@ -154,7 +154,7 @@
   `docs/superpowers/specs/2026-08-30-application-architecture-design.md` 작성 및
   placeholder·모순·범위·module 책임·dependency 방향·requirement trace 자체 검토;
   `./scripts/verify setup` PASS, 79 tests; `git diff --check` PASS; 작성된 문서
-  사람 검토 필요
+  사용자 검토 승인; AI는 `HUMAN_APPROVED`를 기록하지 않음
 
 ## 1. 검증 가능한 개발 기반
 
@@ -239,8 +239,8 @@
 - Requirements: `NAV-01`, route 기반 전체 requirement
 - Risk: MEDIUM
 - Depends on: `ARCH-01`
-- Deliverable: router, query client, auth provider, 공통 error boundary, 개발 MSW
-  bootstrap의 composition
+- Deliverable: router, query client, 공통 error boundary, 개발 MSW bootstrap의
+  composition; auth provider는 `DEC-AUTH-01` 승인 후 생성
 - Acceptance: 다섯 route가 고유 page boundary로 resolve되고 provider 초기화
   실패가 숨겨지지 않으며 test에서 독립 render 가능하다.
 - Automatic verification: provider/router integration tests,
@@ -249,18 +249,20 @@
 - Status: NOT_STARTED
 - Evidence: 미실행
 
-### [ ] ARCH-03 typed API client와 공통 상태 UI
+### [ ] ARCH-03 typed API client와 test 경계
 
 - Requirements: 모든 API requirement
 - Risk: MEDIUM
 - Depends on: `ARCH-01`, `SCF-03`
 - Deliverable: generated contract를 소비하는 fetch client, error normalization,
-  loading/empty/error primitives, MSW test harness
+  MSW test harness; loading/empty/error UI는 첫 실제 화면 소비 작업에서 생성
 - Acceptance: JSON success와 `ErrorResponse`가 구분되고 non-JSON/network/abort가
   deterministic error로 변환되며 page가 raw fetch를 직접 호출하지 않는다.
+  미사용 공통 상태 component나 public API를 미리 만들지 않는다.
 - Automatic verification: client unit/integration tests, MSW handler contract tests,
   `./scripts/verify quick`
-- Browser verification: 대표 loading/error/success 상태의 accessible output
+- Browser verification: 독립 UI 없음; 첫 실제 화면 소비 작업에서
+  loading/error/success의 accessible output 검증
 - Status: NOT_STARTED
 - Evidence: 미실행
 
