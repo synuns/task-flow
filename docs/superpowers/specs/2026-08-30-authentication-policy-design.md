@@ -82,7 +82,9 @@ token으로 새 보호 요청을 보내지 않고 refresh한다. 그 전에도 s
 401 처리는 다음 순서를 지킨다.
 
 1. 요청 generation이 현재 generation과 다르면 이전 세션 응답이다. 현재 인증
-   상태와 cache를 변경하지 않고 해당 요청만 stale-session 결과로 종료한다.
+   상태와 cache를 변경하지 않고 해당 요청만 내부 stale-session 제어 흐름으로
+   종료한 뒤 공개 경계에서는 `aborted`로 정규화한다. 사용자 오류 UI를 만들지
+   않는다.
 2. Generation은 같지만 요청 token과 현재 token이 다르면 refresh 완료 후 늦게
    도착한 이전 token의 401이다. 추가 refresh 없이 최신 token으로 한 번만
    재실행한다.
@@ -180,6 +182,8 @@ bearer와 refresh integration evidence를 함께 검토한다.
 - 동시 refresh는 하나이며 원본 요청은 최대 한 번만 replay된다.
 - 늦게 도착한 이전 token과 이전 session 응답이 현재 상태를 훼손하지 않는다.
 - 현재 인증 상태의 replay 401과 refresh 400/401만 terminal transition을 만든다.
+- 이전 session 폐기는 별도 공개 오류 종류를 추가하지 않고 `aborted` 비표시
+  semantics를 사용한다.
 - Return location은 같은 origin의 등록된 내부 route로 제한된다.
 - Shared API와 app auth provider 사이에 역방향 import가 없다.
 - Provider는 navigation하지 않고 router 내부 boundary가 이동을 소유한다.
