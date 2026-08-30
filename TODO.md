@@ -120,6 +120,25 @@
   focused unittest, `./scripts/verify setup`, `git diff --check` PASS;
   `assignment-original/` diff 없음
 
+### [x] TOOL-AI-REVIEW-01 redaction audit 오탐 수정
+
+- Requirements: `SYS-05`
+- Risk: LOW — 기존 review scanner 판정 규칙의 구현 오류 수정
+- Depends on: `PLAN-01`
+- Deliverable: 이미 `[REDACTED]`인 값은 REVIEW로 유지하고 실제 미마스킹
+  secret만 BLOCKING하는 scanner와 회귀 test
+- Acceptance: secret pattern 재적용 결과가 원문과 다를 때만
+  `unredacted_secret`이며 실제 secret 차단과 TTY 사람 승인 경계는 유지된다.
+- Automatic verification: focused scanner test, 실제 closed candidate read-only
+  재검사, `./scripts/verify quick`
+- Browser verification: 적용 없음 — terminal-only tooling
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 RED
+  `python3 -m unittest tests.test_review_scanner.ReviewScannerTests.test_redacted_secret_is_review_only -v`
+  예상한 `unredacted_secret` 오탐 FAIL; GREEN scanner 5 tests PASS; 실제 선택
+  candidate read-only 재검사 `blocking=0`, `review=4`; raw secret 차단 test 유지;
+  `./scripts/verify quick` PASS, hook tests 80개·frontend tests 3개
+
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`
