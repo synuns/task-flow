@@ -137,7 +137,7 @@
 - Status: IN_PROGRESS
 - Evidence: 2026-08-30 Codex `/root`; 사용자 회고 후 계획 완료 review와 개선안
   반영 요청; `docs/superpowers/specs/2026-08-30-plan-completion-adversarial-review-design.md`
-  설계 중
+  작성 및 placeholder·모순·범위·상태 전이 자체 검토; 사용자 문서 검토 대기
 
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
