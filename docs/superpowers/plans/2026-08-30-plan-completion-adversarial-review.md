@@ -325,7 +325,7 @@ whitespace error 없음, 원본 diff 없음.
 
 ```text
 Review target: docs/superpowers/plans/2026-08-30-plan-completion-adversarial-review.md, FLOW-REVIEW-01, latest reviewed implementation/correction commit SHA
-Reviewer: reviewer identifier and relationship to Task 2 author
+Reviewer: reviewer identifier and relationship to final implementation/correction author
 Checks: checks performed from Step 1
 Findings: none or classified findings
 Corrections: not applicable or applied corrections
