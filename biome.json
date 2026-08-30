@@ -26,9 +26,296 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "recommended"
+      "preset": "recommended",
+      "style": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": [
+                  "@/app/**",
+                  "@/pages/*/**",
+                  "@/widgets/*/**",
+                  "@/features/*/**",
+                  "@/entities/*/**",
+                  "@/shared/*/**",
+                  "@/generated/**"
+                ],
+                "message": "Slice 외부에서는 public API만 import하세요."
+              }
+            ]
+          }
+        }
+      }
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/app/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/*/**",
+                      "@/widgets/*/**",
+                      "@/features/*/**",
+                      "@/entities/*/**",
+                      "@/shared/*/**",
+                      "@/mocks/**",
+                      "@/generated/**"
+                    ],
+                    "message": "app 내부 상대 import와 하위 layer public API만 사용하세요."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/pages/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/**",
+                      "@/widgets/*/**",
+                      "@/features/*/**",
+                      "@/entities/*/**",
+                      "@/shared/*/**",
+                      "@/mocks/**",
+                      "@/generated/**"
+                    ],
+                    "message": "pages는 같은 layer나 상위 layer를 import할 수 없습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/widgets/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/**",
+                      "@/widgets/**",
+                      "@/features/*/**",
+                      "@/entities/*/**",
+                      "@/shared/*/**",
+                      "@/mocks/**",
+                      "@/generated/**"
+                    ],
+                    "message": "widgets는 같은 layer나 상위 layer를 import할 수 없습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/features/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/**",
+                      "@/widgets/**",
+                      "@/features/**",
+                      "@/entities/*/**",
+                      "@/shared/*/**",
+                      "@/mocks/**",
+                      "@/generated/**"
+                    ],
+                    "message": "features는 같은 layer나 상위 layer를 import할 수 없습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/entities/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/**",
+                      "@/widgets/**",
+                      "@/features/**",
+                      "@/entities/**",
+                      "@/shared/*/**",
+                      "@/mocks/**",
+                      "@/generated/**"
+                    ],
+                    "message": "entities는 같은 layer나 상위 layer를 import할 수 없습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/**",
+                      "@/widgets/**",
+                      "@/features/**",
+                      "@/entities/**",
+                      "@/shared/**",
+                      "@/mocks/**",
+                      "@/generated/**"
+                    ],
+                    "message": "shared는 다른 layer, slice, mocks, generated를 import할 수 없습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/api/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app",
+                      "@/app/**",
+                      "@/pages/**",
+                      "@/widgets/**",
+                      "@/features/**",
+                      "@/entities/**",
+                      "@/shared/**",
+                      "@/mocks/**"
+                    ],
+                    "message": "shared/api는 generated와 내부 상대 import만 추가로 사용할 수 있습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/**/*.{test,spec}.{ts,tsx}", "src/test/**/*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app/**",
+                      "@/pages/*/**",
+                      "@/widgets/*/**",
+                      "@/features/*/**",
+                      "@/entities/*/**",
+                      "@/shared/*/**",
+                      "@/generated/**"
+                    ],
+                    "message": "Test도 public API를 사용하며 generated를 직접 import하지 않습니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/api/**/*.{test,spec}.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/app/**",
+                      "@/pages/*/**",
+                      "@/widgets/*/**",
+                      "@/features/*/**",
+                      "@/entities/*/**",
+                      "@/shared/*/**"
+                    ],
+                    "message": "shared/api test는 generated와 mocks만 경계 예외로 사용합니다."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double",

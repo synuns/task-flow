@@ -231,7 +231,7 @@
 
 ## 2. 애플리케이션 구조·공통 경계
 
-### [ ] ARCH-01 FSD directory와 public boundary
+### [x] ARCH-01 FSD directory와 public boundary
 
 - Requirements: 전체 기능 requirement의 구조 기반
 - Risk: LOW — `DEC-ARCH-01` 승인안 실행
@@ -244,8 +244,13 @@
 - Automatic verification: architecture lint/type test,
   Biome `noRestrictedImports` 허용·차단 fixture, `./scripts/verify quick`
 - Browser verification: 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 Codex `/root`; `pnpm vitest run
+  src/test/architecture-contract.test.ts` RED — `test/openapi-contract.test.ts`의
+  generated 직접 import 1건 탐지; 계약 test를 `shared/api`로 이동 후 focused
+  Vitest 2 files/3 tests GREEN; Biome fixture는 public API import 허용·deep import
+  차단 확인; `./scripts/verify quick` PASS — setup 79 tests, format, lint, typecheck,
+  Vitest 4 files/5 tests; browser 적용 없음
 
 ### [ ] ARCH-02 app provider와 router composition
 
