@@ -126,7 +126,7 @@
   focused unittest, `./scripts/verify setup`, `git diff --check` PASS;
   `assignment-original/` diff 없음
 
-### [ ] FLOW-REVIEW-01 계획 완료 적대적 리뷰 계약 보강
+### [x] FLOW-REVIEW-01 계획 완료 적대적 리뷰 계약 보강
 
 - Requirements: 전체 계획 기반 작업과 Golden Journey
 - Risk: HIGH — 사람 gate와 완료 상태 의미 변경
@@ -140,11 +140,26 @@
 - Automatic verification: workflow marker와 TODO 상태/dependency 정적 test,
   `./scripts/verify setup`, `git diff --check`
 - Browser verification: 정책 문서에는 적용 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30 Codex `/root`; 사용자 회고 후 계획 완료 review와 개선안
   반영 요청; `docs/superpowers/specs/2026-08-30-plan-completion-adversarial-review-design.md`
   작성 및 placeholder·모순·범위·상태 전이 자체 검토; 사용자 설계 승인;
-  `docs/superpowers/plans/2026-08-30-plan-completion-adversarial-review.md` 구현 계획
+  `docs/superpowers/plans/2026-08-30-plan-completion-adversarial-review.md` 구현 계획;
+  Review target: 위 계획, `FLOW-REVIEW-01`,
+  `7945f8c8d3cdf12a04c196f5cdf033cf0e6c7d51`; Reviewer: 최종 작성자
+  `/root`와 분리된 read-only context `/root/plan_review`,
+  `/root/plan_review_final`; Checks: spec/plan coverage, 완료 전 review 순서,
+  HIGH 결정과 Journey 승인 경계, 동일 target 재사용, TODO ownership, setup
+  marker/test, 최신 `main` 정합성, unrelated/`assignment-original/` diff;
+  Findings: 1차 Important `REQUIREMENT` 순서 모호성, Important `INTEGRATION`
+  stale base, Minor `TOOLING` plan checkbox; 2차 Important `REQUIREMENT` 수정 전
+  SHA 고정, Important `TEST` marker/evidence 계약 누락, Minor `REQUIREMENT` stale
+  인용문; 3차 Minor `REQUIREMENT` 최종 수정 작성자 관계 누락; 최종 findings
+  none; Corrections: 완료 전 순서 명시, `a9243b2` rebase, plan 상태 정합화, 최신
+  수정 SHA 재review 규칙, 필수 marker와 ordering test 보강, stale 문구와 reviewer
+  관계 수정; Rerun: focused unittest PASS, `./scripts/verify quick` PASS(Python 86,
+  Vitest 20), `git diff --check` PASS, `assignment-original/` diff 없음, browser는
+  정책 문서 변경이라 적용 없음; Verdict: PASS
 
 ### [x] TOOL-AI-REVIEW-01 redaction audit 오탐 수정
 

@@ -303,7 +303,7 @@ unrelated diff and assignment-original diff
 Expected: finding마다 severity, workflow class, root cause, correction, rerun이
 작성되거나 `Findings: none`과 reviewer/checks가 함께 기록된다.
 
-- [ ] **Step 2: finding을 수정하고 영향 검증을 재실행한다**
+- [x] **Step 2: finding을 수정하고 영향 검증을 재실행한다**
 
 Run:
 
@@ -317,7 +317,7 @@ git diff --exit-code HEAD -- assignment-original
 Expected: focused test PASS, quick의 setup·format·lint·typecheck·test PASS,
 whitespace error 없음, 원본 diff 없음.
 
-- [ ] **Step 3: review evidence와 완료 상태를 기록한다**
+- [x] **Step 3: review evidence와 완료 상태를 기록한다**
 
 `git rev-parse HEAD`로 최종 review target commit을 얻는다. `TODO.md`의
 `FLOW-REVIEW-01`을 `[x]`, `Status: AI_VERIFIED`로 바꾸고 reviewer가 생성한 실제
@@ -333,14 +333,14 @@ Rerun: Step 2 commands and their PASS results
 Verdict: PASS or PASS_WITH_LOW
 ```
 
-- [ ] **Step 4: final evidence를 커밋한다**
+- [x] **Step 4: final evidence를 커밋한다**
 
 ```bash
 git add TODO.md
 git commit -m "docs(workflow): 계획 완료 리뷰 근거 기록"
 ```
 
-- [ ] **Step 5: 최종 상태를 확인한다**
+- [x] **Step 5: 최종 상태를 확인한다**
 
 Run:
 
