@@ -300,6 +300,10 @@ journey별 대표 success 하나와 critical failure 하나 이하로 유지한�
 
 ## 전체 단계와 exit gate
 
+Every written implementation plan finishes with plan-completion adversarial review
+before its final TODO item is completed. A Golden Journey may reuse the same review
+only when plan path, requirement/Journey IDs, and target commit are identical.
+
 ### 0. 기획·결정 준비
 
 상위 기획과 TODO를 연결하고 auth 정책 등 HIGH 결정을 분리한다. Exit: 문서

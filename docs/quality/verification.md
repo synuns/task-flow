@@ -16,7 +16,8 @@ verification fail.
 ## Modes
 
 - `setup`: required files, document markers and links, risk/approval rules,
-  journey categories, review/final-QA sections, pending-record ignore rule,
+  journey categories, plan-completion review evidence markers, review/final-QA
+  sections, pending-record ignore rule,
   Stop/SessionEnd hook wiring, AI disclosure headings, and the four focused
   artifact-contract, exporter, index, and publisher unit-test suites.
 - `quick`: `setup`, then `format:check`, `lint`, `typecheck`, and `test` after
@@ -82,6 +83,12 @@ refresh/expiry behavior. Core E2E covers only a credential or browser-network
 boundary that integration evidence cannot prove. The human `auth-entry`
 checkpoint reviews both artifacts; authenticated navigation alone is
 insufficient.
+
+## Review Contract Verification
+
+Setup verifies that plan-completion review evidence, HIGH decision state, and TODO
+task ownership rules are present. Marker checks do not prove reviewer independence
+or review quality; a person verifies the recorded reviewer and target commit.
 
 ## Prompt Candidate Verification
 

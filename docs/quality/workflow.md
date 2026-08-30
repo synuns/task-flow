@@ -9,11 +9,13 @@
 5. Run applicable browser checks and record evidence.
 6. Classify failures, correct root cause, and rerun the failed gate.
 7. Record evidence and continue low-risk work.
-8. At a completed golden journey, run lightweight adversarial review and ask
-   for one human checkpoint acceptance.
-9. After all journeys, run full adversarial review, `./scripts/verify full`,
-   and final QA.
-10. Ask a person for final acceptance. AI never declares human acceptance.
+8. After the final implementation and verification task of a written plan, run
+   plan-completion adversarial review before marking the plan-backed TODO item done.
+9. At a completed golden journey, reuse that review when the target is identical;
+   otherwise review only the missing journey scope, then ask for one checkpoint.
+10. After all journeys, run full adversarial review, `./scripts/verify full`, and
+    final QA.
+11. Ask a person for final acceptance. AI never declares human acceptance.
 
 One work unit covers one requirement ID or one independently testable condition
 inside an ID. Do not split work by file when files form one testable behavior.
@@ -49,6 +51,12 @@ diagnosis, or unrelated LOW work that cannot cross the affected boundary.
 
 AI proposes risk and owns execution evidence. People own journey acceptance,
 HIGH decisions, exceptions, and final acceptance.
+
+A HIGH decision item becomes `AI_VERIFIED` only after explicit human decision
+evidence and the specified design/trace verification pass. This records that the
+approved decision was reflected correctly; it is not a Golden Journey acceptance.
+Without human decision evidence it remains `BLOCKED`, and AI never marks
+`HUMAN_APPROVED`.
 
 ## Failure Classification
 
@@ -86,6 +94,32 @@ Rerun verdict:
 
 Browser-tool failure is not product success. Classify it as `ENVIRONMENT` or
 `TOOLING`, restore trustworthy evidence, then rerun.
+
+## Plan-Completion Adversarial Review
+
+After the final implementation and applicable automatic/browser verification task
+of every written plan, use a fresh reviewer context or an explicit second-pass role
+that did not author the final change. Review plan acceptance, incomplete steps,
+requirement omissions, negative paths, invariants, accessibility, weak or duplicate
+tests, console/network errors, unrelated diff, missing evidence, and TODO
+status/dependency consistency. Resolve every HIGH/MEDIUM finding before completing
+the plan-backed TODO item, merge, handoff, or checkpoint request.
+
+Record this block even when no finding exists:
+
+```text
+Review target: plan path, requirement/Journey IDs, target commit SHA
+Reviewer: fresh context or second-pass role ID and relationship to final author
+Checks: checks actually performed
+Findings: none or severity/class/root cause
+Corrections: not applicable or applied changes
+Rerun: reproduction command and result
+Verdict: PASS | PASS_WITH_LOW | BLOCKED
+```
+
+`Findings: none` is valid only with the reviewer, target commit, and checks. When a
+plan and Golden Journey have the same target, one recorded review satisfies both;
+review only the missing scope when their targets differ.
 
 ## Adversarial Review
 

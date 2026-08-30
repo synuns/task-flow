@@ -23,12 +23,18 @@
    Evidence에 남긴다.
 10. 새 작업은 해당 단계에 stable ID로 추가한다. 완료 item을 삭제하거나
     번호를 재사용하지 않는다.
+11. Evidence에 기록된 agent/session이 task block owner다. 병렬 session은
+    소유하지 않은 task block의 checkbox, Status, Evidence를 갱신하지 않는다.
+12. HIGH decision item은 명시적 사람 결정 evidence와 지정 검증이 통과하면
+    `AI_VERIFIED`로 닫는다. 이는 Journey의 `HUMAN_APPROVED`가 아니다.
+13. branch는 merge 전 최신 main을 반영하고 TODO conflict를 item 단위로 합친다.
 
 ## 상태
 
 - `NOT_STARTED`: 시작 전
 - `IN_PROGRESS`: 한 agent가 수행 중
-- `AI_VERIFIED`: acceptance와 자동/browser evidence 충족
+- `AI_VERIFIED`: acceptance와 자동/browser evidence 충족. HIGH decision은 사람
+  결정 evidence가 있을 때 `AI_VERIFIED`로 닫되 Journey 수용을 뜻하지 않는다.
 - `HUMAN_APPROVED`: 사람이 checkpoint 승인
 - `BLOCKED`: blocker와 해제 조건 기록
 
@@ -196,7 +202,7 @@
 - Status: NOT_STARTED
 - Evidence: 미실행; 사람 승인 필요
 
-### [ ] DEC-ARCH-01 애플리케이션 구조 상세 설계
+### [x] DEC-ARCH-01 애플리케이션 구조 상세 설계
 
 - Requirements: 전체 기능 requirement의 구조 기반
 - Risk: HIGH — architecture 결정
@@ -210,12 +216,13 @@
 - Automatic verification: 설계 self-review, dependency 방향과 requirement
   coverage 정적 검토
 - Browser verification: 구현 전 적용 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30 Codex `/root`; 사용자 설계 내용 최종 승인;
   `docs/superpowers/specs/2026-08-30-application-architecture-design.md` 작성 및
   placeholder·모순·범위·module 책임·dependency 방향·requirement trace 자체 검토;
   `./scripts/verify setup` PASS, 79 tests; `git diff --check` PASS; 작성된 문서
-  사용자 검토 승인; AI는 `HUMAN_APPROVED`를 기록하지 않음
+  사용자 검토 승인; 승인된 HIGH 결정을 `AI_VERIFIED`로 정합화했으며 Journey
+  `HUMAN_APPROVED`는 기록하지 않음
 
 ## 1. 검증 가능한 개발 기반
 

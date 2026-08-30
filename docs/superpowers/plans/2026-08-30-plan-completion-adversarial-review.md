@@ -29,7 +29,7 @@
 - Consumes: `scripts.verify.REQUIRED_FILES`, `scripts.verify.REQUIRED_MARKERS`
 - Produces: setup 검증이 요구할 plan review, HIGH 결정, TODO ownership marker 계약
 
-- [ ] **Step 1: 문서 계약 test를 추가한다**
+- [x] **Step 1: 문서 계약 test를 추가한다**
 
 `tests/test_verify.py`의 journey marker test 다음에 추가한다.
 
@@ -60,12 +60,14 @@
         }
         for path, markers in expected.items():
             self.assertIn(path, verifier.REQUIRED_FILES)
+            content = (ROOT / path).read_text(encoding="utf-8")
             for marker in markers:
                 with self.subTest(path=path, marker=marker):
                     self.assertIn(marker, verifier.REQUIRED_MARKERS[path])
+                    self.assertIn(marker, content)
 ```
 
-- [ ] **Step 2: focused test가 계약 누락으로 실패하는지 확인한다**
+- [x] **Step 2: focused test가 계약 누락으로 실패하는지 확인한다**
 
 Run:
 
@@ -76,7 +78,7 @@ python3 -m unittest tests.test_verify.VerifyCliTests.test_setup_requires_plan_co
 Expected: `FAIL`; `docs/project-plan.md` 또는 `TODO.md`가 `REQUIRED_FILES`에 없다는
 assertion이 첫 실패로 출력된다.
 
-- [ ] **Step 3: verifier에 required file과 marker를 최소 추가한다**
+- [x] **Step 3: verifier에 required file과 marker를 최소 추가한다**
 
 `scripts/verify`의 `REQUIRED_FILES`에 추가한다.
 
@@ -140,7 +142,7 @@ Expected: test는 아직 FAIL한다. 문서에 marker가 없기 때문이다.
 - Consumes: Task 1의 `REQUIRED_MARKERS` 계약
 - Produces: 모든 계획 기반 작업이 따르는 완료 gate와 review evidence 형식
 
-- [ ] **Step 1: Required Loop와 task block ownership을 추가한다**
+- [x] **Step 1: Required Loop와 task block ownership을 추가한다**
 
 `AGENTS.md`의 Required Loop에 다음 문장을 반영한다.
 
@@ -156,7 +158,7 @@ different task blocks, but never a block owned by another session. Rebase onto t
 latest main and reconcile TODO state item-by-item before merge.
 ```
 
-- [ ] **Step 2: Operating Loop와 HIGH decision 상태를 명확히 한다**
+- [x] **Step 2: Operating Loop와 HIGH decision 상태를 명확히 한다**
 
 `docs/quality/workflow.md`의 Operating Loop에서 evidence 기록 다음에 둔다.
 
@@ -180,7 +182,7 @@ Without human decision evidence it remains `BLOCKED`, and AI never marks
 `HUMAN_APPROVED`.
 ```
 
-- [ ] **Step 3: 공통 plan-completion review evidence를 추가한다**
+- [x] **Step 3: 공통 plan-completion review evidence를 추가한다**
 
 `docs/quality/workflow.md`의 `## Adversarial Review` 앞에 추가한다.
 
@@ -212,7 +214,7 @@ plan and Golden Journey have the same target, one recorded review satisfies both
 review only the missing scope when their targets differ.
 ````
 
-- [ ] **Step 4: Verification과 project phase 계약을 연결한다**
+- [x] **Step 4: Verification과 project phase 계약을 연결한다**
 
 `docs/quality/verification.md`의 setup 설명에 `plan-completion review evidence
 markers`를 추가하고 Prompt Candidate Verification 앞에 둔다.
@@ -233,7 +235,7 @@ before its final TODO item is completed. A Golden Journey may reuse the same rev
 only when plan path, requirement/Journey IDs, and target commit are identical.
 ```
 
-- [ ] **Step 5: TODO 상태와 병렬 원장 규칙을 정리한다**
+- [x] **Step 5: TODO 상태와 병렬 원장 규칙을 정리한다**
 
 `TODO.md` 규칙에 반영한다.
 
@@ -249,7 +251,7 @@ only when plan path, requirement/Journey IDs, and target commit are identical.
 Status를 `AI_VERIFIED`로 맞춘다. `FLOW-REVIEW-01`은 final review 전까지
 `IN_PROGRESS`를 유지한다.
 
-- [ ] **Step 6: focused test와 setup을 GREEN으로 만든다**
+- [x] **Step 6: focused test와 setup을 GREEN으로 만든다**
 
 Run:
 

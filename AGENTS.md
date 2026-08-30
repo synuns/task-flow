@@ -32,13 +32,18 @@ HIGH-risk human decision.
 
 Select requirement IDs → implement one testable unit → run read-only automatic
 verification → verify applicable browser behavior → classify and fix failures →
-record evidence → run lightweight adversarial review at each golden journey →
-request one human checkpoint → run full review and final QA.
+record evidence → after the final task of a written plan, run a
+plan-completion adversarial review → at each golden journey, reuse or extend that
+review → request one human checkpoint → run full review and final QA.
 
 작업 시작 시 `TODO.md`에서 의존성이 해소된 작업 하나를 선택하고, 종료 전
 상태와 재현 가능한 evidence를 갱신한다. 상위 목표·범위·단계는
 `docs/project-plan.md`를 따른다. 세부 기능 설계와 구현 순서는 별도
 `docs/superpowers/` 문서에서 구체화한다.
+
+The session recorded in Evidence is the task block owner. Parallel work may update
+different task blocks, but never a block owned by another session. Rebase onto the
+latest main and reconcile TODO state item-by-item before merge.
 
 LOW work proceeds continuously. People own golden-journey acceptance, HIGH-risk
 decisions, exceptions, and final completion. AI never marks `HUMAN_APPROVED`.

@@ -119,6 +119,38 @@ class VerifyCliTests(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertIn(marker, markers)
 
+    def test_setup_requires_plan_completion_review_contract(self):
+        verifier = load_verify_module()
+        expected = {
+            "AGENTS.md": (
+                "plan-completion adversarial review",
+                "task block owner",
+            ),
+            "docs/quality/workflow.md": (
+                "## Plan-Completion Adversarial Review",
+                "Review target:",
+                "Findings:",
+                "HIGH decision item",
+            ),
+            "docs/quality/verification.md": (
+                "plan-completion review evidence",
+            ),
+            "docs/project-plan.md": (
+                "plan-completion adversarial review",
+            ),
+            "TODO.md": (
+                "사람 결정 evidence가 있을 때 `AI_VERIFIED`",
+                "소유하지 않은 task block",
+            ),
+        }
+        for path, markers in expected.items():
+            self.assertIn(path, verifier.REQUIRED_FILES)
+            content = (ROOT / path).read_text(encoding="utf-8")
+            for marker in markers:
+                with self.subTest(path=path, marker=marker):
+                    self.assertIn(marker, verifier.REQUIRED_MARKERS[path])
+                    self.assertIn(marker, content)
+
     def test_fsd_creation_constraints_are_recorded(self):
         standards = (ROOT / "docs/coding-standards.md").read_text(encoding="utf-8")
         todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
