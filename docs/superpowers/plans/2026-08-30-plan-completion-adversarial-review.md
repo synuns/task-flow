@@ -263,7 +263,7 @@ git diff --check
 
 Expected: focused test 1개 PASS, setup 79개 이상 PASS, whitespace error 없음.
 
-- [ ] **Step 7: 구현 계약을 커밋한다**
+- [x] **Step 7: 구현 계약을 커밋한다**
 
 ```bash
 git add AGENTS.md TODO.md docs/project-plan.md docs/quality/workflow.md \
@@ -282,7 +282,7 @@ git commit -m "docs(workflow): 계획 완료 적대적 리뷰 계약 적용"
 - Consumes: Task 2의 문서 계약과 구현 commit
 - Produces: `FLOW-REVIEW-01`의 독립 review evidence와 최종 `AI_VERIFIED` 상태
 
-- [ ] **Step 1: fresh reviewer가 구현 commit을 검토한다**
+- [x] **Step 1: fresh reviewer가 구현 commit을 검토한다**
 
 Review target은 Task 2 commit으로 고정한다. reviewer는 Task 2 최종 변경을
 작성하지 않은 context여야 하며 다음을 확인한다.
