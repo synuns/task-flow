@@ -1,3 +1,5 @@
+import { ApiClientProvider, type ApiClient } from "@/shared/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -24,6 +26,21 @@ function controller(status: AuthStatus): AuthController {
   };
 }
 
+const apiClient: ApiClient = {
+  request: async <T,>(
+    input: RequestInfo | URL,
+    _init: RequestInit,
+    isSuccess: (value: unknown) => value is T,
+  ) => {
+    const body: unknown =
+      new URL(String(input)).pathname === "/api/dashboard"
+        ? { numOfTask: 3, numOfRestTask: 2, numOfDoneTask: 1 }
+        : {};
+    if (!isSuccess(body)) throw new Error("router test API fixture is missing");
+    return body;
+  },
+};
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
@@ -45,7 +62,13 @@ describe("app router", () => {
     );
     const router = createMemoryRouter(appRoutes, { initialEntries: [path] });
 
-    render(<RouterProvider router={router} />);
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ApiClientProvider client={apiClient}>
+          <RouterProvider router={router} />
+        </ApiClientProvider>
+      </QueryClientProvider>,
+    );
 
     expect(await screen.findByRole("heading", { name: heading })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveAttribute("href", "/");

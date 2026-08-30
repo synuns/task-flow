@@ -16,3 +16,4 @@ export {
   type AuthTokenPair,
   type SignInCredentials,
 } from "./auth";
+export { type DashboardMetrics, getDashboard } from "./dashboard";
