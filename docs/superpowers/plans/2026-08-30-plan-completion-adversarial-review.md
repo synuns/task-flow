@@ -149,9 +149,10 @@ Expected: test는 아직 FAIL한다. 문서에 marker가 없기 때문이다.
 ```markdown
 Select requirement IDs → implement one testable unit → run read-only automatic
 verification → verify applicable browser behavior → classify and fix failures →
-record evidence → after the final task of a written plan, run a plan-completion
-adversarial review → at each golden journey, reuse or extend that review → request
-one human checkpoint → run full review and final QA.
+record evidence → after the final implementation/verification task and before the
+final completion task or TODO status transition, run a plan-completion adversarial
+review → at each golden journey, reuse or extend that review → request one human
+checkpoint → run full review and final QA.
 
 The session recorded in Evidence is the task block owner. Parallel work may update
 different task blocks, but never a block owned by another session. Rebase onto the
@@ -284,8 +285,9 @@ git commit -m "docs(workflow): 계획 완료 적대적 리뷰 계약 적용"
 
 - [x] **Step 1: fresh reviewer가 구현 commit을 검토한다**
 
-Review target은 Task 2 commit으로 고정한다. reviewer는 Task 2 최종 변경을
-작성하지 않은 context여야 하며 다음을 확인한다.
+Review target은 evidence/status 전환 직전의 최신 구현·수정 commit으로 고정한다.
+reviewer는 그 최종 변경을 작성하지 않은 context여야 하며 다음을 확인한다. 수정이
+추가되면 새 commit을 대상으로 review를 반복한다.
 
 ```text
 spec/plan coverage
@@ -317,12 +319,12 @@ whitespace error 없음, 원본 diff 없음.
 
 - [ ] **Step 3: review evidence와 완료 상태를 기록한다**
 
-`git rev-parse HEAD`로 Task 2 target commit을 얻는다. `TODO.md`의
+`git rev-parse HEAD`로 최종 review target commit을 얻는다. `TODO.md`의
 `FLOW-REVIEW-01`을 `[x]`, `Status: AI_VERIFIED`로 바꾸고 reviewer가 생성한 실제
 값을 추가한다.
 
 ```text
-Review target: docs/superpowers/plans/2026-08-30-plan-completion-adversarial-review.md, FLOW-REVIEW-01, Task 2 target commit SHA
+Review target: docs/superpowers/plans/2026-08-30-plan-completion-adversarial-review.md, FLOW-REVIEW-01, latest reviewed implementation/correction commit SHA
 Reviewer: reviewer identifier and relationship to Task 2 author
 Checks: checks performed from Step 1
 Findings: none or classified findings

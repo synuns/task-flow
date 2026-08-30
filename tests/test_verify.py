@@ -123,23 +123,35 @@ class VerifyCliTests(unittest.TestCase):
         verifier = load_verify_module()
         expected = {
             "AGENTS.md": (
+                "after the final implementation/verification task",
+                "before the final completion task or TODO status transition",
                 "plan-completion adversarial review",
                 "task block owner",
             ),
             "docs/quality/workflow.md": (
                 "## Plan-Completion Adversarial Review",
                 "Review target:",
+                "Reviewer:",
+                "Checks:",
                 "Findings:",
+                "Corrections:",
+                "Rerun:",
+                "Verdict:",
+                "`Findings: none` is valid only with the reviewer, target commit, and checks.",
                 "HIGH decision item",
+                "not a Golden Journey acceptance",
+                "same target, one recorded review satisfies both",
             ),
             "docs/quality/verification.md": (
                 "plan-completion review evidence",
             ),
             "docs/project-plan.md": (
                 "plan-completion adversarial review",
+                "only when plan path, requirement/Journey IDs, and target commit are identical",
             ),
             "TODO.md": (
                 "사람 결정 evidence가 있을 때 `AI_VERIFIED`",
+                "이는 Journey의 `HUMAN_APPROVED`가 아니다.",
                 "소유하지 않은 task block",
             ),
         }
@@ -150,6 +162,17 @@ class VerifyCliTests(unittest.TestCase):
                 with self.subTest(path=path, marker=marker):
                     self.assertIn(marker, verifier.REQUIRED_MARKERS[path])
                     self.assertIn(marker, content)
+
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        ordered = tuple(
+            agents.index(marker)
+            for marker in (
+                "after the final implementation/verification task",
+                "before the final completion task or TODO status transition",
+                "plan-completion adversarial review",
+            )
+        )
+        self.assertEqual(ordered, tuple(sorted(ordered)))
 
     def test_fsd_creation_constraints_are_recorded(self):
         standards = (ROOT / "docs/coding-standards.md").read_text(encoding="utf-8")

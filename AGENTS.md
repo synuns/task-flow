@@ -32,8 +32,8 @@ HIGH-risk human decision.
 
 Select requirement IDs → implement one testable unit → run read-only automatic
 verification → verify applicable browser behavior → classify and fix failures →
-record evidence → after the final implementation/verification task and before the
-final completion task or TODO status transition, run a
+record evidence → after the final implementation/verification task and
+before the final completion task or TODO status transition, run a
 plan-completion adversarial review → at each golden journey, reuse or extend that
 review → request one human checkpoint → run full review and final QA.
 
