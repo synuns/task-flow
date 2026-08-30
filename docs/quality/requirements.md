@@ -63,10 +63,12 @@ its requirement IDs, independent initial state, OpenAPI contract, actions,
 observable result, and lowest sufficient evidence level.
 
 Authentication storage, refresh replay, terminal session transition, and
-signed-out protected-route behavior remain behind `DEC-AUTH-01`. Delete error
-UI, modal-close behavior, duplicate-submit behavior, and list/detail/dashboard
-cache consistency remain behind `DEC-DELETE-01`. A scenario names these gates
-instead of choosing behavior for them.
+signed-out protected-route behavior follow
+`docs/superpowers/specs/2026-08-30-authentication-policy-design.md`
+(`DEC-AUTH-01`). Delete error UI, modal-close behavior, duplicate-submit
+behavior, and list/detail/dashboard cache consistency follow
+`docs/superpowers/specs/2026-08-30-delete-consistency-policy-design.md`
+(`DEC-DELETE-01`).
 
 ## Master Journey
 
@@ -95,9 +97,9 @@ executable journeys without making their state or execution order dependent.
 
 Requirements: `NAV-02`, `AUTH-01` through `AUTH-07`.
 
-Decision gate: `DEC-AUTH-01`. Before approval, executable scope ends after
-validating the 200 `AuthTokenResponse`. After approval, the same journey adds
-the exact protected-request, refresh, terminal-failure, and navigation results.
+Decision gate: `DEC-AUTH-01`. The journey uses the approved protected-request,
+refresh, terminal-failure, stale-session isolation, and navigation results from
+the authentication policy design.
 
 Independent initial state: fresh signed-out context at `/sign-in`; sign-in API
 fixture reset per case; no stored token or cookie assumed.
@@ -181,14 +183,15 @@ request counts start at zero.
 | `RES-P1-1` | `TASK-DETAIL-01` | Open existing `/task/:id` | Bearer `GET /api/task/{id}`, 200 `TaskDetailResponse` | `title`, `memo`, `registerDatetime` equal response | integration + browser |
 | `RES-P1-2` | `TASK-DETAIL-03` | Open delete confirmation | None | Accessible modal contains ID input | component + browser |
 | `RES-P1-3` | `TASK-DETAIL-04` | Enter wrong, whitespace, case-different, then exact ID | None | Disabled until exact equality; no early request | unit + component |
-| `RES-P1-4` | `TASK-DETAIL-05` | Under approved policy, submit exact ID | Bearer `DELETE /api/task/{id}`, 200 `DeleteTaskResponse { success: true }` | Exact endpoint called once and success navigates `/task` | integration + browser |
+| `RES-P1-4` | `TASK-DETAIL-05` | Under approved policy, submit exact ID | Bearer `DELETE /api/task/{id}`, 200 `DeleteTaskResponse { success: true }` | One user attempt sends DELETE once plus at most one auth replay; only 200 success navigates `/task` | integration + browser |
 | `RES-E1` | `TASK-DETAIL-02` | Open missing ID and recover | `GET /api/task/{id}`, 404 `ErrorResponse` | Missing UI shows `errorMessage`; action returns `/task` | integration + browser |
 | `RES-E2` | `TASK-DETAIL-04` | Attempt non-exact ID | None | Submit disabled and DELETE count is zero | component + integration |
 | `RES-E3` | `AUTH-07`, `TASK-DETAIL-05` | Exercise DELETE 401 | `DELETE /api/task/{id}`, 401 `ErrorResponse` | Result matches both decision documents | integration |
 | `RES-E4` | `TASK-DETAIL-05` | Exercise DELETE 404 | `DELETE /api/task/{id}`, 404 `ErrorResponse` | Result matches `DEC-DELETE-01`; no redirect without 200 | integration + browser when modal behavior is involved |
 
-The scenario does not choose in-flight close, duplicate submit, or cache
-mutation before `DEC-DELETE-01` approval.
+The scenario uses the approved pending close lock, one-attempt duplicate guard,
+server-authoritative fixture mutation, and outcome-unknown reconciliation from
+`DEC-DELETE-01`.
 
 ## Invariants
 

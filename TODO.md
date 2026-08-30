@@ -79,8 +79,13 @@
 - Automatic verification: 설계 문서 self-review와 OpenAPI/auth requirement
   trace 검사
 - Browser verification: 구현 전 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행; 사람 승인 필요
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 `docs/superpowers/specs/2026-08-30-authentication-policy-design.md`;
+  access token memory 저장, MSW refresh cookie, session generation, single-flight
+  refresh, 최대 한 번 replay, late 401와 이전 session 격리, 내부 route allowlist,
+  app callback 주입과 router-owned navigation을 확정하고 사용자 대화 승인;
+  `./scripts/verify quick` PASS, `git diff --check` PASS, 원본 문서 diff 없음;
+  tracked `HUMAN_APPROVED` 표시는 사람 직접 확인 대기
 
 ### [x] PLAN-02 에이전트 코딩 규약 연결
 
@@ -132,8 +137,14 @@
   확정되며 사람이 승인한다.
 - Automatic verification: 설계 self-review, OpenAPI/delete requirement trace 검사
 - Browser verification: 구현 전 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행; 사람 승인 필요
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30
+  `docs/superpowers/specs/2026-08-30-delete-consistency-policy-design.md`;
+  server-authoritative 비낙관적 삭제, attempt당 auth replay 포함 DELETE 최대 2회,
+  200-only redirect, 404 non-success, outcome-unknown detail 재조회, 단일 fixture
+  store와 cache 일관성을 확정하고 사용자 대화 승인; tracked `HUMAN_APPROVED`
+  표시는 사람 직접 확인 대기; `./scripts/verify quick` PASS,
+  `git diff --check` PASS, 원본 문서 diff 없음
 
 ### [ ] DEC-ARCH-01 애플리케이션 구조 상세 설계
 
@@ -154,7 +165,10 @@
   `docs/superpowers/specs/2026-08-30-application-architecture-design.md` 작성 및
   placeholder·모순·범위·module 책임·dependency 방향·requirement trace 자체 검토;
   `./scripts/verify setup` PASS, 79 tests; `git diff --check` PASS; 작성된 문서
-  사용자 검토 승인; AI는 `HUMAN_APPROVED`를 기록하지 않음
+  사용자 검토 승인; 2026-08-30 `shared/api` auth callback app 주입과
+  RouterProvider 내부 navigation 책임을 추가 승인; tracked `HUMAN_APPROVED`
+  표시는 사람 직접 확인 대기; `./scripts/verify quick` PASS,
+  `git diff --check` PASS, 원본 문서 diff 없음
 
 ## 1. 검증 가능한 개발 기반
 

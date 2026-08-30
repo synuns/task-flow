@@ -216,31 +216,33 @@ App bootstrap은 router, query client, auth context, MSW development bootstrap�
 ### 인증 정책
 
 OpenAPI는 sign-in response에 accessToken과 refreshToken을 반환하면서 refresh는
-`token` cookie를 요구한다. token 저장 위치와 cookie 설정 주체는 명시하지
-않는다. 다음을 하나의 auth 설계에서 확정한다.
+`token` cookie를 요구한다. 확정된 정책은
+`docs/superpowers/specs/2026-08-30-authentication-policy-design.md`가 관리한다.
 
-- access token 저장 위치와 page reload 시 동작
-- response의 refreshToken과 refresh cookie 관계
-- token expiry 판정과 동시 401 처리
-- refresh 성공 시 request replay 범위와 무한 retry 방지
-- refresh 400/401 시 session 정리와 UI 이동
-- `/`, `/task`, `/task/:id`, `/user`의 비로그인 접근 정책
-- MSW가 cookie와 JWT expiry를 결정적으로 재현하는 방법
-
-승인 evidence는 결정 문서 경로, 승인자, 승인 시점, 영향을 받는 requirement를
-남긴다. `AUTH-07` 구현은 승인 전 시작하지 않는다.
+- Access token은 메모리에만 저장하고 MSW가 refresh cookie server 동작을
+  모사한다.
+- Expiry와 현재 token의 401은 session generation을 보존하는 single-flight
+  refresh와 최대 한 번 replay로 처리한다.
+- Late 401과 이전 session 응답은 현재 인증 상태를 변경하지 않는다.
+- Auth provider는 navigation하지 않고 router 내부 boundary가 보호 route와
+  허용된 복귀 위치를 처리한다.
+- `shared/api`는 app auth provider를 import하지 않고 token과 refresh callback을
+  app composition에서 주입받는다.
 
 ### 삭제와 mock data 일관성
 
-원본은 exact ID 확인 후 delete 호출과 `/task` redirect를 요구한다. 다음
-세부사항이 accepted behavior를 바꾸면 사람 결정을 요청한다.
+원본은 exact ID 확인 후 delete 호출과 `/task` redirect를 요구한다. 확정된
+정책은
+`docs/superpowers/specs/2026-08-30-delete-consistency-policy-design.md`가 관리한다.
 
-- 성공 후 목록, 상세, dashboard fixture의 일관성 유지 범위
-- delete 401/404와 network 실패 표시 방식
-- 중복 submit과 요청 중 modal close 정책
-
-최소 기준은 정확한 route ID 없이는 호출하지 않고, 200 success에서만
-`/task`로 이동하는 것이다.
+- 비낙관적 server-authoritative 삭제를 사용하고 pending 중 modal과 중복
+  submit을 잠근다.
+- 사용자 submit 한 번은 attempt 하나이며 auth replay를 포함한 DELETE 전송은
+  attempt당 최대 두 번이다.
+- 200 `{ success: true }`만 자동 `/task` 이동을 만든다.
+- 404와 outcome-unknown은 success가 아니며, network와 invalid-response는 상세
+  재조회로 상태를 조정하고 DELETE를 자동 재전송하지 않는다.
+- 하나의 task fixture store가 목록, 상세와 dashboard 수치의 source of truth다.
 
 ## 공통 UX·접근성 기준
 
