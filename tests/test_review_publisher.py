@@ -3,6 +3,7 @@ import json
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest import mock
 
@@ -58,6 +59,25 @@ class PublisherTransactionTests(unittest.TestCase):
             review_publisher.publish_receipt(self.root, self.receipt())
         self.assertEqual(raised.exception.code, "record_not_closed")
 
+    def test_superseded_record_is_rejected_before_publication(self):
+        self.store.session_start("session-123", "clear")
+        destination = self.root / "artifacts" / ("codex-session-{}.md".format(self.closed.record_id))
+
+        with self.assertRaises(ValueError) as raised:
+            review_publisher.publish_receipt(self.root, self.receipt())
+
+        self.assertEqual(str(raised.exception), "record_not_closed")
+        self.assertFalse(destination.exists())
+        self.assertEqual(
+            (self.root / "artifacts" / "index.md").read_text(encoding="utf-8"),
+            render_artifact_index.render_index([]),
+        )
+        self.assertNotIn(
+            self.closed.record_id,
+            (self.root / "AI_USAGE.md").read_text(encoding="utf-8"),
+        )
+        self.assertFalse(review_publisher.journal_path(self.root, self.closed.record_id).exists())
+
     def test_destination_conflict_does_not_overwrite(self):
         destination = self.root / "artifacts" / ("codex-session-{}.md".format(self.closed.record_id))
         destination.write_bytes(b"different\n")
@@ -72,6 +92,24 @@ class PublisherTransactionTests(unittest.TestCase):
         with self.assertRaises(review_publisher.PublicationError) as raised:
             review_publisher.publish_receipt(self.root, receipt)
         self.assertEqual(raised.exception.code, "snapshot_digest_mismatch")
+
+    def test_unicode_reviewer_is_accepted(self):
+        receipt = replace(self.receipt(), reviewer="홍길동")
+
+        try:
+            result = review_publisher.publish_receipt(self.root, receipt)
+        except review_publisher.PublicationError as error:
+            self.fail("Unicode reviewer rejected: {}".format(error.code))
+
+        self.assertEqual(result.status, "published")
+
+    def test_control_character_reviewer_is_rejected(self):
+        receipt = replace(self.receipt(), reviewer="Reviewer\nInjected")
+
+        with self.assertRaises(review_publisher.PublicationError) as raised:
+            review_publisher.publish_receipt(self.root, receipt)
+
+        self.assertEqual(raised.exception.code, "invalid_reviewer")
 
     def test_cancel_before_commit_leaves_no_public_artifact(self):
         review_publisher.request_cancel()

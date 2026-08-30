@@ -115,8 +115,12 @@ def list_review_pending_records(repo_root: Path) -> List[RecordRef]:
                 continue
             if not hmac.compare_digest(hashlib.sha256(paths.markdown.read_bytes()).hexdigest(), metadata.get("artifact_sha256", "")):
                 continue
-            records.append(RecordRef(metadata["session_id"], metadata["generation"], metadata["segment"], metadata["revision"], "closed"))
-        except (OSError, UnicodeError, ValueError, KeyError):
+            ref = RecordRef(metadata["session_id"], metadata["generation"], metadata["segment"], metadata["revision"], "closed")
+            current = store.current_ref(ref.session_id, migrate=False)
+            if ref.record_id != record or current is None or current.record_id != record or current.state != "closed":
+                continue
+            records.append(ref)
+        except (OSError, TypeError, UnicodeError, ValueError, KeyError):
             continue
     def sort_key(ref):
         try:
@@ -158,6 +162,7 @@ def run_review(repo_root: Path, input_stream=sys.stdin, output_stream=sys.stdout
     if selected is None:
         return 0
     output_stream.write("선택한 세션: {}\n".format(selected.session_id))
+    output_stream.write("검수 대상 기록: {}\n".format(selected.record_id))
     output_stream.flush()
     check_cancel()
     raw, _stat = read_candidate_once(store.paths(selected.record_id).markdown)

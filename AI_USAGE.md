@@ -39,12 +39,15 @@ Lifecycle 훅은 pending 후보와 metadata만 생성합니다. 사람은 먼저
 pnpm run ai:review
 ```
 
-명령은 검수 대기 세션 ID 목록을 보여주고 번호 선택 후 선택한 ID를 다시
-표시합니다. 정확히 `y`+Enter로 확인한 record만 artifact로 게시합니다.
+명령은 검수 대기 세션 ID 목록을 보여주고 번호 선택 후 선택한 session ID와
+정확한 record ID를 다시 표시합니다. 정확히 `y`+Enter로 확인한 record만
+artifact로 게시합니다.
 다른 입력, EOF, signal은 취소되며 AI와 non-TTY 실행은 게시할 수 없습니다.
-reviewer는 `git config user.name`에서만 읽습니다. 자동 마스킹은 사람 검토를
-대체하지 않습니다. 게시 transaction은 staging, artifact atomic rename, public
-index 갱신 순서로 실행되며 재실행해도 동일 결과를 냅니다.
+reviewer는 `git config user.name`에서만 읽으며 출력 가능한 Unicode 이름을
+허용하고 제어 문자는 거부합니다. 자동 마스킹은 사람 검토를 대체하지
+않습니다. 게시 transaction은 current closed record를 다시 검증한 뒤 staging,
+artifact atomic rename, public index 갱신 순서로 실행되며 재실행해도 동일
+결과를 냅니다.
 `artifacts/`에는 사람 승인 기록만 추가합니다.
 
 ### 검토 완료 기록

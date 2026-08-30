@@ -153,11 +153,14 @@
 - Browser verification: 적용 없음 — terminal-only tooling
 - Status: AI_VERIFIED
 - Evidence: 2026-08-30 사용자 승인, spec commit `752582c`; RED focused
-  tests가 기존 자동 선택·risk menu·reviewer prompt를 재현한 뒤 review CLI 7개와
-  scanner 5개 PASS; 문서 변경 후 setup marker 실패를 TOOLING으로 분류하고
-  reviewed SHA-256 audit 문구 복원 후 재검증; `./scripts/verify setup` PASS,
-  `./scripts/verify quick` PASS (hook tests 81개·frontend tests 3개),
-  `git diff --check` PASS; 실제 TTY publication은 사람 checkpoint 대기
+  tests가 기존 자동 선택·risk menu·reviewer prompt를 재현; 전체 리뷰에서
+  superseded closed segment 노출을 RED로 재현하고 current manifest filter로 수정;
+  review CLI 9개·scanner 5개 PASS; 문서 변경 후 setup marker 실패를 TOOLING으로
+  분류하고 reviewed SHA-256 audit 문구 복원 후 재검증; `./scripts/verify setup`,
+  `./scripts/verify quick`, `git diff --check` PASS; 전체 리뷰에서 session 전환 시
+  publisher 부분 게시 race, Unicode reviewer 계약 불일치, exact record 식별 누락을
+  발견하고 2026-08-30 사람 승인 후 각각 RED→GREEN; focused 22개, hook tests
+  86개·frontend tests 3개 PASS; 실제 TTY publication은 사람 checkpoint 대기
 
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 

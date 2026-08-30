@@ -43,6 +43,28 @@ class ReviewCliTests(unittest.TestCase):
         self.assertNotIn("session-123.s0001", output.getvalue())
         self.assertIn("Select [1-1]:", output.getvalue())
 
+    def test_review_pending_list_excludes_superseded_closed_segment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            store = review_ai_record.RecordStore(root, clock=lambda: "2026-08-29T12:00:00Z")
+            store.record_prompt("session-123", "turn-1", b"first\n", "codex-rollout-v1")
+            store.session_end("session-123")
+            store.session_start("session-123", "clear")
+            store.record_prompt("session-123", "turn-2", b"second\n", "codex-rollout-v1")
+            current = store.session_end("session-123")
+
+            records = review_ai_record.list_review_pending_records(root)
+
+            self.assertEqual([record.record_id for record in records], [current.record_id])
+
+    def test_invalid_selection_does_not_choose_record(self):
+        record = review_ai_record.RecordRef("session-123", 1, 1, 7, "closed")
+        for value in ("0\n", "2\n", "x\n", "\n", ""):
+            with self.subTest(value=repr(value)):
+                self.assertIsNone(
+                    review_ai_record.choose_record([record], TtyStringIO(value), TtyStringIO())
+                )
+
     def test_missing_reviewer_stops_without_prompt_or_publication(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -99,6 +121,7 @@ class ReviewCliTests(unittest.TestCase):
                 result = review_ai_record.run_review(root, TtyStringIO("1\ny\n"), output)
             self.assertEqual(result, 0)
             self.assertIn("선택한 세션: session-123", output.getvalue())
+            self.assertIn("검수 대상 기록: session-123.s0001", output.getvalue())
             self.assertIn("published", output.getvalue())
             self.assertEqual(store.read_metadata(closed.record_id)["state"], "published")
 

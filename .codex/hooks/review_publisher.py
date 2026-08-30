@@ -188,7 +188,7 @@ def validate_receipt(receipt):
         raise PublicationError("invalid_record_id")
     if not re.fullmatch(r"[0-9a-f]{64}", receipt.candidate_sha256):
         raise PublicationError("invalid_candidate_digest")
-    if not receipt.reviewer or not re.fullmatch(r"[A-Za-z0-9 ._@-]{1,128}", receipt.reviewer):
+    if not isinstance(receipt.reviewer, str) or not receipt.reviewer.strip() or len(receipt.reviewer) > 128 or not receipt.reviewer.isprintable():
         raise PublicationError("invalid_reviewer")
 
 
@@ -233,6 +233,11 @@ def publish_receipt(repo_root: Path, receipt: ReviewReceipt) -> PublicationResul
                 raise PublicationError("record_not_closed")
             if metadata.get("revision") != receipt.revision:
                 raise PublicationError("candidate_changed")
+            current = store.current_ref(session_id, migrate=False)
+            if current is None or current.record_id != receipt.record_id or current.state != "closed":
+                raise PublicationError("record_not_closed")
+            if current.revision != receipt.revision:
+                raise PublicationError("candidate_changed")
             journal = None
             try:
                 journal = read_journal(repo_root, receipt.record_id)
@@ -266,7 +271,6 @@ def publish_receipt(repo_root: Path, receipt: ReviewReceipt) -> PublicationResul
                 store.atomic_write_bytes(usage_path, atomic_usage.encode("utf-8"))
                 completed = _mark_step(completed, "ai_usage")
                 check_cancel()
-                current = store.current_ref(session_id, migrate=False)
                 if metadata.get("state") != "published":
                     store.mark_published_locked(current, receipt.record_id, receipt.candidate_sha256)
                 completed = _mark_step(completed, "metadata")
