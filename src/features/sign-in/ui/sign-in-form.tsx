@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { signInSchema, type SignInValues } from "../model/sign-in-schema";
 
-type SignInFormProps = { onAuthenticated(tokens: AuthTokenPair): void };
+export type SignInFormProps = { onAuthenticated(tokens: AuthTokenPair): void };
 
 function validationMessage(field: "email" | "password", value: string): true | string {
   const result = signInSchema.shape[field].safeParse(value);
