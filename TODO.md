@@ -98,6 +98,24 @@
   FSD, shadcn-first, SOLID, 기존 code 보존, browser QA heading·명령 정적 검사
   PASS; shadcn `search`, `view`, `add` 명령은 공식 CLI 문서와 대조
 
+### [ ] SCN-01 Golden Journey 통합 시나리오 재작성
+
+- Requirements: 전체 Golden Journey requirement
+- Risk: LOW — accepted behavior를 바꾸지 않는 원본·OpenAPI trace 정교화
+- Depends on: `PLAN-01`
+- Deliverable: Master Journey와 독립 실행 가능한 네 Journey의 정상·핵심 예외
+  경로를 통합한 `docs/quality/requirements.md`
+- Acceptance: 모든 단계가 requirement와 OpenAPI operation/status/schema에
+  trace되고 인증·삭제 미확정 동작은 명시적 결정 gate로 남으며 OpenAPI에 없는
+  동작이나 data를 추가하지 않는다.
+- Automatic verification: requirement/API trace self-review,
+  `./scripts/verify setup`, `git diff --check`
+- Browser verification: 문서 설계에는 적용 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-08-30 사용자 구조 승인; 설계
+  `docs/superpowers/specs/2026-08-30-golden-journey-scenarios-design.md` 작성 및
+  `./scripts/verify setup`, `git diff --check` PASS
+
 ### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`
