@@ -49,11 +49,11 @@
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
 | 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
 | 2. 공통 구조 | provider/router/API/test 경계 검증 | AI_VERIFIED |
-| 3. auth-entry | evidence·review 후 사람 checkpoint | BLOCKED — auth 정책 결정 필요 |
-| 4. work-overview | evidence·review 후 사람 checkpoint | NOT_STARTED |
-| 5. task-discovery | evidence·review 후 사람 checkpoint | NOT_STARTED |
-| 6. task-resolution | evidence·review 후 사람 checkpoint | NOT_STARTED |
-| 7. 통합·제출 QA | full QA 후 사람 최종 acceptance | NOT_STARTED |
+| 3. auth-entry | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 4. work-overview | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 5. task-discovery | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 6. task-resolution | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 7. 통합·제출 QA | full QA 후 사람 최종 acceptance | IN_PROGRESS |
 
 ## 0. 기획·결정 준비
 
@@ -73,7 +73,7 @@
   coverage 27/27; TODO 34 items의 필수 field 10종과 dependency reference 검사 PASS;
   staged `git diff --check` PASS
 
-### [ ] DEC-AUTH-01 인증 정책 사람 결정
+### [x] DEC-AUTH-01 인증 정책 사람 결정
 
 - Requirements: `AUTH-07`, `NAV-02`, `NAV-03`
 - Risk: HIGH
@@ -85,8 +85,15 @@
 - Automatic verification: 설계 문서 self-review와 OpenAPI/auth requirement
   trace 검사
 - Browser verification: 구현 전 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행; 사람 승인 필요
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `docs/superpowers/specs/2026-08-30-authentication-policy-design.md`;
+  access token memory 저장, MSW refresh cookie, session generation, single-flight
+  refresh, 최대 한 번 replay, late 401와 이전 session 격리, 내부 route allowlist,
+  app callback 주입과 router-owned navigation을 확정하고 사용자 대화 승인;
+  `docs/superpowers/plans/2026-08-30-authentication-policy.md` 실행 계획 자체 검토;
+  구현 후 auth/provider/request Vitest와 auth-entry Chromium, architecture 정적
+  검토, `./scripts/verify quick` PASS; 사람 승인 evidence는 기록하되 규약에 따라
+  AI가 `HUMAN_APPROVED`로 표시하지 않음
 
 ### [x] PLAN-02 에이전트 코딩 규약 연결
 
@@ -202,7 +209,8 @@
   publisher 부분 게시 race, Unicode reviewer 계약 불일치, exact record 식별 누락을
   발견하고 2026-08-30 사람 승인 후 각각 RED→GREEN; focused 22개, hook tests
   86개·frontend tests 3개 PASS; 실제 TTY publication은 사람 checkpoint 대기
-### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
+
+### [x] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`
 - Risk: HIGH — destructive-data semantics
@@ -214,8 +222,16 @@
   확정되며 사람이 승인한다.
 - Automatic verification: 설계 self-review, OpenAPI/delete requirement trace 검사
 - Browser verification: 구현 전 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행; 사람 승인 필요
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30
+  `docs/superpowers/specs/2026-08-30-delete-consistency-policy-design.md`;
+  server-authoritative 비낙관적 삭제, attempt당 auth replay 포함 DELETE 최대 2회,
+  200-only redirect, 404 non-success, outcome-unknown detail 재조회, 단일 fixture
+  store와 cache 일관성을 확정하고 사용자 대화 승인;
+  `docs/superpowers/plans/2026-08-30-delete-consistency-policy.md` 실행 계획 자체 검토;
+  구현 후 delete outcome/guard/cache/transport Vitest와 task-resolution Chromium,
+  architecture 정적 검토, `./scripts/verify quick` PASS; 사람 승인 evidence는
+  기록하되 규약에 따라 AI가 `HUMAN_APPROVED`로 표시하지 않음
 
 ### [x] DEC-ARCH-01 애플리케이션 구조 상세 설계
 
@@ -236,8 +252,11 @@
   `docs/superpowers/specs/2026-08-30-application-architecture-design.md` 작성 및
   placeholder·모순·범위·module 책임·dependency 방향·requirement trace 자체 검토;
   `./scripts/verify setup` PASS, 79 tests; `git diff --check` PASS; 작성된 문서
-  사용자 검토 승인; 승인된 HIGH 결정을 `AI_VERIFIED`로 정합화했으며 Journey
-  `HUMAN_APPROVED`는 기록하지 않음
+  사용자 검토 승인; 2026-08-30 `shared/api` auth callback app 주입과
+  RouterProvider 내부 navigation 책임을 추가 승인; 구현 후 FSD/public API,
+  generated/mocks, provider/router ownership 정적·Vitest 검토와
+  `./scripts/verify quick` PASS; 사람 승인 evidence는 기록하되 규약에 따라 AI가
+  `HUMAN_APPROVED`로 표시하지 않음
 
 ## 1. 검증 가능한 개발 기반
 
@@ -372,7 +391,10 @@
   generated 직접 import 1건 탐지; 계약 test를 `shared/api`로 이동 후 focused
   Vitest 2 files/3 tests GREEN; Biome fixture는 public API import 허용·deep import
   차단 확인; `./scripts/verify quick` PASS — setup 79 tests, format, lint, typecheck,
-  Vitest 4 files/5 tests; browser 적용 없음
+  Vitest 4 files/5 tests; browser 적용 없음; 2026-08-30 mock handler 첫 소비에서
+  기존 contract가 `mocks` 내부 import까지 차단하는 INTEGRATION failure를 재현,
+  production→mocks 금지는 유지하고 mocks 내부 composition만 허용한 뒤 focused
+  architecture 2 tests와 `./scripts/verify quick` 재통과
 
 ### [x] ARCH-02 app provider와 router composition
 
@@ -439,7 +461,7 @@
 
 ## 3. auth-entry Journey
 
-### [ ] AUTH-UNIT-01 sign-in schema
+### [x] AUTH-UNIT-01 sign-in schema
 
 - Requirements: `AUTH-02`, `AUTH-03`
 - Risk: LOW
@@ -451,10 +473,13 @@
 - Automatic verification: schema boundary table unit tests,
   `./scripts/verify quick`
 - Browser verification: 적용 없음
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 `pnpm vitest run
+  src/features/sign-in/model/sign-in-schema.test.ts` RED — schema module 없음;
+  valid와 required/email/길이/기호 경계 6 tests GREEN; `./scripts/verify quick`
+  PASS — Vitest 10 files/30 tests; browser 적용 없음
 
-### [ ] AUTH-UI-01 sign-in form 접근성·submit 상태
+### [x] AUTH-UI-01 sign-in form 접근성·submit 상태
 
 - Requirements: `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-04`
 - Risk: LOW
@@ -465,10 +490,13 @@
 - Automatic verification: Testing Library/user-event component tests,
   `./scripts/verify quick`
 - Browser verification: `/sign-in` mobile/desktop, keyboard tab order와 visible 오류
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 sign-in form test RED — component module 없음; label,
+  accessible description, disabled/enabled, pending duplicate guard 3 tests GREEN;
+  Chromium 390x844에서 dashboard/task/sign-in/email/password/submit keyboard 순서,
+  valid enable, horizontal overflow 없음 확인; `docs/quality/evidence/auth-entry.md`
 
-### [ ] AUTH-API-01 sign-in 요청과 오류 modal
+### [x] AUTH-API-01 sign-in 요청과 오류 modal
 
 - Requirements: `AUTH-05`, `AUTH-06`
 - Risk: MEDIUM
@@ -480,10 +508,14 @@
 - Automatic verification: MSW integration tests, modal component tests,
   `./scripts/verify quick`
 - Browser verification: error fixture, focus trap/restore, console/network 기록
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: 2026-08-30 auth API test RED — endpoint/handler module 없음; exact
+  credentials, MSW refresh cookie rotation, missing-cookie 401 3 tests와 server
+  error modal/focus restore component test GREEN; native `dialog`를 사용해 새 runtime
+  dependency 없이 browser modal 초기 focus와 submit focus 복귀 확인;
+  `docs/quality/evidence/auth-entry.md`; `./scripts/verify quick` PASS
 
-### [ ] AUTH-STATE-01 승인된 token·refresh 상태
+### [x] AUTH-STATE-01 승인된 token·refresh 상태
 
 - Requirements: `AUTH-07`
 - Risk: HIGH 실행 — 승인안 준수 검토 필요
@@ -495,10 +527,14 @@
 - Automatic verification: token helper unit tests, protected request와 refresh
   integration tests, `./scripts/verify quick`
 - Browser verification: integration에서 증명 못한 cookie/network boundary만 대상
-- Status: BLOCKED
-- Evidence: blocker `DEC-AUTH-01` 사람 승인 없음
+- Status: AI_VERIFIED
+- Evidence: `DEC-AUTH-01` 사용자 대화 승인 범위대로 memory access token,
+  mock refresh cookie, generation, single-flight, late 401 latest-token replay,
+  replay terminal cleanup, stale-session no-op를 구현; focused Vitest 10 files/50 tests,
+  quick gate, reload cookie 경계 E2E PASS; `docs/quality/evidence/auth-entry.md`;
+  tracked decision의 `HUMAN_APPROVED` 표시는 사람 직접 확인 대기
 
-### [ ] AUTH-NAV-01 비로그인/로그인 navigation 전환
+### [x] AUTH-NAV-01 비로그인/로그인 navigation 전환
 
 - Requirements: `NAV-02`, `NAV-03`, `AUTH-07`
 - Risk: MEDIUM
@@ -509,8 +545,11 @@
 - Automatic verification: router/auth integration tests,
   `./scripts/verify quick`
 - Browser verification: auth transition 전후 route/action/icon 확인
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: router/auth integration에서 보호 route 차단, initializing/unavailable,
+  내부 return allowlist와 action 상호 배타를 검증; Chromium에서 `/task/task-1` →
+  `/sign-in` → 안전 복귀 → reload → `/user` 이동 PASS;
+  `docs/quality/evidence/auth-entry.md`
 
 ### [ ] JOURNEY-AUTH-01 auth-entry 검증·review·checkpoint
 
@@ -522,12 +561,14 @@
   finding이 해결된 뒤 사람 checkpoint를 요청한다.
 - Automatic verification: auth 관련 test, `./scripts/verify quick`, core E2E auth tag
 - Browser verification: `/sign-in` invalid/error/success와 필요한 credential boundary
-- Status: BLOCKED
-- Evidence: blocker auth 구현 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: automatic, browser, architecture boundary와 lightweight adversarial review
+  PASS; `docs/quality/evidence/auth-entry.md`; 2026-08-31 사용자 대화 checkpoint 승인;
+  규약에 따라 AI가 tracked `HUMAN_APPROVED`를 직접 표시하지 않음
 
 ## 4. work-overview Journey
 
-### [ ] NAV-PRIMARY-01 공통 dashboard/task navigation
+### [x] NAV-PRIMARY-01 공통 dashboard/task navigation
 
 - Requirements: `NAV-01`
 - Risk: LOW
@@ -538,10 +579,12 @@
 - Automatic verification: shell/router integration tests,
   `./scripts/verify quick`
 - Browser verification: 다섯 route와 mobile/desktop navigation
-- Status: NOT_STARTED
-- Evidence: 미실행
+- Status: AI_VERIFIED
+- Evidence: router Vitest와 Chromium desktop/mobile에서 dashboard/task action 유지,
+  distinct Lucide icon, `aria-current`, route 이동 확인;
+  `docs/quality/evidence/work-overview.md`
 
-### [ ] DASH-01 dashboard metrics
+### [x] DASH-01 dashboard metrics
 
 - Requirements: `DASH-01`
 - Risk: MEDIUM
@@ -552,10 +595,12 @@
 - Automatic verification: MSW integration tests, component state tests,
   `./scripts/verify quick`
 - Browser verification: `/` fixture 비교와 console/network 기록
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: endpoint guard와 loading/error/retry/success component RED→GREEN 4 tests;
+  단일 task store handler 일관성 6 tests; Chromium bearer request와 fixture `3/2/1`
+  확인; `docs/quality/evidence/work-overview.md`
 
-### [ ] USER-01 profile data
+### [x] USER-01 profile data
 
 - Requirements: `USER-01`
 - Risk: MEDIUM
@@ -565,8 +610,9 @@
 - Automatic verification: MSW integration tests, component state tests,
   `./scripts/verify quick`
 - Browser verification: `/user` fixture 비교와 console/network 기록
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: user endpoint/handler/query UI RED→GREEN 6 tests; Chromium bearer request와
+  `김담당`/`오늘도 차근차근` 확인; `docs/quality/evidence/work-overview.md`
 
 ### [ ] JOURNEY-WORK-01 work-overview 검증·review·checkpoint
 
@@ -578,12 +624,15 @@
   accessibility가 증명되고 finding 해결 후 사람 checkpoint를 요청한다.
 - Automatic verification: 관련 test, `./scripts/verify quick`, core E2E work tag
 - Browser verification: dashboard/task/profile navigation과 fixture 비교
-- Status: BLOCKED
-- Evidence: 선행 작업 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: focused 7 files/22 tests, quick 24 files/85 tests, core E2E, agent-browser
+  desktop/mobile와 lightweight adversarial review PASS;
+  `docs/quality/evidence/work-overview.md`; 2026-08-31 사용자 대화 checkpoint 승인
+  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
 
 ## 5. task-discovery Journey
 
-### [ ] TASK-PAGE-01 초기 task page와 card
+### [x] TASK-PAGE-01 초기 task page와 card
 
 - Requirements: `TASK-LIST-01`, `TASK-LIST-02`, `TASK-LIST-05`
 - Risk: MEDIUM
@@ -594,10 +643,11 @@
 - Automatic verification: MSW/router integration tests, card component tests,
   `./scripts/verify quick`
 - Browser verification: `/task` initial states와 card→detail navigation
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: task API/card/widget RED→GREEN tests; exact `page=1`, title/memo, empty,
+  retry와 `/task/task-3` Chromium 검증; `docs/quality/evidence/task-discovery.md`
 
-### [ ] TASK-PAGE-02 infinite pagination state
+### [x] TASK-PAGE-02 infinite pagination state
 
 - Requirements: `TASK-LIST-04`
 - Risk: MEDIUM
@@ -608,10 +658,11 @@
 - Automatic verification: multi-page integration tests와 request count assertion,
   `./scripts/verify quick`
 - Browser verification: two-page scroll network log와 terminal page 확인
-- Status: BLOCKED
-- Evidence: blocker `TASK-PAGE-01`
+- Status: AI_VERIFIED
+- Evidence: StrictMode single in-flight와 terminal request count tests; Chromium
+  requests `[1, 2]` exactly once; `docs/quality/evidence/task-discovery.md`
 
-### [ ] TASK-PAGE-03 virtualized growing list
+### [x] TASK-PAGE-03 virtualized growing list
 
 - Requirements: `TASK-LIST-03`, `TASK-LIST-04`
 - Risk: MEDIUM
@@ -624,8 +675,9 @@
   `./scripts/verify quick`
 - Browser verification: 고정 viewport에서 scroll, DOM count, request sequence,
   terminal page trace
-- Status: BLOCKED
-- Evidence: blocker `TASK-PAGE-02`
+- Status: AI_VERIFIED
+- Evidence: stable domain key, 96px row measurement, bounded DOM 1/3 records와 terminal
+  scroll 확인; `docs/quality/evidence/task-discovery.md`
 
 ### [ ] JOURNEY-TASK-LIST-01 task-discovery 검증·review·checkpoint
 
@@ -637,12 +689,15 @@
   navigation이 증명되고 finding 해결 후 사람 checkpoint를 요청한다.
 - Automatic verification: 관련 test, `./scripts/verify quick`, core E2E discovery tag
 - Browser verification: two-page journey trace, console/network/DOM count
-- Status: BLOCKED
-- Evidence: 선행 작업 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: focused 4 files/13 tests, quick 27 files/92 tests, core E2E,
+  agent-browser DOM/network/navigation와 lightweight adversarial review PASS;
+  `docs/quality/evidence/task-discovery.md`; 2026-08-31 사용자 대화 checkpoint 승인
+  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
 
 ## 6. task-resolution Journey
 
-### [ ] TASK-DETAIL-01 상세 success와 404 복구
+### [x] TASK-DETAIL-01 상세 success와 404 복구
 
 - Requirements: `TASK-DETAIL-01`, `TASK-DETAIL-02`
 - Risk: MEDIUM
@@ -653,10 +708,11 @@
 - Automatic verification: MSW/router integration tests,
   `./scripts/verify quick`
 - Browser verification: existing/missing ID 직접 진입과 recovery
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: detail API/page/router RED→GREEN 11 tests; Chromium existing 200와 삭제 후
+  new-document 404/목록 복구 확인; `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DELETE-01 삭제 modal과 exact ID guard
+### [x] TASK-DELETE-01 삭제 modal과 exact ID guard
 
 - Requirements: `TASK-DETAIL-03`, `TASK-DETAIL-04`
 - Risk: LOW
@@ -667,23 +723,29 @@
 - Automatic verification: component boundary tests와 user-event keyboard test,
   `./scripts/verify quick`
 - Browser verification: wrong→exact 입력, focus trap/restore, mobile overflow
-- Status: BLOCKED
-- Evidence: blocker `TASK-DETAIL-01`
+- Status: AI_VERIFIED
+- Evidence: attempt/dialog 5 tests로 exact byte guard, pending lock, focus reset,
+  GET-only recovery 검증; Chromium wrong→exact 확인;
+  `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DELETE-02 delete 요청·실패·redirect
+### [x] TASK-DELETE-02 delete 요청·실패·redirect
 
 - Requirements: `TASK-DETAIL-05`
 - Risk: HIGH 실행 — destructive behavior 검토 필요
 - Depends on: `TASK-DELETE-01`, `DEC-DELETE-01`
 - Deliverable: exact route ID DELETE, in-flight guard, error 표시, success cache 처리와
   `/task` navigation
-- Acceptance: guard 전 요청 0회, submit 후 exact endpoint 1회, 200 success에서만
-  redirect하며 승인된 목록/dashboard/detail 일관성을 유지한다.
+- Acceptance: guard 전 요청 0회, 사용자 submit은 1회이며 exact endpoint 전송은
+  최초 요청과 auth replay를 합쳐 최대 2회, 200 success에서만 redirect하며 승인된
+  목록/dashboard/detail 일관성을 유지한다.
 - Automatic verification: MSW integration tests와 request count/cache assertions,
   `./scripts/verify quick`
 - Browser verification: wrong/exact ID, network request, failure stay, success redirect
-- Status: BLOCKED
-- Evidence: 선행 구현과 삭제 일관성 검토 미완료
+- Status: AI_VERIFIED
+- Evidence: delete/recheck 12-case outcome table, cache/page/store/transport tests,
+  feature DELETE 1회와 auth replay 포함 최대 2회, 200-only redirect, 404 stay,
+  list/detail/dashboard 일관성 Chromium 검증;
+  `docs/quality/evidence/task-resolution.md`
 
 ### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 검증·review·checkpoint
 
@@ -695,12 +757,15 @@
   해결 후 사람 checkpoint를 요청한다.
 - Automatic verification: 관련 test, `./scripts/verify quick`, core E2E resolution tag
 - Browser verification: 기존→없는 ID→복구→삭제 전체 trace
-- Status: BLOCKED
-- Evidence: 선행 작업 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: focused 8 files/38 tests, quick 33 files/118 tests, 관련 core E2E 4건,
+  agent-browser detail/modal/list/404/dashboard와 lightweight adversarial review PASS;
+  `docs/quality/evidence/task-resolution.md`; 2026-08-31 사용자 대화 checkpoint 승인
+  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
 
 ## 7. 통합·제출 QA
 
-### [ ] QA-01 requirement evidence와 상태 정합성
+### [x] QA-01 requirement evidence와 상태 정합성
 
 - Requirements: 전체
 - Risk: MEDIUM
@@ -712,10 +777,13 @@
 - Automatic verification: requirement ID/상태/evidence 정적 audit,
   `./scripts/verify setup`
 - Browser verification: evidence 경로 존재와 대상 commit 확인
-- Status: BLOCKED
-- Evidence: 선행 Journey 미완료
+- Status: AI_VERIFIED
+- Evidence: 네 Journey checkpoint 승인 수신; requirement 27개 row의 자동/browser
+  evidence 경로와 상태 audit, 누락 경로 없음; `SYS-02`, `SYS-04`의 stale 상태를
+  correction; `SYS-05`는 사람 검토 미완료를 반영해 `IN_PROGRESS` 유지;
+  `docs/quality/evidence/final-qa.md`; `./scripts/verify full` PASS on `8a09746`
 
-### [ ] QA-02 journey 간 full adversarial review
+### [x] QA-02 journey 간 full adversarial review
 
 - Requirements: 전체 invariant와 Golden Journey
 - Risk: MEDIUM
@@ -727,8 +795,14 @@
   있고 unresolved high/medium finding이 없다.
 - Automatic verification: 영향 test와 `./scripts/verify quick` 재실행
 - Browser verification: 교차 journey regression, console/network, mobile/desktop
-- Status: BLOCKED
-- Evidence: 사람 Journey checkpoint와 구현 미완료
+- Status: AI_VERIFIED
+- Evidence: auth generation/refresh/terminal transition, router-owned navigation,
+  protected cache, delete 200/404/unknown/stale result, OAS/MSW operation과 schema,
+  FSD/generated/raw-fetch/storage/color/secret/debug/generated-noise를 교차 검토;
+  stale DEC/requirement/checkpoint 문서 상태 correction; work-overview partial-name와
+  route-render race `TEST` finding correction 후 Chromium 3회 반복 PASS;
+  `./scripts/verify full` PASS on `8a09746`; unresolved HIGH/MEDIUM finding 없음;
+  `docs/quality/evidence/final-qa.md`
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 
@@ -742,8 +816,10 @@
 - Automatic verification: `./scripts/verify setup`, secret/generated-noise scan,
   `git diff --check`
 - Browser verification: 적용 없음
-- Status: BLOCKED
-- Evidence: 선행 QA 미완료; AI record 게시에는 사람 TTY 승인 필요
+- Status: IN_PROGRESS
+- Evidence: `AI_USAGE.md` 필수 section과 자동 검증, branch diff의 secret/debug/
+  generated/unrelated scan PASS; 기존 `legacy/pre-policy` record는 문서상 사람 검토
+  대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요
 
 ### [ ] QA-04 final verification과 사람 acceptance 요청
 
@@ -756,5 +832,8 @@
 - Automatic verification: `./scripts/verify full`
 - Browser verification: 네 core journey의 최종 commit evidence, console/network,
   accessibility, responsive spot check
-- Status: BLOCKED
-- Evidence: 선행 QA와 사람 checkpoint 미완료; AI가 최종 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: 네 Journey checkpoint 승인 evidence 수신; `./scripts/verify full` PASS on
+  `8a09746` — setup 79 tests, 33 Vitest files/118 tests, build, Chromium core 5건;
+  final QA 근거 `docs/quality/evidence/final-qa.md`; `QA-03` 사람 검토와 사람 최종
+  acceptance 대기, AI가 최종 승인 기록 금지

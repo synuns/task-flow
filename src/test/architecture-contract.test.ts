@@ -96,7 +96,12 @@ function violations(): string[] {
         continue;
       }
 
-      if (target[0] === "mocks" && relative(sourceRoot, file) !== "main.tsx" && !isTestFile(file)) {
+      if (
+        target[0] === "mocks" &&
+        source[0] !== "mocks" &&
+        relative(sourceRoot, file) !== "main.tsx" &&
+        !isTestFile(file)
+      ) {
         failures.push(`${relative(sourceRoot, file)} imports ${specifier} outside main/test`);
         continue;
       }

@@ -91,7 +91,7 @@ app → pages → widgets → features → entities → shared
 
 | module | 책임 | 소비자 | 공개 interface |
 | --- | --- | --- | --- |
-| `app` | provider와 router 조합 | `main.tsx` | `App` |
+| `app` | query, auth, API client provider와 router 조합 | `main.tsx` | `App` |
 | 각 `pages/*` | route param 확인과 하위 단위 조합 | app router | 해당 `*Page` |
 | `widgets/app-shell` | 공통 layout과 navigation 영역 | app router | `AppShell` |
 | `widgets/dashboard-summary` | dashboard 조회와 세 metric 표시 | dashboard page | `DashboardSummary` |
@@ -99,7 +99,7 @@ app → pages → widgets → features → entities → shared
 | `entities/task` | task 조회 model과 card/detail 표시 | task widget과 page | 실제 소비되는 query hook과 task UI |
 | `features/sign-in` | form 검증, sign-in mutation, 오류 modal | sign-in page | `SignInForm` |
 | `features/delete-task` | exact ID 확인과 delete mutation | task detail page | `DeleteTaskDialog` |
-| `shared/api` | contract endpoint, private transport, error normalization | feature, entity, widget | endpoint 함수와 `ApiError` |
+| `shared/api` | contract endpoint, private transport, 주입된 auth callback 적용, error normalization | app composition, feature, entity, widget | API client factory/provider/hook, endpoint 함수와 `ApiError` |
 | `mocks` | 개발·test API 대체 | DEV bootstrap과 test setup | `startWorker`, `server` entry |
 
 Dashboard는 현재 독립 domain 객체가 아니다. 조회와 표시를
@@ -119,9 +119,13 @@ main.tsx
   → MSW start 완료
   → App
       → QueryClientProvider
-      → RouterProvider
-          → AppShell
-          → route page
+      → AuthProvider
+          → AuthenticatedApiBridge
+              → ApiClientProvider
+                  → RouterProvider
+                      → AuthRouteBoundary
+                      → AppShell
+                      → route page
 ```
 
 - `mocks/browser`는 `import.meta.env.DEV` 분기 안에서만 동적 import한다.
@@ -131,9 +135,18 @@ main.tsx
   사용한다.
 - 승인되지 않은 재요청과 불필요한 중복 호출을 피하기 위해 기본 query retry는
   비활성화한다. 기능별 retry는 accepted behavior가 생길 때 별도로 검토한다.
-- 현재 인증 provider, context, interface, placeholder는 만들지 않는다.
-- `DEC-AUTH-01` 승인 후 정해진 인증 provider가 필요하면 QueryClientProvider와
-  RouterProvider 사이에서 조합한다.
+- AuthProvider는 QueryClientProvider와 RouterProvider 사이에서 조합한다.
+- AuthProvider는 token과 session transition만 관리한다. RouterProvider 밖에
+  있으므로 `useNavigate`를 사용하거나 navigation callback을 소유하지 않는다.
+- `AuthenticatedApiBridge`는 auth state에서 token 조회와 refresh callback을
+  얻어 `shared/api`의 API client factory에 주입하고 generic
+  `ApiClientProvider`를 구성한다. `shared/api`가 app의 auth provider나 context를
+  import하는 역방향 의존은 금지한다.
+- API client instance와 auth callback은 app lifetime 동안 안정적인 identity를
+  유지하고 callback이 현재 auth snapshot을 조회한다. Token 변경마다 client나
+  query observer를 다시 만들지 않는다.
+- RouterProvider 내부의 `AuthRouteBoundary`가 auth 초기화 대기, 보호 route,
+  로그인 후 복귀, terminal session transition에 따른 이동을 담당한다.
 
 ## route 경계
 
@@ -151,10 +164,20 @@ main.tsx
 - dashboard와 task navigation을 포함하는 공통 shell은 root layout route에서
   page outlet을 감싼다.
 - `/task/:id`의 runtime param 검증은 task detail page 경계에서 수행한다.
-- 비로그인 보호 route와 redirect 여부는 `DEC-AUTH-01`까지 결정하지 않는다.
+- `/`, `/task`, `/task/:id`, `/user`는 보호 route이며 비로그인 접근은
+  `AuthRouteBoundary`가 `/sign-in`으로 이동시킨다. 복귀 위치는 같은 origin의
+  등록된 내부 route만 허용하고 외부 URL, `/sign-in`, 미등록 route는 `/`로
+  대체한다.
 - route error boundary는 render 오류와 React Router가 전달한 route 오류만
   담당한다. event handler 또는 TanStack Query 비동기 오류를 잡는 것으로
   간주하지 않는다.
+
+인증 상태 변경은 navigation 자체를 수행하지 않는다. Sign-in 성공과 terminal
+auth failure는 provider state만 갱신하고, RouterProvider 내부 boundary가 그
+state를 관찰해 route를 전환한다.
+
+Auth state action이 필요한 page는 app route element가 public prop으로 callback을
+주입한다. Page, feature와 entity가 app auth provider를 직접 import하지 않는다.
 
 ## API 경계와 data flow
 
@@ -174,14 +197,22 @@ feature / entity / widget
   소비자는 endpoint 함수와 그 결과만 사용한다.
 - raw `fetch`, URL과 query 조립, JSON 판별, 오류 정규화는 private transport에
   둔다.
+- `shared/api` transport는 `app`, auth provider, auth context, router를 import하지
+  않는다. API client factory는 현재 session generation과 access token 조회,
+  single-flight refresh, terminal auth failure 반영 callback을 인자로 받는다.
+- `shared/api`의 generic `ApiClientProvider`와 consumer hook은 완성된 API client
+  instance만 전달하며 auth state 구조나 navigation을 알지 않는다.
+- callback 구현과 주입은 app composition이 담당한다. Refresh endpoint는 이
+  auth callback을 거치지 않는 독립 endpoint로 두어 refresh의 재귀 호출을
+  금지한다.
 - endpoint adapter는 첫 실제 기능 소비 시 추가한다. 예상 공개 함수는
   `signIn`, `getDashboard`, `getTasks`, `getTaskDetail`, `deleteTask`, `getUser`이며
   미사용 함수를 한꺼번에 만들지 않는다.
 - loading, empty, error UI도 첫 실제 화면 소비 시 해당 feature, entity, widget에
   semantic markup으로 만들고 두 번째 소비가 생기기 전에는 `shared/ui`로
   추출하지 않는다.
-- bearer header, refresh, bounded replay는 같은 transport 경계 안에서 처리할
-  수 있어야 하지만 exact interface와 구현은 `DEC-AUTH-01` 승인 후 정한다.
+- Bearer header, refresh와 bounded replay는 auth 설계에 따라 app이 주입한
+  callback을 사용하는 같은 transport 경계에서 처리한다.
 - sign-in과 delete mutation은 feature가 소유한다. Task와 user 읽기 query는
   entity가, dashboard 읽기 query는 `widgets/dashboard-summary`가 소유한다.
 
@@ -220,8 +251,8 @@ idle/loading 전이를 따른다. 인증·삭제 고유 오류 전이는 각 HIG
 - handler와 fixture는 해당 endpoint의 첫 실제 소비 시 함께 추가한다.
 - mock handler는 OpenAPI method, path, query, request body, status, response
   schema를 유지한다.
-- mock state가 삭제 이후 목록·상세·dashboard 값을 어떻게 바꾸는지는
-  `DEC-DELETE-01` 전까지 구현하지 않는다.
+- 삭제 기능을 구현할 때는 delete 설계에 따라 하나의 task fixture store에서
+  목록·상세·dashboard 상태를 일관되게 파생한다.
 
 ## import 경계 검증
 
@@ -235,6 +266,8 @@ idle/loading 전이를 따른다. 인증·삭제 고유 오류 전이는 각 HIG
 - application source에서 `mocks` import를 금지하되 `main.tsx`의 DEV 동적 import와
   test source만 명시적으로 허용한다.
 - `generated` import는 `shared/api` source에만 허용한다.
+- `shared/api`에서 `app` 또는 router module을 import하는 경우와 transport가
+  navigation callback을 요구하는 경우를 architecture contract 위반으로 본다.
 
 Biome rule은 빠른 lint feedback을 담당한다. 상대 경로로 layer 또는 slice
 경계를 우회하는 경우와 `shared/api` 외부의 generated import는 작은 architecture
@@ -287,6 +320,10 @@ MSW worker 요청을 확인한다. 구체적인 기록 형식은
 - 각 예정 module의 책임, 소비자, 공개 interface가 구분된다.
 - provider, route, API, generated, mock, test 경계가 scaffold 및 채택 stack과
   일치한다.
+- auth callback은 app에서 `shared/api`로만 주입되고 `shared/api`는 app auth
+  provider와 router를 알지 않는다.
+- AuthProvider는 navigation을 수행하지 않고 RouterProvider 내부 boundary가
+  인증 상태에 따른 route transition을 소유한다.
 - dashboard를 근거 없이 entity로 취급하지 않는다.
 - generated는 `shared/api`만 import하며 외부에 노출하지 않는다.
 - 인증 placeholder와 승인되지 않은 인증·삭제 behavior가 없다.
