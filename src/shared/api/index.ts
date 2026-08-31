@@ -19,8 +19,10 @@ export {
 export { type DashboardMetrics, getDashboard } from "./dashboard";
 export { getUser, type UserProfileData } from "./user";
 export {
+  deleteTask,
   getTaskDetail,
   getTasks,
+  type DeleteTaskResult,
   type TaskDetail,
   type TaskListItem,
   type TaskPage,

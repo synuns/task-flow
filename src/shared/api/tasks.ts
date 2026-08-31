@@ -10,6 +10,7 @@ export type TaskListItem = {
 };
 export type TaskPage = { data: TaskListItem[]; hasNext: boolean };
 export type TaskDetail = { title: string; memo: string; registerDatetime: string };
+export type DeleteTaskResult = { success: true };
 
 function isTaskItem(value: unknown): value is TaskListItem {
   if (!value || typeof value !== "object") return false;
@@ -40,6 +41,12 @@ function isTaskDetail(value: unknown): value is TaskDetail {
   );
 }
 
+function isDeleteTaskResult(value: unknown): value is DeleteTaskResult {
+  return (
+    !!value && typeof value === "object" && (value as Record<string, unknown>).success === true
+  );
+}
+
 export function getTasks(client: ApiClient, page: number, signal?: AbortSignal): Promise<TaskPage> {
   const url = new URL("/api/task", globalThis.location?.origin ?? "http://localhost");
   url.searchParams.set("page", String(page));
@@ -52,4 +59,12 @@ export function getTaskDetail(client: ApiClient, id: string): Promise<TaskDetail
     globalThis.location?.origin ?? "http://localhost",
   );
   return client.request(url, { method: "GET" }, isTaskDetail);
+}
+
+export function deleteTask(client: ApiClient, id: string): Promise<DeleteTaskResult> {
+  const url = new URL(
+    `/api/task/${encodeURIComponent(id)}`,
+    globalThis.location?.origin ?? "http://localhost",
+  );
+  return client.request(url, { method: "DELETE" }, isDeleteTaskResult);
 }
