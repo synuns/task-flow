@@ -812,9 +812,18 @@
   `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
 - Browser verification: fresh Vite server에서 네 core Journey와 console/network 결과
 - Status: IN_PROGRESS
-- Evidence: 2026-08-31 Codex `/root` task block owner; `--pass-with-no-tests`,
-  verifier self-test 미실행, local existing-server 재사용, Node 25 MSW
-  `--localstorage-file` warning, `8a09746` 기준 stale final evidence를 재현
+- Evidence: 2026-08-31 Codex `/root` task block owner; RED에서 보호 Journey의
+  `/api/sign-in` 호출, local focused-test 허용, 완료 task의 미완료 dependency,
+  canonical full의 `tests/test_verify.py` 누락을 재현. `07323d0`, `9a5ff67`,
+  `e01c9c2`에서 독립 auth fixture, focused-test 차단, TODO 의미 검사와 guarded
+  verifier regression stage 구현; fresh read-only reviewer
+  `/root/harness_independent_review`가 target `e01c9c2`에서 MEDIUM 3건을 발견하고,
+  `9cabebf`에서 MSW HttpOnly cookie-store, parser adversarial case, runtime config
+  assertion correction을 확인해 findings none/PASS. Canonical `./scripts/verify full`
+  PASS — hook 86, contract 12, Vitest 34 files/122 tests, build, core Chromium 5,
+  verifier regression 19; `git diff --check`와 clean status 확인. `QA-02`가 실제 사람
+  checkpoint 근거 부재로 BLOCKED이므로 본 task는 `IN_PROGRESS` 유지;
+  `docs/quality/evidence/final-qa.md`
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 

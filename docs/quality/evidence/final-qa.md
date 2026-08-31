@@ -42,6 +42,28 @@ Independent review status: the prior cross-Journey review narrative has no revie
 exact target commit record, so it is not accepted as the required independent review.
 No historical reviewer or target was added retroactively.
 
+## Scenario Loop Harness Independent Review — 2026-09-01
+
+Review target: `9cabebf343fed5ab1c82f7432ce1134e4d1ac157`,
+`QA-HARNESS-01`, and the five scenario-loop harness findings
+Reviewer: `/root/harness_independent_review`, a fresh read-only context that did not
+author the implementation
+Checks: inspected `6931c91..9cabebf` and the correction diff, auth fixture/MSW cookie
+boundary, three protected Journey specs, Playwright/Vitest config, TODO parser/tests,
+`TODO.md`, and all five evidence files; ran `tests/test_verify_contract.py`, the harness
+config Vitest, protected Journey Playwright tests, `./scripts/verify full`,
+`git diff --check`, and `git status --short`
+Findings: the first review of `e01c9c2` found three MEDIUM findings — JavaScript-readable
+wide-path fixture cookie, TODO parser negative/English/Status gaps, and loss of semantic
+fresh-server config coverage. The final review of `9cabebf` found none.
+Corrections: seeded the existing MSW cookie store with an HttpOnly `/api/refresh` cookie
+and asserted no document token; added missing-Status and Korean/English approval-claim
+boundaries; restored semantic config imports and `reuseExistingServer: false` assertion
+Rerun: verifier contract 12/12, harness config 2/2, protected Journey 3/3, hook 86,
+Vitest 34 files/122 tests, build, core Chromium 5, verifier regression 19, diff check and
+clean status all PASS
+Verdict: PASS
+
 ## Human-owned remainder
 
 `SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its

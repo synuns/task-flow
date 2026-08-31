@@ -26,10 +26,9 @@ followed dashboard and profile routes; all three actions remained visible at 390
 document width stayed within 390px, and computed font contained `Pretendard`; static
 review found no raw fetch in page/widget, no generated import outside shared API, and
 dashboard/user roots are both in protected cache cleanup
-Console/Network: independent fixture setup produced the expected anonymous bootstrap
-401 only; after the authenticated journey began there were no console or page errors;
-MSW console inspection showed dashboard/user 200 responses and Playwright proved bearer
-headers
+Console/Network: the independent fixture entered through a successful refresh without
+calling `/api/sign-in`; there were no console or page errors; MSW console inspection
+showed dashboard/user 200 responses and Playwright proved bearer headers
 Screenshot/Trace: `/tmp/kbhc-work-overview.png`; Playwright `work-overview` attachment;
 trace, screenshot and video retained automatically on failure
 Verdict: `NAV-PRIMARY-01`, `DASH-01`, and `USER-01` `AI_VERIFIED`;

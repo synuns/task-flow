@@ -28,10 +28,10 @@ proved title/memo rendering, absence of added status UI, empty terminal handling
 single in-flight behavior and explicit retry; static review found no raw fetch in
 page/widget, no generated import outside shared API, and both task query roots in
 protected cache cleanup
-Console/Network: independent fixture setup produced the expected anonymous bootstrap
-401 only; after authentication there were no page errors or unexpected console errors;
-MSW console showed both task responses as 200 and browser resource entries confirmed
-the exact page sequence
+Console/Network: the independent fixture entered through a successful refresh without
+calling `/api/sign-in`; there were no page errors or unexpected console errors; MSW
+console showed both task responses as 200 and browser resource entries confirmed the
+exact page sequence
 Screenshot/Trace: `/tmp/kbhc-task-discovery.png`; Playwright `task-discovery`
 attachment; trace, screenshot and video retained automatically on failure
 Verdict: `TASK-PAGE-01`, `TASK-PAGE-02`, and `TASK-PAGE-03` `AI_VERIFIED`;

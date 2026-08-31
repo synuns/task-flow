@@ -33,10 +33,10 @@ replay; core Chromium observed zero DELETE for non-exact inputs, one bearer DELE
 the exact submission, post-delete list absence, new-document detail 404 and dashboard
 `2/1/1`; agent-browser independently observed the same accessible states and MSW
 sequence `GET 200 → DELETE 200 → list 200 → detail 404 → dashboard 200`
-Console/Network: fresh anonymous bootstrap produced the expected refresh 401; deliberate
-deleted-detail verification produced the expected GET 404; no page errors or other
-console errors; manual console showed exactly one DELETE 200 and E2E proved its bearer
-header
+Console/Network: the independent fixture entered through a successful refresh without
+calling `/api/sign-in`; deliberate deleted-detail verification produced the expected GET
+404; no page errors or other console errors; manual console showed exactly one DELETE
+200 and E2E proved its bearer header
 Screenshot/Trace: `/tmp/kbhc-task-resolution-list.png`,
 `/tmp/kbhc-task-resolution.png`; Playwright `task-resolution` attachment; trace,
 screenshot and video retained automatically on failure
