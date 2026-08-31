@@ -20,7 +20,7 @@ verification fail.
   sections, pending-record ignore rule,
   Stop/SessionEnd hook wiring, AI disclosure headings, and the four focused
   artifact-contract, exporter, index, and publisher unit-test suites. It also
-  runs the verifier regression suite once with recursive re-entry disabled.
+  runs a read-only verifier contract suite without invoking quick or full recursively.
 - `quick`: `setup`, then `format:check`, `lint`, `typecheck`, and `test` after
   frontend scaffolding.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
@@ -67,10 +67,11 @@ Every E2E names its unique cross-boundary risk. `test:e2e:core` runs only
 `@core`; extended, diagnostic,
 or browser-compatibility suites use separate explicit commands.
 
-Setup rejects an empty-tolerant core command, a missing `@core` selector, any
-missing journey tag, or a Playwright configuration that can reuse an existing
-local server. Full verification therefore starts a fresh server and fails when
-the core selection is empty.
+Setup rejects an empty-tolerant core command or missing `@core` selector and
+checks Playwright's listed tests for all four journey tags. The frontend suite
+imports the Playwright configuration to require a fresh local server. Full
+verification therefore starts a fresh server and fails when core selection is
+empty.
 
 Review slow, flaky, redundant cases for removal or demotion to integration or
 component tests.
