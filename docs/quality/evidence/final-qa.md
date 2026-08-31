@@ -28,11 +28,14 @@ Screenshot/Trace: the four journey evidence files reference their Chromium attac
 and manual screenshots at desktop and applicable 390x844 mobile viewports
 Finding: `DOCUMENTATION` — three approved and implemented `DEC-*` items, final `SYS-02`
 and `SYS-04`, the phase summary, and checkpoint verdict wording retained stale pre-review
-states
+states; `TEST` — work-overview used a partial accessible-name locator and inspected the
+request sequence before the returned dashboard finished rendering
 Correction: set the three decision items and two supported system requirements to
-`AI_VERIFIED`, align the phase/checkpoint wording with received approval, and preserve
-the rule that AI never writes `HUMAN_APPROVED`
-Rerun verdict: pending the clean `./scripts/verify full` run recorded below
+`AI_VERIFIED`, align the phase/checkpoint wording with received approval, preserve the
+rule that AI never writes `HUMAN_APPROVED`, use exact global-navigation names, await the
+returned dashboard heading, and assert its legitimate bearer reload
+Rerun verdict: focused work-overview Chromium rerun passed three consecutive parallel
+cases; clean `./scripts/verify full` rerun pending
 
 ## Human-owned remainder
 

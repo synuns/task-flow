@@ -19,8 +19,8 @@ loading, recoverable error/retry and success remain distinguishable; Pretendard 
 computed font; mobile has no horizontal clipping
 Actual: focused Vitest passed 7 files/22 tests; quick gate passed setup 79 tests,
 format, lint, generated API type check, TypeScript and Vitest 24 files/85 tests; core
-Chromium passed; Playwright observed exactly one `/api/dashboard` and one `/api/user`
-request and both Authorization headers began with `Bearer `; visible values were
+Chromium passed; Playwright observed `/api/dashboard`, `/api/user`, then the expected
+dashboard reload after route return, and all three Authorization headers began with `Bearer `; visible values were
 dashboard `3/2/1` and profile `김담당`/`오늘도 차근차근`; `aria-current=page`
 followed dashboard and profile routes; all three actions remained visible at 390x844,
 document width stayed within 390px, and computed font contained `Pretendard`; static
@@ -42,8 +42,10 @@ boundary; `TEST` — generic test client and router provider harness were incomp
 manual QA reused a stale element ref after a new snapshot
 Correction: keep mock fixture types structural and validate them through handlers; use a
 generic guard-aware test client; provide Query/API providers in router tests; wait for
-the sign-in heading before API fixture setup; reacquire element refs after navigation
+the sign-in heading before API fixture setup; reacquire element refs after navigation;
+use exact accessible names for global navigation, await the returned dashboard heading,
+and assert its legitimate second request instead of racing the route render
 Rerun verdict: PASS — focused, quick, core browser, manual accessible-tree/mobile and
-static boundary checks passed; lightweight adversarial review found no remaining
-requirement omission, auth/cache leak, OAS shape mismatch, navigation/accessibility gap
-or duplicate request
+static boundary checks passed; final QA repeated the work-overview E2E three times after
+the locator/request correction; no remaining requirement omission, auth/cache leak,
+OAS shape mismatch, navigation/accessibility gap or unexpected duplicate request remained
