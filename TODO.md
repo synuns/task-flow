@@ -804,6 +804,24 @@
   `./scripts/verify full` PASS on `8a09746`; unresolved HIGH/MEDIUM finding 없음;
   `docs/quality/evidence/final-qa.md`
 
+### [ ] QA-HARNESS-01 최종 검증 하네스 강화
+
+- Requirements: 전체 verification contract, `SYS-05`
+- Risk: LOW — accepted behavior를 바꾸지 않는 검증 도구 보강
+- Depends on: `QA-02`
+- Deliverable: 비어 있지 않은 네 core Journey 선택, verifier self-test stage,
+  fresh Playwright server, Node 25 MSW warning 제거, 최신 full-gate evidence
+- Acceptance: core E2E가 없거나 Journey tag가 빠지면 setup이 실패하고,
+  verifier regression test가 재귀 없이 canonical setup에서 실행되며, local full도
+  기존 4173 server를 재사용하지 않고 MSW web-storage warning 없이 통과한다.
+- Automatic verification: focused `tests/test_verify.py`, focused MSW Vitest,
+  `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
+- Browser verification: fresh Vite server에서 네 core Journey와 console/network 결과
+- Status: IN_PROGRESS
+- Evidence: 2026-08-31 Codex `/root` task block owner; `--pass-with-no-tests`,
+  verifier self-test 미실행, local existing-server 재사용, Node 25 MSW
+  `--localstorage-file` warning, `8a09746` 기준 stale final evidence를 재현
+
 ### [ ] QA-03 제출 산출물과 AI disclosure
 
 - Requirements: `SYS-05`

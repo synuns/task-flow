@@ -3,6 +3,7 @@ import importlib.machinery
 import importlib.util
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -26,9 +27,12 @@ def load_verify_module():
 
 class VerifyCliTests(unittest.TestCase):
     def run_verify(self, *args):
+        environment = os.environ.copy()
+        environment["KBHC_VERIFY_SELF_TESTING"] = "1"
         return subprocess.run(
             [str(VERIFY), *args],
             cwd=str(ROOT),
+            env=environment,
             text=True,
             capture_output=True,
             check=False,
@@ -190,28 +194,179 @@ class VerifyCliTests(unittest.TestCase):
 
     def test_setup_runs_pipeline_suites_without_verify_recursion(self):
         verifier = load_verify_module()
-        with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
-            result = verifier.verify_setup()
+        with mock.patch.dict(os.environ, {"KBHC_VERIFY_SELF_TESTING": "0"}):
+            with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+                result = verifier.verify_setup()
 
         self.assertEqual(result, 0)
-        run_stage.assert_called_once_with(
-            "hook-tests",
+        self.assertEqual(
+            run_stage.call_args_list,
             [
-                sys.executable,
-                "-m",
-                "unittest",
-                "tests/test_artifact_contract.py",
-                "tests/test_export_session.py",
-                "tests/test_render_artifact_index.py",
-                "tests/test_publish_ai_record.py",
-                "tests/test_transcript_adapter.py",
-                "tests/test_session_records.py",
-                "tests/test_review_scanner.py",
-                "tests/test_review_ai_record.py",
-                "tests/test_review_publisher.py",
-                "-v",
+                mock.call(
+                    "hook-tests",
+                    [
+                        sys.executable,
+                        "-m",
+                        "unittest",
+                        "tests/test_artifact_contract.py",
+                        "tests/test_export_session.py",
+                        "tests/test_render_artifact_index.py",
+                        "tests/test_publish_ai_record.py",
+                        "tests/test_transcript_adapter.py",
+                        "tests/test_session_records.py",
+                        "tests/test_review_scanner.py",
+                        "tests/test_review_ai_record.py",
+                        "tests/test_review_publisher.py",
+                        "-v",
+                    ],
+                ),
+                mock.call(
+                    "verify-tests",
+                    [
+                        "env",
+                        "KBHC_VERIFY_SELF_TESTING=1",
+                        sys.executable,
+                        "-m",
+                        "unittest",
+                        "tests/test_verify.py",
+                        "-v",
+                    ],
+                ),
             ],
         )
+
+    def test_core_e2e_contract_requires_all_four_journeys(self):
+        verifier = load_verify_module()
+        self.assertTrue(
+            hasattr(verifier, "verify_core_e2e_contract"),
+            "core E2E contract validator is missing",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "e2e").mkdir()
+            (root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "scripts": {
+                            "test:e2e:core": "playwright test --grep @core"
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (root / "playwright.config.ts").write_text(
+                "reuseExistingServer: false\n", encoding="utf-8"
+            )
+            for journey, tag in (
+                ("auth-entry", "@auth"),
+                ("work-overview", "@work"),
+                ("task-discovery", "@task-discovery"),
+                ("task-resolution", "@task-resolution"),
+            ):
+                (root / "e2e" / f"{journey}.spec.ts").write_text(
+                    f'test("@core {tag}", () => {{}});\n', encoding="utf-8"
+                )
+
+            self.assertEqual(verifier.verify_core_e2e_contract(root), [])
+            (root / "e2e" / "task-resolution.spec.ts").write_text(
+                'test("@task-resolution", () => {});\n', encoding="utf-8"
+            )
+            self.assertEqual(
+                verifier.verify_core_e2e_contract(root),
+                ["task-resolution core E2E tag missing"],
+            )
+
+    def test_core_e2e_contract_rejects_empty_selection(self):
+        verifier = load_verify_module()
+        self.assertTrue(
+            hasattr(verifier, "verify_core_e2e_contract"),
+            "core E2E contract validator is missing",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "scripts": {
+                            "test:e2e:core": "playwright test --grep @core --pass-with-no-tests"
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (root / "playwright.config.ts").write_text(
+                "reuseExistingServer: false\n", encoding="utf-8"
+            )
+
+            self.assertIn(
+                "test:e2e:core permits an empty selection",
+                verifier.verify_core_e2e_contract(root),
+            )
+
+    def test_core_e2e_contract_requires_core_selector(self):
+        verifier = load_verify_module()
+        self.assertTrue(
+            hasattr(verifier, "verify_core_e2e_contract"),
+            "core E2E contract validator is missing",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "package.json").write_text(
+                json.dumps({"scripts": {"test:e2e:core": "true"}}), encoding="utf-8"
+            )
+            (root / "playwright.config.ts").write_text(
+                "reuseExistingServer: false\n", encoding="utf-8"
+            )
+
+            self.assertIn(
+                "test:e2e:core does not select @core Playwright tests",
+                verifier.verify_core_e2e_contract(root),
+            )
+
+    def test_core_e2e_contract_requires_fresh_server(self):
+        verifier = load_verify_module()
+        self.assertTrue(
+            hasattr(verifier, "verify_core_e2e_contract"),
+            "core E2E contract validator is missing",
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "package.json").write_text(
+                json.dumps({"scripts": {"test:e2e:core": "playwright test"}}),
+                encoding="utf-8",
+            )
+            (root / "playwright.config.ts").write_text(
+                "reuseExistingServer: !process.env.CI\n", encoding="utf-8"
+            )
+
+            self.assertIn(
+                "Playwright may reuse an existing server",
+                verifier.verify_core_e2e_contract(root),
+            )
+
+    def test_msw_transport_test_has_no_node_webstorage_warning(self):
+        result = subprocess.run(
+            [
+                "pnpm",
+                "exec",
+                "vitest",
+                "run",
+                "src/shared/api/request.test.ts",
+                "--pool=forks",
+                "--maxWorkers=1",
+            ],
+            cwd=str(ROOT),
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        combined = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 0, combined)
+        self.assertNotIn("--localstorage-file", combined)
 
     def test_quick_runs_frontend_after_scaffolding(self):
         result = self.run_verify("quick")

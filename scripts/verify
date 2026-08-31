@@ -113,6 +113,12 @@ REQUIRED_PACKAGE_SCRIPTS = (
     "build",
     "test:e2e:core",
 )
+CORE_E2E_JOURNEYS = {
+    "auth-entry": ("e2e/auth-entry.spec.ts", "@auth"),
+    "work-overview": ("e2e/work-overview.spec.ts", "@work"),
+    "task-discovery": ("e2e/task-discovery.spec.ts", "@task-discovery"),
+    "task-resolution": ("e2e/task-resolution.spec.ts", "@task-resolution"),
+}
 
 
 def git_paths(command):
@@ -216,6 +222,35 @@ def stop_hook_command():
     return hook_command("Stop")
 
 
+def verify_core_e2e_contract(root=ROOT):
+    errors = []
+    try:
+        package = json.loads((root / "package.json").read_text(encoding="utf-8"))
+        core_script = package.get("scripts", {}).get("test:e2e:core", "")
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        core_script = ""
+    if "playwright test" not in core_script or "--grep @core" not in core_script:
+        errors.append("test:e2e:core does not select @core Playwright tests")
+    if "--pass-with-no-tests" in core_script:
+        errors.append("test:e2e:core permits an empty selection")
+
+    try:
+        playwright_config = (root / "playwright.config.ts").read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        playwright_config = ""
+    if "reuseExistingServer: false" not in playwright_config:
+        errors.append("Playwright may reuse an existing server")
+
+    for journey, (relative, tag) in CORE_E2E_JOURNEYS.items():
+        try:
+            source = (root / relative).read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            source = ""
+        if "@core" not in source or tag not in source:
+            errors.append("{} core E2E tag missing".format(journey))
+    return errors
+
+
 def verify_setup():
     try:
         for relative in REQUIRED_FILES:
@@ -263,8 +298,15 @@ def verify_setup():
             "review tooling invalid: {}".format(", ".join(tooling_errors)),
             "./scripts/verify setup",
         )
+    core_e2e_errors = verify_core_e2e_contract(ROOT)
+    if core_e2e_errors:
+        return fail(
+            "setup",
+            "core E2E harness invalid: {}".format(", ".join(core_e2e_errors)),
+            "./scripts/verify setup",
+        )
     print("PASS setup")
-    return run_stage(
+    hook_result = run_stage(
         "hook-tests",
         [
             sys.executable,
@@ -279,6 +321,20 @@ def verify_setup():
             "tests/test_review_scanner.py",
             "tests/test_review_ai_record.py",
             "tests/test_review_publisher.py",
+            "-v",
+        ],
+    )
+    if hook_result or os.environ.get("KBHC_VERIFY_SELF_TESTING") == "1":
+        return hook_result
+    return run_stage(
+        "verify-tests",
+        [
+            "env",
+            "KBHC_VERIFY_SELF_TESTING=1",
+            sys.executable,
+            "-m",
+            "unittest",
+            "tests/test_verify.py",
             "-v",
         ],
     )

@@ -19,7 +19,8 @@ verification fail.
   journey categories, plan-completion review evidence markers, review/final-QA
   sections, pending-record ignore rule,
   Stop/SessionEnd hook wiring, AI disclosure headings, and the four focused
-  artifact-contract, exporter, index, and publisher unit-test suites.
+  artifact-contract, exporter, index, and publisher unit-test suites. It also
+  runs the verifier regression suite once with recursive re-entry disabled.
 - `quick`: `setup`, then `format:check`, `lint`, `typecheck`, and `test` after
   frontend scaffolding.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
@@ -65,6 +66,11 @@ Keep at most one representative success path and one critical failure path per j
 Every E2E names its unique cross-boundary risk. `test:e2e:core` runs only
 `@core`; extended, diagnostic,
 or browser-compatibility suites use separate explicit commands.
+
+Setup rejects an empty-tolerant core command, a missing `@core` selector, any
+missing journey tag, or a Playwright configuration that can reuse an existing
+local server. Full verification therefore starts a fresh server and fails when
+the core selection is empty.
 
 Review slow, flaky, redundant cases for removal or demotion to integration or
 component tests.
