@@ -1,6 +1,6 @@
+import { dashboardKeys } from "@/entities/dashboard";
 import { getDashboard, useApiClient } from "@/shared/api";
 import { useQuery } from "@tanstack/react-query";
-import { dashboardKeys } from "./model/dashboard-keys";
 
 function errorMessage(error: unknown): string {
   return error && typeof error === "object" && "message" in error
@@ -44,5 +44,3 @@ export function DashboardSummary() {
     </dl>
   );
 }
-
-export { dashboardKeys } from "./model/dashboard-keys";

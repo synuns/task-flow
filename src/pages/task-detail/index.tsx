@@ -1,7 +1,8 @@
 import { taskKeys } from "@/entities/task";
+import { DeleteTaskDialog, evictTaskSnapshots } from "@/features/delete-task";
 import { type ApiError, getTaskDetail, useApiClient } from "@/shared/api";
-import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function asApiError(value: unknown): ApiError | null {
   return value && typeof value === "object" && "kind" in value ? (value as ApiError) : null;
@@ -9,6 +10,8 @@ function asApiError(value: unknown): ApiError | null {
 
 export function TaskDetailPage() {
   const client = useApiClient();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { id = "" } = useParams();
   const query = useQuery({
     queryKey: taskKeys.detail(id),
@@ -41,6 +44,14 @@ export function TaskDetailPage() {
       <h1>{query.data.title}</h1>
       <p>{query.data.memo}</p>
       <time dateTime={query.data.registerDatetime}>{query.data.registerDatetime}</time>
+      <DeleteTaskDialog
+        onAbsent={() => evictTaskSnapshots(queryClient)}
+        onSuccess={async () => {
+          await evictTaskSnapshots(queryClient);
+          navigate("/task", { replace: true });
+        }}
+        taskId={id}
+      />
     </article>
   );
 }

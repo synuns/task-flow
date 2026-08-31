@@ -66,7 +66,7 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
   const listScreenshot = await page.screenshot({ fullPage: true });
   await page.getByRole("link", { name: /완료한 일/ }).click();
   await expect(page).toHaveURL(/\/task\/task-3$/);
-  await expect(page.getByRole("heading", { name: "할 일 상세" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "완료한 일" })).toBeVisible();
 
   await test.info().attach("task-discovery", {
     body: listScreenshot,

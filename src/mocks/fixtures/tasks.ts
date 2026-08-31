@@ -13,6 +13,8 @@ type DashboardResponse = {
 
 export type StoredTask = TaskItem & { registerDatetime: string };
 
+const fixtureStorageKey = "__kbhc_msw_task_fixture__";
+
 const seed: StoredTask[] = [
   {
     id: "task-1",
@@ -37,11 +39,45 @@ const seed: StoredTask[] = [
   },
 ];
 
-let tasks = structuredClone(seed);
+function isStoredTask(value: unknown): value is StoredTask {
+  if (!value || typeof value !== "object") return false;
+  const task = value as Record<string, unknown>;
+  return (
+    typeof task.id === "string" &&
+    typeof task.title === "string" &&
+    typeof task.memo === "string" &&
+    (task.status === "TODO" || task.status === "DONE") &&
+    typeof task.registerDatetime === "string"
+  );
+}
+
+function loadTasks(): StoredTask[] {
+  try {
+    const raw = globalThis.sessionStorage?.getItem(fixtureStorageKey);
+    if (!raw) return structuredClone(seed);
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.every(isStoredTask)
+      ? structuredClone(parsed)
+      : structuredClone(seed);
+  } catch {
+    return structuredClone(seed);
+  }
+}
+
+let tasks = loadTasks();
 const taskPageSize = 2;
+
+function persistTasks(): void {
+  try {
+    globalThis.sessionStorage?.setItem(fixtureStorageKey, JSON.stringify(tasks));
+  } catch {
+    // A storage-disabled browser can still exercise the fixture until the next reload.
+  }
+}
 
 export function resetTaskStore(): void {
   tasks = structuredClone(seed);
+  persistTasks();
 }
 
 export function listTaskPage(page: number): TaskListResponse {
@@ -59,7 +95,9 @@ export function findTask(id: string): StoredTask | null {
 export function removeTask(id: string): StoredTask | null {
   const index = tasks.findIndex((task) => task.id === id);
   if (index < 0) return null;
-  return tasks.splice(index, 1)[0] ?? null;
+  const removed = tasks.splice(index, 1)[0] ?? null;
+  persistTasks();
+  return removed;
 }
 
 export function getDashboardMetrics(): DashboardResponse {
