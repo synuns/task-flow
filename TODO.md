@@ -43,11 +43,11 @@
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
 | 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
 | 2. 공통 구조 | provider/router/API/test 경계 검증 | AI_VERIFIED |
-| 3. auth-entry | evidence·review 후 사람 checkpoint | BLOCKED — auth 정책 결정 필요 |
-| 4. work-overview | evidence·review 후 사람 checkpoint | NOT_STARTED |
-| 5. task-discovery | evidence·review 후 사람 checkpoint | NOT_STARTED |
-| 6. task-resolution | evidence·review 후 사람 checkpoint | NOT_STARTED |
-| 7. 통합·제출 QA | full QA 후 사람 최종 acceptance | NOT_STARTED |
+| 3. auth-entry | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 4. work-overview | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 5. task-discovery | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 6. task-resolution | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 7. 통합·제출 QA | full QA 후 사람 최종 acceptance | IN_PROGRESS |
 
 ## 0. 기획·결정 준비
 
@@ -67,7 +67,7 @@
   coverage 27/27; TODO 34 items의 필수 field 10종과 dependency reference 검사 PASS;
   staged `git diff --check` PASS
 
-### [ ] DEC-AUTH-01 인증 정책 사람 결정
+### [x] DEC-AUTH-01 인증 정책 사람 결정
 
 - Requirements: `AUTH-07`, `NAV-02`, `NAV-03`
 - Risk: HIGH
@@ -79,14 +79,15 @@
 - Automatic verification: 설계 문서 self-review와 OpenAPI/auth requirement
   trace 검사
 - Browser verification: 구현 전 적용 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30 `docs/superpowers/specs/2026-08-30-authentication-policy-design.md`;
   access token memory 저장, MSW refresh cookie, session generation, single-flight
   refresh, 최대 한 번 replay, late 401와 이전 session 격리, 내부 route allowlist,
   app callback 주입과 router-owned navigation을 확정하고 사용자 대화 승인;
   `docs/superpowers/plans/2026-08-30-authentication-policy.md` 실행 계획 자체 검토;
-  `./scripts/verify quick` PASS, `git diff --check` PASS, 원본 문서 diff 없음;
-  tracked `HUMAN_APPROVED` 표시는 사람 직접 확인 대기
+  구현 후 auth/provider/request Vitest와 auth-entry Chromium, architecture 정적
+  검토, `./scripts/verify quick` PASS; 사람 승인 evidence는 기록하되 규약에 따라
+  AI가 `HUMAN_APPROVED`로 표시하지 않음
 
 ### [x] PLAN-02 에이전트 코딩 규약 연결
 
@@ -145,7 +146,7 @@
   반영 요청; `docs/superpowers/specs/2026-08-30-plan-completion-adversarial-review-design.md`
   작성 및 placeholder·모순·범위·상태 전이 자체 검토; 사용자 문서 검토 대기
 
-### [ ] DEC-DELETE-01 삭제 일관성 정책 사람 결정
+### [x] DEC-DELETE-01 삭제 일관성 정책 사람 결정
 
 - Requirements: `TASK-DETAIL-03`~`TASK-DETAIL-05`, `DASH-01`, `TASK-LIST-01`
 - Risk: HIGH — destructive-data semantics
@@ -157,18 +158,18 @@
   확정되며 사람이 승인한다.
 - Automatic verification: 설계 self-review, OpenAPI/delete requirement trace 검사
 - Browser verification: 구현 전 적용 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30
   `docs/superpowers/specs/2026-08-30-delete-consistency-policy-design.md`;
   server-authoritative 비낙관적 삭제, attempt당 auth replay 포함 DELETE 최대 2회,
   200-only redirect, 404 non-success, outcome-unknown detail 재조회, 단일 fixture
-  store와 cache 일관성을 확정하고 사용자 대화 승인; tracked `HUMAN_APPROVED`
-  표시는 사람 직접 확인 대기;
+  store와 cache 일관성을 확정하고 사용자 대화 승인;
   `docs/superpowers/plans/2026-08-30-delete-consistency-policy.md` 실행 계획 자체 검토;
-  `./scripts/verify quick` PASS,
-  `git diff --check` PASS, 원본 문서 diff 없음
+  구현 후 delete outcome/guard/cache/transport Vitest와 task-resolution Chromium,
+  architecture 정적 검토, `./scripts/verify quick` PASS; 사람 승인 evidence는
+  기록하되 규약에 따라 AI가 `HUMAN_APPROVED`로 표시하지 않음
 
-### [ ] DEC-ARCH-01 애플리케이션 구조 상세 설계
+### [x] DEC-ARCH-01 애플리케이션 구조 상세 설계
 
 - Requirements: 전체 기능 requirement의 구조 기반
 - Risk: HIGH — architecture 결정
@@ -182,15 +183,16 @@
 - Automatic verification: 설계 self-review, dependency 방향과 requirement
   coverage 정적 검토
 - Browser verification: 구현 전 적용 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-30 Codex `/root`; 사용자 설계 내용 최종 승인;
   `docs/superpowers/specs/2026-08-30-application-architecture-design.md` 작성 및
   placeholder·모순·범위·module 책임·dependency 방향·requirement trace 자체 검토;
   `./scripts/verify setup` PASS, 79 tests; `git diff --check` PASS; 작성된 문서
   사용자 검토 승인; 2026-08-30 `shared/api` auth callback app 주입과
-  RouterProvider 내부 navigation 책임을 추가 승인; tracked `HUMAN_APPROVED`
-  표시는 사람 직접 확인 대기; `./scripts/verify quick` PASS,
-  `git diff --check` PASS, 원본 문서 diff 없음
+  RouterProvider 내부 navigation 책임을 추가 승인; 구현 후 FSD/public API,
+  generated/mocks, provider/router ownership 정적·Vitest 검토와
+  `./scripts/verify quick` PASS; 사람 승인 evidence는 기록하되 규약에 따라 AI가
+  `HUMAN_APPROVED`로 표시하지 않음
 
 ## 1. 검증 가능한 개발 기반
 
@@ -675,7 +677,8 @@
 - Status: IN_PROGRESS
 - Evidence: focused 8 files/38 tests, quick 33 files/118 tests, 관련 core E2E 4건,
   agent-browser detail/modal/list/404/dashboard와 lightweight adversarial review PASS;
-  `docs/quality/evidence/task-resolution.md`; 사람 checkpoint 대기
+  `docs/quality/evidence/task-resolution.md`; 2026-08-31 사용자 대화 checkpoint 승인
+  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
 
 ## 7. 통합·제출 QA
 

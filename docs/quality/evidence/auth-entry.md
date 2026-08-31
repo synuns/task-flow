@@ -34,8 +34,10 @@ cookie is read and persisted only by MSW/mock-server code
 Screenshot/Trace: Playwright `auth-entry` and `auth-credential-failure` PNG attachments;
 trace, screenshot and video retained automatically on failure
 Verdict: `AUTH-UI-01`, `AUTH-API-01`, `AUTH-STATE-01`, and `AUTH-NAV-01`
-`AI_VERIFIED`; `JOURNEY-AUTH-01` awaits the human checkpoint and is not marked
+`AI_VERIFIED`; `JOURNEY-AUTH-01` checkpoint approval was received and is not marked
 `HUMAN_APPROVED` by AI
+Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
+규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
 Failure class: `INTEGRATION` — initial reload lost mock server refresh-session state;
 `TEST` — first mobile keyboard assertion initially ignored the preceding global nav
 Correction: persist the server-side MSW fixture state across page module reload in

@@ -41,8 +41,10 @@ Screenshot/Trace: `/tmp/kbhc-task-resolution-list.png`,
 `/tmp/kbhc-task-resolution.png`; Playwright `task-resolution` attachment; trace,
 screenshot and video retained automatically on failure
 Verdict: `TASK-DETAIL-01`, `TASK-DELETE-01`, and `TASK-DELETE-02` `AI_VERIFIED`;
-`JOURNEY-TASK-DETAIL-01` awaits the human checkpoint and is not marked
+`JOURNEY-TASK-DETAIL-01` checkpoint approval was received and is not marked
 `HUMAN_APPROVED` by AI
+Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
+규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
 Failure class: `TEST` — detail test client generic and router placeholder fixture were
 stale; `TEST/TOOLING` — one router fixture edit needed formatting; `ARCHITECTURE` — the
 written plan's feature-to-widget dashboard key import reversed FSD direction;
