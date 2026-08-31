@@ -5,6 +5,7 @@ type ModalProps = PropsWithChildren<{
   title: string;
   onClose(): void;
   closeDisabled?: boolean;
+  busy?: boolean;
   returnFocusRef?: RefObject<HTMLElement | null>;
 }>;
 
@@ -13,6 +14,7 @@ export function Modal({
   title,
   onClose,
   closeDisabled = false,
+  busy = false,
   returnFocusRef,
   children,
 }: ModalProps) {
@@ -40,6 +42,7 @@ export function Modal({
 
   return (
     <dialog
+      aria-busy={busy || undefined}
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
