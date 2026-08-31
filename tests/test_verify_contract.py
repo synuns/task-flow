@@ -87,6 +87,52 @@ class VerifyContractTests(unittest.TestCase):
                 ["JOURNEY-AUTH-01 claims checkpoint approval without HUMAN_APPROVED"],
             )
 
+    def test_todo_accepts_explicit_missing_approval_evidence(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [ ] JOURNEY-AUTH-01 checkpoint
+- Depends on: 없음
+- Status: IN_PROGRESS
+- Evidence: checkpoint 승인 근거 없음
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(verifier.verify_todo_consistency(root), [])
+
+    def test_todo_rejects_english_unapproved_checkpoint_claim(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [ ] JOURNEY-AUTH-01 checkpoint
+- Depends on: 없음
+- Status: IN_PROGRESS
+- Evidence: checkpoint approval was received
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                verifier.verify_todo_consistency(root),
+                ["JOURNEY-AUTH-01 claims checkpoint approval without HUMAN_APPROVED"],
+            )
+
+    def test_todo_rejects_missing_status(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [ ] JOURNEY-AUTH-01 checkpoint
+- Depends on: 없음
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                verifier.verify_todo_consistency(root),
+                ["JOURNEY-AUTH-01 missing Status"],
+            )
+
     def test_repository_todo_state_is_consistent(self):
         verifier = load_verify_module()
         self.assertEqual(verifier.verify_todo_consistency(ROOT), [])

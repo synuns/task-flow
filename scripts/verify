@@ -361,7 +361,9 @@ def verify_todo_consistency(root=ROOT):
     completed_statuses = {"AI_VERIFIED", "HUMAN_APPROVED"}
     for task_id, task in tasks.items():
         completed = task["status"] in completed_statuses
-        if task["checked"] != completed:
+        if task["status"] is None:
+            errors.append("{} missing Status".format(task_id))
+        elif task["checked"] != completed:
             errors.append("{} checkbox does not match status {}".format(task_id, task["status"]))
         for dependency in task["dependencies"]:
             if dependency not in tasks:
@@ -371,7 +373,11 @@ def verify_todo_consistency(root=ROOT):
         if (
             task_id.startswith("JOURNEY-")
             and task["status"] != "HUMAN_APPROVED"
-            and re.search(r"checkpoint\s+승인", task["block"])
+            and re.search(
+                r"checkpoint\s+승인\s+(?:수신|받음)|checkpoint\s+approval\s+was\s+received",
+                task["block"],
+                re.IGNORECASE,
+            )
         ):
             errors.append(
                 "{} claims checkpoint approval without HUMAN_APPROVED".format(task_id)

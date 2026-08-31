@@ -25,6 +25,7 @@ test("@core @work shows authenticated dashboard, profile, and persistent navigat
 
   await prepareAuthenticatedPage(page);
   await page.goto("/");
+  expect(await page.evaluate(() => document.cookie)).not.toContain("token=");
   await expect(page.getByRole("heading", { name: "대시보드" })).toBeVisible();
   await expect(page.getByText("전체 할 일").locator("xpath=following-sibling::dd")).toHaveText("3");
   await expect(page.getByText("남은 할 일").locator("xpath=following-sibling::dd")).toHaveText("2");
