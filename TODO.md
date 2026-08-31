@@ -542,11 +542,12 @@
 - Status: IN_PROGRESS
 - Evidence: focused 7 files/22 tests, quick 24 files/85 tests, core E2E, agent-browser
   desktop/mobile와 lightweight adversarial review PASS;
-  `docs/quality/evidence/work-overview.md`; 사람 checkpoint 대기
+  `docs/quality/evidence/work-overview.md`; 2026-08-31 사용자 대화 checkpoint 승인
+  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
 
 ## 5. task-discovery Journey
 
-### [ ] TASK-PAGE-01 초기 task page와 card
+### [x] TASK-PAGE-01 초기 task page와 card
 
 - Requirements: `TASK-LIST-01`, `TASK-LIST-02`, `TASK-LIST-05`
 - Risk: MEDIUM
@@ -557,10 +558,11 @@
 - Automatic verification: MSW/router integration tests, card component tests,
   `./scripts/verify quick`
 - Browser verification: `/task` initial states와 card→detail navigation
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: task API/card/widget RED→GREEN tests; exact `page=1`, title/memo, empty,
+  retry와 `/task/task-3` Chromium 검증; `docs/quality/evidence/task-discovery.md`
 
-### [ ] TASK-PAGE-02 infinite pagination state
+### [x] TASK-PAGE-02 infinite pagination state
 
 - Requirements: `TASK-LIST-04`
 - Risk: MEDIUM
@@ -571,10 +573,11 @@
 - Automatic verification: multi-page integration tests와 request count assertion,
   `./scripts/verify quick`
 - Browser verification: two-page scroll network log와 terminal page 확인
-- Status: BLOCKED
-- Evidence: blocker `TASK-PAGE-01`
+- Status: AI_VERIFIED
+- Evidence: StrictMode single in-flight와 terminal request count tests; Chromium
+  requests `[1, 2]` exactly once; `docs/quality/evidence/task-discovery.md`
 
-### [ ] TASK-PAGE-03 virtualized growing list
+### [x] TASK-PAGE-03 virtualized growing list
 
 - Requirements: `TASK-LIST-03`, `TASK-LIST-04`
 - Risk: MEDIUM
@@ -587,8 +590,9 @@
   `./scripts/verify quick`
 - Browser verification: 고정 viewport에서 scroll, DOM count, request sequence,
   terminal page trace
-- Status: BLOCKED
-- Evidence: blocker `TASK-PAGE-02`
+- Status: AI_VERIFIED
+- Evidence: stable domain key, 96px row measurement, bounded DOM 1/3 records와 terminal
+  scroll 확인; `docs/quality/evidence/task-discovery.md`
 
 ### [ ] JOURNEY-TASK-LIST-01 task-discovery 검증·review·checkpoint
 
@@ -600,8 +604,10 @@
   navigation이 증명되고 finding 해결 후 사람 checkpoint를 요청한다.
 - Automatic verification: 관련 test, `./scripts/verify quick`, core E2E discovery tag
 - Browser verification: two-page journey trace, console/network/DOM count
-- Status: BLOCKED
-- Evidence: 선행 작업 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: focused 4 files/13 tests, quick 27 files/92 tests, core E2E,
+  agent-browser DOM/network/navigation와 lightweight adversarial review PASS;
+  `docs/quality/evidence/task-discovery.md`; 사람 checkpoint 대기
 
 ## 6. task-resolution Journey
 

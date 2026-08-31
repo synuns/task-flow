@@ -34,6 +34,8 @@ Screenshot/Trace: `/tmp/kbhc-work-overview.png`; Playwright `work-overview` atta
 trace, screenshot and video retained automatically on failure
 Verdict: `NAV-PRIMARY-01`, `DASH-01`, and `USER-01` `AI_VERIFIED`;
 `JOURNEY-WORK-01` awaits the human checkpoint and is not marked `HUMAN_APPROVED` by AI
+Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
+규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
 Failure class: `IMPLEMENTATION` — mock generated import violated the authoritative lint
 boundary; `TEST` — generic test client and router provider harness were incomplete;
 `ENVIRONMENT/TEST` — browser fixture POST raced async worker startup; `TEST/TOOLING` —
