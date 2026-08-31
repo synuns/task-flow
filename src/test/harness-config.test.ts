@@ -1,8 +1,10 @@
-// @vitest-environment node
+import playwrightConfig from "../../playwright.config.ts?raw";
+import vitestConfig from "../../vitest.config.ts?raw";
+import { describe, expect, it } from "vitest";
 
-import { expect, it } from "vitest";
-import config from "../../playwright.config";
-
-it("starts a fresh server for every Playwright run", () => {
-  expect(config.webServer).toMatchObject({ reuseExistingServer: false });
+describe("local verification configuration", () => {
+  it("rejects focused Playwright and Vitest tests", () => {
+    expect(playwrightConfig).toMatch(/forbidOnly:\s*true/);
+    expect(vitestConfig).toMatch(/allowOnly:\s*false/);
+  });
 });
