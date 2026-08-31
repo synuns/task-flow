@@ -16,7 +16,7 @@ export function TaskList() {
   const query = useInfiniteQuery({
     queryKey: taskKeys.all,
     initialPageParam: 1,
-    queryFn: ({ pageParam, signal }) => getTasks(client, pageParam, signal),
+    queryFn: ({ pageParam }) => getTasks(client, pageParam),
     getNextPageParam: (lastPage, pages) => (lastPage.hasNext ? pages.length + 1 : undefined),
   });
   const tasks = useMemo(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
@@ -57,7 +57,7 @@ export function TaskList() {
 
   return (
     <section>
-      <section aria-label="할 일 목록" ref={scrollRef} style={{ height: 120, overflow: "auto" }}>
+      <section aria-label="할 일 목록" ref={scrollRef} style={{ height: 32, overflow: "auto" }}>
         <ul
           style={{
             height: virtualizer.getTotalSize(),

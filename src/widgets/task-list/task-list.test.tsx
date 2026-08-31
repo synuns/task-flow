@@ -2,7 +2,7 @@ import { ApiClientProvider, type ApiClient } from "@/shared/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren, StrictMode } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TaskList } from ".";
@@ -25,11 +25,13 @@ function wrapper(client: ApiClient) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return function Providers({ children }: PropsWithChildren) {
     return (
-      <MemoryRouter>
-        <QueryClientProvider client={queryClient}>
-          <ApiClientProvider client={client}>{children}</ApiClientProvider>
-        </QueryClientProvider>
-      </MemoryRouter>
+      <StrictMode>
+        <MemoryRouter>
+          <QueryClientProvider client={queryClient}>
+            <ApiClientProvider client={client}>{children}</ApiClientProvider>
+          </QueryClientProvider>
+        </MemoryRouter>
+      </StrictMode>
     );
   };
 }
@@ -47,16 +49,27 @@ describe("TaskList", () => {
       releaseSecond = resolve;
     });
     const requestedPages: number[] = [];
+    const requestSignals: Array<AbortSignal | null | undefined> = [];
     const client: ApiClient = {
       request: async <T,>(
         input: RequestInfo | URL,
-        _init: RequestInit,
+        init: RequestInit,
         isSuccess: (value: unknown) => value is T,
       ) => {
         const page = Number(new URL(String(input)).searchParams.get("page"));
         requestedPages.push(page);
-        if (page === 1) await firstPending;
-        if (page === 2) await secondPending;
+        requestSignals.push(init.signal);
+        const waitFor = page === 1 ? firstPending : secondPending;
+        await Promise.race([
+          waitFor,
+          new Promise<void>((_, reject) => {
+            init.signal?.addEventListener(
+              "abort",
+              () => reject(new DOMException("aborted", "AbortError")),
+              { once: true },
+            );
+          }),
+        ]);
         const body: unknown =
           page === 1
             ? {
@@ -79,6 +92,7 @@ describe("TaskList", () => {
     expect(screen.getByRole("status")).toHaveTextContent("할 일을 불러오고 있습니다.");
     releaseFirst();
     expect(await screen.findByText("첫 번째 할 일")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "할 일 목록" })).toHaveStyle({ height: "32px" });
     await waitFor(() => expect(requestedPages).toEqual([1, 2]));
     expect(screen.getByRole("button", { name: "다음 페이지 불러오는 중" })).toBeDisabled();
     releaseSecond();
@@ -87,6 +101,7 @@ describe("TaskList", () => {
     expect(screen.getByText("모든 할 일을 불러왔습니다.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /다음 페이지/ })).not.toBeInTheDocument();
     expect(requestedPages).toEqual([1, 2]);
+    expect(requestSignals).toEqual([undefined, undefined]);
   });
 
   it("shows a distinct empty state without requesting another page", async () => {
