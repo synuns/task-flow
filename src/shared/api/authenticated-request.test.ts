@@ -113,9 +113,7 @@ describe("authenticated request", () => {
       http.delete("/api/protected", ({ request }) => {
         const header = request.headers.get("Authorization");
         headers.push(header);
-        return header === "Bearer token-a"
-          ? unauthorized()
-          : HttpResponse.json({ ok: true });
+        return header === "Bearer token-a" ? unauthorized() : HttpResponse.json({ ok: true });
       }),
     );
 
