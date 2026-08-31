@@ -38,16 +38,17 @@ const seed: StoredTask[] = [
 ];
 
 let tasks = structuredClone(seed);
+const taskPageSize = 2;
 
 export function resetTaskStore(): void {
   tasks = structuredClone(seed);
 }
 
 export function listTaskPage(page: number): TaskListResponse {
-  const start = (page - 1) * 20;
+  const start = (page - 1) * taskPageSize;
   return {
-    data: tasks.slice(start, start + 20).map(({ registerDatetime: _, ...task }) => task),
-    hasNext: start + 20 < tasks.length,
+    data: tasks.slice(start, start + taskPageSize).map(({ registerDatetime: _, ...task }) => task),
+    hasNext: start + taskPageSize < tasks.length,
   };
 }
 

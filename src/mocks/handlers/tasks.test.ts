@@ -66,6 +66,22 @@ describe("task handlers", () => {
     expect(response.body).toMatchObject({ data: expect.any(Array), hasNext: expect.any(Boolean) });
   });
 
+  it("returns two ordered pages and stops at the terminal page", async () => {
+    const first = (await apiRequest("/api/task?page=1")).body as {
+      data: Array<{ id: string }>;
+      hasNext: boolean;
+    };
+    const second = (await apiRequest("/api/task?page=2")).body as {
+      data: Array<{ id: string }>;
+      hasNext: boolean;
+    };
+
+    expect(first).toMatchObject({ hasNext: true });
+    expect(first.data.map((task) => task.id)).toEqual(["task-1", "task-2"]);
+    expect(second).toMatchObject({ hasNext: false });
+    expect(second.data.map((task) => task.id)).toEqual(["task-3"]);
+  });
+
   it("never mutates the store for an unauthorized delete", async () => {
     expect(await apiRequest("/api/task/task-1", "DELETE", "wrong-token")).toEqual({
       status: 401,
@@ -81,11 +97,14 @@ describe("task handlers", () => {
     await apiRequest("/api/task/task-1", "DELETE");
     resetTaskStore();
 
-    const restored = (await apiRequest("/api/task?page=1")).body as {
+    const restoredFirst = (await apiRequest("/api/task?page=1")).body as {
       data: Array<{ id: string }>;
     };
-    expect(restored.data).toHaveLength(3);
-    expect(restored.data.map((task) => task.id)).toEqual(["task-1", "task-2", "task-3"]);
+    const restoredSecond = (await apiRequest("/api/task?page=2")).body as {
+      data: Array<{ id: string }>;
+    };
+    const restoredIds = [...restoredFirst.data, ...restoredSecond.data].map((task) => task.id);
+    expect(restoredIds).toEqual(["task-1", "task-2", "task-3"]);
     expect((await apiRequest("/api/task/task-1")).status).toBe(200);
     expect((await apiRequest("/api/dashboard")).body).toEqual({
       numOfTask: 3,
