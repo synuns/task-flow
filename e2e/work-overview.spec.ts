@@ -1,10 +1,12 @@
 import { expect, test } from "@playwright/test";
+import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
 test("@core @work shows authenticated dashboard, profile, and persistent navigation", async ({
   page,
 }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
+  const signInRequests: string[] = [];
   const protectedRequests: Array<{ path: string; authorization?: string }> = [];
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
@@ -12,6 +14,7 @@ test("@core @work shows authenticated dashboard, profile, and persistent navigat
   page.on("pageerror", (error) => pageErrors.push(error.message));
   page.on("request", (request) => {
     const url = new URL(request.url());
+    if (url.pathname === "/api/sign-in") signInRequests.push(request.method());
     if (url.pathname === "/api/dashboard" || url.pathname === "/api/user") {
       protectedRequests.push({
         path: url.pathname,
@@ -20,24 +23,8 @@ test("@core @work shows authenticated dashboard, profile, and persistent navigat
     }
   });
 
-  await page.goto("/sign-in");
-  await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
-  const setupStatus = await page.evaluate(async () => {
-    const response = await fetch("/api/sign-in", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "user@example.com", password: "Password1" }),
-    });
-    return response.status;
-  });
-  expect(setupStatus).toBe(200);
-  expect(consoleErrors).toEqual([
-    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
-  ]);
-  consoleErrors.length = 0;
-
-  await page.reload();
-  await expect(page).toHaveURL(/\/$/);
+  await prepareAuthenticatedPage(page);
+  await page.goto("/");
   await expect(page.getByRole("heading", { name: "대시보드" })).toBeVisible();
   await expect(page.getByText("전체 할 일").locator("xpath=following-sibling::dd")).toHaveText("3");
   await expect(page.getByText("남은 할 일").locator("xpath=following-sibling::dd")).toHaveText("2");
@@ -83,6 +70,7 @@ test("@core @work shows authenticated dashboard, profile, and persistent navigat
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);
+  expect(signInRequests).toEqual([]);
 
   await test.info().attach("work-overview", {
     body: await page.screenshot({ fullPage: true }),

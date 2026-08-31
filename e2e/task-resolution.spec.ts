@@ -1,40 +1,26 @@
 import { expect, test } from "@playwright/test";
+import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
 test("@core @task-resolution deletes only after exact confirmation and refreshes server state", async ({
   page,
 }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
+  const signInRequests: string[] = [];
   const deleteRequests: Array<{ authorization?: string }> = [];
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
   page.on("request", (request) => {
-    if (new URL(request.url()).pathname === "/api/task/task-1" && request.method() === "DELETE") {
+    const path = new URL(request.url()).pathname;
+    if (path === "/api/sign-in") signInRequests.push(request.method());
+    if (path === "/api/task/task-1" && request.method() === "DELETE") {
       deleteRequests.push({ authorization: request.headers().authorization });
     }
   });
 
-  await page.goto("/sign-in");
-  await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
-  expect(
-    await page.evaluate(async () => {
-      const response = await fetch("/api/sign-in", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "user@example.com", password: "Password1" }),
-      });
-      return response.status;
-    }),
-  ).toBe(200);
-  expect(consoleErrors).toEqual([
-    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
-  ]);
-  consoleErrors.length = 0;
-
-  await page.reload();
-  await expect(page).toHaveURL(/\/$/);
+  await prepareAuthenticatedPage(page);
   await page.goto("/task/task-1");
   await expect(page.getByRole("heading", { name: "첫 번째 할 일" })).toBeVisible();
   await expect(page.getByText("삭제 검증 대상")).toBeVisible();
@@ -70,6 +56,7 @@ test("@core @task-resolution deletes only after exact confirmation and refreshes
     "Failed to load resource: the server responded with a status of 404 (Not Found)",
   ]);
   expect(pageErrors).toEqual([]);
+  expect(signInRequests).toEqual([]);
 
   await test.info().attach("task-resolution", {
     body: await page.screenshot({ fullPage: true }),

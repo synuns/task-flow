@@ -1,0 +1,21 @@
+import type { Page } from "@playwright/test";
+
+const refreshToken = "e2e-approved-refresh-token";
+
+export async function prepareAuthenticatedPage(page: Page): Promise<void> {
+  await page.addInitScript(
+    ({ storageKey, token }) => {
+      if (sessionStorage.getItem(storageKey) !== null) return;
+      document.cookie = `token=${token}; Path=/; SameSite=Strict`;
+      sessionStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          sequence: 0,
+          currentAccessToken: null,
+          activeRefreshTokens: [token],
+        }),
+      );
+    },
+    { storageKey: "__kbhc_msw_auth_fixture__", token: refreshToken },
+  );
+}

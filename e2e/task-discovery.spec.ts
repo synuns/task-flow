@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
 test("@core @task-discovery loads terminal pages into a bounded virtual list", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
+  const signInRequests: string[] = [];
   const taskRequests: Array<{ page: string | null; authorization?: string }> = [];
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
@@ -10,6 +12,7 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
   page.on("pageerror", (error) => pageErrors.push(error.message));
   page.on("request", (request) => {
     const url = new URL(request.url());
+    if (url.pathname === "/api/sign-in") signInRequests.push(request.method());
     if (url.pathname === "/api/task" && request.method() === "GET") {
       taskRequests.push({
         page: url.searchParams.get("page"),
@@ -18,26 +21,8 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
     }
   });
 
-  await page.goto("/sign-in");
-  await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
-  expect(
-    await page.evaluate(async () => {
-      const response = await fetch("/api/sign-in", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "user@example.com", password: "Password1" }),
-      });
-      return response.status;
-    }),
-  ).toBe(200);
-  expect(consoleErrors).toEqual([
-    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
-  ]);
-  consoleErrors.length = 0;
-
-  await page.reload();
-  await expect(page).toHaveURL(/\/$/);
-  await page.getByRole("link", { name: "할 일" }).click();
+  await prepareAuthenticatedPage(page);
+  await page.goto("/task");
   await expect(page).toHaveURL(/\/task$/);
   await expect(page.getByRole("heading", { name: "할 일", exact: true })).toBeVisible();
   await expect(page.getByText("첫 번째 할 일")).toBeVisible();
@@ -62,6 +47,7 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
   expect(taskRequests.every((request) => request.authorization?.startsWith("Bearer "))).toBe(true);
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);
+  expect(signInRequests).toEqual([]);
 
   const listScreenshot = await page.screenshot({ fullPage: true });
   await page.getByRole("link", { name: /완료한 일/ }).click();
