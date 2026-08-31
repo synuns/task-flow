@@ -1,7 +1,7 @@
 # Final QA Evidence
 
 Requirement/Journey: `SYS-02`, `SYS-04`, assignment-wide cross-journey review
-Branch/Scope: `fix/dec-prefix`; `main...HEAD`
+Branch/Scope: `fix/dec-prefix`; full-gate commit `8a09746`; `main...HEAD`
 Review date: 2026-08-31
 Precondition: all four journey evidence records exist and the user approved each
 checkpoint in conversation; AI does not write `HUMAN_APPROVED`
@@ -35,7 +35,9 @@ Correction: set the three decision items and two supported system requirements t
 rule that AI never writes `HUMAN_APPROVED`, use exact global-navigation names, await the
 returned dashboard heading, and assert its legitimate bearer reload
 Rerun verdict: focused work-overview Chromium rerun passed three consecutive parallel
-cases; clean `./scripts/verify full` rerun pending
+cases; clean `./scripts/verify full` passed on `8a09746` — setup 79 tests, format, lint,
+generated API check, TypeScript, 33 Vitest files/118 tests, production build, and five
+Chromium core cases across all four journeys
 
 ## Human-owned remainder
 

@@ -682,7 +682,7 @@
 
 ## 7. 통합·제출 QA
 
-### [ ] QA-01 requirement evidence와 상태 정합성
+### [x] QA-01 requirement evidence와 상태 정합성
 
 - Requirements: 전체
 - Risk: MEDIUM
@@ -694,10 +694,13 @@
 - Automatic verification: requirement ID/상태/evidence 정적 audit,
   `./scripts/verify setup`
 - Browser verification: evidence 경로 존재와 대상 commit 확인
-- Status: BLOCKED
-- Evidence: 선행 Journey 미완료
+- Status: AI_VERIFIED
+- Evidence: 네 Journey checkpoint 승인 수신; requirement 27개 row의 자동/browser
+  evidence 경로와 상태 audit, 누락 경로 없음; `SYS-02`, `SYS-04`의 stale 상태를
+  correction; `SYS-05`는 사람 검토 미완료를 반영해 `IN_PROGRESS` 유지;
+  `docs/quality/evidence/final-qa.md`; `./scripts/verify full` PASS on `8a09746`
 
-### [ ] QA-02 journey 간 full adversarial review
+### [x] QA-02 journey 간 full adversarial review
 
 - Requirements: 전체 invariant와 Golden Journey
 - Risk: MEDIUM
@@ -709,8 +712,14 @@
   있고 unresolved high/medium finding이 없다.
 - Automatic verification: 영향 test와 `./scripts/verify quick` 재실행
 - Browser verification: 교차 journey regression, console/network, mobile/desktop
-- Status: BLOCKED
-- Evidence: 사람 Journey checkpoint와 구현 미완료
+- Status: AI_VERIFIED
+- Evidence: auth generation/refresh/terminal transition, router-owned navigation,
+  protected cache, delete 200/404/unknown/stale result, OAS/MSW operation과 schema,
+  FSD/generated/raw-fetch/storage/color/secret/debug/generated-noise를 교차 검토;
+  stale DEC/requirement/checkpoint 문서 상태 correction; work-overview partial-name와
+  route-render race `TEST` finding correction 후 Chromium 3회 반복 PASS;
+  `./scripts/verify full` PASS on `8a09746`; unresolved HIGH/MEDIUM finding 없음;
+  `docs/quality/evidence/final-qa.md`
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 
@@ -724,8 +733,10 @@
 - Automatic verification: `./scripts/verify setup`, secret/generated-noise scan,
   `git diff --check`
 - Browser verification: 적용 없음
-- Status: BLOCKED
-- Evidence: 선행 QA 미완료; AI record 게시에는 사람 TTY 승인 필요
+- Status: IN_PROGRESS
+- Evidence: `AI_USAGE.md` 필수 section과 자동 검증, branch diff의 secret/debug/
+  generated/unrelated scan PASS; 기존 `legacy/pre-policy` record는 문서상 사람 검토
+  대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요
 
 ### [ ] QA-04 final verification과 사람 acceptance 요청
 
@@ -738,5 +749,8 @@
 - Automatic verification: `./scripts/verify full`
 - Browser verification: 네 core journey의 최종 commit evidence, console/network,
   accessibility, responsive spot check
-- Status: BLOCKED
-- Evidence: 선행 QA와 사람 checkpoint 미완료; AI가 최종 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: 네 Journey checkpoint 승인 evidence 수신; `./scripts/verify full` PASS on
+  `8a09746` — setup 79 tests, 33 Vitest files/118 tests, build, Chromium core 5건;
+  final QA 근거 `docs/quality/evidence/final-qa.md`; `QA-03` 사람 검토와 사람 최종
+  acceptance 대기, AI가 최종 승인 기록 금지
