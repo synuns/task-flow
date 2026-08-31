@@ -18,4 +18,10 @@ export {
 } from "./auth";
 export { type DashboardMetrics, getDashboard } from "./dashboard";
 export { getUser, type UserProfileData } from "./user";
-export { getTasks, type TaskListItem, type TaskPage } from "./tasks";
+export {
+  getTaskDetail,
+  getTasks,
+  type TaskDetail,
+  type TaskListItem,
+  type TaskPage,
+} from "./tasks";

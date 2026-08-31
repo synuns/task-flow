@@ -9,6 +9,7 @@ export type TaskListItem = {
   status: "TODO" | "DONE";
 };
 export type TaskPage = { data: TaskListItem[]; hasNext: boolean };
+export type TaskDetail = { title: string; memo: string; registerDatetime: string };
 
 function isTaskItem(value: unknown): value is TaskListItem {
   if (!value || typeof value !== "object") return false;
@@ -29,8 +30,26 @@ function isTaskPage(value: unknown): value is GeneratedTaskListResponse {
   );
 }
 
+function isTaskDetail(value: unknown): value is TaskDetail {
+  if (!value || typeof value !== "object") return false;
+  const data = value as Record<string, unknown>;
+  return (
+    typeof data.title === "string" &&
+    typeof data.memo === "string" &&
+    typeof data.registerDatetime === "string"
+  );
+}
+
 export function getTasks(client: ApiClient, page: number, signal?: AbortSignal): Promise<TaskPage> {
   const url = new URL("/api/task", globalThis.location?.origin ?? "http://localhost");
   url.searchParams.set("page", String(page));
   return client.request(url, { method: "GET", signal }, isTaskPage);
+}
+
+export function getTaskDetail(client: ApiClient, id: string): Promise<TaskDetail> {
+  const url = new URL(
+    `/api/task/${encodeURIComponent(id)}`,
+    globalThis.location?.origin ?? "http://localhost",
+  );
+  return client.request(url, { method: "GET" }, isTaskDetail);
 }

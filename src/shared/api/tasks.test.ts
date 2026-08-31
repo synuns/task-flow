@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ApiClient } from "./api-client-context";
-import { getTasks } from "./tasks";
+import { getTaskDetail, getTasks } from "./tasks";
 
 function clientFor(body: unknown, capture: { url?: string; method?: string }): ApiClient {
   return {
@@ -20,6 +20,21 @@ function clientFor(body: unknown, capture: { url?: string; method?: string }): A
 }
 
 describe("tasks API", () => {
+  it("requests the encoded task ID and accepts the OpenAPI detail shape", async () => {
+    const capture: { url?: string; method?: string } = {};
+    const body = {
+      title: "첫 번째 할 일",
+      memo: "삭제 검증 대상",
+      registerDatetime: "2026-08-30T09:00:00.000Z",
+    };
+
+    await expect(getTaskDetail(clientFor(body, capture), "task/A")).resolves.toEqual(body);
+    expect(capture).toEqual({
+      url: `${globalThis.location.origin}/api/task/task%2FA`,
+      method: "GET",
+    });
+  });
+
   it("requests the exact page and accepts the OpenAPI task-list shape", async () => {
     const capture: { url?: string; method?: string } = {};
     const body = {

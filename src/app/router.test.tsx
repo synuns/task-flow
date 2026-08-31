@@ -38,7 +38,13 @@ const apiClient: ApiClient = {
         ? { numOfTask: 3, numOfRestTask: 2, numOfDoneTask: 1 }
         : pathname === "/api/user"
           ? { name: "김담당", memo: "오늘도 차근차근" }
-          : {};
+          : pathname === "/api/task/task-1"
+            ? {
+                title: "첫 번째 할 일",
+                memo: "삭제 검증 대상",
+                registerDatetime: "2026-08-30T09:00:00.000Z",
+              }
+            : {};
     if (!isSuccess(body)) throw new Error("router test API fixture is missing");
     return body;
   },
@@ -55,7 +61,7 @@ describe("app router", () => {
     ["/", "대시보드", "authenticated"],
     ["/sign-in", "로그인", "anonymous"],
     ["/task", "할 일", "authenticated"],
-    ["/task/task-1", "할 일 상세", "authenticated"],
+    ["/task/task-1", "첫 번째 할 일", "authenticated"],
     ["/user", "회원정보", "authenticated"],
   ])("resolves %s to its auth-aware page boundary", async (path, heading, kind) => {
     auth.controller = controller(
