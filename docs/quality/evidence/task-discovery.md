@@ -37,6 +37,8 @@ attachment; trace, screenshot and video retained automatically on failure
 Verdict: `TASK-PAGE-01`, `TASK-PAGE-02`, and `TASK-PAGE-03` `AI_VERIFIED`;
 `JOURNEY-TASK-LIST-01` awaits the human checkpoint and is not marked `HUMAN_APPROVED`
 by AI
+Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
+규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
 Failure class: `TEST` — the reset assertion initially assumed all three fixtures were
 on page 1; `UX_ACCESSIBILITY` — the first virtual markup used generic ARIA list roles;
 `INTEGRATION` — StrictMode cancelled the first signal-bound request and retransmitted

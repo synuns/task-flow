@@ -607,11 +607,12 @@
 - Status: IN_PROGRESS
 - Evidence: focused 4 files/13 tests, quick 27 files/92 tests, core E2E,
   agent-browser DOM/network/navigation와 lightweight adversarial review PASS;
-  `docs/quality/evidence/task-discovery.md`; 사람 checkpoint 대기
+  `docs/quality/evidence/task-discovery.md`; 2026-08-31 사용자 대화 checkpoint 승인
+  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
 
 ## 6. task-resolution Journey
 
-### [ ] TASK-DETAIL-01 상세 success와 404 복구
+### [x] TASK-DETAIL-01 상세 success와 404 복구
 
 - Requirements: `TASK-DETAIL-01`, `TASK-DETAIL-02`
 - Risk: MEDIUM
@@ -622,10 +623,11 @@
 - Automatic verification: MSW/router integration tests,
   `./scripts/verify quick`
 - Browser verification: existing/missing ID 직접 진입과 recovery
-- Status: BLOCKED
-- Evidence: blocker `AUTH-STATE-01`
+- Status: AI_VERIFIED
+- Evidence: detail API/page/router RED→GREEN 11 tests; Chromium existing 200와 삭제 후
+  new-document 404/목록 복구 확인; `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DELETE-01 삭제 modal과 exact ID guard
+### [x] TASK-DELETE-01 삭제 modal과 exact ID guard
 
 - Requirements: `TASK-DETAIL-03`, `TASK-DETAIL-04`
 - Risk: LOW
@@ -636,10 +638,12 @@
 - Automatic verification: component boundary tests와 user-event keyboard test,
   `./scripts/verify quick`
 - Browser verification: wrong→exact 입력, focus trap/restore, mobile overflow
-- Status: BLOCKED
-- Evidence: blocker `TASK-DETAIL-01`
+- Status: AI_VERIFIED
+- Evidence: attempt/dialog 5 tests로 exact byte guard, pending lock, focus reset,
+  GET-only recovery 검증; Chromium wrong→exact 확인;
+  `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DELETE-02 delete 요청·실패·redirect
+### [x] TASK-DELETE-02 delete 요청·실패·redirect
 
 - Requirements: `TASK-DETAIL-05`
 - Risk: HIGH 실행 — destructive behavior 검토 필요
@@ -652,9 +656,11 @@
 - Automatic verification: MSW integration tests와 request count/cache assertions,
   `./scripts/verify quick`
 - Browser verification: wrong/exact ID, network request, failure stay, success redirect
-- Status: BLOCKED
-- Evidence: `DEC-DELETE-01` 설계와 문서의 사용자 대화 승인은 완료; tracked
-  `HUMAN_APPROVED` 사람 직접 표시와 선행 `TASK-DELETE-01` 구현 대기
+- Status: AI_VERIFIED
+- Evidence: delete/recheck 12-case outcome table, cache/page/store/transport tests,
+  feature DELETE 1회와 auth replay 포함 최대 2회, 200-only redirect, 404 stay,
+  list/detail/dashboard 일관성 Chromium 검증;
+  `docs/quality/evidence/task-resolution.md`
 
 ### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 검증·review·checkpoint
 
@@ -666,8 +672,10 @@
   해결 후 사람 checkpoint를 요청한다.
 - Automatic verification: 관련 test, `./scripts/verify quick`, core E2E resolution tag
 - Browser verification: 기존→없는 ID→복구→삭제 전체 trace
-- Status: BLOCKED
-- Evidence: 선행 작업 미완료; AI가 사람 승인 기록 금지
+- Status: IN_PROGRESS
+- Evidence: focused 8 files/38 tests, quick 33 files/118 tests, 관련 core E2E 4건,
+  agent-browser detail/modal/list/404/dashboard와 lightweight adversarial review PASS;
+  `docs/quality/evidence/task-resolution.md`; 사람 checkpoint 대기
 
 ## 7. 통합·제출 QA
 
