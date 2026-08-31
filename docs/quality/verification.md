@@ -16,7 +16,8 @@ verification fail.
 ## Modes
 
 - `setup`: required files, document markers and links, risk/approval rules,
-  journey categories, plan-completion review evidence markers, review/final-QA
+  journey categories, TODO checkbox/Status/dependency consistency and unsupported
+  checkpoint-approval claims, plan-completion review evidence markers, review/final-QA
   sections, pending-record ignore rule,
   Stop/SessionEnd hook wiring, AI disclosure headings, and the four focused
   artifact-contract, exporter, index, and publisher unit-test suites. It also
@@ -24,7 +25,9 @@ verification fail.
 - `quick`: `setup`, then `format:check`, `lint`, `typecheck`, and `test` after
   frontend scaffolding.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
-  scaffolding.
+  scaffolding, then the complete `tests/test_verify.py` verifier regression suite.
+  `KBHC_VERIFY_SELF_TESTING=1` guards nested verifier subprocesses from recursive
+  re-entry.
 
 Before `package.json` exists, frontend stages print
 `SKIP frontend not scaffolded`. This certifies workflow setup only. After

@@ -3,6 +3,7 @@ import importlib.machinery
 import importlib.util
 import io
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -26,9 +27,12 @@ def load_verify_module():
 
 class VerifyCliTests(unittest.TestCase):
     def run_verify(self, *args):
+        environment = os.environ.copy()
+        environment["KBHC_VERIFY_SELF_TESTING"] = "1"
         return subprocess.run(
             [str(VERIFY), *args],
             cwd=str(ROOT),
+            env=environment,
             text=True,
             capture_output=True,
             check=False,

@@ -41,10 +41,9 @@ Screenshot/Trace: `/tmp/kbhc-task-resolution-list.png`,
 `/tmp/kbhc-task-resolution.png`; Playwright `task-resolution` attachment; trace,
 screenshot and video retained automatically on failure
 Verdict: `TASK-DETAIL-01`, `TASK-DELETE-01`, and `TASK-DELETE-02` `AI_VERIFIED`;
-`JOURNEY-TASK-DETAIL-01` checkpoint approval was received and is not marked
-`HUMAN_APPROVED` by AI
-Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
-규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
+`JOURNEY-TASK-DETAIL-01` remains `IN_PROGRESS`
+Human checkpoint record: tracked primary evidence was not found; checkpoint remains
+unapproved
 Failure class: `TEST` — detail test client generic and router placeholder fixture were
 stale; `TEST/TOOLING` — one router fixture edit needed formatting; `ARCHITECTURE` — the
 written plan's feature-to-widget dashboard key import reversed FSD direction;
@@ -55,7 +54,5 @@ dashboard query key to `entities/dashboard`; persist the DEV-only mock task stor
 validated session storage using the established auth fixture lifecycle; add a
 module-reload regression and DELETE-specific auth replay characterization
 Rerun verdict: PASS — focused, quick, three related core journeys, manual
-accessible-tree/network/state and static boundary checks passed; lightweight adversarial
-review found no remaining non-exact submit, duplicate attempt, third transmission,
-success misclassification, automatic DELETE retry, stale cache/session mutation,
-optimistic update, route ownership or FSD-direction omission
+accessible-tree/network/state and static boundary checks passed; the prior review note
+had no reviewer or target commit and does not count as an independent review

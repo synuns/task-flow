@@ -3,8 +3,8 @@
 Requirement/Journey: `SYS-02`, `SYS-04`, assignment-wide cross-journey review
 Branch/Scope: `fix/dec-prefix`; full-gate commit `8a09746`; `main...HEAD`
 Review date: 2026-08-31
-Precondition: all four journey evidence records exist and the user approved each
-checkpoint in conversation; AI does not write `HUMAN_APPROVED`
+Precondition: all four journey evidence records exist; no tracked primary human approval
+record was found, so every checkpoint remains unapproved
 Actions: compare the branch diff with the original requirement and OpenAPI; inspect auth,
 router, delete, query-cache and mock boundaries; run color-literal, forbidden-import,
 raw-fetch, production-storage, navigation-owner, secret, debug-output, generated-noise
@@ -31,13 +31,16 @@ and `SYS-04`, the phase summary, and checkpoint verdict wording retained stale p
 states; `TEST` — work-overview used a partial accessible-name locator and inspected the
 request sequence before the returned dashboard finished rendering
 Correction: set the three decision items and two supported system requirements to
-`AI_VERIFIED`, align the phase/checkpoint wording with received approval, preserve the
-rule that AI never writes `HUMAN_APPROVED`, use exact global-navigation names, await the
-returned dashboard heading, and assert its legitimate bearer reload
+`AI_VERIFIED`, use exact global-navigation names, await the returned dashboard heading,
+and assert its legitimate bearer reload
 Rerun verdict: focused work-overview Chromium rerun passed three consecutive parallel
 cases; clean `./scripts/verify full` passed on `8a09746` — setup 79 tests, format, lint,
 generated API check, TypeScript, 33 Vitest files/118 tests, production build, and five
 Chromium core cases across all four journeys
+
+Independent review status: the prior cross-Journey review narrative has no reviewer or
+exact target commit record, so it is not accepted as the required independent review.
+No historical reviewer or target was added retroactively.
 
 ## Human-owned remainder
 

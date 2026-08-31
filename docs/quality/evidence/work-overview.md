@@ -33,9 +33,9 @@ headers
 Screenshot/Trace: `/tmp/kbhc-work-overview.png`; Playwright `work-overview` attachment;
 trace, screenshot and video retained automatically on failure
 Verdict: `NAV-PRIMARY-01`, `DASH-01`, and `USER-01` `AI_VERIFIED`;
-`JOURNEY-WORK-01` checkpoint approval was received and is not marked `HUMAN_APPROVED` by AI
-Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
-규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
+`JOURNEY-WORK-01` remains `IN_PROGRESS`
+Human checkpoint record: tracked primary evidence was not found; checkpoint remains
+unapproved
 Failure class: `IMPLEMENTATION` — mock generated import violated the authoritative lint
 boundary; `TEST` — generic test client and router provider harness were incomplete;
 `ENVIRONMENT/TEST` — browser fixture POST raced async worker startup; `TEST/TOOLING` —
@@ -49,3 +49,5 @@ Rerun verdict: PASS — focused, quick, core browser, manual accessible-tree/mob
 static boundary checks passed; final QA repeated the work-overview E2E three times after
 the locator/request correction; no remaining requirement omission, auth/cache leak,
 OAS shape mismatch, navigation/accessibility gap or unexpected duplicate request remained
+in the implementation self-check. The prior review note had no reviewer or target commit
+and does not count as an independent review

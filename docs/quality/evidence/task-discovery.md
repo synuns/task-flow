@@ -35,10 +35,9 @@ the exact page sequence
 Screenshot/Trace: `/tmp/kbhc-task-discovery.png`; Playwright `task-discovery`
 attachment; trace, screenshot and video retained automatically on failure
 Verdict: `TASK-PAGE-01`, `TASK-PAGE-02`, and `TASK-PAGE-03` `AI_VERIFIED`;
-`JOURNEY-TASK-LIST-01` checkpoint approval was received and is not marked
-`HUMAN_APPROVED` by AI
-Human checkpoint record: 2026-08-31 사용자 대화에서 checkpoint 승인 수신; 프로젝트
-규약에 따라 AI가 상태를 `HUMAN_APPROVED`로 변경하지 않음
+`JOURNEY-TASK-LIST-01` remains `IN_PROGRESS`
+Human checkpoint record: tracked primary evidence was not found; checkpoint remains
+unapproved
 Failure class: `TEST` — the reset assertion initially assumed all three fixtures were
 on page 1; `UX_ACCESSIBILITY` — the first virtual markup used generic ARIA list roles;
 `INTEGRATION` — StrictMode cancelled the first signal-bound request and retransmitted
@@ -49,6 +48,6 @@ let the shared in-flight query survive StrictMode remount instead of consuming i
 signal; give the viewport and rows a stable 96px size; scroll the grown list to its new
 end before selecting the terminal record
 Rerun verdict: PASS — focused, quick, core browser, manual accessible-tree/DOM/network
-and static boundary checks passed; lightweight adversarial review found and corrected
-the clipped 32px viewport and found no remaining contract-shape, duplicate-page,
-terminal-loop, navigation, auth/cache, architecture or recovery-state omission
+and static boundary checks passed; the implementation self-check found and corrected
+the clipped 32px viewport. The prior review note had no reviewer or target commit and
+does not count as an independent review

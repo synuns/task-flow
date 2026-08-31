@@ -49,10 +49,10 @@
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
 | 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
 | 2. 공통 구조 | provider/router/API/test 경계 검증 | AI_VERIFIED |
-| 3. auth-entry | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
-| 4. work-overview | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
-| 5. task-discovery | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
-| 6. task-resolution | evidence·review 후 사람 checkpoint | IN_PROGRESS — checkpoint 승인 수신 |
+| 3. auth-entry | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
+| 4. work-overview | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
+| 5. task-discovery | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
+| 6. task-resolution | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
 | 7. 통합·제출 QA | full QA 후 사람 최종 acceptance | IN_PROGRESS |
 
 ## 0. 기획·결정 준비
@@ -562,9 +562,9 @@
 - Automatic verification: auth 관련 test, `./scripts/verify quick`, core E2E auth tag
 - Browser verification: `/sign-in` invalid/error/success와 필요한 credential boundary
 - Status: IN_PROGRESS
-- Evidence: automatic, browser, architecture boundary와 lightweight adversarial review
-  PASS; `docs/quality/evidence/auth-entry.md`; 2026-08-31 사용자 대화 checkpoint 승인;
-  규약에 따라 AI가 tracked `HUMAN_APPROVED`를 직접 표시하지 않음
+- Evidence: automatic, browser, architecture boundary self-check PASS;
+  `docs/quality/evidence/auth-entry.md`; 독립 review의 reviewer/target 기록과 tracked
+  사람 승인 근거가 없어 checkpoint 미승인 유지
 
 ## 4. work-overview Journey
 
@@ -626,9 +626,8 @@
 - Browser verification: dashboard/task/profile navigation과 fixture 비교
 - Status: IN_PROGRESS
 - Evidence: focused 7 files/22 tests, quick 24 files/85 tests, core E2E, agent-browser
-  desktop/mobile와 lightweight adversarial review PASS;
-  `docs/quality/evidence/work-overview.md`; 2026-08-31 사용자 대화 checkpoint 승인
-  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
+  desktop/mobile self-check PASS; `docs/quality/evidence/work-overview.md`; 독립
+  review의 reviewer/target 기록과 tracked 사람 승인 근거가 없어 checkpoint 미승인 유지
 
 ## 5. task-discovery Journey
 
@@ -691,9 +690,9 @@
 - Browser verification: two-page journey trace, console/network/DOM count
 - Status: IN_PROGRESS
 - Evidence: focused 4 files/13 tests, quick 27 files/92 tests, core E2E,
-  agent-browser DOM/network/navigation와 lightweight adversarial review PASS;
-  `docs/quality/evidence/task-discovery.md`; 2026-08-31 사용자 대화 checkpoint 승인
-  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
+  agent-browser DOM/network/navigation self-check PASS;
+  `docs/quality/evidence/task-discovery.md`; 독립 review의 reviewer/target 기록과
+  tracked 사람 승인 근거가 없어 checkpoint 미승인 유지
 
 ## 6. task-resolution Journey
 
@@ -759,13 +758,13 @@
 - Browser verification: 기존→없는 ID→복구→삭제 전체 trace
 - Status: IN_PROGRESS
 - Evidence: focused 8 files/38 tests, quick 33 files/118 tests, 관련 core E2E 4건,
-  agent-browser detail/modal/list/404/dashboard와 lightweight adversarial review PASS;
-  `docs/quality/evidence/task-resolution.md`; 2026-08-31 사용자 대화 checkpoint 승인
-  수신, AI는 `HUMAN_APPROVED`로 상태 변경하지 않음
+  agent-browser detail/modal/list/404/dashboard self-check PASS;
+  `docs/quality/evidence/task-resolution.md`; 독립 review의 reviewer/target 기록과
+  tracked 사람 승인 근거가 없어 checkpoint 미승인 유지
 
 ## 7. 통합·제출 QA
 
-### [x] QA-01 requirement evidence와 상태 정합성
+### [ ] QA-01 requirement evidence와 상태 정합성
 
 - Requirements: 전체
 - Risk: MEDIUM
@@ -777,13 +776,12 @@
 - Automatic verification: requirement ID/상태/evidence 정적 audit,
   `./scripts/verify setup`
 - Browser verification: evidence 경로 존재와 대상 commit 확인
-- Status: AI_VERIFIED
-- Evidence: 네 Journey checkpoint 승인 수신; requirement 27개 row의 자동/browser
-  evidence 경로와 상태 audit, 누락 경로 없음; `SYS-02`, `SYS-04`의 stale 상태를
-  correction; `SYS-05`는 사람 검토 미완료를 반영해 `IN_PROGRESS` 유지;
-  `docs/quality/evidence/final-qa.md`; `./scripts/verify full` PASS on `8a09746`
+- Status: BLOCKED
+- Evidence: requirement 27개 row의 자동/browser evidence 경로 audit 결과는 보존;
+  네 Journey의 tracked 사람 승인 근거가 없어 dependency 미완료. 각 checkpoint의
+  실제 사람 승인 기록이 확인되어 사람이 상태를 갱신하면 재개
 
-### [x] QA-02 journey 간 full adversarial review
+### [ ] QA-02 journey 간 full adversarial review
 
 - Requirements: 전체 invariant와 Golden Journey
 - Risk: MEDIUM
@@ -795,14 +793,10 @@
   있고 unresolved high/medium finding이 없다.
 - Automatic verification: 영향 test와 `./scripts/verify quick` 재실행
 - Browser verification: 교차 journey regression, console/network, mobile/desktop
-- Status: AI_VERIFIED
-- Evidence: auth generation/refresh/terminal transition, router-owned navigation,
-  protected cache, delete 200/404/unknown/stale result, OAS/MSW operation과 schema,
-  FSD/generated/raw-fetch/storage/color/secret/debug/generated-noise를 교차 검토;
-  stale DEC/requirement/checkpoint 문서 상태 correction; work-overview partial-name와
-  route-render race `TEST` finding correction 후 Chromium 3회 반복 PASS;
-  `./scripts/verify full` PASS on `8a09746`; unresolved HIGH/MEDIUM finding 없음;
-  `docs/quality/evidence/final-qa.md`
+- Status: BLOCKED
+- Evidence: 기존 교차 검토 내용에는 reviewer와 exact target commit 기록이 없어
+  독립 review 완료 근거로 인정하지 않음. 네 Journey `HUMAN_APPROVED`와 `QA-01`
+  완료 후 실제 fresh review를 수행해야 재개
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 
@@ -851,7 +845,6 @@
 - Browser verification: 네 core journey의 최종 commit evidence, console/network,
   accessibility, responsive spot check
 - Status: IN_PROGRESS
-- Evidence: 네 Journey checkpoint 승인 evidence 수신; `./scripts/verify full` PASS on
-  `8a09746` — setup 79 tests, 33 Vitest files/118 tests, build, Chromium core 5건;
-  final QA 근거 `docs/quality/evidence/final-qa.md`; `QA-03` 사람 검토와 사람 최종
-  acceptance 대기, AI가 최종 승인 기록 금지
+- Evidence: `./scripts/verify full` PASS on `8a09746` — setup 79 tests, 33 Vitest
+  files/118 tests, build, Chromium core 5건; 네 Journey의 tracked 사람 승인 근거가
+  없어 checkpoint 미승인, `QA-02`/`QA-03`과 사람 최종 acceptance 대기
