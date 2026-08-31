@@ -106,6 +106,27 @@ describe("authenticated request", () => {
     expect(auth.terminate).toHaveBeenCalledWith({ generation: 1, accessToken: "token-b" });
   });
 
+  it("sends a DELETE at most twice when the second transmission is the auth replay", async () => {
+    const auth = harness({ generation: 1, accessToken: "token-a" });
+    const headers: Array<string | null> = [];
+    server.use(
+      http.delete("/api/protected", ({ request }) => {
+        const header = request.headers.get("Authorization");
+        headers.push(header);
+        return header === "Bearer token-a"
+          ? unauthorized()
+          : HttpResponse.json({ ok: true });
+      }),
+    );
+
+    await expect(
+      createAuthenticatedRequest(auth.callbacks)(url, { method: "DELETE" }, isData),
+    ).resolves.toEqual({ ok: true });
+
+    expect(headers).toEqual(["Bearer token-a", "Bearer token-b"]);
+    expect(auth.refresh).toHaveBeenCalledTimes(1);
+  });
+
   it("discards a previous generation response without refresh or termination", async () => {
     const auth = harness({ generation: 1, accessToken: "token-a" });
     let release: () => void = () => undefined;
