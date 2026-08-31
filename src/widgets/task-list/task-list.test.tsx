@@ -92,7 +92,8 @@ describe("TaskList", () => {
     expect(screen.getByRole("status")).toHaveTextContent("할 일을 불러오고 있습니다.");
     releaseFirst();
     expect(await screen.findByText("첫 번째 할 일")).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "할 일 목록" })).toHaveStyle({ height: "32px" });
+    expect(screen.getByRole("region", { name: "할 일 목록" })).toHaveStyle({ height: "96px" });
+    expect(screen.getAllByRole("listitem")[0]).toHaveStyle({ minHeight: "96px" });
     await waitFor(() => expect(requestedPages).toEqual([1, 2]));
     expect(screen.getByRole("button", { name: "다음 페이지 불러오는 중" })).toBeDisabled();
     releaseSecond();

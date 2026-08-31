@@ -57,7 +57,7 @@ export function TaskList() {
 
   return (
     <section>
-      <section aria-label="할 일 목록" ref={scrollRef} style={{ height: 32, overflow: "auto" }}>
+      <section aria-label="할 일 목록" ref={scrollRef} style={{ height: 96, overflow: "auto" }}>
         <ul
           style={{
             height: virtualizer.getTotalSize(),
@@ -78,6 +78,7 @@ export function TaskList() {
                 ref={virtualizer.measureElement}
                 style={{
                   left: 0,
+                  minHeight: virtualItem.size,
                   position: "absolute",
                   top: 0,
                   transform: `translateY(${virtualItem.start}px)`,
