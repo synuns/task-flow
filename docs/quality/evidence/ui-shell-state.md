@@ -7,7 +7,7 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
 
 - Branch: `feat/ui-shell-state`
 - Implementation commits: `285614b`, `819d0b8`
-- Verification target: `819d0b8`
+- Verification target: `e52890f`
 - Task owner: Codex `/root`, 2026-09-01
 - Parallel implementers: `/root/ui_shell`, `/root/ui_state`; isolated worktrees and
   disjoint file ownership
@@ -32,6 +32,9 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
   src/widgets/user-profile/user-profile.test.tsx` — 5 files, 15 tests PASS.
 - Integrated quick: `./scripts/verify quick` — setup hook 86 tests, verifier contract 18,
   format, lint, OpenAPI type check, TypeScript, 38 Vitest files/132 tests PASS.
+- Final full after TODO completion transition: `./scripts/verify full` — the same setup/quick
+  gates, production build, four Golden Journey Chromium core cases 5/5, verifier regression
+  19 tests PASS. Build emitted only the pre-existing Vite chunk-size advisory.
 - `git diff --check` PASS; no dependency, API, auth, cache, route, architecture, or
   `assignment-original/` change.
 
@@ -73,13 +76,27 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
   the expression was corrected immediately and returned the expected computed accent colors.
   This was not a product failure.
 
-## Task reviews
+## Task and plan-completion reviews
 
 - Shell reviewer: initial Important `TEST` finding for redundant focus utilities; corrected
   to a final test-only diff. Re-review: no Critical, Important, or Minor findings; Approved.
 - State reviewer: initial Important architecture/YAGNI finding for unused `AsyncEmpty`;
   removed and replaced with domain-local empty characterization. Re-review: no code finding;
   one ignored-report wording Minor was corrected; Approved.
-- Plan-completion and whole-branch review: pending before the final TODO completion transition.
+- Review target: `52d200f..e52890f`; `UI-SHELL-01`, `UI-STATE-01`, applicable backlog
+  plan and UI design specifications.
+- Reviewer: `/root/final_ui_review`; implementation과 이전 task review에 참여하지 않은
+  fresh read-only reviewer.
+- Checks: plan acceptance, negative paths, navigation/auth/current-route invariants,
+  responsive/keyboard accessibility, icon mapping, shared-state/YAGNI boundary, tests,
+  browser evidence, console/network, unrelated scope, dependencies, API/auth/cache invariants,
+  evidence와 TODO consistency.
+- Findings: final target에서 Critical, Important, Minor 없음. 이전 Minor `TEST` icon
+  mapping coverage는 최종 교정으로 해결.
+- Corrections: anonymous dashboard/task/login icon을 각 named link에 연결해 assert하고,
+  authenticated profile의 `lucide-circle-user-round`를 assert함.
+- Rerun: shell/router 2 files/8 tests, fresh quick 38 files/132 tests, final full build/core
+  E2E/verifier regression PASS.
+- Verdict: PASS; Ready to merge: Yes.
 
 This evidence does not mark a Golden Journey `HUMAN_APPROVED` checkpoint or final acceptance.
