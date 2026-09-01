@@ -673,7 +673,7 @@
   `assignment-original/` diff 없음; Verdict: PASS. Journey `HUMAN_APPROVED`나 최종
   사람 acceptance를 뜻하지 않음
 
-### [ ] UI-SHELL-01 반응형 application shell
+### [x] UI-SHELL-01 반응형 application shell
 
 - Requirements: `NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`
 - Risk: LOW — 기존 router/auth action의 presentation
@@ -685,10 +685,33 @@
   src/app/router.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, `/sign-in`, `/task`, `/task/task-1`, `/user`, 두 viewport,
   keyboard navigation, computed Pretendard, console/page error와 예상 밖 network 없음
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-shell-state`,
+  final correction code target `970d7df`, full-verification target `29c927f`; 기존 shell
+  production을 재사용하고 Tab order,
+  auth action 상호 배타,
+  current route와 named link별 distinct Lucide icon을 characterization함. Integrated focused
+  5 files/15 tests, final shell/router 2 files/8 tests와 quick 38 files/132 tests PASS;
+  agent-browser `ui-shell-desktop` 1280x720와 `ui-shell-mobile` 390x844에서 다섯 route,
+  224px sidebar, 48px mobile target, no overflow, Pretendard, hover, 2px focus ring,
+  current/auth action과 distinct icon 확인, errors `[]`, session 종료; 상세 기록
+  `docs/quality/evidence/ui-shell-state.md`. Review target: `52d200f..e52890f`;
+  Reviewer: 구현·이전 task review와 분리된 fresh read-only `/root/final_ui_review`;
+  Checks: plan acceptance, navigation/auth/current-route, responsive/keyboard/icon,
+  test·browser·console/network·scope·TODO consistency; Findings: final Critical/Important/Minor
+  없음; Corrections: reviewer의 초기 redundant focus style, icon mapping coverage findings를
+  production 확장 없이 교정; Rerun: shell/router 2 files/8 tests와 quick 38 files/132 tests
+  및 final full build/core 5/5/verifier regression PASS; Verdict: PASS. Golden Journey
+  `HUMAN_APPROVED`나 최종 acceptance가 아님. Final design correction RED는 Lucide
+  24px를 재현했고 `size={20}` GREEN 후 shell/router 2 files/8 tests, quick 38 files/132
+  tests PASS; agent-browser 390x844에서 anonymous/authenticated 네 icon 20x20, target 48px,
+  width 390, errors `[]` 확인. Review target: `5cd937f..53d1a16`; Reviewer: correction을
+  작성하지 않은 read-only second-pass `/root/final_adversarial_review_2`; Checks: 20px
+  named icon mapping, RED/GREEN, mobile computed size/target/overflow/errors, 48px oracle와
+  target provenance; Findings: Critical/Important/Minor 없음; Corrections: 추가 없음;
+  Rerun: reviewer가 owner focused/quick와 browser evidence 검사; Verdict: PASS
 
-### [ ] UI-STATE-01 공통 비동기 상태 표현
+### [x] UI-STATE-01 공통 비동기 상태 표현
 
 - Requirements: loading, empty, recoverable error, success 공통 invariant
 - Risk: LOW
@@ -701,8 +724,20 @@
   `./scripts/verify quick`
 - Browser verification: 적용 없음 — shared semantic contract는 component test로
   검증하고 실제 `/`, `/user` browser 상태는 `DASHBOARD-VIEW-01`, `PROFILE-VIEW-01`이 소유
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-shell-state`,
+  target `e52890f`; missing `async-state` import RED 후 dashboard/profile 두 실제 소비자가
+  공유하는 `AsyncLoading` live status와 `AsyncError` alert/retry만 구현하고, unused
+  `AsyncEmpty`는 review에서 제거하며 dashboard zero-task Card를 domain-local empty
+  상태로 characterization함. Integrated focused 5 files/15 tests, final quick 38 files/132
+  tests PASS; 상세 기록 `docs/quality/evidence/ui-shell-state.md`. Review target:
+  `52d200f..e52890f`; Reviewer: 구현·이전 task review와 분리된 fresh read-only
+  `/root/final_ui_review`; Checks: plan acceptance, shared consumer/YAGNI, state semantics,
+  tests·scope·dependency·API/auth/cache·evidence·TODO consistency; Findings: final
+  Critical/Important/Minor 없음; Corrections: reviewer의 unused empty abstraction finding과
+  보고 wording 교정; Rerun: focused shell/router 2 files/8 tests, quick 38 files/132 tests와
+  final full build/core 5/5/verifier regression PASS; Verdict: PASS. Golden Journey
+  `HUMAN_APPROVED`나 최종 acceptance가 아님
 
 ## 3. auth-entry Journey
 

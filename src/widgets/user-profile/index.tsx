@@ -1,13 +1,5 @@
 import { getUser, useApiClient } from "@/shared/api";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
-  Card,
-  CardContent,
-  Skeleton,
-} from "@/shared/ui";
+import { AsyncError, AsyncLoading, Card, CardContent, Skeleton } from "@/shared/ui";
 import { useQuery } from "@tanstack/react-query";
 import { userKeys } from "./model/user-keys";
 
@@ -23,23 +15,19 @@ export function UserProfile() {
 
   if (query.isPending) {
     return (
-      <div className="max-w-2xl" role="status">
-        <span className="sr-only">회원정보를 불러오고 있습니다.</span>
+      <AsyncLoading className="max-w-2xl" message="회원정보를 불러오고 있습니다.">
         <Skeleton className="h-40" />
-      </div>
+      </AsyncLoading>
     );
   }
   if (query.isError) {
     return (
-      <Alert className="max-w-2xl" variant="destructive">
-        <AlertTitle>회원정보를 불러오지 못했습니다.</AlertTitle>
-        <AlertDescription>
-          <p>{errorMessage(query.error)}</p>
-          <Button onClick={() => void query.refetch()} size="sm" type="button" variant="outline">
-            다시 불러오기
-          </Button>
-        </AlertDescription>
-      </Alert>
+      <AsyncError
+        className="max-w-2xl"
+        message={errorMessage(query.error)}
+        onRetry={() => void query.refetch()}
+        title="회원정보를 불러오지 못했습니다."
+      />
     );
   }
 

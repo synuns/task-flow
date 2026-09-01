@@ -1,10 +1,8 @@
 import { dashboardKeys } from "@/entities/dashboard";
 import { getDashboard, useApiClient } from "@/shared/api";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
+  AsyncError,
+  AsyncLoading,
   Card,
   CardContent,
   CardDescription,
@@ -30,23 +28,18 @@ export function DashboardSummary() {
 
   if (query.isPending) {
     return (
-      <div role="status">
-        <span className="sr-only">업무 현황을 불러오고 있습니다.</span>
+      <AsyncLoading message="업무 현황을 불러오고 있습니다.">
         <Skeleton className="h-64 rounded-xl" />
-      </div>
+      </AsyncLoading>
     );
   }
   if (query.isError) {
     return (
-      <Alert variant="destructive">
-        <AlertTitle>업무 현황을 불러오지 못했습니다.</AlertTitle>
-        <AlertDescription>
-          <p>{errorMessage(query.error)}</p>
-          <Button onClick={() => void query.refetch()} size="sm" type="button" variant="outline">
-            다시 불러오기
-          </Button>
-        </AlertDescription>
-      </Alert>
+      <AsyncError
+        message={errorMessage(query.error)}
+        onRetry={() => void query.refetch()}
+        title="업무 현황을 불러오지 못했습니다."
+      />
     );
   }
 
