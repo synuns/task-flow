@@ -1263,7 +1263,7 @@ src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify qui
   rejection supplied failure UI proof; no product change. Full evidence:
   `docs/quality/evidence/work-overview.md#dashboard-view-01`
 
-### [ ] PROFILE-VIEW-01 회원정보 화면
+### [x] PROFILE-VIEW-01 회원정보 화면
 
 - Requirements: `USER-01`
 - Risk: LOW — 검증된 profile data의 presentation
@@ -1275,8 +1275,16 @@ src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify qui
 src/widgets/user-profile/user-profile.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/user`, 두 viewport, fixture name/memo, state, bearer request,
   console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `/root/work_task2_profile`; code target
+  `86adb3b3daf506b9a5d54fb89448d1d2e3875f41`; focused profile/API 2 files/4 tests,
+  quick 38 files/149 tests, mapped Playwright 1 Chromium test PASS. Independent
+  authenticated browser fixture at 1280x720/390x844 recorded exact
+  `이름/김담당`, `메모/오늘도 차근차근`, one Card, no overflow, bearer-only MSW 200,
+  alert/retry recovery, empty post-recovery page errors, and successful named-session
+  close. MSW route-abort bypass was TOOLING; temporary browser-only query interception
+  was removed before retry, with no product/test source change. Full evidence:
+  `docs/quality/evidence/work-overview.md#profile-view-01`.
 
 ### [ ] WORK-NAV-RESPONSIVE-01 인증 후 route navigation 검증
 

@@ -68,3 +68,16 @@ the locator/request correction; no remaining requirement omission, auth/cache le
 OAS shape mismatch, navigation/accessibility gap or unexpected duplicate request remained
 in the implementation self-check. The prior review note had no reviewer or target commit
 and does not count as an independent review
+
+## PROFILE-VIEW-01
+
+Requirement/Journey: `USER-01`; `work-overview`
+Code target: `86adb3b3daf506b9a5d54fb89448d1d2e3875f41`
+Session/branch: `/root/work_task2_profile`; `feat/work-overview-loop`
+Automatic checks: `pnpm vitest run src/widgets/user-profile/user-profile.test.tsx src/shared/api/user.test.ts` — PASS, 2 files/4 tests; `./scripts/verify quick` — PASS, setup Python 86 + verifier 19, format, lint, typecheck, Vitest 38 files/149 tests; `pnpm exec playwright test e2e/work-overview.spec.ts` — PASS, 1 Chromium test. The first mapped-E2E invocation found this task's Vite server using port 4173; after closing that owned server, the fresh Playwright server passed without product changes.
+Browser precondition/actions: started Vite with `pnpm dev --host 127.0.0.1 --port 4173`; named agent-browser session `profile-view-01` opened `/sign-in`, installed the approved refresh-cookie/session fixture, and navigated to `/user`. Fixture bootstrap issued refresh then user access and made no `/api/sign-in` request.
+Desktop actual (1280x720): fresh interactive snapshot exposed `대시보드`, `할 일`, `회원정보`; DOM rows were `이름/김담당` and `메모/오늘도 차근차근`; one `[data-slot=card]`; `scrollWidth=1280`, `innerWidth=1280`. Screenshot: `/tmp/kbhc-profile-view-01-desktop.png`.
+Mobile actual (390x844): fresh snapshot retained the three navigation links; one Card; `scrollWidth=390`, `innerWidth=390`, so no horizontal overflow. Screenshot: `/tmp/kbhc-profile-view-01-mobile.png`.
+API observation: browser request log after recovery recorded repeated `GET http://127.0.0.1:4173/api/user (fetch)` entries. MSW console recorded `GET /api/user` 200 with the exact fixture body; its handler accepts 200 only when `Authorization` is bearer. The mapped Playwright run explicitly asserted the `/api/user` request header starts with `Bearer `.
+Failure/retry: prescribed `agent-browser network route '**/api/user' --abort` followed by reload still rendered profile success and no alert because the MSW service worker handled the request first. The route was removed. A temporary browser-only TanStack Query query-function rejection then produced the recoverable alert `회원정보를 불러오지 못했습니다.네트워크 요청에 실패했습니다.다시 불러오기` and its `다시 불러오기` button. The original query function was restored before clicking retry; retry returned the exact two rows and `alert: null`.
+Failure class/correction: `TOOLING` — agent-browser route interception cannot abort MSW service-worker-owned traffic. No product or test source changed. The temporary browser-only interception was removed before retry. Post-recovery console contained only MSW's user 200 log, `agent-browser errors` was empty, and `agent-browser --session profile-view-01 close` returned `✓ Browser closed`. Verdict: PASS.
