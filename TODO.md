@@ -1286,7 +1286,7 @@ src/widgets/user-profile/user-profile.test.tsx`, `./scripts/verify quick`
   was removed before retry, with no product/test source change. Full evidence:
   `docs/quality/evidence/work-overview.md#profile-view-01`.
 
-### [ ] WORK-NAV-RESPONSIVE-01 인증 후 route navigation 검증
+### [x] WORK-NAV-RESPONSIVE-01 인증 후 route navigation 검증
 
 - Requirements: `SYS-03`, `NAV-01`, `NAV-03`
 - Risk: MEDIUM — 세 route의 shell/content 통합
@@ -1300,8 +1300,8 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/` → `/user` → `/task` → `/`, 390x844/1280x720,
   current route, keyboard, font, console/network
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `/root/work_task3_nav`; start SHA `73b5050f8aa317574e63fe2ddcc4b6dd9f4de972`; focused shell/router/theme 3 files/12 tests, quick 38 files/149 tests, mapped Chromium 1 test PASS. Authenticated `/` → `/user` → `/task` → `/` desktop snapshots verified each `aria-current`, Pretendard, and 224px header; fresh mobile document verified 48px distinct-icon actions, fixed bottom header, 390px no-overflow, and Tab `대시보드` → `할 일` → `회원정보`. Final console/page-error buffers were empty, network monitor emitted `No requests captured` under MSW, screenshot and close succeeded. Full evidence: `docs/quality/evidence/work-overview.md#work-nav-responsive-01`.
 
 ### [ ] WORK-JOURNEY-VERIFY-01 work-overview 통합 검증
 

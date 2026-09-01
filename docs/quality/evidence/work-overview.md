@@ -1,5 +1,18 @@
 # Work Overview Evidence
 
+## WORK-NAV-RESPONSIVE-01
+
+Requirement/Journey: `SYS-03`, `NAV-01`, `NAV-03`; `work-overview`
+Target commit: `73b5050f8aa317574e63fe2ddcc4b6dd9f4de972`
+Session/branch: `/root/work_task3_nav`; `feat/work-overview-loop`
+Automatic checks: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx src/app/router.test.tsx src/test/theme-contract.test.ts` — PASS, 3 files/12 tests; `./scripts/verify quick` — PASS, setup Python 86 + verifier 19, format, lint, typecheck, Vitest 38 files/149 tests; mapped `pnpm exec playwright test e2e/work-overview.spec.ts` — PASS, 1 Chromium test.
+Browser precondition/actions: Vite `pnpm dev --host 127.0.0.1 --port 4173`; named agent-browser session `work-nav-responsive-01`; seeded the approved refresh-cookie/session fixture at `/sign-in`, then navigated to `/`. Fresh interactive snapshots were taken at desktop `/`, `/user`, `/task`, and return `/`, then at mobile `/`.
+Desktop actual (1280x720): exact route sequence `/` → `/user` → `/task` → `/`; each snapshot exposed `대시보드`, `할 일`, and `회원정보` (the task snapshot also exposed the three task links). `a[aria-current=page]` returned, in order, `대시보드`, `회원정보`, `할 일`, `대시보드`; computed font was `Pretendard, ui-sans-serif, system-ui, sans-serif`; desktop header width was `224px`.
+Mobile actual (390x844): a fresh document had `BODY` focus; Tab order was `대시보드` → `할 일` → `회원정보`. `scrollWidth=390`, `innerWidth=390`; header was `position: fixed`, `bottom: 0px`; each navigation link measured `48px` high. Icon classes were respectively `lucide lucide-layout-dashboard`, `lucide lucide-list-todo`, and `lucide lucide-circle-user-round`, proving three distinct Lucide icons. Screenshot: `/tmp/kbhc-work-nav-responsive-01-mobile.png`.
+Console/network/errors: after the authenticated bootstrap, cleared final browser buffers produced `No requests captured` for `network requests --filter api` (MSW service-worker traffic is not captured by that monitor), and both `console` and `errors` produced no output. `agent-browser --session work-nav-responsive-01 close` returned `✓ Browser closed`.
+Failure/retry: a first mobile Tab sequence inherited focus from the preceding dashboard-link click and therefore began at `할 일`. This was a test-state observation, not a product failure. Reloading the same authenticated route established `BODY` focus and reran the prescribed order as `대시보드` → `할 일` → `회원정보`.
+Failure class/correction: `TEST` — browser focus was not reset after navigation. No product or test source changed; fresh-document keyboard evidence replaced the inherited-focus observation. Rerun verdict: PASS.
+
 ## DASHBOARD-VIEW-01
 
 Requirement/Journey: `DASH-01`; `work-overview`
