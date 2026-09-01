@@ -7,7 +7,9 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
 
 - Branch: `feat/ui-shell-state`
 - Implementation commits: `285614b`, `819d0b8`
-- Verification target: `e52890f`
+- Implementation/browser/plan-review target: `e52890f`
+- First completed-state full-verification target: `5cd937f`
+- Final design-correction code target: `970d7df`
 - Task owner: Codex `/root`, 2026-09-01
 - Parallel implementers: `/root/ui_shell`, `/root/ui_state`; isolated worktrees and
   disjoint file ownership
@@ -57,13 +59,31 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
 ## Mobile browser verification
 
 - Route/viewport: the same anonymous/authenticated route sweep; 390x844.
-- Expected: bottom navigation remains visible, targets are at least 44px, current/focus is
+- Expected: bottom navigation remains visible, targets are at least 48px, current/focus is
   distinguishable, and there is no horizontal clipping.
 - Actual: all three navigation targets measured 48px high; document and viewport widths were
   both 390px on all routes; anonymous sign-in main ended above the bottom navigation; current
   actions matched each route; keyboard focus retained the 2px dark-gold ring and Pretendard;
   the three distinct icons and visible labels remained legible.
 - Screenshot: `/tmp/kbhc-ui-shell-mobile.png`.
+
+## Final design correction
+
+- Source: fresh final adversarial review of `52d200f..5cd937f`.
+- Finding: mobile navigation icons used Lucide's 24px default while the approved design
+  specifies a 20px baseline.
+- RED: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx` — both anonymous and
+  authenticated cases failed with expected `height="20"`, received `height="24"`.
+- GREEN: set the existing Lucide `size` prop to 20 for dashboard, task, and dynamic auth
+  icons. `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx src/app/router.test.tsx`
+  — 2 files, 8 tests PASS; `./scripts/verify quick` — 38 files, 132 tests PASS.
+- Browser: `ui-shell-icon-correction`, 390x844. Anonymous dashboard/task/login and
+  authenticated profile SVGs computed 20x20; every target remained 48px; document width and
+  viewport were both 390px; page errors were `[]`; screenshot
+  `/tmp/kbhc-ui-shell-icon-20px-mobile.png`; session closed.
+- `TOOLING`: the first authenticated profile-size `agent-browser eval` expression was
+  malformed. A simpler expression immediately reproduced the intended 20x20 result; this was
+  not a product failure.
 
 ## Console, network, and failures
 
