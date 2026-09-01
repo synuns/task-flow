@@ -408,6 +408,88 @@
   Pretendard, font/worker network와 console/page error 재확인; 상세 기록
   `docs/quality/evidence/frontend-scaffolding.md`
 
+### [ ] SCF-RUNTIME-01 제출 preview mock 실행
+
+- Requirements: `SYS-04`
+- Risk: HIGH — 제출 실행 방식과 API 대체 구현 활성화 범위
+- Depends on: `SCF-04`
+- Deliverable: production build에서도 시작되는 MSW와 build/preview Playwright harness
+- Acceptance: `pnpm build && pnpm preview`에서 worker가 준비되고 보호 API가 mock
+  응답을 반환하며 Playwright가 development server를 사용하지 않는다.
+- Automatic verification: harness Vitest, `pnpm build`, `./scripts/verify quick`
+- Browser verification: production preview `/sign-in`과 보호 route, worker/network,
+  console/page error
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root`; 사용자 리뷰 1번 수정 명시 승인;
+  `docs/superpowers/specs/2026-09-01-review-findings-corrections-design.md`와 구현 계획;
+  최신 `b11fac7` 기준 `./scripts/verify quick` PASS
+
+### [ ] E2E-SMOKE-01 전체 smoke 현재 계약 정합화
+
+- Requirements: 전체 route와 `SYS-03`, `SYS-04`
+- Risk: LOW — stale 검증 기대값 교정
+- Depends on: `SCF-RUNTIME-01`
+- Deliverable: 현재 인증 경계·heading·예상 console을 검증하는 전체 smoke
+- Acceptance: 모든 tracked Playwright test가 production preview에서 통과하고 stale
+  anonymous protected-route 또는 이전 heading 기대값이 없다.
+- Automatic verification: `pnpm exec playwright test`, `./scripts/verify quick`
+- Browser verification: `/sign-in`, `/`, `/task`, `/task/task-1`, `/user`
+- Status: NOT_STARTED
+- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 2번 수정 명시 승인
+
+### [ ] TASK-PAGE-EMPTY-01 빈 중간 page pagination 복구
+
+- Requirements: `TASK-LIST-04`
+- Risk: MEDIUM — infinite pagination 종료 판정
+- Depends on: `TASK-PAGE-03`
+- Deliverable: empty `data`와 true `hasNext` 조합의 next-page 진행
+- Acceptance: 빈 중간 page 뒤 다음 data가 렌더되고 false terminal page에서만 멈춘다.
+- Automatic verification: task-list focused Vitest, `./scripts/verify quick`
+- Browser verification: 적용 가능한 mock fixture가 있으면 `/task` request sequence 확인
+- Status: NOT_STARTED
+- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 4번 수정 명시 승인
+
+### [ ] API-CANCEL-01 query AbortSignal 전파
+
+- Requirements: `DASH-01`, `USER-01`, `TASK-LIST-01`, `TASK-DETAIL-01`
+- Risk: LOW — read request 취소 전파
+- Depends on: `ARCH-03`
+- Deliverable: 네 TanStack Query read 경로의 `AbortSignal` 전달
+- Acceptance: query가 취소되면 dashboard, user, task list, task detail API request가
+  같은 signal을 받아 중단 가능하다.
+- Automatic verification: API/widget/page focused Vitest, `./scripts/verify quick`
+- Browser verification: 일반 route 회귀 확인
+- Status: NOT_STARTED
+- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 5번 수정 명시 승인
+
+### [ ] MOCK-PAGE-VALIDATION-01 task page query 검증
+
+- Requirements: `SYS-04`, `TASK-LIST-01`
+- Risk: HIGH — OpenAPI에 명시되지 않은 invalid query mock 응답 확정
+- Depends on: `SCF-03`, `TASK-PAGE-01`
+- Deliverable: `page` trust-boundary validation과 400 `ErrorResponse`
+- Acceptance: 누락, 0, 음수, 소수, 비숫자 page는 400 errorMessage이고 1 이상의
+  정수만 기존 page 응답을 받는다.
+- Automatic verification: handler focused Vitest, `./scripts/verify quick`
+- Browser verification: 적용 없음 — invalid parameter contract integration test가 직접 검증
+- Status: NOT_STARTED
+- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 6번 수정 명시 승인
+
+### [ ] REVIEW-CORRECTIONS-01 리뷰 교정 계획 완료 적대적 review
+
+- Requirements: 위 다섯 task의 requirements
+- Risk: MEDIUM — 교정 누락과 회귀 검출
+- Depends on: `SCF-RUNTIME-01`, `E2E-SMOKE-01`, `TASK-PAGE-EMPTY-01`,
+  `API-CANCEL-01`, `MOCK-PAGE-VALIDATION-01`
+- Deliverable: exact target diff의 요구사항·test·browser·범위 review record
+- Acceptance: finding마다 분류·root cause·correction·rerun이 있고 unresolved
+  HIGH/MEDIUM finding이 없다.
+- Automatic verification: 영향 focused test, `./scripts/verify quick`,
+  `./scripts/verify full`, `git diff --check`
+- Browser verification: production preview route/network/console 재검증
+- Status: NOT_STARTED
+- Evidence: 2026-09-01 Codex `/root` task block owner
+
 ### [x] SCF-05 KB올라케어 semantic color theme
 
 - Requirements: `SYS-02`
