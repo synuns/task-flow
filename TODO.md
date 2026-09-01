@@ -455,7 +455,7 @@
   package 없음; baseline `./scripts/verify quick` PASS — format, lint, typecheck,
   Vitest 34 files/122 tests; 이 결정은 Golden Journey `HUMAN_APPROVED`가 아님
 
-### [ ] UI-IMPLEMENT-01 Focus workspace 반응형 화면 구현
+### [x] UI-IMPLEMENT-01 Focus workspace 반응형 화면 구현
 
 - Requirements: `NAV-01`~`NAV-03`, `DASH-01`, `AUTH-01`~`AUTH-06`,
   `TASK-LIST-01`~`TASK-LIST-05`, `TASK-DETAIL-01`~`TASK-DETAIL-05`, `USER-01`,
@@ -471,10 +471,23 @@
 - Automatic verification: focused unit/component/integration tests,
   `./scripts/verify quick`, plan-completion adversarial review, `./scripts/verify full`
 - Browser verification: agent-browser desktop/mobile evidence와 기존 네 `@core` Journey
-- Status: IN_PROGRESS
-- Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-focus` isolated
-  worktree; Task 1 primitive public contract RED — `Button` export 부재로 focused Vitest
-  1 failed
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-focus`, target
+  `3011147e340c05efcbc2940ea2905dd0e2028125`; approved 9개 shadcn/ui primitive와
+  Ocare Yellow semantic palette, single-summary dashboard, 224px desktop sidebar,
+  icon·label mobile navigation, responsive virtual task list, sign-in/profile/detail/delete
+  상태 구현. `./scripts/verify full` PASS — hook 86, contract 18, 35 Vitest files/126
+  tests, build, Chromium core 5/5, verifier regression 19. Agent-browser 1280×800와
+  390×844에서 content 960px, 48px mobile target, dark-gold active indicator,
+  reduced-motion, dialog clipping/exact-ID/focus 복원을 확인하고 session 종료.
+  Review target: `3011147e340c05efcbc2940ea2905dd0e2028125`; Reviewer: 구현과 분리된 read-only
+  `/root/ui_plan_review`; Checks: 승인 spec/plan, dependency/API/auth/cache/delete 범위,
+  다섯 route, 네 Journey, desktop/mobile와 E2E bounded virtualization; Findings: 최종
+  target Critical/Important/Minor 없음; Corrections: 초기 dashboard/list/shell drift와
+  loading/error/shadow LOW findings 교정; Rerun: focused tests, quick, core 5/5, full,
+  `git diff --check` PASS; Verdict: PASS — unresolved HIGH/MEDIUM 없음. 상세 재현 기록은
+  `docs/quality/evidence/ui-focus.md`; Golden Journey `HUMAN_APPROVED`와 최종 사람
+  acceptance는 별도임
 
 ## 2. 애플리케이션 구조·공통 경계
 
