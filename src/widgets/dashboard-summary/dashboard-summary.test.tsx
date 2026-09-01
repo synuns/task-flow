@@ -42,13 +42,15 @@ describe("DashboardSummary", () => {
     expect(screen.getByRole("status")).toHaveTextContent("업무 현황을 불러오고 있습니다.");
     release();
 
-    expect(await screen.findByText("전체 할 일")).toBeInTheDocument();
+    expect(await screen.findByText("오늘의 업무 현황")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "3개 중 2개가 남았습니다" })).toBeInTheDocument();
+    expect(screen.getByText("1 / 3 완료")).toBeInTheDocument();
     expect(screen.getByText("전체 할 일").nextElementSibling).toHaveTextContent("3");
     expect(screen.getByText("남은 할 일").nextElementSibling).toHaveTextContent("2");
     expect(screen.getByText("완료한 일").nextElementSibling).toHaveTextContent("1");
     expect(screen.getByRole("progressbar", { name: "업무 완료율" })).toHaveAttribute(
       "aria-valuenow",
-      "33",
+      "33.33333333333333",
     );
   });
 
@@ -66,7 +68,7 @@ describe("DashboardSummary", () => {
     };
     render(<DashboardSummary />, { wrapper: wrapper(client) });
 
-    expect(await screen.findByText("아직 등록된 할 일이 없습니다.")).toBeInTheDocument();
+    expect(await screen.findByText("등록된 할 일이 없습니다")).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "업무 완료율" })).toHaveAttribute(
       "aria-valuenow",
       "0",
@@ -86,7 +88,7 @@ describe("DashboardSummary", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("네트워크 요청에 실패했습니다.");
     await user.click(screen.getByRole("button", { name: "다시 불러오기" }));
 
-    expect(await screen.findByText("전체 할 일")).toBeInTheDocument();
+    expect(await screen.findByText("오늘의 업무 현황")).toBeInTheDocument();
     expect(request).toHaveBeenCalledTimes(2);
   });
 });

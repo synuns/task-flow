@@ -48,7 +48,7 @@ test("@core @task-resolution deletes only after exact confirmation and refreshes
   await expect(page.getByText("두 번째 할 일")).toBeVisible();
 
   await page.goto("/task/task-1");
-  await expect(page.getByRole("alert")).toContainText("할 일을 찾을 수 없습니다.");
+  await expect(page.getByText("할 일을 찾을 수 없습니다.", { exact: true })).toHaveCount(1);
   await expect(page.getByRole("link", { name: "할 일 목록으로 이동" })).toBeVisible();
   await page.getByRole("link", { name: "대시보드" }).click();
   await expect(page.getByText("전체 할 일").locator("xpath=following-sibling::dd")).toHaveText("2");

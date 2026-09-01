@@ -8,7 +8,7 @@ export function TaskCard({ id, title, memo }: TaskCardProps) {
   return (
     <article className="h-full p-1">
       <Link className="block h-full rounded-xl" to={`/task/${encodeURIComponent(id)}`}>
-        <Card className="h-full gap-2 py-3 transition-colors hover:border-ring hover:bg-accent/40">
+        <Card className="h-full gap-2 py-3 shadow-none transition-colors hover:border-ring hover:bg-accent/40">
           <CardContent className="grid h-full grid-cols-[1fr_auto] items-center gap-4">
             <div className="min-w-0">
               <h2 className="truncate font-semibold">{title}</h2>

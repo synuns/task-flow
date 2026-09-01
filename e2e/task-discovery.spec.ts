@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
 test("@core @task-discovery loads terminal pages into a bounded virtual list", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 400 });
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   const signInRequests: string[] = [];

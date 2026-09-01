@@ -88,8 +88,12 @@ export function TaskList() {
   }
 
   return (
-    <div className="grid gap-3">
-      <section aria-label="할 일 목록" className="h-48 overflow-auto" ref={scrollRef}>
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <section
+        aria-label="할 일 목록"
+        className="min-h-0 flex-1 overflow-auto rounded-xl"
+        ref={scrollRef}
+      >
         <ul
           className="relative m-0 list-none p-0"
           style={{
@@ -122,8 +126,24 @@ export function TaskList() {
       </section>
       {query.isError && query.data && (
         <Alert variant="destructive">
-          <AlertDescription>{errorMessage(query.error)}</AlertDescription>
+          <AlertDescription>
+            <p>{errorMessage(query.error)}</p>
+            <Button
+              onClick={() => void query.fetchNextPage()}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              다시 불러오기
+            </Button>
+          </AlertDescription>
         </Alert>
+      )}
+      {query.isFetchingNextPage && (
+        <div className="grid gap-2" role="status">
+          <span className="sr-only">다음 할 일을 불러오고 있습니다.</span>
+          <Skeleton className="h-24" />
+        </div>
       )}
       {query.hasNextPage && (
         <Button

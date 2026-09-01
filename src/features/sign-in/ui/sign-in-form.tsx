@@ -82,7 +82,11 @@ export function SignInForm({ onAuthenticated }: SignInFormProps) {
             <div className="grid gap-2">
               <Label htmlFor="sign-in-password">비밀번호</Label>
               <Input
-                aria-describedby={errors.password ? "sign-in-password-error" : undefined}
+                aria-describedby={
+                  errors.password
+                    ? "sign-in-password-help sign-in-password-error"
+                    : "sign-in-password-help"
+                }
                 aria-invalid={errors.password ? "true" : "false"}
                 autoComplete="current-password"
                 className="h-11"
@@ -92,6 +96,9 @@ export function SignInForm({ onAuthenticated }: SignInFormProps) {
                   validate: (value) => validationMessage("password", value),
                 })}
               />
+              <p className="text-muted-foreground text-sm" id="sign-in-password-help">
+                8~24자의 영문과 숫자를 입력하세요.
+              </p>
               {errors.password && (
                 <p className="text-destructive text-sm" id="sign-in-password-error">
                   {errors.password.message}

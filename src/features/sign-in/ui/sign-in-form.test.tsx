@@ -27,12 +27,15 @@ describe("SignInForm", () => {
     expect(email).toHaveAttribute("data-slot", "input");
     expect(submit).toHaveAttribute("data-slot", "button");
     expect(submit).toBeDisabled();
+    expect(password).toHaveAccessibleDescription("8~24자의 영문과 숫자를 입력하세요.");
 
     await user.type(email, "invalid");
     await user.type(password, "Password!");
 
     expect(email).toHaveAccessibleDescription("올바른 이메일을 입력해주세요.");
-    expect(password).toHaveAccessibleDescription("비밀번호는 영문과 숫자로만 입력해주세요.");
+    expect(password).toHaveAccessibleDescription(
+      "8~24자의 영문과 숫자를 입력하세요. 비밀번호는 영문과 숫자로만 입력해주세요.",
+    );
     expect(submit).toBeDisabled();
   });
 

@@ -83,7 +83,8 @@ describe("app router", () => {
     const navigation = screen.getByRole("navigation", { name: "주요 메뉴" });
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
     expect(navigation.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(3);
-    expect(screen.getByText("오케어 업무")).toBeInTheDocument();
+    expect(screen.getByText("업무 관리")).toBeInTheDocument();
+    expect(screen.queryByText("오늘의 목표에 집중하세요.")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "할 일" })).toHaveAttribute("href", "/task");
     if (kind === "authenticated") {
@@ -96,10 +97,9 @@ describe("app router", () => {
     }
 
     const currentLabel = path.startsWith("/task") ? "할 일" : heading;
-    expect(screen.getByRole("link", { name: currentLabel })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    const currentLink = screen.getByRole("link", { name: currentLabel });
+    expect(currentLink).toHaveAttribute("aria-current", "page");
+    expect(currentLink).toHaveClass("bg-primary/35", "before:bg-ring");
   });
 
   it("renders the route error boundary for render failures", async () => {

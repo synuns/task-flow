@@ -7,6 +7,9 @@ import {
   Button,
   Card,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   Progress,
   Skeleton,
 } from "@/shared/ui";
@@ -52,42 +55,43 @@ export function DashboardSummary() {
     );
   }
 
-  const completion = query.data.numOfTask
-    ? Math.round((query.data.numOfDoneTask / query.data.numOfTask) * 100)
-    : 0;
+  const { numOfDoneTask: done, numOfRestTask: rest, numOfTask: total } = query.data;
+  const completion = total ? (done / total) * 100 : 0;
+  const summary = total ? `${total}개 중 ${rest}개가 남았습니다` : "등록된 할 일이 없습니다";
 
   return (
-    <div className="grid gap-4">
-      <dl className="grid gap-3 sm:grid-cols-3">
-        <Card className="gap-2 py-5">
-          <dt className="px-6 text-muted-foreground text-sm">전체 할 일</dt>
-          <dd className="px-6 font-semibold text-3xl tabular-nums">{query.data.numOfTask}</dd>
-        </Card>
-        <Card className="gap-2 py-5">
-          <dt className="px-6 text-muted-foreground text-sm">남은 할 일</dt>
-          <dd className="px-6 font-semibold text-3xl tabular-nums">{query.data.numOfRestTask}</dd>
-        </Card>
-        <Card className="gap-2 py-5">
-          <dt className="px-6 text-muted-foreground text-sm">완료한 일</dt>
-          <dd className="px-6 font-semibold text-3xl tabular-nums">{query.data.numOfDoneTask}</dd>
-        </Card>
-      </dl>
-      <Card className="bg-accent/40">
-        <CardContent className="grid gap-4">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="font-medium">업무 완료율</p>
-              <p className="mt-1 text-muted-foreground text-sm">
-                {query.data.numOfTask === 0
-                  ? "아직 등록된 할 일이 없습니다."
-                  : `${query.data.numOfDoneTask}개의 업무를 완료했습니다.`}
-              </p>
-            </div>
-            <span className="font-semibold text-2xl tabular-nums">{completion}%</span>
+    <Card>
+      <CardHeader>
+        <CardDescription>오늘의 업무 현황</CardDescription>
+        <CardTitle>
+          <h2 className="text-2xl tracking-tight">{summary}</h2>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-5">
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between gap-4 text-sm">
+            <span className="font-medium tabular-nums">
+              {done} / {total} 완료
+            </span>
+            <span className="text-muted-foreground tabular-nums">{Math.round(completion)}%</span>
           </div>
           <Progress aria-label="업무 완료율" value={completion} />
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+        <dl className="grid grid-cols-3 divide-x rounded-lg bg-accent/50 py-3 text-center">
+          <div>
+            <dt className="text-muted-foreground text-xs">전체 할 일</dt>
+            <dd className="mt-1 font-semibold tabular-nums">{total}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-xs">남은 할 일</dt>
+            <dd className="mt-1 font-semibold tabular-nums">{rest}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground text-xs">완료한 일</dt>
+            <dd className="mt-1 font-semibold tabular-nums">{done}</dd>
+          </div>
+        </dl>
+      </CardContent>
+    </Card>
   );
 }

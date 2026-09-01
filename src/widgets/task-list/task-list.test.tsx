@@ -93,10 +93,11 @@ describe("TaskList", () => {
     expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
     releaseFirst();
     expect(await screen.findByText("첫 번째 할 일")).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "할 일 목록" })).toHaveClass("h-48");
+    expect(screen.getByRole("region", { name: "할 일 목록" })).toHaveClass("min-h-0", "flex-1");
     expect(screen.getAllByRole("listitem")[0]).toHaveStyle({ minHeight: "96px" });
     await waitFor(() => expect(requestedPages).toEqual([1, 2]));
     expect(screen.getByRole("button", { name: "다음 페이지 불러오는 중" })).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent("다음 할 일을 불러오고 있습니다.");
     releaseSecond();
 
     expect(await screen.findByText("완료한 일")).toBeInTheDocument();

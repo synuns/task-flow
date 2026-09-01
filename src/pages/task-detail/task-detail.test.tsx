@@ -79,7 +79,8 @@ describe("TaskDetailPage", () => {
 
     renderPage(client, "/task/missing");
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("할 일을 찾을 수 없습니다.");
+    await screen.findByRole("alert");
+    expect(screen.getAllByText("할 일을 찾을 수 없습니다.")).toHaveLength(1);
     expect(screen.getByRole("link", { name: "할 일 목록으로 이동" })).toHaveAttribute(
       "href",
       "/task",

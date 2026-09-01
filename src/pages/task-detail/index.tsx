@@ -42,7 +42,7 @@ export function TaskDetailPage() {
     if (error?.kind === "http" && error.status === 404) {
       return (
         <Alert variant="destructive">
-          <AlertTitle>할 일을 찾을 수 없습니다.</AlertTitle>
+          <AlertTitle>요청한 할 일이 없습니다.</AlertTitle>
           <AlertDescription>
             <p>{error.message}</p>
             <Button asChild size="sm" variant="outline">
