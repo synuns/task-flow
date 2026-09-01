@@ -1033,8 +1033,10 @@
   `./scripts/verify quick`
 - Browser verification: `/task/task-1` 직접 진입 → `/sign-in` → 복귀 → reload,
   390x844/1280x720, route/action, refresh network, console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
+  `feat/auth-entry-loop`; dependency `AUTH-ERROR-VIEW-01` `AI_VERIFIED`; target
+  `AUTH-07`, `NAV-02`, `NAV-03`; initializing/unavailable shell continuity RED 진행 중
 
 ### [ ] AUTH-JOURNEY-VERIFY-01 auth-entry 통합 검증
 
