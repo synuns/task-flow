@@ -1437,3 +1437,491 @@ Provide:
 
 Do not invoke `scripts/publish-ai-record` on the user's behalf. Do not start
 frontend implementation in this session.
+
+## 2026-09-01 Agent Loop Readiness Execution Addendum
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use
+> superpowers:subagent-driven-development or superpowers:executing-plans and
+> execute each checkbox in order.
+
+**Goal:** Make Journey lookup and the existing local/CI verification contract
+deterministic without changing product code, UX, dependencies, or CI provider
+configuration.
+
+**Architecture:** Keep policy and lookup guidance in `AGENTS.md` and
+`docs/quality/verification.md`. Enforce package manager, Playwright verdict,
+fixture/test selection, command execution, and exit status through the existing
+Playwright config, verifier, and contract tests.
+
+**Tech Stack:** Markdown, Python 3 standard library and `unittest`, pnpm
+10.15.1, Playwright 1.62.1, Vitest
+
+### Global Constraints
+
+- Installed and declared `@playwright/test` version is `1.62.1`; do not update dependencies.
+- Because `1.62.1 >= 1.61.0`, use `retries: 1` and `failOnFlakyTests: true` in every environment.
+- If Playwright is later pinned below `1.61.0`, set `retries: 0` and omit unsupported flaky gating instead of upgrading it implicitly.
+- Local and CI use `./scripts/verify full` as the same final verdict.
+- Documents provide entry points and policy; no verifier or contract test may depend on their exact prose.
+- Do not add GitHub Actions, a document index, a generic project-loop skill, product code, UX, or a dependency.
+- Preserve `reuseExistingServer: false` and existing retained failure artifacts.
+
+### Readiness File Map
+
+- `playwright.config.ts`: one retry and flaky verdict for local and CI.
+- `src/test/harness-config.test.ts`: installed-version and environment-independent Playwright contract.
+- `scripts/verify`: required executable files, pnpm stages, read-only and nonzero failure propagation.
+- `tests/test_verify_contract.py`: package manager, fixture, core file/selection, and repository contract.
+- `tests/test_verify.py`: verifier command and exit-status behavior.
+- `AGENTS.md`: shortest pre-change Journey lookup and post-change verification entry point.
+- `docs/quality/verification.md`: Journey-to-code/test map and shared local/CI bootstrap.
+- `TODO.md`: owner, reproducible evidence, and final readiness status.
+
+---
+
+### Task 1: Playwright Retry and Flaky Verdict Contract
+
+**Files:**
+- Modify: `src/test/harness-config.test.ts`
+- Modify: `playwright.config.ts`
+
+**Interfaces:**
+- Consumes: exact `@playwright/test` version from `package.json` and `node_modules/@playwright/test/package.json`
+- Produces: `playwrightConfig.retries === 1` and `playwrightConfig.failOnFlakyTests === true` with or without `CI`
+
+- [ ] **Step 1: Add failing installed-version and local/CI verdict tests**
+
+Add `vi` to the Vitest import, load the declared and installed package records,
+and add these tests to `src/test/harness-config.test.ts`:
+
+```ts
+import { describe, expect, it, vi } from "vitest";
+
+const packageDocument = JSON.parse(
+  readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+) as { devDependencies: Record<string, string> };
+const installedPlaywright = JSON.parse(
+  readFileSync(
+    new URL("../../node_modules/@playwright/test/package.json", import.meta.url),
+    "utf8",
+  ),
+) as { version: string };
+
+it("uses the exact installed Playwright version declared by the project", () => {
+  expect(installedPlaywright.version).toBe(packageDocument.devDependencies["@playwright/test"]);
+  const [major, minor] = installedPlaywright.version.split(".").map(Number);
+  expect(major > 1 || (major === 1 && minor >= 61)).toBe(true);
+});
+
+it("fails flaky tests after one diagnostic retry locally and in CI", async () => {
+  const originalCi = process.env.CI;
+  try {
+    delete process.env.CI;
+    vi.resetModules();
+    const local = (await import("../../playwright.config")).default;
+    process.env.CI = "1";
+    vi.resetModules();
+    const ci = (await import("../../playwright.config")).default;
+
+    const verdict = (config: typeof local) => ({
+      retries: config.retries,
+      failOnFlakyTests: config.failOnFlakyTests,
+    });
+    expect(verdict(local)).toEqual({ retries: 1, failOnFlakyTests: true });
+    expect(verdict(ci)).toEqual(verdict(local));
+  } finally {
+    if (originalCi === undefined) delete process.env.CI;
+    else process.env.CI = originalCi;
+    vi.resetModules();
+  }
+});
+```
+
+- [ ] **Step 2: Run the focused test and confirm the old config fails**
+
+Run:
+
+```bash
+pnpm exec vitest run src/test/harness-config.test.ts --pool=forks --maxWorkers=1
+```
+
+Expected: FAIL because the existing local config has `retries: 0`, the CI
+config has `retries: 2`, and `failOnFlakyTests` is absent.
+
+- [ ] **Step 3: Apply the minimum supported Playwright config**
+
+Replace the environment-dependent retry line in `playwright.config.ts` and add
+the supported flaky gate:
+
+```ts
+  retries: 1,
+  failOnFlakyTests: true,
+```
+
+Keep `reuseExistingServer: false`, `trace: "retain-on-failure"`,
+`screenshot: "only-on-failure"`, and `video: "retain-on-failure"` unchanged.
+
+- [ ] **Step 4: Run focused tests and commit**
+
+Run:
+
+```bash
+pnpm exec vitest run src/test/harness-config.test.ts --pool=forks --maxWorkers=1
+git diff --check
+```
+
+Expected: the harness file passes all tests and `git diff --check` prints nothing.
+
+Commit:
+
+```bash
+git add playwright.config.ts src/test/harness-config.test.ts
+git commit -m "test(e2e): flaky 판정 계약 고정"
+```
+
+---
+
+### Task 2: Executable Verifier Contract
+
+**Files:**
+- Modify: `tests/test_verify_contract.py`
+- Modify: `tests/test_verify.py`
+- Modify: `scripts/verify`
+
+**Interfaces:**
+- Consumes: `packageManager: pnpm@10.15.1`, four core spec paths, `e2e/authenticated-fixture.ts`, and package scripts
+- Produces: setup checks based on files and executable behavior; every frontend stage uses `pnpm run`; any child failure makes verification nonzero
+
+- [ ] **Step 1: Replace prose-marker assertions with failing executable assertions**
+
+Delete `tests/test_verify.py` methods that inspect `REQUIRED_MARKERS` or exact
+documentation wording:
+
+```text
+test_setup_rejects_missing_reviewed_and_legacy_markers
+test_setup_requires_digest_and_auth_evidence_contracts
+test_setup_requires_integrated_journey_contract_markers
+test_setup_requires_plan_completion_review_contract
+test_fsd_creation_constraints_are_recorded
+```
+
+Delete `test_repository_worktree_default_is_recorded` from
+`tests/test_verify_contract.py`. Existing TODO parsing, hook transaction tests,
+architecture contract tests, and review tooling tests retain the executable
+behavior previously described by those documents.
+
+Add these repository contract tests to `tests/test_verify_contract.py`:
+
+```python
+    def test_repository_uses_pinned_pnpm_and_required_core_files(self):
+        verifier = load_verify_module()
+        package = verifier.package_document()
+
+        self.assertEqual(package["packageManager"], "pnpm@10.15.1")
+        for relative in (
+            "pnpm-lock.yaml",
+            "e2e/authenticated-fixture.ts",
+            "e2e/auth-entry.spec.ts",
+            "e2e/work-overview.spec.ts",
+            "e2e/task-discovery.spec.ts",
+            "e2e/task-resolution.spec.ts",
+            "src/mocks/fixtures/auth.ts",
+            "src/mocks/fixtures/tasks.ts",
+        ):
+            with self.subTest(relative=relative):
+                self.assertIn(relative, verifier.REQUIRED_FILES)
+                self.assertTrue((ROOT / relative).is_file())
+
+    def test_protected_core_journeys_use_authenticated_fixture(self):
+        for relative in (
+            "e2e/work-overview.spec.ts",
+            "e2e/task-discovery.spec.ts",
+            "e2e/task-resolution.spec.ts",
+        ):
+            source = (ROOT / relative).read_text(encoding="utf-8")
+            with self.subTest(relative=relative):
+                self.assertIn('from "./authenticated-fixture"', source)
+                self.assertIn("prepareAuthenticatedPage(page)", source)
+```
+
+Extend `test_playwright_lists_all_core_journeys` so the `--list` result also
+must contain every real core spec path:
+
+```python
+        for relative in (
+            "auth-entry.spec.ts",
+            "work-overview.spec.ts",
+            "task-discovery.spec.ts",
+            "task-resolution.spec.ts",
+        ):
+            with self.subTest(relative=relative):
+                self.assertIn(relative, combined)
+```
+
+Add command and failure tests to `tests/test_verify.py`:
+
+```python
+    def test_frontend_stages_use_pnpm(self):
+        verifier = load_verify_module()
+        package = {
+            "packageManager": "pnpm@10.15.1",
+            "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
+            "kbhc": {"frontendScaffolded": True},
+        }
+        with mock.patch.object(verifier, "package_document", return_value=package):
+            with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+                result = verifier.verify_frontend("full")
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            run_stage.call_args_list,
+            [
+                mock.call(name, ["pnpm", "run", name])
+                for name in ("format:check", "lint", "typecheck", "test", "build", "test:e2e:core")
+            ],
+        )
+
+    def test_frontend_stops_and_returns_nonzero_on_child_failure(self):
+        verifier = load_verify_module()
+        package = {
+            "packageManager": "pnpm@10.15.1",
+            "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
+            "kbhc": {"frontendScaffolded": True},
+        }
+        with mock.patch.object(verifier, "package_document", return_value=package):
+            with mock.patch.object(verifier, "run_stage", side_effect=[0, 1]) as run_stage:
+                result = verifier.verify_frontend("quick")
+
+        self.assertNotEqual(result, 0)
+        self.assertEqual(run_stage.call_count, 2)
+```
+
+- [ ] **Step 2: Run the focused contracts and confirm they fail**
+
+Run:
+
+```bash
+python3 -m unittest tests.test_verify_contract tests.test_verify -v
+```
+
+Expected: FAIL because `REQUIRED_FILES` lacks core files,
+`package_document()` does not enforce pnpm, and frontend stages still invoke
+`npm run`.
+
+- [ ] **Step 3: Make verifier setup structural and executable**
+
+Remove the complete `REQUIRED_MARKERS` mapping and its nested marker loop from
+`verify_setup()`. Keep canonical document paths in `REQUIRED_FILES`, and add:
+
+```python
+    "pnpm-lock.yaml",
+    "e2e/authenticated-fixture.ts",
+    "e2e/auth-entry.spec.ts",
+    "e2e/work-overview.spec.ts",
+    "e2e/task-discovery.spec.ts",
+    "e2e/task-resolution.spec.ts",
+    "src/mocks/fixtures/auth.ts",
+    "src/mocks/fixtures/tasks.ts",
+```
+
+After validating the `package.json` object shape in `package_document()`, add:
+
+```python
+    if package.get("packageManager") != "pnpm@10.15.1":
+        raise ValueError("package.json packageManager must be pnpm@10.15.1")
+```
+
+Change both frontend command sites in `verify_frontend()` to:
+
+```python
+        result = run_stage(name, ["pnpm", "run", name])
+```
+
+Do not change `run_stage()`; it already converts an `OSError` or nonzero child
+status into a standard nonzero verifier result with reproduction details.
+
+- [ ] **Step 4: Run focused contracts and commit**
+
+Run:
+
+```bash
+python3 -m unittest tests.test_verify_contract tests.test_verify -v
+./scripts/verify setup
+git diff --check
+```
+
+Expected: all verifier tests pass, setup reports `PASS`, and the diff check is empty.
+
+Commit:
+
+```bash
+git add scripts/verify tests/test_verify.py tests/test_verify_contract.py
+git commit -m "test(verify): 실행 가능한 검증 계약 강화"
+```
+
+---
+
+### Task 3: Journey Entry Points and Shared Final Gate
+
+**Files:**
+- Modify: `AGENTS.md`
+- Modify: `docs/quality/verification.md`
+
+**Interfaces:**
+- Consumes: canonical Journey definitions in `docs/quality/requirements.md`, current routes/code areas, and four core spec paths
+- Produces: one pre-change lookup path and one local/CI bootstrap ending in `./scripts/verify full`
+
+- [ ] **Step 1: Add the shortest pre/post-change loop to `AGENTS.md`**
+
+Add this paragraph after the opening Required Loop paragraph:
+
+```markdown
+Before changing code, locate the applicable Journey by searching requirement ID,
+route, API path, or symbol across `docs/quality/requirements.md`, `TODO.md`, `src`,
+and `e2e`. After the lowest sufficient focused test, run `./scripts/verify quick`
+and the mapped Journey E2E before `./scripts/verify full`.
+```
+
+Change the separate formatting mutation command from `npm run format` to
+`pnpm run format`.
+
+- [ ] **Step 2: Update verifier policy and add the compact Journey map**
+
+In `docs/quality/verification.md`, describe `setup` as required-file and
+executable-contract validation instead of document-marker validation. Change
+the formatting command to `pnpm run format`.
+
+Add this section before `## Core E2E Journeys`:
+
+```markdown
+## Journey Lookup Before a Change
+
+Search a requirement ID, route, API path, or symbol in
+`docs/quality/requirements.md`, `TODO.md`, `src`, and `e2e`, then use this map.
+
+| Journey | Requirements and routes | Primary implementation areas | Focused E2E |
+| --- | --- | --- | --- |
+| `auth-entry` | `NAV-02`, `AUTH-01..07`; `/sign-in`, protected routes | `src/app/auth`, `src/features/sign-in`, `src/shared/api/auth*` | `e2e/auth-entry.spec.ts` |
+| `work-overview` | `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`; `/`, `/user` | `src/widgets/app-shell`, `src/pages/dashboard`, `src/pages/user`, `src/widgets/dashboard-summary`, `src/widgets/user-profile` | `e2e/work-overview.spec.ts` |
+| `task-discovery` | `TASK-LIST-01..05`; `/task`, `GET /api/task` | `src/pages/task-list`, `src/widgets/task-list`, `src/entities/task`, `src/shared/api/tasks.ts` | `e2e/task-discovery.spec.ts` |
+| `task-resolution` | `TASK-DETAIL-01..05`; `/task/:id`, `GET/DELETE /api/task/:id` | `src/pages/task-detail`, `src/features/delete-task`, `src/shared/api/tasks.ts` | `e2e/task-resolution.spec.ts` |
+
+The table is a lookup aid, not a replacement for requirement IDs or focused
+unit, component, and integration tests.
+```
+
+Add the shared bootstrap and final verdict:
+
+````markdown
+## Local and CI Bootstrap
+
+Use a Node version allowed by `package.json#engines` and pnpm `10.15.1` in both
+environments, then run:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+./scripts/verify full
+```
+
+`./scripts/verify full` is the final verdict in both environments. Playwright
+keeps one retry only for diagnostics and `failOnFlakyTests: true` makes a flaky
+result fail the gate.
+````
+
+- [ ] **Step 3: Check entry points, run quick verification, and commit**
+
+Run:
+
+```bash
+for path in docs/quality/requirements.md TODO.md src e2e e2e/auth-entry.spec.ts e2e/work-overview.spec.ts e2e/task-discovery.spec.ts e2e/task-resolution.spec.ts; do test -e "$path"; done
+./scripts/verify quick
+git diff --check
+```
+
+Expected: every mapped path exists, quick passes, and the diff check is empty.
+
+Commit:
+
+```bash
+git add AGENTS.md docs/quality/verification.md
+git commit -m "docs(workflow): Journey 검증 진입점 보강"
+```
+
+---
+
+### Task 4: Determinism Evidence and Completion Review
+
+**Files:**
+- Modify: `TODO.md`
+
+**Interfaces:**
+- Consumes: Tasks 1-3 commits and existing fresh-server/resettable-fixture behavior
+- Produces: reproducible LOOP-READINESS-01 evidence without setting a human-owned Journey status
+
+- [ ] **Step 1: Repeat the core suite in the isolated worktree**
+
+Run:
+
+```bash
+pnpm run test:e2e:core
+pnpm run test:e2e:core
+```
+
+Expected on both runs: all selected core tests pass, no retry is classified as
+flaky, protected Journey request-count assertions pass, and Playwright exits 0.
+
+- [ ] **Step 2: Prove the same final command locally and with CI set**
+
+Run:
+
+```bash
+./scripts/verify full
+CI=1 ./scripts/verify full
+git diff --check
+```
+
+Expected: both full runs pass the same stages and exit 0; neither changes the
+repository fingerprint; the diff check is empty.
+
+- [ ] **Step 3: Run the mandatory plan-completion adversarial review**
+
+After Tasks 1-3 and all verification above, ask a fresh reviewer to inspect the
+approved readiness addendum, this execution addendum, and the exact current
+HEAD. Record these seven fields in `LOOP-READINESS-01` evidence:
+
+```text
+Review target: readiness design addendum, execution addendum, requirement/Journey IDs, exact commit
+Reviewer: fresh reviewer identity
+Checks: scope, version gate, local/CI parity, executable contracts, fixture/core selection, exit status, evidence
+Findings: concrete findings or none
+Corrections: applied corrections or not applicable
+Rerun: exact commands and results
+Verdict: PASS or FAIL
+```
+
+Expected: no unresolved HIGH or MEDIUM finding. Fix any LOW implementation
+finding in its owning file and rerun the focused check plus both full commands.
+
+- [ ] **Step 4: Update only the owned TODO block and verify it**
+
+Set `LOOP-READINESS-01` to checked and `AI_VERIFIED`. Record exact commit IDs,
+test counts, both core runs, local and CI-set full results, read-only result,
+review fields, and the explicit facts that GitHub Actions, product code, UX,
+dependencies, and human-owned Journey statuses were not changed.
+
+Run:
+
+```bash
+./scripts/verify setup
+git diff --check
+```
+
+Expected: setup passes with the completed TODO state and the diff check is empty.
+
+Commit:
+
+```bash
+git add TODO.md
+git commit -m "docs(todo): 작업 루프 검증 근거 기록"
+```

@@ -309,7 +309,9 @@
   Vitest 36 files/128 tests; 설계 자체 검토 후 `./scripts/verify setup` PASS —
   hook 86, contract 18; 상세 설계는
   `docs/superpowers/specs/2026-08-29-agentic-development-verification-loop-design.md`
-  readiness addendum; implementation plan과 사용자 문서 검토 대기
+  readiness addendum; 사용자 설계 승인 후 실행 계획은
+  `docs/superpowers/plans/2026-08-29-agentic-development-verification-loop.md`
+  readiness execution addendum에 추가
 
 ## 1. 검증 가능한 개발 기반
 
