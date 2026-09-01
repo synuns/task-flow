@@ -24,18 +24,18 @@ export function AppShell({ authAction }: { authAction: AuthAction }) {
           className="grid grid-cols-3 gap-1 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:flex md:h-[calc(100%-5rem)] md:flex-col md:p-0 md:pt-4"
         >
           <NavLink className={itemClass} end to="/">
-            <LayoutDashboard aria-hidden="true" />
+            <LayoutDashboard aria-hidden="true" size={20} />
             <span>대시보드</span>
           </NavLink>
           <NavLink className={itemClass} to="/task">
-            <ListTodo aria-hidden="true" />
+            <ListTodo aria-hidden="true" size={20} />
             <span>할 일</span>
           </NavLink>
           <NavLink
             className={({ isActive }) => `${itemClass({ isActive })} md:mt-auto`}
             to={authAction.to}
           >
-            <AuthIcon aria-hidden="true" />
+            <AuthIcon aria-hidden="true" size={20} />
             <span>{authLabel}</span>
           </NavLink>
         </nav>

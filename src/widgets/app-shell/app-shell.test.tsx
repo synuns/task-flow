@@ -27,9 +27,10 @@ describe("AppShell", () => {
       ["할 일", "lucide-list-todo"],
       ["로그인", "lucide-log-in"],
     ]) {
-      expect(
-        screen.getByRole("link", { name: label }).querySelector(`.${icon}`),
-      ).toBeInTheDocument();
+      const iconElement = screen.getByRole("link", { name: label }).querySelector(`.${icon}`);
+      expect(iconElement).toBeInTheDocument();
+      expect(iconElement).toHaveAttribute("height", "20");
+      expect(iconElement).toHaveAttribute("width", "20");
     }
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "할 일" })).toHaveAttribute("aria-current", "page");
@@ -58,7 +59,10 @@ describe("AppShell", () => {
     expect(await screen.findByRole("heading", { name: "회원정보" })).toBeInTheDocument();
     const profileLink = screen.getByRole("link", { name: "회원정보" });
     expect(profileLink).toHaveAttribute("href", "/user");
-    expect(profileLink.querySelector(".lucide-circle-user-round")).toBeInTheDocument();
+    const profileIcon = profileLink.querySelector(".lucide-circle-user-round");
+    expect(profileIcon).toBeInTheDocument();
+    expect(profileIcon).toHaveAttribute("height", "20");
+    expect(profileIcon).toHaveAttribute("width", "20");
     expect(screen.queryByRole("link", { name: "로그인" })).not.toBeInTheDocument();
   });
 });
