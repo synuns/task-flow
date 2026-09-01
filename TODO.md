@@ -578,7 +578,7 @@
   mocks, auth placeholder, route error 과대책임, aborted UI, 빈 layer/public API,
   dashboard entity 위반 0건
 
-### [ ] UI-FOUNDATION-01 공통 interactive UI와 surface
+### [x] UI-FOUNDATION-01 공통 interactive UI와 surface
 
 - Requirements: `SYS-02`, `SYS-03`, 공통 접근성 invariant
 - Risk: LOW — 기존 token과 채택 stack 안의 UI 표현
@@ -591,16 +591,37 @@
   src/test/theme-contract.test.ts`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, 390x844/1280x720, keyboard focus와 disabled/error,
   예상 밖 console/page/network error 없음
-- Status: IN_PROGRESS
-- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자가 기존 primitive의
-  foundation 계약 검증과 실제 실패의 최소 교정만 승인함;
-  `docs/superpowers/specs/2026-09-01-ui-foundation-contract-design.md`에 Button,
-  Input·Label, Card surface, semantic token, focus, disabled와 error 계약 및
-  automatic/browser 검증 범위를 확정함; 기능·route·showcase·wrapper·비동기 상태
-  UI·shell·dependency·public API 확장은 제외함;
-  `docs/superpowers/plans/2026-09-01-ui-foundation-contract.md`에 characterization
-  test, 두 viewport browser evidence, plan-completion review와 상태 전이를 분리함;
-  plan 실행 대기
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root` task block owner; branch
+  `feat/ui-foundation-contract`, target
+  `78e46cc73d41cb9f5e681bc46975c4daee2ac2e5`; 승인된 design
+  `docs/superpowers/specs/2026-09-01-ui-foundation-contract-design.md`와 plan
+  `docs/superpowers/plans/2026-09-01-ui-foundation-contract.md`에 따라 기존 Button,
+  Input·Label, Card surface의 label/error/disabled/focus/semantic token 계약만
+  characterization함. Baseline 2 files/4 tests, focused 2 files/5 tests,
+  `./scripts/verify quick` setup hook 86·verifier 18·Vitest 36 files/128 tests PASS;
+  production primitive, dependency, public API와 `assignment-original/` 변경 없음.
+  Agent-browser `ui-foundation-desktop` `/sign-in` 1280×720과
+  `ui-foundation-mobile` 390×844에서 active password focus ring, email
+  `aria-invalid`·연결된 visible error, disabled submit, mobile width 390=390을
+  확인하고 screenshots `/tmp/kbhc-ui-foundation-desktop.png`,
+  `/tmp/kbhc-ui-foundation-mobile.png` 저장 후 두 session 종료; MSW의 승인된
+  anonymous bootstrap `POST /api/refresh` 401과 대응 resource line 외 예상 밖
+  console/page/network 오류 없음; 상세 기록 `docs/quality/evidence/ui-foundation.md`.
+  Failure/Correction: 초기 `TEST` DOM cleanup 누락은 `afterEach(cleanup)`, 초기
+  `TOOLING` format 차이는 test 한 파일 format으로 교정 후 같은 focused/quick
+  gate PASS; review의 Minor `TEST` Card border coverage는 `78e46cc`에서 semantic
+  `border` assertion으로 교정. Review target: 위 plan, `UI-FOUNDATION-01`,
+  `SYS-02`, `SYS-03`, base `b5ae18d`, target `78e46cc`; Reviewer: 구현 작성자와
+  분리된 fresh read-only `/root/ui_foundation_review`; Checks: spec/plan coverage,
+  label/error/disabled/focus/token contract, test isolation, desktop/mobile evidence,
+  console/network 분류, dependency/public API/production/Journey/shell/wrapper/
+  async-state/`assignment-original` 비확장, TODO dependency와 상태; Findings: 최종
+  target Critical/Important/Minor 없음, 이전 Minor `TEST` 해결; Corrections:
+  `78e46cc` Card surface border 계약 추가; Rerun: reviewer focused 2 files/5 tests,
+  task owner quick 36 files/128 tests, `git diff --check` PASS,
+  `assignment-original/` diff 없음; Verdict: PASS. Journey `HUMAN_APPROVED`나 최종
+  사람 acceptance를 뜻하지 않음
 
 ### [ ] UI-SHELL-01 반응형 application shell
 
