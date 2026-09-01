@@ -985,7 +985,7 @@
   1 file/7 tests, `./scripts/verify quick` hook 86·verifier 19·Vitest 38 files/145 tests,
   `git diff --check` PASS; Verdict: PASS
 
-### [ ] AUTH-ERROR-VIEW-01 로그인 오류 modal 화면
+### [x] AUTH-ERROR-VIEW-01 로그인 오류 modal 화면
 
 - Requirements: `AUTH-06`
 - Risk: MEDIUM — modal interaction과 focus lifecycle
@@ -997,11 +997,27 @@
   src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/sign-in` credential failure, 390x844/1280x720, focus
   trap/restore, modal overflow, POST status/body, console/page error
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
   `feat/auth-entry-loop`; start commit
-  `fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d`; target `AUTH-06`; focused
-  baseline 4 files/26 tests PASS; error modal characterization 진행 중
+  `fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d`; target `AUTH-06`; 기존 shared
+  Radix Dialog와 `onCloseAutoFocus`가 acceptance를 충족해 production 변경 없이 exact
+  실패 request 1회·API `errorMessage` 표시와 Escape focus 복귀 characterization만
+  `0d7d815`에 추가함. Focused Vitest 1 file/9 tests, `./scripts/verify quick` hook
+  86·verifier 19·Vitest 38 files/147 tests, `git diff --check` PASS.
+  Agent-browser `auth-error-view-01-mobile` 390x844에서 초기 focus가 close에 있고
+  Tab/Shift+Tab 후에도 modal 안에 머물며 Escape 후 submit으로 복귀함; scrollWidth
+  390px로 content/action clipping 없음. `auth-error-view-01-desktop` 1280x720에서
+  modal content/action과 scrollWidth 1280px를 확인하고, 안정화 대기 후 명시적 close와
+  submit focus 복귀를 재확인함. MSW console은 fresh refresh 401과 exact
+  `POST /api/sign-in` body 1회·400만 기록했고 page error 없음. Screenshots:
+  `/tmp/kbhc-auth-error-view-01-mobile.png`,
+  `/tmp/kbhc-auth-error-view-01-desktop.png`.
+  Failure/Correction: `TOOLING` — close 직후 exit animation 전에 DOM을 읽은 첫 측정을
+  500ms 안정화 후 재실행해 dialog 0과 submit focus를 확인함; agent-browser request
+  log가 service-worker 요청을 포착하지 않아 MSW console과 component exact-count
+  assertion으로 교차 검증함. Task adversarial check: 요구되지 않은 production 변경이나
+  새 abstraction/dependency 없음, dependency·범위·접근성·negative path PASS
 
 ### [ ] AUTH-SESSION-UX-01 인증 초기화·실패·복귀 화면
 
