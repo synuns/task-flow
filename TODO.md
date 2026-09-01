@@ -370,6 +370,32 @@
   - Failure class: TEST — Biome이 test regex 선언 formatting 차이를 탐지
   - Correction/Rerun: 요구 format으로 한 줄 교정 후 같은 quick gate PASS
 
+### [ ] UI-DESIGN-01 화면 구성과 Journey UX 설계
+
+- Requirements: `NAV-01`~`NAV-03`, `DASH-01`, `AUTH-01`~`AUTH-06`,
+  `TASK-LIST-01`~`TASK-LIST-05`, `TASK-DETAIL-01`~`TASK-DETAIL-05`, `USER-01`,
+  `SYS-02`, `SYS-03`
+- Risk: MEDIUM — 여러 route의 시각 위계와 responsive interaction pattern 확정
+- Depends on: `SCF-05`, `AUTH-NAV-01`, `DASH-01`, `USER-01`, `TASK-PAGE-03`,
+  `TASK-DELETE-02`
+- Deliverable: 필요한 화면·상태, Focus workspace layout, 오케어 Yellow palette,
+  shadcn/ui component mapping, desktop/mobile navigation과 Journey별 UX를 확정한
+  화면 디자인 설계 문서
+- Acceptance: 원본·OpenAPI·Golden Journey의 accepted behavior를 바꾸지 않고 다섯
+  route와 공통 상태가 trace되며, desktop sidebar와 icon·label 기반 mobile bottom
+  navigation, loading·empty·error·404·modal, 접근성·responsive·검증 기준이 한 가지
+  동작으로 정해지고 사용자가 설계를 승인한다.
+- Automatic verification: 설계 문서 placeholder·모순·범위·requirement trace 자체
+  검토, `./scripts/verify setup`, `git diff --check`
+- Browser verification: 구현 전 제품 QA는 적용 없음 — visual companion 시안의
+  desktop/mobile layout과 상태 화면을 사용자와 검토
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; required 문서, OpenAPI,
+  Golden Journey, 현재 desktop/mobile UI 조사; 사용자가 Focus workspace, Journey UX,
+  오케어 App Store 기반 Yellow palette, responsive·상태 화면을 순차 승인하고 mobile
+  navigation에서 distinct icon을 적극 활용하도록 조건 추가; 설계 문서 작성과 자체
+  검토 진행 중
+
 ## 2. 애플리케이션 구조·공통 경계
 
 ### [x] ARCH-01 FSD directory와 public boundary
