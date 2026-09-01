@@ -1491,7 +1491,7 @@ src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
   fresh session으로 교정; rerun은 refresh/task/detail 200, page error와 예상하지 않은
   console error 없음. 제품 code/test 변경 없음.
 
-### [ ] TASK-LIST-VIRTUAL-UX-01 production scroll viewport
+### [x] TASK-LIST-VIRTUAL-UX-01 production scroll viewport
 
 - Requirements: `TASK-LIST-03`
 - Risk: MEDIUM — responsive scroll와 virtual measurement
@@ -1504,8 +1504,19 @@ src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
   `./scripts/verify quick`
 - Browser verification: `/task`, 390x844/1280x720, 실제 wheel/keyboard scroll,
   viewport/row size, mounted DOM count, clipping과 console/page/network 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root` task block owner; branch
+  `feat/task-discovery-loop`; start commit
+  `dca7fd7057752d2ade56b76608d1a250e2263d1b`; requirements `TASK-LIST-03`;
+  plan `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`. Focused list 1
+  file/5 tests와 quick hook 86·contract 19·Vitest 38 files/149 tests PASS.
+  Agent-browser `task-list-virtual-ux-01`에서 40개 schema fixture를 끝까지 scroll해
+  desktop `clientHeight 500`, `scrollHeight 3840`, `scrollTop 3340`, mounted 6/40;
+  mobile `clientHeight 560`, document/viewport width 390, mounted 6/40을 확인하고 실제
+  scroll `2780→3280`을 재검증함. page 1..20이 성공했고 terminal 뒤 추가 요청, page
+  error, 예상하지 않은 console error 없음. Screenshot:
+  `/tmp/kbhc-task-list-virtual-ux-01-desktop.png`,
+  `/tmp/kbhc-task-list-virtual-ux-01-mobile.png`. 제품 code/test 변경 없음.
 
 ### [ ] TASK-LIST-PAGING-UX-01 무한 pagination feedback
 

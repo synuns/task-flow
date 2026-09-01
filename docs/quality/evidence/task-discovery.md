@@ -84,3 +84,33 @@ Correction: seed auth/task storage on a same-origin non-app resource, then navig
 `/task` in a new named session
 Rerun verdict: PASS — component, quick, desktop pointer, mobile keyboard/focus, route,
 responsive width and console/page-error checks passed; no product code/test change
+
+## TASK-LIST-VIRTUAL-UX-01
+
+Requirement/Journey: `TASK-LIST-03`; `DISC-P1-3`
+Commit: `dca7fd7057752d2ade56b76608d1a250e2263d1b`
+Agent-browser session: `task-list-virtual-ux-01`
+Route/Viewport: `/task`; Chromium `1280x720`, `390x844`
+Precondition: same-origin auth fixture and 40 schema-conforming task records seeded before
+app bootstrap; fresh browser session
+Actions: run the focused list suite and quick gate; inspect desktop dimensions and mounted
+rows; wheel-scroll each two-record page through the terminal page; resize to mobile, inspect
+width and mounted rows, then scroll up 500px and down 500px; inspect resource timing, console
+and page errors; close the named session
+Expected: the remaining-height region is taller than the old 96px viewport, real scrolling
+reaches all 40 records, mounted DOM remains near the viewport rather than growing to 40,
+mobile content does not overflow horizontally, and resizing preserves usable scrolling
+Actual: focused Vitest passed 1 file/5 tests; quick passed hook 86, contract 19 and Vitest 38
+files/149 tests. Desktop reached task 40 with clientHeight 500px, scrollHeight 3840px,
+scrollTop 3340px and 6/40 mounted rows. Mobile measured clientHeight 560px, scrollHeight
+3840px, document/viewport width 390px and 6/40 mounted rows; an up/down gesture moved
+scrollTop 3280→2780→3280 without clipping or jump
+Console/Network: resource timing and MSW logs showed successful `/api/task?page=1..20` and
+`hasNext:false` on page 20; no later task request, page error or unexpected console error
+Screenshot/Trace: `/tmp/kbhc-task-list-virtual-ux-01-desktop.png`,
+`/tmp/kbhc-task-list-virtual-ux-01-mobile.png`
+Failure class: none
+Correction: none; the existing remaining-height region, 96px row estimate, stable ID key
+and measured virtual rows already satisfy the requirement
+Rerun verdict: PASS — focused, quick, 40-record bounded DOM, terminal scroll, resize,
+responsive width and console/page-error checks passed; no product code/test change
