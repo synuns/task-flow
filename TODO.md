@@ -951,11 +951,12 @@
   invalid/valid/pending, clipping, console/network
 - Status: IN_PROGRESS
 - Evidence: 2026-09-01 Codex `/root` task block owner; branch
-  `feat/auth-view-01`; start `f5ba414`, test target `9c66ae7`; design
+  `feat/auth-view-01`; start `f5ba414`, test target `19285d6`; design
   `docs/superpowers/specs/2026-09-01-auth-entry-scenario-loop-design.md`, plan
   `docs/superpowers/plans/2026-09-01-auth-view-scenario-loop.md`. 기존 화면에서
   label/description/disabled·valid·pending 동작이 재현되어 production RED나 변경 없이
-  empty, 7자, 25자, non-ASCII와 `로그인 중` component characterization을 추가함;
+  empty, 7자, 25자, non-ASCII와 `로그인 중`, exact sign-in request 1회 component
+  characterization을 추가함;
   focused Vitest 1 file/7 tests PASS, `./scripts/verify quick` setup hook 86,
   verifier 19, Vitest 38 files/145 tests PASS. Agent-browser
   `auth-view-01-mobile`, `auth-view-01-mobile-form`, `auth-view-01-desktop`에서
@@ -963,13 +964,17 @@
   password, disabled submit skip, invalid email·7자 password 연결 오류와 disabled,
   valid enable·submit, mobile form 308px/scrollWidth 390px, desktop form 398px·section
   448px/scrollWidth 1280px. Fresh anonymous bootstrap `POST /api/refresh` 401은 예상
-  console error이고 page error 없음; service-worker 요청 목록은 CLI capture가 비었으나
-  MSW console에서 exact body의 `POST /api/sign-in` 200 한 건을 확인함. Screenshots:
-  `/tmp/kbhc-auth-view-01-mobile.png`, `/tmp/kbhc-auth-view-01-desktop.png`;
+  console error이고 page error 없음. Fresh `auth-view-01-network` session에서 page
+  `fetch`를 sessionStorage에 계측해 `POST /api/sign-in` 한 건과 후속 dashboard GET
+  두 건을 분리 확인했고, MSW console의 exact body/status와 일치함. Screenshots:
+  `/tmp/kbhc-auth-view-01-mobile.png`, `/tmp/kbhc-auth-view-01-desktop.png`; trace:
+  `/tmp/kbhc-auth-view-01-network-trace.zip`;
   Failure/Correction: `TOOLING` unsupported `is focused`를 activeElement eval로 교체,
   Biome 한 줄 format을 `pnpm run format` 후 quick 재실행, 성공 후 dashboard screenshot을
-  fresh invalid-form capture로 교체; rerun PASS. Plan-completion review 전까지
-  `IN_PROGRESS` 유지
+  fresh invalid-form capture로 교체. Initial fresh review `BLOCKED`: MEDIUM `TEST`
+  request count 누락과 MEDIUM `TOOLING` network artifact 누락; request counter assertion과
+  named-session fetch 계측/trace로 교정하고 focused/quick/browser rerun PASS.
+  Correction review 전까지 `IN_PROGRESS` 유지
 
 ### [ ] AUTH-ERROR-VIEW-01 로그인 오류 modal 화면
 
