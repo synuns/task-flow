@@ -1059,7 +1059,7 @@
   return route, auth policy와 unrelated diff를 검토했고 provider·transport·API 변경 및
   새 dependency/abstraction 없음; Verdict: PASS
 
-### [ ] AUTH-JOURNEY-VERIFY-01 auth-entry 통합 검증
+### [x] AUTH-JOURNEY-VERIFY-01 auth-entry 통합 검증
 
 - Requirements: `NAV-02`, `AUTH-01`~`AUTH-07`
 - Risk: MEDIUM — Journey evidence gate
@@ -1075,10 +1075,28 @@
   `pnpm exec playwright test e2e/auth-entry.spec.ts`
 - Browser verification: named `agent-browser` session, `/sign-in` invalid/error/success,
   protected direct entry/reload, 두 viewport와 credential/network boundary
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
-  `feat/auth-entry-loop`; start `fd91069`; target `NAV-02`, `AUTH-01`~`AUTH-07`와
-  `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`; current-target evidence 통합 진행 중
+  `feat/auth-entry-loop`; start `fd91069`, verification commit `0e38ee6`; target
+  `NAV-02`, `AUTH-01`~`AUTH-07`와 `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`를
+  `docs/quality/evidence/auth-entry.md`에 lowest-level evidence로 매핑함. Schema
+  1 file/6 tests, focused auth 4 files/28 tests, `./scripts/verify quick` hook
+  86·verifier 19·Vitest 38 files/148 tests PASS. 기존 Playwright 2 cases에 새 case
+  없이 credential failure exact POST/body 1회·400, focus trap·Escape를 보강했고 초기와
+  fresh rerun 모두 2/2 PASS. Agent-browser
+  `auth-journey-verify-01-mobile` 390x844와
+  `auth-journey-verify-01-desktop` 1280x720에서 invalid/disabled→400 modal→submit
+  focus 복귀→valid same-route return→reload refresh 200 1회→profile-only action과
+  scrollWidth 390/1280px를 확인; expected bootstrap 401·credential 400 외 page error와
+  unexpected console error 없음. Screenshots:
+  `/tmp/kbhc-auth-journey-verify-01-mobile.png`,
+  `/tmp/kbhc-auth-journey-verify-01-desktop.png`.
+  Failure/Correction: `TOOLING` — agent-browser request log가 MSW service-worker
+  요청을 포착하지 않아 Playwright request/response listener, MSW console과 component
+  exact-count assertion을 current evidence로 사용함. Verify-task adversarial check:
+  scenario 누락, exact request/status, bearer/refresh, duplicate E2E, artifact 경로,
+  expected console 분류, unrelated diff와 dependency/status를 검토했고 unresolved
+  HIGH/MEDIUM 없음; 사람 승인 주장은 없음; Verdict: PASS
 
 ### [ ] AUTH-JOURNEY-REVIEW-01 auth-entry 독립 review
 
