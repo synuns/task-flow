@@ -133,9 +133,10 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
         <AlertDialogHeader>
           <AlertDialogTitle>할 일 삭제</AlertDialogTitle>
           <AlertDialogDescription>
-            삭제하려면 할 일 ID를 정확히 입력해주세요: {taskId}
+            삭제하려면 아래 할 일 ID를 정확히 입력해주세요.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        <code className="rounded-md bg-muted px-3 py-2 font-mono text-sm">{taskId}</code>
         <form className="contents" onSubmit={(event) => void submit(event)}>
           <div className="grid gap-2">
             <Label htmlFor="delete-task-id">할 일 ID</Label>

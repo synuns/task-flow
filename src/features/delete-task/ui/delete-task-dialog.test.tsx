@@ -53,6 +53,7 @@ describe("DeleteTaskDialog", () => {
     await user.click(trigger);
     const dialog = screen.getByRole("alertdialog", { name: "할 일 삭제" });
     expect(dialog).toHaveAttribute("data-slot", "alert-dialog-content");
+    expect(screen.getByText("task-1")).toHaveClass("font-mono");
     const input = screen.getByRole("textbox", { name: "할 일 ID" });
     const submit = screen.getByRole("button", { name: "삭제 확인" });
 

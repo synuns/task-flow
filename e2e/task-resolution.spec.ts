@@ -24,7 +24,9 @@ test("@core @task-resolution deletes only after exact confirmation and refreshes
   await page.goto("/task/task-1");
   await expect(page.getByRole("heading", { name: "첫 번째 할 일" })).toBeVisible();
   await expect(page.getByText("삭제 검증 대상")).toBeVisible();
-  await expect(page.getByText("2026-08-30T09:00:00.000Z")).toBeVisible();
+  const registeredAt = page.locator("time");
+  await expect(registeredAt).toHaveAttribute("datetime", "2026-08-30T09:00:00.000Z");
+  await expect(registeredAt).toContainText("2026년 8월 30일");
 
   await page.getByRole("button", { name: "할 일 삭제" }).click();
   const input = page.getByRole("textbox", { name: "할 일 ID" });
@@ -46,7 +48,7 @@ test("@core @task-resolution deletes only after exact confirmation and refreshes
   await expect(page.getByText("두 번째 할 일")).toBeVisible();
 
   await page.goto("/task/task-1");
-  await expect(page.getByRole("alert")).toHaveText("할 일을 찾을 수 없습니다.");
+  await expect(page.getByRole("alert")).toContainText("할 일을 찾을 수 없습니다.");
   await expect(page.getByRole("link", { name: "할 일 목록으로 이동" })).toBeVisible();
   await page.getByRole("link", { name: "대시보드" }).click();
   await expect(page.getByText("전체 할 일").locator("xpath=following-sibling::dd")).toHaveText("2");

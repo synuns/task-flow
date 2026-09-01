@@ -89,12 +89,7 @@ export function TaskList() {
 
   return (
     <div className="grid gap-3">
-      <section
-        aria-label="할 일 목록"
-        className="rounded-xl border bg-card"
-        ref={scrollRef}
-        style={{ height: 96, overflow: "auto" }}
-      >
+      <section aria-label="할 일 목록" className="h-48 overflow-auto" ref={scrollRef}>
         <ul
           className="relative m-0 list-none p-0"
           style={{

@@ -34,6 +34,10 @@ test("@core @work shows authenticated dashboard, profile, and persistent navigat
     "aria-current",
     "page",
   );
+  const navigation = page.getByRole("navigation", { name: "주요 메뉴" });
+  await expect(navigation).toBeVisible();
+  await expect(navigation.locator("svg")).toHaveCount(3);
+  await expect(page.locator("header")).toHaveCSS("width", "224px");
 
   await page.getByRole("link", { name: "회원정보", exact: true }).click();
   await expect(page).toHaveURL(/\/user$/);
@@ -68,6 +72,13 @@ test("@core @work shows authenticated dashboard, profile, and persistent navigat
   await expect(page.getByRole("link", { name: "대시보드", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "할 일", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "회원정보", exact: true })).toBeVisible();
+  await expect(page.locator("header")).toHaveCSS("position", "fixed");
+  await expect(page.locator("header")).toHaveCSS("bottom", "0px");
+  for (const navigationName of ["대시보드", "할 일", "회원정보"]) {
+    const link = page.getByRole("link", { name: navigationName, exact: true });
+    await expect(link).toHaveCSS("min-height", "48px");
+    await expect(link.locator("svg")).toBeVisible();
+  }
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);
