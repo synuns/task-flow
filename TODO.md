@@ -1077,11 +1077,13 @@
   protected direct entry/reload, 두 viewport와 credential/network boundary
 - Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
-  `feat/auth-entry-loop`; start `fd91069`, verification commit `0e38ee6`; target
+  `feat/auth-entry-loop`; start `fd91069`, verification commit
+  `0e38ee653c5f95d6ac205c93101f8c4c8393b2aa`, review correction target
+  `cbff6b502d14faaec3255fa8cf4fb890279dbf65`; target
   `NAV-02`, `AUTH-01`~`AUTH-07`와 `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`를
   `docs/quality/evidence/auth-entry.md`에 lowest-level evidence로 매핑함. Schema
-  1 file/6 tests, focused auth 4 files/28 tests, `./scripts/verify quick` hook
-  86·verifier 19·Vitest 38 files/148 tests PASS. 기존 Playwright 2 cases에 새 case
+  1 file/6 tests, focused auth 4 files/29 tests, `./scripts/verify quick` hook
+  86·verifier 19·Vitest 38 files/149 tests PASS. 기존 Playwright 2 cases에 새 case
   없이 credential failure exact POST/body 1회·400, focus trap·Escape를 보강했고 초기와
   fresh rerun 모두 2/2 PASS. Agent-browser
   `auth-journey-verify-01-mobile` 390x844와
@@ -1096,7 +1098,10 @@
   exact-count assertion을 current evidence로 사용함. Verify-task adversarial check:
   scenario 누락, exact request/status, bearer/refresh, duplicate E2E, artifact 경로,
   expected console 분류, unrelated diff와 dependency/status를 검토했고 unresolved
-  HIGH/MEDIUM 없음; 사람 승인 주장은 없음; Verdict: PASS
+  HIGH/MEDIUM 없음; 사람 승인 주장은 없음. Initial fresh review는 authenticated
+  `refresh()` 401 terminal path 직접 test와 exact-SHA 결속 누락을 MEDIUM으로 찾았고,
+  provider regression test와 canonical evidence 교정으로 해소 후 재review 대상으로 전환;
+  verify-task self-check Verdict: PASS
 
 ### [ ] AUTH-JOURNEY-REVIEW-01 auth-entry 독립 review
 
@@ -1112,7 +1117,11 @@
 - Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
   `feat/auth-entry-loop`; plan
   `docs/superpowers/plans/2026-09-01-auth-entry-remaining-loop.md`; target
-  `NAV-02`, `AUTH-01`~`AUTH-07` / `auth-entry`; fresh exact-SHA review 시작
+  `NAV-02`, `AUTH-01`~`AUTH-07` / `auth-entry`; review ownership start와 initial
+  target `7d01a9345c2d7500063e42294d43c441a1fd7808`, merge-base
+  `fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d`; fresh review는 Critical 없음,
+  Important 2건(`AUTH-E3` direct refresh failure test, evidence exact SHA)으로 FAIL;
+  correction `cbff6b502d14faaec3255fa8cf4fb890279dbf65` 이후 재review 대기
 
 ### [ ] JOURNEY-AUTH-01 auth-entry 사람 checkpoint
 

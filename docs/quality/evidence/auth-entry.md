@@ -3,8 +3,13 @@
 Requirement/Journey: `NAV-02`, `NAV-03`, `AUTH-01`~`AUTH-07`;
 `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`; `auth-entry`
 
-Commit: implementation target `be22ce0`; verification start `017e2cd` on
-`feat/auth-entry-loop` (the enclosing evidence commit records the E2E observation diff)
+Commit: automatic correction target
+`cbff6b502d14faaec3255fa8cf4fb890279dbf65`; browser-tested production target
+`be22ce004a974251f4579469fc01c03df263d433`; integration evidence target
+`0e38ee653c5f95d6ac205c93101f8c4c8393b2aa`; merge-base
+`fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d` on `feat/auth-entry-loop`.
+Later commits through the automatic target add only evidence/TODO records and the
+provider regression test; they do not change the browser-tested production code.
 
 Route/Viewport: `/sign-in`, `/task/task-1`, `/user`; Chromium 390x844 and
 1280x720
@@ -38,10 +43,10 @@ Actual:
 | `AUTH-P2-2` | auth provider/authenticated-request focused tests; protected-entry Playwright and browser reload | single-flight/bounded replay/stale generation PASS; one successful cookie refresh on reload keeps `/task/task-1` |
 | `AUTH-E1` | schema 1 file/6 tests; sign-in component 1 file/9 tests; mobile browser | empty, invalid email, 7/25-character and Korean/symbol password boundaries keep submit disabled PASS |
 | `AUTH-E2` | sign-in component; credential-failure Playwright; both named browser sessions | one exact POST, 400 `errorMessage`, focus trap, Escape and submit focus restore PASS |
-| `AUTH-E3` | auth provider/authenticated-request focused tests | bootstrap 401 becomes anonymous; current replay 401 terminates matching session/cache only; network failure remains recoverable PASS |
+| `AUTH-E3` | auth provider/authenticated-request focused tests | authenticated refresh 401 rejects, increments generation, clears the token and protected cache while retaining unrelated cache; bootstrap 401, replay terminal failure and recoverable network failure PASS |
 
-Fresh totals: focused auth 4 files/28 tests PASS; `./scripts/verify quick` PASS
-(hook 86, verifier 19, Vitest 38 files/148 tests); mapped Playwright 2/2
+Fresh totals: focused auth 4 files/29 tests PASS; `./scripts/verify quick` PASS
+(hook 86, verifier 19, Vitest 38 files/149 tests); mapped Playwright 2/2
 PASS on initial run and fresh rerun. `auth-journey-verify-01-mobile` confirmed
 invalid email and 7-character password errors, disabled submit, 400 modal focus
 trap/Escape, exact protected return, reload, profile-only action, and
@@ -81,6 +86,6 @@ flag before retry, and fully revert the fixture source; wait 500ms for explicit
 close and run `pnpm run format`
 
 Rerun verdict: PASS — no temporary fixture or unrelated file remains; focused
-4/28, quick 38/148, mapped Playwright 2/2, both current named browser sessions,
+4/29, quick 38/149, mapped Playwright 2/2, both current named browser sessions,
 screenshots, expected console/network classification, and `git diff --check`
 all pass
