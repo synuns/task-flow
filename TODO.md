@@ -997,8 +997,11 @@
   src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/sign-in` credential failure, 390x844/1280x720, focus
   trap/restore, modal overflow, POST status/body, console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
+  `feat/auth-entry-loop`; start commit
+  `fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d`; target `AUTH-06`; focused
+  baseline 4 files/26 tests PASS; error modal characterization 진행 중
 
 ### [ ] AUTH-SESSION-UX-01 인증 초기화·실패·복귀 화면
 
