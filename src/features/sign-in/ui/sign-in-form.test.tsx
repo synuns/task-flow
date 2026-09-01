@@ -90,6 +90,43 @@ describe("SignInForm", () => {
     expect(submit).toHaveFocus();
   });
 
+  it("submits failed credentials once and displays the returned errorMessage", async () => {
+    const user = userEvent.setup();
+    const requests: unknown[] = [];
+    server.use(
+      http.post("/api/sign-in", async ({ request }) => {
+        requests.push(await request.json());
+        return HttpResponse.json({ errorMessage: "로그인이 거부되었습니다." }, { status: 400 });
+      }),
+    );
+    render(<SignInForm onAuthenticated={vi.fn()} />);
+
+    await user.type(screen.getByRole("textbox", { name: "이메일" }), "user@example.com");
+    await user.type(screen.getByLabelText("비밀번호"), "Password2");
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+
+    expect(await screen.findByRole("dialog", { name: "로그인 실패" })).toHaveTextContent(
+      "로그인이 거부되었습니다.",
+    );
+    expect(requests).toEqual([{ email: "user@example.com", password: "Password2" }]);
+  });
+
+  it("closes the server error dialog with Escape and restores submit focus", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm onAuthenticated={vi.fn()} />);
+
+    await user.type(screen.getByRole("textbox", { name: "이메일" }), "wrong@example.com");
+    await user.type(screen.getByLabelText("비밀번호"), "Password1");
+    const submit = screen.getByRole("button", { name: "로그인" });
+    await user.click(submit);
+
+    expect(await screen.findByRole("dialog", { name: "로그인 실패" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(submit).toHaveFocus();
+  });
+
   it("submits once and returns the token pair", async () => {
     const user = userEvent.setup();
     const onAuthenticated = vi.fn();
