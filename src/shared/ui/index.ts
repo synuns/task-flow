@@ -5,6 +5,5 @@ export * from "./card";
 export * from "./dialog";
 export * from "./input";
 export * from "./label";
-export { Modal } from "./modal";
 export * from "./progress";
 export * from "./skeleton";

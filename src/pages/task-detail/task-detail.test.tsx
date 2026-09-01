@@ -57,8 +57,16 @@ describe("TaskDetailPage", () => {
     renderPage(client);
 
     expect(await screen.findByRole("heading", { name: "첫 번째 할 일" })).toBeInTheDocument();
-    expect(screen.getByText("삭제 검증 대상")).toBeInTheDocument();
-    expect(screen.getByText("2026-08-30T09:00:00.000Z")).toBeInTheDocument();
+    expect(screen.getByText("삭제 검증 대상").closest('[data-slot="card"]')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        new Intl.DateTimeFormat("ko-KR", {
+          dateStyle: "long",
+          timeStyle: "short",
+          timeZone: "Asia/Seoul",
+        }).format(new Date("2026-08-30T09:00:00.000Z")),
+      ),
+    ).toBeInTheDocument();
     expect(requests).toEqual([`${globalThis.location.origin}/api/task/task-1`]);
   });
 
@@ -145,7 +153,9 @@ describe("TaskDetailPage", () => {
     await user.click(screen.getByRole("button", { name: "삭제 확인" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("할 일을 찾을 수 없습니다.");
-    expect(screen.getByRole("heading", { name: "첫 번째 할 일" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "첫 번째 할 일", hidden: true }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "목록 도착" })).not.toBeInTheDocument();
     expect(queryClient.getQueriesData({ queryKey: ["tasks"] })).toEqual([]);
     expect(queryClient.getQueriesData({ queryKey: ["task"] })).toEqual([]);

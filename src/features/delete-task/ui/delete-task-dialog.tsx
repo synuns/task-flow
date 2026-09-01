@@ -1,5 +1,20 @@
 import { useApiClient } from "@/shared/api";
-import { Modal } from "@/shared/ui";
+import {
+  Alert,
+  AlertDescription,
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+  Input,
+  Label,
+} from "@/shared/ui";
+import { Trash2 } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { createAttemptGuard } from "../model/attempt-guard";
@@ -91,54 +106,82 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
     input !== taskId || pending || state.kind === "absent" || state.kind === "success";
 
   return (
-    <>
-      <button
-        onClick={() => {
-          setInput("");
-          setState({ kind: "idle" });
-          setOpen(true);
-        }}
-        ref={triggerRef}
-        type="button"
+    <AlertDialog
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) setOpen(true);
+        else resetAndClose();
+      }}
+      open={open}
+    >
+      <AlertDialogTrigger asChild>
+        <Button
+          onClick={() => {
+            setInput("");
+            setState({ kind: "idle" });
+          }}
+          ref={triggerRef}
+          type="button"
+          variant="destructive"
+        >
+          <Trash2 aria-hidden="true" />할 일 삭제
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent
+        aria-busy={pending || undefined}
+        onEscapeKeyDown={(event) => pending && event.preventDefault()}
       >
-        할 일 삭제
-      </button>
-      <Modal
-        busy={pending}
-        closeDisabled={pending}
-        onClose={resetAndClose}
-        open={open}
-        returnFocusRef={triggerRef}
-        title="할 일 삭제"
-      >
-        <form onSubmit={(event) => void submit(event)}>
-          <p>삭제하려면 할 일 ID를 정확히 입력해주세요: {taskId}</p>
-          <label htmlFor="delete-task-id">할 일 ID</label>
-          <input
-            autoComplete="off"
-            disabled={pending}
-            id="delete-task-id"
-            onChange={(event) => setInput(event.target.value)}
-            value={input}
-          />
-          {pending && <p role="status">삭제 결과를 확인하고 있습니다.</p>}
-          {message && <p role="alert">{message}</p>}
+        <AlertDialogHeader>
+          <AlertDialogTitle>할 일 삭제</AlertDialogTitle>
+          <AlertDialogDescription>
+            삭제하려면 할 일 ID를 정확히 입력해주세요: {taskId}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <form className="contents" onSubmit={(event) => void submit(event)}>
+          <div className="grid gap-2">
+            <Label htmlFor="delete-task-id">할 일 ID</Label>
+            <Input
+              autoComplete="off"
+              disabled={pending}
+              id="delete-task-id"
+              onChange={(event) => setInput(event.target.value)}
+              value={input}
+            />
+          </div>
+          {pending && (
+            <p className="text-muted-foreground text-sm" role="status">
+              삭제 결과를 확인하고 있습니다.
+            </p>
+          )}
+          {message && (
+            <Alert variant={state.kind === "exists" ? "default" : "destructive"}>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          )}
           {showRecovery && (
-            <div>
-              <button disabled={pending} onClick={() => void recheck()} type="button">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                disabled={pending}
+                onClick={() => void recheck()}
+                type="button"
+                variant="outline"
+              >
                 다시 확인
-              </button>
-              <Link to="/task">할 일 목록으로 이동</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/task">할 일 목록으로 이동</Link>
+              </Button>
             </div>
           )}
-          <button disabled={pending} onClick={resetAndClose} type="button">
-            취소
-          </button>
-          <button disabled={submitDisabled} type="submit">
-            삭제 확인
-          </button>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending} type="button">
+              취소
+            </AlertDialogCancel>
+            <Button disabled={submitDisabled} type="submit" variant="destructive">
+              삭제 확인
+            </Button>
+          </AlertDialogFooter>
         </form>
-      </Modal>
-    </>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

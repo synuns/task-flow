@@ -1,5 +1,5 @@
 import { ApiClientProvider, type ApiClient } from "@/shared/api";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +51,8 @@ describe("DeleteTaskDialog", () => {
 
     const trigger = screen.getByRole("button", { name: "할 일 삭제" });
     await user.click(trigger);
-    const dialog = screen.getByRole("dialog", { name: "할 일 삭제" });
+    const dialog = screen.getByRole("alertdialog", { name: "할 일 삭제" });
+    expect(dialog).toHaveAttribute("data-slot", "alert-dialog-content");
     const input = screen.getByRole("textbox", { name: "할 일 ID" });
     const submit = screen.getByRole("button", { name: "삭제 확인" });
 
@@ -74,8 +75,8 @@ describe("DeleteTaskDialog", () => {
     expect(input).toBeDisabled();
     expect(screen.getByRole("button", { name: "취소" })).toBeDisabled();
     expect(submit).toBeDisabled();
-    fireEvent(dialog, new Event("cancel", { bubbles: false, cancelable: true }));
-    expect(screen.getByRole("dialog", { name: "할 일 삭제" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("alertdialog", { name: "할 일 삭제" })).toBeInTheDocument();
 
     release({ kind: "exists", message: "할 일이 존재합니다. 삭제를 다시 시도할 수 있습니다." });
     expect(await screen.findByRole("alert")).toHaveTextContent("삭제를 다시 시도할 수 있습니다.");
@@ -83,7 +84,7 @@ describe("DeleteTaskDialog", () => {
     expect(submit).toBeEnabled();
 
     await user.click(screen.getByRole("button", { name: "취소" }));
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
     await user.click(trigger);
     expect(screen.getByRole("textbox", { name: "할 일 ID" })).toHaveValue("");
