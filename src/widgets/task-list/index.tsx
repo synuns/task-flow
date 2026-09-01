@@ -1,7 +1,17 @@
 import { TaskCard, taskKeys } from "@/entities/task";
 import { getTasks, useApiClient } from "@/shared/api";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Card,
+  CardContent,
+  Skeleton,
+} from "@/shared/ui";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { Inbox } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
 function errorMessage(error: unknown): string {
@@ -42,29 +52,53 @@ export function TaskList() {
     query.fetchNextPage,
   ]);
 
-  if (query.isPending) return <p role="status">할 일을 불러오고 있습니다.</p>;
-  if (query.isError && !query.data) {
+  if (query.isPending) {
     return (
-      <section>
-        <p role="alert">{errorMessage(query.error)}</p>
-        <button onClick={() => void query.refetch()} type="button">
-          다시 불러오기
-        </button>
-      </section>
+      <div className="grid gap-2" role="status">
+        <span className="sr-only">할 일을 불러오고 있습니다.</span>
+        <Skeleton className="h-24" />
+      </div>
     );
   }
-  if (tasks.length === 0) return <p>등록된 할 일이 없습니다.</p>;
+  if (query.isError && !query.data) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>할 일을 불러오지 못했습니다.</AlertTitle>
+        <AlertDescription>
+          <p>{errorMessage(query.error)}</p>
+          <Button onClick={() => void query.refetch()} size="sm" type="button" variant="outline">
+            다시 불러오기
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+  if (tasks.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center py-8 text-center">
+          <Inbox aria-hidden="true" className="mb-3 size-8 text-muted-foreground" />
+          <p className="font-medium">등록된 할 일이 없습니다.</p>
+          <p className="mt-1 text-muted-foreground text-sm">
+            새 업무가 등록되면 이곳에 표시됩니다.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <section>
-      <section aria-label="할 일 목록" ref={scrollRef} style={{ height: 96, overflow: "auto" }}>
+    <div className="grid gap-3">
+      <section
+        aria-label="할 일 목록"
+        className="rounded-xl border bg-card"
+        ref={scrollRef}
+        style={{ height: 96, overflow: "auto" }}
+      >
         <ul
+          className="relative m-0 list-none p-0"
           style={{
             height: virtualizer.getTotalSize(),
-            listStyle: "none",
-            margin: 0,
-            padding: 0,
-            position: "relative",
           }}
         >
           {virtualItems.map((virtualItem) => {
@@ -91,17 +125,24 @@ export function TaskList() {
           })}
         </ul>
       </section>
-      {query.isError && query.data && <p role="alert">{errorMessage(query.error)}</p>}
+      {query.isError && query.data && (
+        <Alert variant="destructive">
+          <AlertDescription>{errorMessage(query.error)}</AlertDescription>
+        </Alert>
+      )}
       {query.hasNextPage && (
-        <button
+        <Button
           disabled={query.isFetchingNextPage}
           onClick={() => void query.fetchNextPage()}
           type="button"
+          variant="secondary"
         >
           {query.isFetchingNextPage ? "다음 페이지 불러오는 중" : "다음 페이지 불러오기"}
-        </button>
+        </Button>
       )}
-      {!query.hasNextPage && <p>모든 할 일을 불러왔습니다.</p>}
-    </section>
+      {!query.hasNextPage && (
+        <p className="text-center text-muted-foreground text-sm">모든 할 일을 불러왔습니다.</p>
+      )}
+    </div>
   );
 }

@@ -12,6 +12,7 @@ describe("TaskCard", () => {
     );
 
     const link = screen.getByRole("link", { name: /첫 번째 할 일/ });
+    expect(link.querySelector('[data-slot="card"]')).toBeInTheDocument();
     expect(link).toHaveTextContent("삭제 검증 대상");
     expect(link).toHaveAttribute("href", "/task/task%2FA");
     expect(screen.queryByText("TODO")).not.toBeInTheDocument();
