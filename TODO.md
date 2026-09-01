@@ -408,7 +408,7 @@
   Pretendard, font/worker network와 console/page error 재확인; 상세 기록
   `docs/quality/evidence/frontend-scaffolding.md`
 
-### [ ] SCF-RUNTIME-01 제출 preview mock 실행
+### [x] SCF-RUNTIME-01 제출 preview mock 실행
 
 - Requirements: `SYS-04`
 - Risk: HIGH — 제출 실행 방식과 API 대체 구현 활성화 범위
@@ -419,12 +419,15 @@
 - Automatic verification: harness Vitest, `pnpm build`, `./scripts/verify quick`
 - Browser verification: production preview `/sign-in`과 보호 route, worker/network,
   console/page error
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root`; 사용자 리뷰 1번 수정 명시 승인;
   `docs/superpowers/specs/2026-09-01-review-findings-corrections-design.md`와 구현 계획;
-  최신 `b11fac7` 기준 `./scripts/verify quick` PASS
+  RED harness가 dev server command를 재현; GREEN `cb7f34d`에서 production
+  build/preview command와 unconditional worker bootstrap, harness Vitest와 build PASS;
+  production preview agent-browser에서 worker controller
+  `/mockServiceWorker.js`, 보호 API 200, page error 없음; `./scripts/verify full` PASS
 
-### [ ] E2E-SMOKE-01 전체 smoke 현재 계약 정합화
+### [x] E2E-SMOKE-01 전체 smoke 현재 계약 정합화
 
 - Requirements: 전체 route와 `SYS-03`, `SYS-04`
 - Risk: LOW — stale 검증 기대값 교정
@@ -434,10 +437,13 @@
   anonymous protected-route 또는 이전 heading 기대값이 없다.
 - Automatic verification: `pnpm exec playwright test`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, `/`, `/task`, `/task/task-1`, `/user`
-- Status: NOT_STARTED
-- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 2번 수정 명시 승인
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root`; 사용자 리뷰 2번 수정 명시 승인; RED 전체
+  Playwright에서 anonymous protected route와 stale detail heading, expected 401 console로
+  2건 FAIL; authenticated scaffold와 sign-in/protected route 분리, exact current heading으로
+  교정; production preview 전체 Playwright 7/7 PASS, core 5/5 PASS
 
-### [ ] TASK-PAGE-EMPTY-01 빈 중간 page pagination 복구
+### [x] TASK-PAGE-EMPTY-01 빈 중간 page pagination 복구
 
 - Requirements: `TASK-LIST-04`
 - Risk: MEDIUM — infinite pagination 종료 판정
@@ -446,10 +452,13 @@
 - Acceptance: 빈 중간 page 뒤 다음 data가 렌더되고 false terminal page에서만 멈춘다.
 - Automatic verification: task-list focused Vitest, `./scripts/verify quick`
 - Browser verification: 적용 가능한 mock fixture가 있으면 `/task` request sequence 확인
-- Status: NOT_STARTED
-- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 4번 수정 명시 승인
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root`; 사용자 리뷰 4번 수정 명시 승인; RED 빈 page
+  `{ data: [], hasNext: true }` 뒤 page 2 미요청 FAIL; empty page를 list end로 판정하고
+  terminal empty만 empty UI로 표시; task-list focused 5/5, quick와 task-discovery
+  production Chromium PASS
 
-### [ ] API-CANCEL-01 query AbortSignal 전파
+### [x] API-CANCEL-01 query AbortSignal 전파
 
 - Requirements: `DASH-01`, `USER-01`, `TASK-LIST-01`, `TASK-DETAIL-01`
 - Risk: LOW — read request 취소 전파
@@ -459,10 +468,13 @@
   같은 signal을 받아 중단 가능하다.
 - Automatic verification: API/widget/page focused Vitest, `./scripts/verify quick`
 - Browser verification: 일반 route 회귀 확인
-- Status: NOT_STARTED
-- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 5번 수정 명시 승인
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root`; 사용자 리뷰 5번 수정 명시 승인; RED dashboard,
+  user, task list, task detail 네 request의 signal `undefined` FAIL; 각 query context signal을
+  기존 API adapter와 client request에 전달; 관련 focused 7 files/22 tests, quick와
+  production route Chromium PASS
 
-### [ ] MOCK-PAGE-VALIDATION-01 task page query 검증
+### [x] MOCK-PAGE-VALIDATION-01 task page query 검증
 
 - Requirements: `SYS-04`, `TASK-LIST-01`
 - Risk: HIGH — OpenAPI에 명시되지 않은 invalid query mock 응답 확정
@@ -472,10 +484,13 @@
   정수만 기존 page 응답을 받는다.
 - Automatic verification: handler focused Vitest, `./scripts/verify quick`
 - Browser verification: 적용 없음 — invalid parameter contract integration test가 직접 검증
-- Status: NOT_STARTED
-- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자 리뷰 6번 수정 명시 승인
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root`; 사용자 리뷰 6번 및 400 `ErrorResponse` 설계 명시
+  승인; RED 누락·0·음수·1.5·비숫자 모두 200 FAIL; handler trust boundary에서
+  OpenAPI `required`, `integer`, `minimum: 1` 검증; handler focused 12/12, quick PASS;
+  `assignment-original/` diff 없음
 
-### [ ] REVIEW-CORRECTIONS-01 리뷰 교정 계획 완료 적대적 review
+### [x] REVIEW-CORRECTIONS-01 리뷰 교정 계획 완료 적대적 review
 
 - Requirements: 위 다섯 task의 requirements
 - Risk: MEDIUM — 교정 누락과 회귀 검출
@@ -487,8 +502,16 @@
 - Automatic verification: 영향 focused test, `./scripts/verify quick`,
   `./scripts/verify full`, `git diff --check`
 - Browser verification: production preview route/network/console 재검증
-- Status: NOT_STARTED
-- Evidence: 2026-09-01 Codex `/root` task block owner
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root`; Review target: implementation commit `cb7f34d`;
+  Reviewer: 구현 완료·commit 후 새 read-only second-pass의 `/root`; Checks: 사용자
+  1·2·4·5·6 coverage, 네 query sibling/caller, OpenAPI page constraint와 원본 diff,
+  production worker/route/network, empty-page termination, invalid query matrix, weak test,
+  unrelated diff; Findings: unresolved HIGH 0, MEDIUM 0, MINOR 0; Corrections: 없음;
+  Rerun: `git diff --check`, `./scripts/verify quick` PASS(38 files/141 tests), production
+  전체 Playwright 7/7, `./scripts/verify full` PASS(core 5/5, verifier regression 19),
+  agent-browser mobile task와 desktop user/worker/network/page-error PASS;
+  Verdict: PASS
 
 ### [x] SCF-05 KB올라케어 semantic color theme
 
