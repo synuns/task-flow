@@ -4,7 +4,8 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: true,
-  retries: process.env.CI ? 2 : 0,
+  retries: 1,
+  failOnFlakyTests: true,
   reporter: "html",
   use: {
     baseURL: "http://127.0.0.1:4173",
