@@ -150,3 +150,34 @@ Correction: use a temporary page-local fetch wrapper after authenticated bootstr
 before SPA task navigation; reject only page 2, restore the original fetch before retry
 Rerun verdict: PASS — focused, quick, exact success sequence, terminal stop, preserved
 partial data, retry sequence and console/page-error checks passed; no product code/test change
+
+## TASK-LIST-STATES-01
+
+Requirement/Journey: `TASK-LIST-01`, `TASK-LIST-04`; `DISC-E1`, `DISC-E2`
+Commit: `1e4620cf44e901c9d14b23eb47e57c8aeeea6cbb`
+Agent-browser sessions: `task-list-states-01-error`, `task-list-states-01-empty`
+Route/Viewport: `/` → `/task` at `1280x720`; `/task` at `390x844`; production preview
+Precondition: approved auth fixture; default three-task store for recoverable initial error,
+fresh empty task store for terminal empty state
+Actions: run focused state suite and quick; install a temporary page-local rejection for
+page 1 after dashboard bootstrap, navigate to task, inspect alert/action/layout, restore fetch
+and retry; in a fresh mobile session seed `[]` before bootstrap, inspect empty semantics,
+actions, width, request timing, console and page errors; close both sessions
+Expected: loading states have semantic status; initial error has one visible retry; retry
+restores data without duplicate page requests; empty terminal is distinct, makes no next-page
+request, invents no unsupported create CTA and has no horizontal clipping
+Actual: focused Vitest passed 1 file/5 tests, including initial/next loading, terminal and
+intermediate empty, initial and partial retry; quick passed hook 86, contract 19 and Vitest
+38 files/149 tests. Desktop error exposed one alert with title/message/retry, no list region
+and width 1280; restored retry produced pages 1→2, three rows and terminal. Mobile empty was
+true with createAction false, nextAction false and document/viewport width 390
+Console/Network: corrected desktop success timing contained page 1 then page 2 exactly once;
+empty timing contained only page 1 with MSW `{data:[],hasNext:false}`. The deliberate initial
+rejection failed before transmission; no page error or unexpected console error
+Screenshot/Trace: `/tmp/kbhc-task-list-states-01-error.png`,
+`/tmp/kbhc-task-list-states-01-empty.png`
+Failure class: none beyond the already-classified MSW route interception tooling constraint
+Correction: use the established page-local rejected-fetch technique and restore fetch before
+retry; no product correction
+Rerun verdict: PASS — focused, quick, recoverable initial error, successful retry, terminal
+empty, unsupported-CTA absence, responsive width and console/page-error checks passed

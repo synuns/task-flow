@@ -1546,7 +1546,7 @@ src/shared/api/tasks.test.ts`, `./scripts/verify quick`
   `/tmp/kbhc-task-list-paging-ux-01-partial-error.png`,
   `/tmp/kbhc-task-list-paging-ux-01-retry-terminal.png`.
 
-### [ ] TASK-LIST-STATES-01 목록 초기·빈·오류 화면
+### [x] TASK-LIST-STATES-01 목록 초기·빈·오류 화면
 
 - Requirements: `TASK-LIST-01`, `TASK-LIST-04`
 - Risk: LOW — 검증된 query states의 presentation
@@ -1558,8 +1558,21 @@ src/shared/api/tasks.test.ts`, `./scripts/verify quick`
   `./scripts/verify quick`
 - Browser verification: `/task`, 390x844/1280x720, state fixture별 layout/action,
   request count와 console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root` task block owner; branch
+  `feat/task-discovery-loop`; start commit
+  `1e4620cf44e901c9d14b23eb47e57c8aeeea6cbb`; requirements `TASK-LIST-01`,
+  `TASK-LIST-04`; plan
+  `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`. Focused list 1
+  file/5 tests와 quick hook 86·contract 19·Vitest 38 files/149 tests PASS; component
+  suite가 initial/next loading, empty/continuation, initial/partial retry를 검증함.
+  Production preview agent-browser `task-list-states-01-error`에서 desktop initial
+  transport error의 alert/retry 1개와 list 부재를 확인하고 복구 후 page `1→2`, 3개
+  card와 terminal을 확인. `task-list-states-01-empty` mobile은 empty message true,
+  create/next action false, document/viewport width 390, page 1 한 번만 요청함. 예상한
+  rejected fetch 외 console/page error 없음; 제품 code/test 변경 없음. Screenshots:
+  `/tmp/kbhc-task-list-states-01-error.png`,
+  `/tmp/kbhc-task-list-states-01-empty.png`.
 
 ### [ ] TASK-LIST-JOURNEY-VERIFY-01 task-discovery 통합 검증
 
