@@ -635,8 +635,10 @@
   src/app/router.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, `/sign-in`, `/task`, `/task/task-1`, `/user`, 두 viewport,
   keyboard navigation, computed Pretendard, console/page error와 예상 밖 network 없음
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; parallel isolated implementation,
+  focused/quick automatic verification, desktop/mobile browser sweep와 task review 기록은
+  `docs/quality/evidence/ui-shell-state.md`; plan-completion review와 final gate 대기
 
 ### [ ] UI-STATE-01 공통 비동기 상태 표현
 
@@ -651,8 +653,10 @@
   `./scripts/verify quick`
 - Browser verification: 적용 없음 — shared semantic contract는 component test로
   검증하고 실제 `/`, `/user` browser 상태는 `DASHBOARD-VIEW-01`, `PROFILE-VIEW-01`이 소유
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; shared loading/error와
+  domain-local empty 상태의 RED/GREEN, focused/quick 및 task review 기록은
+  `docs/quality/evidence/ui-shell-state.md`; plan-completion review와 final gate 대기
 
 ## 3. auth-entry Journey
 
