@@ -2,6 +2,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -136,6 +137,162 @@ class VerifyContractTests(unittest.TestCase):
     def test_repository_todo_state_is_consistent(self):
         verifier = load_verify_module()
         self.assertEqual(verifier.verify_todo_consistency(ROOT), [])
+
+    def test_repository_worktree_default_is_recorded(self):
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        workflow = (ROOT / "docs/quality/workflow.md").read_text(encoding="utf-8")
+
+        for document in (agents, workflow):
+            with self.subTest(document="AGENTS.md" if document is agents else "workflow.md"):
+                self.assertIn("격리 worktree를 기본", document)
+                self.assertIn("별도 질문 없이", document)
+                self.assertIn("`.worktrees/<branch>`", document)
+                self.assertIn("생성 또는 안전 검사가 실패", document)
+
+    def test_repository_todo_contains_granular_journey_backlog(self):
+        todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
+        expected = {
+            "UI-FOUNDATION-01": ({"SCF-05", "ARCH-02"}, "NOT_STARTED"),
+            "UI-SHELL-01": ({"UI-FOUNDATION-01", "AUTH-NAV-01"}, "NOT_STARTED"),
+            "UI-STATE-01": ({"UI-FOUNDATION-01"}, "NOT_STARTED"),
+            "AUTH-VIEW-01": ({"UI-SHELL-01", "UI-STATE-01", "AUTH-UI-01"}, "NOT_STARTED"),
+            "AUTH-ERROR-VIEW-01": ({"AUTH-VIEW-01", "AUTH-API-01"}, "NOT_STARTED"),
+            "AUTH-SESSION-UX-01": (
+                {"AUTH-ERROR-VIEW-01", "AUTH-STATE-01", "UI-STATE-01"},
+                "NOT_STARTED",
+            ),
+            "AUTH-JOURNEY-VERIFY-01": ({"AUTH-SESSION-UX-01"}, "NOT_STARTED"),
+            "AUTH-JOURNEY-REVIEW-01": ({"AUTH-JOURNEY-VERIFY-01"}, "NOT_STARTED"),
+            "JOURNEY-AUTH-01": ({"AUTH-JOURNEY-REVIEW-01"}, "BLOCKED"),
+            "DASHBOARD-VIEW-01": ({"UI-SHELL-01", "UI-STATE-01", "DASH-01"}, "NOT_STARTED"),
+            "PROFILE-VIEW-01": ({"UI-SHELL-01", "UI-STATE-01", "USER-01"}, "NOT_STARTED"),
+            "WORK-NAV-RESPONSIVE-01": (
+                {"DASHBOARD-VIEW-01", "PROFILE-VIEW-01"},
+                "NOT_STARTED",
+            ),
+            "WORK-JOURNEY-VERIFY-01": ({"WORK-NAV-RESPONSIVE-01"}, "NOT_STARTED"),
+            "WORK-JOURNEY-REVIEW-01": ({"WORK-JOURNEY-VERIFY-01"}, "NOT_STARTED"),
+            "JOURNEY-WORK-01": ({"WORK-JOURNEY-REVIEW-01"}, "BLOCKED"),
+            "TASK-CARD-VIEW-01": ({"UI-FOUNDATION-01", "TASK-PAGE-01"}, "NOT_STARTED"),
+            "TASK-LIST-VIRTUAL-UX-01": (
+                {"TASK-CARD-VIEW-01", "TASK-PAGE-03"},
+                "NOT_STARTED",
+            ),
+            "TASK-LIST-PAGING-UX-01": (
+                {"TASK-LIST-VIRTUAL-UX-01", "TASK-PAGE-02"},
+                "NOT_STARTED",
+            ),
+            "TASK-LIST-STATES-01": (
+                {"TASK-LIST-PAGING-UX-01", "UI-STATE-01"},
+                "NOT_STARTED",
+            ),
+            "TASK-LIST-JOURNEY-VERIFY-01": ({"TASK-LIST-STATES-01"}, "NOT_STARTED"),
+            "TASK-LIST-JOURNEY-REVIEW-01": (
+                {"TASK-LIST-JOURNEY-VERIFY-01"},
+                "NOT_STARTED",
+            ),
+            "JOURNEY-TASK-LIST-01": ({"TASK-LIST-JOURNEY-REVIEW-01"}, "BLOCKED"),
+            "TASK-DETAIL-VIEW-01": (
+                {"UI-SHELL-01", "UI-STATE-01", "TASK-DETAIL-01"},
+                "NOT_STARTED",
+            ),
+            "TASK-DETAIL-RECOVERY-VIEW-01": ({"TASK-DETAIL-VIEW-01"}, "NOT_STARTED"),
+            "TASK-DELETE-DIALOG-VIEW-01": (
+                {"TASK-DETAIL-VIEW-01", "TASK-DELETE-01", "UI-FOUNDATION-01"},
+                "NOT_STARTED",
+            ),
+            "TASK-DELETE-OUTCOME-VIEW-01": (
+                {
+                    "TASK-DELETE-DIALOG-VIEW-01",
+                    "TASK-DELETE-02",
+                    "TASK-DETAIL-RECOVERY-VIEW-01",
+                },
+                "NOT_STARTED",
+            ),
+            "TASK-DETAIL-JOURNEY-VERIFY-01": (
+                {"TASK-DELETE-OUTCOME-VIEW-01"},
+                "NOT_STARTED",
+            ),
+            "TASK-DETAIL-JOURNEY-REVIEW-01": (
+                {"TASK-DETAIL-JOURNEY-VERIFY-01"},
+                "NOT_STARTED",
+            ),
+            "JOURNEY-TASK-DETAIL-01": ({"TASK-DETAIL-JOURNEY-REVIEW-01"}, "BLOCKED"),
+            "QA-CROSS-AUTH-01": (
+                {
+                    "JOURNEY-AUTH-01",
+                    "JOURNEY-WORK-01",
+                    "JOURNEY-TASK-LIST-01",
+                    "JOURNEY-TASK-DETAIL-01",
+                },
+                "NOT_STARTED",
+            ),
+            "QA-CROSS-DATA-01": (
+                {
+                    "JOURNEY-AUTH-01",
+                    "JOURNEY-WORK-01",
+                    "JOURNEY-TASK-LIST-01",
+                    "JOURNEY-TASK-DETAIL-01",
+                },
+                "NOT_STARTED",
+            ),
+            "QA-RESPONSIVE-A11Y-01": (
+                {"QA-CROSS-AUTH-01", "QA-CROSS-DATA-01"},
+                "NOT_STARTED",
+            ),
+            "QA-CONTRACT-01": (
+                {"QA-CROSS-AUTH-01", "QA-CROSS-DATA-01"},
+                "NOT_STARTED",
+            ),
+            "QA-HARNESS-01": ({"QA-02"}, "BLOCKED"),
+            "QA-03": ({"QA-02"}, "BLOCKED"),
+            "QA-04": (
+                {
+                    "QA-02",
+                    "QA-03",
+                    "JOURNEY-AUTH-01",
+                    "JOURNEY-WORK-01",
+                    "JOURNEY-TASK-LIST-01",
+                    "JOURNEY-TASK-DETAIL-01",
+                },
+                "BLOCKED",
+            ),
+        }
+
+        for task_id, (dependencies, status) in expected.items():
+            match = re.search(
+                rf"^### \[[ x]\] {re.escape(task_id)}\b(?P<block>.*?)(?=^### \[[ x]\]|\Z)",
+                todo,
+                re.MULTILINE | re.DOTALL,
+            )
+            self.assertIsNotNone(match, task_id)
+            block = match.group("block") if match else ""
+            for field in (
+                "Requirements",
+                "Risk",
+                "Depends on",
+                "Deliverable",
+                "Acceptance",
+                "Automatic verification",
+                "Browser verification",
+                "Status",
+                "Evidence",
+            ):
+                self.assertIn(f"- {field}:", block, f"{task_id} missing {field}")
+            self.assertIn(f"- Status: {status}", block, task_id)
+            dependency_match = re.search(
+                r"^- Depends on:(.*?)(?=\n- [A-Z]|\Z)",
+                block,
+                re.MULTILINE | re.DOTALL,
+            )
+            self.assertIsNotNone(dependency_match, task_id)
+            actual_dependencies = set(
+                re.findall(
+                    r"`([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)`",
+                    dependency_match.group(1) if dependency_match else "",
+                )
+            )
+            self.assertEqual(actual_dependencies, dependencies, task_id)
 
     def test_setup_runs_read_only_verifier_contract_tests(self):
         verifier = load_verify_module()

@@ -48,12 +48,12 @@
 | --- | --- | --- |
 | 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
 | 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
-| 2. 공통 구조 | provider/router/API/test 경계 검증 | AI_VERIFIED |
-| 3. auth-entry | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
-| 4. work-overview | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
-| 5. task-discovery | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
-| 6. task-resolution | evidence·review 후 사람 checkpoint | IN_PROGRESS — tracked 사람 승인 근거 없음 |
-| 7. 통합·제출 QA | full QA 후 사람 최종 acceptance | IN_PROGRESS |
+| 2. 공통 구조 | provider/router/API 기반 + 실제 UI shell/state | IN_PROGRESS — 로직 기반 검증, UI backlog 시작 전 |
+| 3. auth-entry | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
+| 4. work-overview | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
+| 5. task-discovery | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
+| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
+| 7. 통합·제출 QA | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — Journey UI 구현 전 |
 
 ## 0. 기획·결정 준비
 
@@ -257,6 +257,22 @@
   generated/mocks, provider/router ownership 정적·Vitest 검토와
   `./scripts/verify quick` PASS; 사람 승인 evidence는 기록하되 규약에 따라 AI가
   `HUMAN_APPROVED`로 표시하지 않음
+
+### [ ] PLAN-JOURNEY-BACKLOG-01 Journey 구현 백로그 세분화
+
+- Requirements: 전체 Journey의 실행 단위와 evidence contract
+- Risk: LOW — accepted behavior를 바꾸지 않는 실행 원장 보강
+- Depends on: `PLAN-01`, `FLOW-REVIEW-01`
+- Deliverable: 공통 UI, 네 Journey 구현·검증·review와 통합 QA의 세부 TODO graph
+- Acceptance: 기존 완료 이력을 보존하고 dependency-resolved `NOT_STARTED` task가
+  있으며 Journey review와 사람 checkpoint가 분리되고 setup 계약이 이를 검증한다.
+- Automatic verification: focused verifier contract test, `./scripts/verify setup`,
+  `./scripts/verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — 원장 설계 변경
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; 승인된 design
+  `docs/superpowers/specs/2026-09-01-journey-implementation-backlog-design.md`와 plan
+  `docs/superpowers/plans/2026-09-01-journey-implementation-backlog.md`
 
 ## 1. 검증 가능한 개발 기반
 
@@ -527,6 +543,50 @@
   mocks, auth placeholder, route error 과대책임, aborted UI, 빈 layer/public API,
   dashboard entity 위반 0건
 
+### [ ] UI-FOUNDATION-01 공통 interactive UI와 surface
+
+- Requirements: `SYS-02`, `SYS-03`, 공통 접근성 invariant
+- Risk: LOW — 기존 token과 채택 stack 안의 UI 표현
+- Depends on: `SCF-05`, `ARCH-02`
+- Deliverable: button, input, card/surface, focus, disabled/error 표현의 공통 기반
+- Acceptance: representative control이 semantic token만 사용하고 keyboard focus,
+  disabled와 error를 color 외 text/semantics로 구분한다. 기존 저장소와 공식 shadcn
+  registry를 먼저 조사하며 새 runtime dependency는 추가하지 않는다.
+- Automatic verification: `pnpm vitest run src/shared/ui/ui-foundation.test.tsx
+  src/test/theme-contract.test.ts`, `./scripts/verify quick`
+- Browser verification: `/sign-in`, 390x844/1280x720, keyboard focus와 disabled/error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] UI-SHELL-01 반응형 application shell
+
+- Requirements: `NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`
+- Risk: LOW — 기존 router/auth action의 presentation
+- Depends on: `UI-FOUNDATION-01`, `AUTH-NAV-01`
+- Deliverable: responsive navigation과 page content shell
+- Acceptance: 다섯 route에서 dashboard/task와 인증 action이 유지되고 current route,
+  hover/focus가 구분되며 390x844/1280x720에서 clipping이 없다.
+- Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
+  src/app/router.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/`, `/sign-in`, `/task`, `/task/task-1`, `/user`, 두 viewport,
+  keyboard navigation, computed Pretendard, console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] UI-STATE-01 공통 비동기 상태 표현
+
+- Requirements: loading, empty, recoverable error, success 공통 invariant
+- Risk: LOW
+- Depends on: `UI-FOUNDATION-01`
+- Deliverable: 실제 반복되는 loading, empty, error/retry 상태 UI
+- Acceptance: loading live status, error alert/retry, empty message가 layout을 유지한다.
+  두 소비처 이상이 생길 때만 shared UI로 올리고 generic framework는 만들지 않는다.
+- Automatic verification: `pnpm vitest run src/shared/ui/async-state.test.tsx`,
+  `./scripts/verify quick`
+- Browser verification: 첫 소비 Journey에서 390x844/1280x720 상태별 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
 ## 3. auth-entry Journey
 
 ### [x] AUTH-UNIT-01 sign-in schema
@@ -619,20 +679,99 @@
   `/sign-in` → 안전 복귀 → reload → `/user` 이동 PASS;
   `docs/quality/evidence/auth-entry.md`
 
-### [ ] JOURNEY-AUTH-01 auth-entry 검증·review·checkpoint
+### [ ] AUTH-VIEW-01 로그인 page와 form 화면
+
+- Requirements: `AUTH-01`~`AUTH-05`
+- Risk: LOW — 검증된 form behavior의 presentation
+- Depends on: `UI-SHELL-01`, `UI-STATE-01`, `AUTH-UI-01`
+- Deliverable: 읽기 가능한 hierarchy와 상태 표현을 가진 로그인 page/form
+- Acceptance: label/input/inline error가 연결되고 empty, invalid email, 7·25자와
+  non-ASCII password, valid, pending 상태가 text와 style로 구분되며 submit 규칙은
+  유지된다.
+- Automatic verification: `pnpm vitest run
+  src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/sign-in`, 390x844/1280x720, keyboard tab order,
+  invalid/valid/pending, clipping, console/network
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] AUTH-ERROR-VIEW-01 로그인 오류 modal 화면
+
+- Requirements: `AUTH-06`
+- Risk: MEDIUM — modal interaction과 focus lifecycle
+- Depends on: `AUTH-VIEW-01`, `AUTH-API-01`
+- Deliverable: 400 `errorMessage`를 표시하는 styled accessible modal
+- Acceptance: close button과 Escape가 동작하고 focus가 modal 안에 머문 뒤 submit으로
+  복귀하며 390x844에서 content와 action이 잘리지 않는다.
+- Automatic verification: `pnpm vitest run
+  src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/sign-in` credential failure, 390x844/1280x720, focus
+  trap/restore, modal overflow, POST status/body, console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] AUTH-SESSION-UX-01 인증 초기화·실패·복귀 화면
+
+- Requirements: `AUTH-07`, `NAV-02`, `NAV-03`
+- Risk: MEDIUM — auth route와 visible state 통합
+- Depends on: `AUTH-ERROR-VIEW-01`, `AUTH-STATE-01`, `UI-STATE-01`
+- Deliverable: bootstrap, unavailable/retry, anonymous redirect와 authenticated return UI
+- Acceptance: 인증 초기화와 recoverable failure가 빈 화면으로 보이지 않고 보호 route
+  직접 진입, 로그인 복귀와 refresh-cookie reload가 layout jump 없이 승인 정책대로
+  전환된다.
+- Automatic verification: `pnpm vitest run src/app/auth/auth-route-boundary.test.tsx
+  src/app/auth/auth-provider.test.tsx src/app/router.test.tsx`,
+  `./scripts/verify quick`
+- Browser verification: `/task/task-1` 직접 진입 → `/sign-in` → 복귀 → reload,
+  390x844/1280x720, route/action, refresh network, console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] AUTH-JOURNEY-VERIFY-01 auth-entry 통합 검증
+
+- Requirements: `NAV-02`, `AUTH-01`~`AUTH-07`
+- Risk: MEDIUM — Journey evidence gate
+- Depends on: `AUTH-SESSION-UX-01`
+- Deliverable: current commit의 auth-entry focused, quick, core/browser evidence
+- Acceptance: `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`가 lowest-level automatic evidence와
+  current-commit browser record에 trace되고 console/network expected와 actual이
+  기록된다.
+- Automatic verification: `pnpm vitest run
+  src/features/sign-in/ui/sign-in-form.test.tsx
+  src/app/auth/auth-route-boundary.test.tsx src/app/auth/auth-provider.test.tsx
+  src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
+  `pnpm exec playwright test e2e/auth-entry.spec.ts`
+- Browser verification: named `agent-browser` session, `/sign-in` invalid/error/success,
+  protected direct entry/reload, 두 viewport와 credential/network boundary
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] AUTH-JOURNEY-REVIEW-01 auth-entry 독립 review
+
+- Requirements: `NAV-02`, `AUTH-01`~`AUTH-07`
+- Risk: MEDIUM — Journey review gate
+- Depends on: `AUTH-JOURNEY-VERIFY-01`
+- Deliverable: exact target SHA의 fresh auth-entry adversarial review record
+- Acceptance: 요구 누락, auth 경계, negative path, 접근성, weak test, console/network와
+  unrelated diff를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
+- Automatic verification: `./scripts/verify quick`
+- Browser verification: finding이 browser behavior에 영향을 주면 해당 auth case 재실행
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] JOURNEY-AUTH-01 auth-entry 사람 checkpoint
 
 - Requirements: `NAV-02`, `AUTH-01`~`AUTH-07`
 - Risk: MEDIUM checkpoint
-- Depends on: `AUTH-NAV-01`
-- Deliverable: focused integration evidence, 최소 core E2E, 독립 adversarial review
-- Acceptance: `docs/quality/requirements.md` auth-entry action/expected 전체가 증명되고
-  finding이 해결된 뒤 사람 checkpoint를 요청한다.
-- Automatic verification: auth 관련 test, `./scripts/verify quick`, core E2E auth tag
-- Browser verification: `/sign-in` invalid/error/success와 필요한 credential boundary
-- Status: IN_PROGRESS
-- Evidence: automatic, browser, architecture boundary self-check PASS;
-  `docs/quality/evidence/auth-entry.md`; 독립 review의 reviewer/target 기록과 tracked
-  사람 승인 근거가 없어 checkpoint 미승인 유지
+- Depends on: `AUTH-JOURNEY-REVIEW-01`
+- Deliverable: auth-entry 사람 checkpoint 기록
+- Acceptance: current target review가 PASS이고 사람이 auth-entry evidence를 검토해
+  명시적으로 승인한 경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
+- Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
+- Browser verification: `AUTH-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
+- Status: BLOCKED
+- Evidence: 기존 automatic, browser, architecture baseline은
+  `docs/quality/evidence/auth-entry.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
 
 ## 4. work-overview Journey
 
@@ -682,20 +821,97 @@
 - Evidence: user endpoint/handler/query UI RED→GREEN 6 tests; Chromium bearer request와
   `김담당`/`오늘도 차근차근` 확인; `docs/quality/evidence/work-overview.md`
 
-### [ ] JOURNEY-WORK-01 work-overview 검증·review·checkpoint
+### [ ] DASHBOARD-VIEW-01 dashboard metric 화면
+
+- Requirements: `DASH-01`
+- Risk: LOW — 검증된 dashboard data의 presentation
+- Depends on: `UI-SHELL-01`, `UI-STATE-01`, `DASH-01`
+- Deliverable: 세 metric의 responsive state surface
+- Acceptance: 전체/남은/완료 label과 value 관계가 유지되고 loading, error/retry와
+  success가 390x844/1280x720에서 layout collapse 없이 구분된다.
+- Automatic verification: `pnpm vitest run
+  src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/`, 두 viewport, fixture 3/2/1, loading/error/retry/success,
+  bearer request와 console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] PROFILE-VIEW-01 회원정보 화면
+
+- Requirements: `USER-01`
+- Risk: LOW — 검증된 profile data의 presentation
+- Depends on: `UI-SHELL-01`, `UI-STATE-01`, `USER-01`
+- Deliverable: name과 memo의 responsive state surface
+- Acceptance: name과 memo hierarchy가 명확하고 loading, error/retry와 success가
+  390x844/1280x720에서 layout collapse 없이 구분된다.
+- Automatic verification: `pnpm vitest run
+  src/widgets/user-profile/user-profile.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/user`, 두 viewport, fixture name/memo, state, bearer request,
+  console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] WORK-NAV-RESPONSIVE-01 인증 후 route navigation 검증
+
+- Requirements: `SYS-03`, `NAV-01`, `NAV-03`
+- Risk: MEDIUM — 세 route의 shell/content 통합
+- Depends on: `DASHBOARD-VIEW-01`, `PROFILE-VIEW-01`
+- Deliverable: dashboard, task, profile 사이의 responsive navigation
+- Acceptance: 세 action과 current route가 유지되고 content가 두 viewport에서 잘리지
+  않으며 keyboard 이동과 computed Pretendard가 확인된다.
+- Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
+  src/widgets/dashboard-summary/dashboard-summary.test.tsx
+  src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
+  `./scripts/verify quick`
+- Browser verification: `/` → `/user` → `/task` → `/`, 390x844/1280x720,
+  current route, keyboard, font, console/network
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] WORK-JOURNEY-VERIFY-01 work-overview 통합 검증
+
+- Requirements: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`
+- Risk: MEDIUM — Journey evidence gate
+- Depends on: `WORK-NAV-RESPONSIVE-01`
+- Deliverable: current commit의 work-overview focused, quick, core/browser evidence
+- Acceptance: `WORK-P1-*`, `WORK-E*`가 fixture, navigation, state, font, accessibility와
+  viewport evidence에 trace되고 expected console/network가 기록된다.
+- Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
+  src/widgets/dashboard-summary/dashboard-summary.test.tsx
+  src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
+  `./scripts/verify quick`,
+  `pnpm exec playwright test e2e/work-overview.spec.ts`
+- Browser verification: named `agent-browser` session, dashboard/task/profile 이동,
+  두 viewport, fixture 비교와 console/network
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] WORK-JOURNEY-REVIEW-01 work-overview 독립 review
+
+- Requirements: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`
+- Risk: MEDIUM — Journey review gate
+- Depends on: `WORK-JOURNEY-VERIFY-01`
+- Deliverable: exact target SHA의 fresh work-overview adversarial review record
+- Acceptance: fixture 표시, navigation, font, responsive, accessibility, weak test와
+  console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
+- Automatic verification: `./scripts/verify quick`
+- Browser verification: finding이 browser behavior에 영향을 주면 해당 work case 재실행
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] JOURNEY-WORK-01 work-overview 사람 checkpoint
 
 - Requirements: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`
 - Risk: MEDIUM checkpoint
-- Depends on: `NAV-PRIMARY-01`, `AUTH-NAV-01`, `DASH-01`, `USER-01`
-- Deliverable: core browser evidence와 독립 adversarial review
-- Acceptance: fixture 값, route action, distinct icon, Pretendard, viewport,
-  accessibility가 증명되고 finding 해결 후 사람 checkpoint를 요청한다.
-- Automatic verification: 관련 test, `./scripts/verify quick`, core E2E work tag
-- Browser verification: dashboard/task/profile navigation과 fixture 비교
-- Status: IN_PROGRESS
-- Evidence: focused 7 files/22 tests, quick 24 files/85 tests, core E2E, agent-browser
-  desktop/mobile self-check PASS; `docs/quality/evidence/work-overview.md`; 독립
-  review의 reviewer/target 기록과 tracked 사람 승인 근거가 없어 checkpoint 미승인 유지
+- Depends on: `WORK-JOURNEY-REVIEW-01`
+- Deliverable: work-overview 사람 checkpoint 기록
+- Acceptance: current target review가 PASS이고 사람이 evidence를 명시적으로 승인한
+  경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
+- Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
+- Browser verification: `WORK-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
+- Status: BLOCKED
+- Evidence: 기존 focused/core/browser baseline은
+  `docs/quality/evidence/work-overview.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
 
 ## 5. task-discovery Journey
 
@@ -746,21 +962,110 @@
 - Evidence: stable domain key, 96px row measurement, bounded DOM 1/3 records와 terminal
   scroll 확인; `docs/quality/evidence/task-discovery.md`
 
-### [ ] JOURNEY-TASK-LIST-01 task-discovery 검증·review·checkpoint
+### [ ] TASK-CARD-VIEW-01 task card 화면
+
+- Requirements: `TASK-LIST-02`, `TASK-LIST-05`
+- Risk: LOW — 검증된 task item/link의 presentation
+- Depends on: `UI-FOUNDATION-01`, `TASK-PAGE-01`
+- Deliverable: title/memo hierarchy와 전체 action을 가진 task card
+- Acceptance: title과 memo가 구분되고 card 전체가 exact encoded detail route로
+  이동하며 hover와 keyboard focus가 명확하다. 원본에 없는 status UI는 추가하지 않는다.
+- Automatic verification: `pnpm vitest run
+  src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/task`, 390x844/1280x720, card content, pointer/keyboard focus,
+  `/task/:id` navigation, console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-LIST-VIRTUAL-UX-01 production scroll viewport
+
+- Requirements: `TASK-LIST-03`
+- Risk: MEDIUM — responsive scroll와 virtual measurement
+- Depends on: `TASK-CARD-VIEW-01`, `TASK-PAGE-03`
+- Deliverable: 여러 행을 탐색할 수 있는 bounded responsive virtual viewport
+- Acceptance: 기존 96px 고정 viewport를 제거하고 두 viewport에서 usable height를
+  제공하며 fetched item이 늘어도 mounted row가 viewport 주변으로 제한되고 scroll
+  position이 안정적이다.
+- Automatic verification: `pnpm vitest run src/widgets/task-list/task-list.test.tsx`,
+  `./scripts/verify quick`
+- Browser verification: `/task`, 390x844/1280x720, 실제 wheel/keyboard scroll,
+  viewport/row size, mounted DOM count와 clipping
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-LIST-PAGING-UX-01 무한 pagination feedback
+
+- Requirements: `TASK-LIST-04`
+- Risk: MEDIUM — scroll trigger와 request lifecycle
+- Depends on: `TASK-LIST-VIRTUAL-UX-01`, `TASK-PAGE-02`
+- Deliverable: list end 자동 pagination과 in-flight/error/terminal feedback
+- Acceptance: end 도달 시 다음 page를 한 번 요청하고 partial-page failure는 retry할 수
+  있으며 `hasNext: false` 뒤 멈춘다. 수동 fallback은 자동 pagination을 대체하지 않는다.
+- Automatic verification: `pnpm vitest run src/widgets/task-list/task-list.test.tsx
+  src/shared/api/tasks.test.ts`, `./scripts/verify quick`
+- Browser verification: `/task`, 두 viewport, page 1→2 scroll, request method/query/count,
+  in-flight/terminal feedback, console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-LIST-STATES-01 목록 초기·빈·오류 화면
+
+- Requirements: `TASK-LIST-01`, `TASK-LIST-04`
+- Risk: LOW — 검증된 query states의 presentation
+- Depends on: `TASK-LIST-PAGING-UX-01`, `UI-STATE-01`
+- Deliverable: initial loading, empty, initial/partial error와 terminal/success 화면
+- Acceptance: 각 state가 semantic role과 visible action/message로 구분되고 상태 전환
+  중 list layout이 붕괴하지 않으며 retry가 기존 page를 중복 요청하지 않는다.
+- Automatic verification: `pnpm vitest run src/widgets/task-list/task-list.test.tsx`,
+  `./scripts/verify quick`
+- Browser verification: `/task`, 390x844/1280x720, state fixture별 layout/action,
+  request count와 console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-LIST-JOURNEY-VERIFY-01 task-discovery 통합 검증
+
+- Requirements: `TASK-LIST-01`~`TASK-LIST-05`
+- Risk: MEDIUM — Journey evidence gate
+- Depends on: `TASK-LIST-STATES-01`
+- Deliverable: current commit의 task-discovery focused, quick, core/browser evidence
+- Acceptance: `DISC-P1-*`, `DISC-E*`가 exact page sequence, bounded DOM, real scroll,
+  terminal stop와 detail navigation evidence에 trace된다.
+- Automatic verification: `pnpm vitest run src/entities/task/ui/task-card.test.tsx
+  src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
+  `./scripts/verify quick`,
+  `pnpm exec playwright test e2e/task-discovery.spec.ts`
+- Browser verification: named `agent-browser` session, `/task` → `/task/task-3`,
+  두 viewport, scroll/DOM/network/console
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-LIST-JOURNEY-REVIEW-01 task-discovery 독립 review
+
+- Requirements: `TASK-LIST-01`~`TASK-LIST-05`
+- Risk: MEDIUM — Journey review gate
+- Depends on: `TASK-LIST-JOURNEY-VERIFY-01`
+- Deliverable: exact target SHA의 fresh task-discovery adversarial review record
+- Acceptance: virtualization, pagination race, keyboard/scroll UX, negative path,
+  weak test와 console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
+- Automatic verification: `./scripts/verify quick`
+- Browser verification: finding이 browser behavior에 영향을 주면 해당 discovery case 재실행
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] JOURNEY-TASK-LIST-01 task-discovery 사람 checkpoint
 
 - Requirements: `TASK-LIST-01`~`TASK-LIST-05`
 - Risk: MEDIUM checkpoint
-- Depends on: `TASK-PAGE-03`
-- Deliverable: core scroll/navigation evidence와 독립 adversarial review
-- Acceptance: card content, bounded DOM, page request once, terminal stop, exact detail
-  navigation이 증명되고 finding 해결 후 사람 checkpoint를 요청한다.
-- Automatic verification: 관련 test, `./scripts/verify quick`, core E2E discovery tag
-- Browser verification: two-page journey trace, console/network/DOM count
-- Status: IN_PROGRESS
-- Evidence: focused 4 files/13 tests, quick 27 files/92 tests, core E2E,
-  agent-browser DOM/network/navigation self-check PASS;
-  `docs/quality/evidence/task-discovery.md`; 독립 review의 reviewer/target 기록과
-  tracked 사람 승인 근거가 없어 checkpoint 미승인 유지
+- Depends on: `TASK-LIST-JOURNEY-REVIEW-01`
+- Deliverable: task-discovery 사람 checkpoint 기록
+- Acceptance: current target review가 PASS이고 사람이 evidence를 명시적으로 승인한
+  경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
+- Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
+- Browser verification: `TASK-LIST-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
+- Status: BLOCKED
+- Evidence: 기존 focused/core/browser baseline은
+  `docs/quality/evidence/task-discovery.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
 
 ## 6. task-resolution Journey
 
@@ -814,30 +1119,204 @@
   list/detail/dashboard 일관성 Chromium 검증;
   `docs/quality/evidence/task-resolution.md`
 
-### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 검증·review·checkpoint
+### [ ] TASK-DETAIL-VIEW-01 task 상세 화면
+
+- Requirements: `TASK-DETAIL-01`
+- Risk: LOW — 검증된 detail data의 presentation
+- Depends on: `UI-SHELL-01`, `UI-STATE-01`, `TASK-DETAIL-01`
+- Deliverable: title, memo와 등록 일시의 responsive detail surface
+- Acceptance: 세 field가 의미 있는 hierarchy로 표시되고 registerDatetime은 readable
+  text와 원본 `dateTime` 값을 함께 보존하며 두 viewport에서 clipping이 없다.
+- Automatic verification: `pnpm vitest run
+  src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/task/task-1`, 390x844/1280x720, field/dateTime, hierarchy,
+  bearer request와 console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-DETAIL-RECOVERY-VIEW-01 상세 오류·404 복구 화면
+
+- Requirements: `TASK-DETAIL-02`
+- Risk: LOW — 검증된 error states의 presentation
+- Depends on: `TASK-DETAIL-VIEW-01`
+- Deliverable: 404 목록 복귀와 일반 오류 retry surface
+- Acceptance: 404 `errorMessage`와 list action이 일반 error/retry와 구분되고 action을
+  keyboard로 실행할 수 있으며 상태 전환 중 shell이 유지된다.
+- Automatic verification: `pnpm vitest run
+  src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
+- Browser verification: `/task/missing`과 recoverable error fixture, 두 viewport,
+  recovery action, GET status와 console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-DELETE-DIALOG-VIEW-01 삭제 확인 modal 화면
+
+- Requirements: `TASK-DETAIL-03`, `TASK-DETAIL-04`
+- Risk: MEDIUM — destructive modal과 focus lifecycle
+- Depends on: `TASK-DETAIL-VIEW-01`, `TASK-DELETE-01`, `UI-FOUNDATION-01`
+- Deliverable: destructive hierarchy와 exact ID form을 가진 삭제 modal
+- Acceptance: route ID 안내, input, cancel/confirm이 명확하고 wrong/공백/case-different
+  값은 disabled, exact 값만 enabled이며 close/Escape/trap/restore와 mobile overflow를
+  검증한다.
+- Automatic verification: `pnpm vitest run
+  src/features/delete-task/ui/delete-task-dialog.test.tsx
+  src/features/delete-task/model/attempt-guard.test.ts`, `./scripts/verify quick`
+- Browser verification: `/task/task-1`, 두 viewport, modal open/wrong/exact/cancel/Escape,
+  focus lifecycle, DELETE 0회와 console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-DELETE-OUTCOME-VIEW-01 삭제 진행·실패·복구 화면
+
+- Requirements: `TASK-DETAIL-05`
+- Risk: HIGH 실행 — 승인된 destructive-data policy 준수
+- Depends on: `TASK-DELETE-DIALOG-VIEW-01`, `TASK-DELETE-02`,
+  `TASK-DETAIL-RECOVERY-VIEW-01`
+- Deliverable: delete pending, 404, outcome-unknown, network failure와 success UI
+- Acceptance: pending은 input/submit/cancel/Escape를 잠그고 404는 stay/recovery,
+  unknown은 GET recheck, network failure는 자동 DELETE 재전송 없이 표시되며 200
+  `{ success: true }`만 `/task`로 이동한다.
+- Automatic verification: `pnpm vitest run
+  src/features/delete-task/ui/delete-task-dialog.test.tsx
+  src/features/delete-task/model/delete-task.test.ts
+  src/features/delete-task/model/delete-cache.test.ts
+  src/pages/task-detail/task-detail.test.tsx
+  src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
+- Browser verification: `/task/task-1`, exact submit, pending/failure/recheck/success,
+  DELETE/GET method·count, redirect와 list/detail/dashboard state
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-DETAIL-JOURNEY-VERIFY-01 task-resolution 통합 검증
+
+- Requirements: `TASK-DETAIL-01`~`TASK-DETAIL-05`
+- Risk: MEDIUM — Journey evidence gate
+- Depends on: `TASK-DELETE-OUTCOME-VIEW-01`
+- Deliverable: current commit의 task-resolution focused, quick, core/browser evidence
+- Acceptance: `RES-P1-*`, `RES-E*`가 detail/404/modal/guard/request count/redirect와
+  list/detail/dashboard 일관성 evidence에 trace된다.
+- Automatic verification: `pnpm vitest run
+  src/features/delete-task/ui/delete-task-dialog.test.tsx
+  src/features/delete-task/model/delete-task.test.ts
+  src/features/delete-task/model/delete-cache.test.ts
+  src/pages/task-detail/task-detail.test.tsx
+  src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
+  `pnpm exec playwright test e2e/task-resolution.spec.ts`
+- Browser verification: named `agent-browser` session, existing→missing→recovery→delete,
+  두 viewport, modal/network/cache/console
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-DETAIL-JOURNEY-REVIEW-01 task-resolution 독립 review
+
+- Requirements: `TASK-DETAIL-01`~`TASK-DETAIL-05`
+- Risk: MEDIUM — Journey review gate
+- Depends on: `TASK-DETAIL-JOURNEY-VERIFY-01`
+- Deliverable: exact target SHA의 fresh task-resolution adversarial review record
+- Acceptance: destructive guard, failure recovery, stale result, cache, 접근성,
+  weak test와 console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
+- Automatic verification: `./scripts/verify quick`
+- Browser verification: finding이 browser behavior에 영향을 주면 해당 resolution case 재실행
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 사람 checkpoint
 
 - Requirements: `TASK-DETAIL-01`~`TASK-DETAIL-05`
 - Risk: MEDIUM checkpoint
-- Depends on: `TASK-DELETE-02`
-- Deliverable: core detail/delete evidence와 독립 adversarial review
-- Acceptance: success/404/recovery/modal/guard/delete/redirect가 증명되고 finding
-  해결 후 사람 checkpoint를 요청한다.
-- Automatic verification: 관련 test, `./scripts/verify quick`, core E2E resolution tag
-- Browser verification: 기존→없는 ID→복구→삭제 전체 trace
-- Status: IN_PROGRESS
-- Evidence: focused 8 files/38 tests, quick 33 files/118 tests, 관련 core E2E 4건,
-  agent-browser detail/modal/list/404/dashboard self-check PASS;
-  `docs/quality/evidence/task-resolution.md`; 독립 review의 reviewer/target 기록과
-  tracked 사람 승인 근거가 없어 checkpoint 미승인 유지
+- Depends on: `TASK-DETAIL-JOURNEY-REVIEW-01`
+- Deliverable: task-resolution 사람 checkpoint 기록
+- Acceptance: current target review가 PASS이고 사람이 evidence를 명시적으로 승인한
+  경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
+- Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
+- Browser verification: `TASK-DETAIL-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
+- Status: BLOCKED
+- Evidence: 기존 focused/core/browser baseline은
+  `docs/quality/evidence/task-resolution.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
 
 ## 7. 통합·제출 QA
+
+### [ ] QA-CROSS-AUTH-01 Journey 간 인증 전환
+
+- Requirements: `AUTH-07`, `NAV-02`, `NAV-03`, 모든 보호 API requirement
+- Risk: MEDIUM — route, auth와 cache의 교차 Journey behavior
+- Depends on: `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`,
+  `JOURNEY-TASK-LIST-01`, `JOURNEY-TASK-DETAIL-01`
+- Deliverable: sign-in, reload, protected direct entry와 terminal 401의 통합 evidence
+- Acceptance: current session과 stale session의 route/action/protected cache가 승인된
+  auth policy대로 전환되고 Journey 사이에 이전 사용자 UI/data가 남지 않는다.
+- Automatic verification: `pnpm vitest run src/app/auth/auth-provider.test.tsx
+  src/app/auth/auth-route-boundary.test.tsx
+  src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
+  `./scripts/verify quick`
+- Browser verification: `/sign-in`, `/`, `/task`, `/task/:id`, `/user`에서 sign-in,
+  reload, direct entry, terminal 401와 console/network
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] QA-CROSS-DATA-01 삭제 후 data 일관성
+
+- Requirements: `DASH-01`, `TASK-LIST-01`, `TASK-DETAIL-01`~`TASK-DETAIL-05`
+- Risk: MEDIUM — mutation 이후 cross-route state
+- Depends on: `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`,
+  `JOURNEY-TASK-LIST-01`, `JOURNEY-TASK-DETAIL-01`
+- Deliverable: delete 전후 list/detail/dashboard의 mock/query 일관성 evidence
+- Acceptance: 성공 삭제 후 list에서 item이 사라지고 detail은 404, dashboard metric은
+  감소하며 failure/unknown result는 승인 정책 밖의 mutation이나 redirect를 만들지 않는다.
+- Automatic verification: `pnpm vitest run src/mocks/fixtures/tasks.test.ts
+  src/mocks/handlers/tasks.test.ts
+  src/features/delete-task/model/delete-cache.test.ts
+  src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
+- Browser verification: detail delete → list → deleted detail → dashboard, request
+  method/count, visible data와 console/network
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
+
+- Requirements: 전체 UI requirement와 접근성 invariant
+- Risk: MEDIUM — application-wide interaction review
+- Depends on: `QA-CROSS-AUTH-01`, `QA-CROSS-DATA-01`
+- Deliverable: 다섯 route와 modal의 responsive/accessibility evidence
+- Acceptance: 390x844/1280x720과 keyboard-only에서 heading/landmark/label/focus,
+  modal trap/restore, clipping, scroll trap과 상태의 비색상 구분에 unresolved finding이 없다.
+- Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
+  src/features/sign-in/ui/sign-in-form.test.tsx
+  src/widgets/dashboard-summary/dashboard-summary.test.tsx
+  src/widgets/user-profile/user-profile.test.tsx
+  src/widgets/task-list/task-list.test.tsx
+  src/pages/task-detail/task-detail.test.tsx
+  src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
+- Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
+  modal, virtual scroll, screenshot, console/network
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조
+
+- Requirements: `SYS-04`와 모든 API requirement
+- Risk: MEDIUM — 제출 mock/API contract 통합
+- Depends on: `QA-CROSS-AUTH-01`, `QA-CROSS-DATA-01`
+- Deliverable: 일곱 OpenAPI operation의 generated/MSW/client trace
+- Acceptance: method, path/query, auth scheme, success/error status와 schema가
+  `assignment-original/openapi.yaml`과 일치하고 독자 endpoint/field/status가 없다.
+- Automatic verification: `pnpm api:types:check`, `pnpm vitest run
+  src/shared/api/openapi-contract.test.ts src/shared/api/auth.test.ts
+  src/shared/api/dashboard.test.ts src/shared/api/user.test.ts
+  src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
+  src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
+- Browser verification: 네 Journey network record에서 실제 method/path/query/status와
+  bearer/cookie boundary 대조
+- Status: NOT_STARTED
+- Evidence: 없음
 
 ### [ ] QA-01 requirement evidence와 상태 정합성
 
 - Requirements: 전체
 - Risk: MEDIUM
 - Depends on: `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`,
-  `JOURNEY-TASK-LIST-01`, `JOURNEY-TASK-DETAIL-01`
+  `JOURNEY-TASK-LIST-01`, `JOURNEY-TASK-DETAIL-01`,
+  `QA-RESPONSIVE-A11Y-01`, `QA-CONTRACT-01`
 - Deliverable: `docs/quality/requirements.md`의 자동/browser evidence와 status 갱신
 - Acceptance: 모든 row가 재현 가능한 명령 또는 browser record를 가리키고 AI가
   `HUMAN_APPROVED`를 기록하지 않는다.
@@ -879,7 +1358,7 @@
 - Automatic verification: focused `tests/test_verify.py`, focused MSW Vitest,
   `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
 - Browser verification: fresh Vite server에서 네 core Journey와 console/network 결과
-- Status: IN_PROGRESS
+- Status: BLOCKED
 - Evidence: 2026-08-31 Codex `/root` task block owner; RED에서 보호 Journey의
   `/api/sign-in` 호출, local focused-test 허용, 완료 task의 미완료 dependency,
   canonical full의 `tests/test_verify.py` 누락을 재현. `07323d0`, `9a5ff67`,
@@ -890,7 +1369,8 @@
   assertion correction을 확인해 findings none/PASS. Canonical `./scripts/verify full`
   PASS — hook 86, contract 12, Vitest 34 files/122 tests, build, core Chromium 5,
   verifier regression 19; `git diff --check`와 clean status 확인. `QA-02`가 실제 사람
-  checkpoint 근거 부재로 BLOCKED이므로 본 task는 `IN_PROGRESS` 유지;
+  checkpoint 근거 부재로 BLOCKED이므로 기존 결과는 baseline으로만 보존하고
+  dependency 해소 후 최신 HEAD에서 full gate를 재실행해야 상태 전환 가능;
   `docs/quality/evidence/final-qa.md`
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
@@ -905,7 +1385,7 @@
 - Automatic verification: `./scripts/verify setup`, secret/generated-noise scan,
   `git diff --check`
 - Browser verification: 적용 없음
-- Status: IN_PROGRESS
+- Status: BLOCKED
 - Evidence: `AI_USAGE.md` 필수 section과 자동 검증, branch diff의 secret/debug/
   generated/unrelated scan PASS; 기존 `legacy/pre-policy` record는 문서상 사람 검토
   대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요
@@ -914,14 +1394,15 @@
 
 - Requirements: 전체
 - Risk: HIGH — 최종 완료는 사람 소유
-- Depends on: `QA-02`, `QA-03`, 네 Journey `HUMAN_APPROVED`
+- Depends on: `QA-02`, `QA-03`, `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`,
+  `JOURNEY-TASK-LIST-01`, `JOURNEY-TASK-DETAIL-01`
 - Deliverable: intended submission commit의 full 검증·browser evidence·최종 QA 보고
 - Acceptance: `docs/quality/workflow.md` Final QA Checklist 전체가 충족되고
   `./scripts/verify full`이 read-only로 통과하며 사람이 최종 acceptance를 결정한다.
 - Automatic verification: `./scripts/verify full`
 - Browser verification: 네 core journey의 최종 commit evidence, console/network,
   accessibility, responsive spot check
-- Status: IN_PROGRESS
+- Status: BLOCKED
 - Evidence: `./scripts/verify full` PASS on `8a09746` — setup 79 tests, 33 Vitest
   files/118 tests, build, Chromium core 5건; 네 Journey의 tracked 사람 승인 근거가
   없어 checkpoint 미승인, `QA-02`/`QA-03`과 사람 최종 acceptance 대기

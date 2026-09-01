@@ -49,6 +49,11 @@ latest main and reconcile TODO state item-by-item before merge.
 LOW work proceeds continuously. People own golden-journey acceptance, HIGH-risk
 decisions, exceptions, and final completion. AI never marks `HUMAN_APPROVED`.
 
+Implementation plan 실행은 격리 worktree를 기본으로 한다. 현재 checkout이
+격리되지 않았다면 별도 질문 없이 ignore된 `.worktrees/<branch>`를 생성한다.
+생성 또는 안전 검사가 실패하거나 사용자가 in-place 작업을 명시한 경우에만
+중단하고 작업 위치를 확인한다.
+
 ## Commands
 
 ```bash
