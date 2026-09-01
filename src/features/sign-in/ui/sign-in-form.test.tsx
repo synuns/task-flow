@@ -94,11 +94,13 @@ describe("SignInForm", () => {
     const user = userEvent.setup();
     const onAuthenticated = vi.fn();
     let release: () => void = () => undefined;
+    let requestCount = 0;
     const pending = new Promise<void>((resolve) => {
       release = resolve;
     });
     server.use(
       http.post("/api/sign-in", async () => {
+        requestCount += 1;
         await pending;
         return HttpResponse.json(startAuthSession());
       }),
@@ -116,6 +118,7 @@ describe("SignInForm", () => {
     release();
 
     await waitFor(() => expect(onAuthenticated).toHaveBeenCalledTimes(1));
+    expect(requestCount).toBe(1);
     expect(onAuthenticated.mock.calls[0]?.[0]).toMatchObject({
       accessToken: expect.any(String),
       refreshToken: expect.any(String),
