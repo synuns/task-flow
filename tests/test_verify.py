@@ -92,7 +92,7 @@ class VerifyCliTests(unittest.TestCase):
         self.assertNotEqual(result, 0)
         self.assertEqual(run_stage.call_count, 2)
 
-    def test_self_testing_full_skips_nested_core_e2e(self):
+    def test_self_testing_full_keeps_core_e2e(self):
         verifier = load_verify_module()
         package = {
             "packageManager": "pnpm@10.15.1",
@@ -109,7 +109,14 @@ class VerifyCliTests(unittest.TestCase):
             run_stage.call_args_list,
             [
                 mock.call(name, ["pnpm", "run", name])
-                for name in ("format:check", "lint", "typecheck", "test", "build")
+                for name in (
+                    "format:check",
+                    "lint",
+                    "typecheck",
+                    "test",
+                    "build",
+                    "test:e2e:core",
+                )
             ],
         )
 
@@ -145,14 +152,18 @@ class VerifyCliTests(unittest.TestCase):
         )
         self.assertEqual(verifier.verify_review_tooling(ROOT), [])
 
-    def test_self_testing_default_runs_full_without_nested_core_e2e(self):
-        result = self.run_verify()
-        combined = result.stdout + result.stderr
-        self.assertEqual(result.returncode, 0, combined)
-        self.assertIn("PASS setup", result.stdout)
-        self.assertIn("PASS build", result.stdout)
-        self.assertNotIn("PASS test:e2e:core", result.stdout)
-        self.assertNotIn("SKIP frontend not scaffolded", result.stdout)
+    def test_default_selects_full_without_nested_subprocess(self):
+        verifier = load_verify_module()
+        with mock.patch.dict(os.environ, {"KBHC_VERIFY_SELF_TESTING": "1"}, clear=True):
+            with mock.patch.object(verifier, "repository_fingerprint", return_value=b"same"):
+                with mock.patch.object(verifier, "verify_setup", return_value=0):
+                    with mock.patch.object(verifier, "verify_frontend", return_value=0) as frontend:
+                        with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+                            result = verifier.main([])
+
+        self.assertEqual(result, 0)
+        frontend.assert_called_once_with("full")
+        run_stage.assert_not_called()
 
     def test_unknown_mode_fails(self):
         result = self.run_verify("unknown")

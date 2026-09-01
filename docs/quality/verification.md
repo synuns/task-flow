@@ -26,7 +26,7 @@ verification fail.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
   scaffolding, then the complete `tests/test_verify.py` verifier regression suite.
   `KBHC_VERIFY_SELF_TESTING=1` guards nested verifier subprocesses from recursive
-  re-entry and skips the nested core E2E already run by the parent full gate.
+  re-entry.
 
 Before `package.json` exists, frontend stages print
 `SKIP frontend not scaffolded`. This certifies workflow setup only. After
