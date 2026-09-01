@@ -1239,7 +1239,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 - Evidence: user endpoint/handler/query UI RED→GREEN 6 tests; Chromium bearer request와
   `김담당`/`오늘도 차근차근` 확인; `docs/quality/evidence/work-overview.md`
 
-### [ ] DASHBOARD-VIEW-01 dashboard metric 화면
+### [x] DASHBOARD-VIEW-01 dashboard metric 화면
 
 - Requirements: `DASH-01`
 - Risk: LOW — 검증된 dashboard data의 presentation
@@ -1251,8 +1251,17 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, 두 viewport, fixture 3/2/1, loading/error/retry/success,
   bearer request와 console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `01a05d12-7ce7-7240-b44a-f525ce4fe48c`; target
+  `8342aa09fe07ab6f4c7938ef59405bd20490e54e`; focused dashboard/API Vitest 2 files/5
+  tests PASS; `./scripts/verify quick` PASS (38 files/149 Vitest tests); mapped
+  `e2e/work-overview.spec.ts` PASS (1 Chromium test). Agent-browser at 1280x720 and
+  390x844 recorded 3/2/1, 33.333% progress, Pretendard and no horizontal overflow;
+  dashboard request initialized with `Authorization: Bearer [redacted]`; temporary
+  transport failure Alert → retry restored 3/2/1 with no page errors. MSW service
+  worker bypassed `network route --abort` (TOOLING), so a temporary browser fetch
+  rejection supplied failure UI proof; no product change. Full evidence:
+  `docs/quality/evidence/work-overview.md#dashboard-view-01`
 
 ### [ ] PROFILE-VIEW-01 회원정보 화면
 
