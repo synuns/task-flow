@@ -50,10 +50,22 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
 test("@core @auth reports a credential failure in a modal and restores focus", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
+  const signInRequests: Array<{ method: string; body: unknown }> = [];
+  const signInStatuses: number[] = [];
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/api/sign-in") {
+      signInRequests.push({ method: request.method(), body: request.postDataJSON() });
+    }
+  });
+  page.on("response", (response) => {
+    if (new URL(response.url()).pathname === "/api/sign-in") {
+      signInStatuses.push(response.status());
+    }
+  });
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/sign-in");
@@ -82,11 +94,22 @@ test("@core @auth reports a credential failure in a modal and restores focus", a
   const dialog = page.getByRole("dialog", { name: "로그인 실패" });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("alert")).toHaveText("이메일 또는 비밀번호가 올바르지 않습니다.");
-  await expect(dialog.getByRole("button", { name: "닫기" })).toBeFocused();
-
-  await dialog.getByRole("button", { name: "닫기" }).click();
+  const close = dialog.getByRole("button", { name: "닫기" });
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(submit).toBeFocused();
+  expect(signInRequests).toEqual([
+    {
+      method: "POST",
+      body: { email: "user@example.com", password: "Password2" },
+    },
+  ]);
+  expect(signInStatuses).toEqual([400]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(consoleErrors).toEqual([
     "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
