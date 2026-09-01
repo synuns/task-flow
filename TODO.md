@@ -1075,8 +1075,10 @@
   `pnpm exec playwright test e2e/auth-entry.spec.ts`
 - Browser verification: named `agent-browser` session, `/sign-in` invalid/error/success,
   protected direct entry/reload, 두 viewport와 credential/network boundary
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
+  `feat/auth-entry-loop`; start `fd91069`; target `NAV-02`, `AUTH-01`~`AUTH-07`와
+  `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`; current-target evidence 통합 진행 중
 
 ### [ ] AUTH-JOURNEY-REVIEW-01 auth-entry 독립 review
 
