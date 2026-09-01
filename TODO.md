@@ -258,7 +258,7 @@
   `./scripts/verify quick` PASS; 사람 승인 evidence는 기록하되 규약에 따라 AI가
   `HUMAN_APPROVED`로 표시하지 않음
 
-### [ ] PLAN-JOURNEY-BACKLOG-01 Journey 구현 백로그 세분화
+### [x] PLAN-JOURNEY-BACKLOG-01 Journey 구현 백로그 세분화
 
 - Requirements: 전체 Journey의 실행 단위와 evidence contract
 - Risk: LOW — accepted behavior를 바꾸지 않는 실행 원장 보강
@@ -269,10 +269,21 @@
 - Automatic verification: focused verifier contract test, `./scripts/verify setup`,
   `./scripts/verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — 원장 설계 변경
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` task block owner; 승인된 design
   `docs/superpowers/specs/2026-09-01-journey-implementation-backlog-design.md`와 plan
-  `docs/superpowers/plans/2026-09-01-journey-implementation-backlog.md`
+  `docs/superpowers/plans/2026-09-01-journey-implementation-backlog.md`;
+  Review target: 위 plan, 전체 Journey/QA gate, `922dc6c`;
+  Reviewer: 최종 작성자와 분리된 fresh read-only `/root/journey_backlog_review`;
+  Checks: 기존 완료 이력, 9개 task field, dependency/cycle/착수 가능 task, browser
+  조건, 상태 전이, evidence/review gate, worktree 정책, final QA chain, unrelated diff;
+  Findings: 초기 HIGH `TOOLING` status 고정과 evidence/review gate 우회, MEDIUM
+  `TEST` final dependency 누락, `INTEGRATION` browser 조건·UI state 순서·harness 우회;
+  Corrections: lifecycle 허용 상태, 완료 evidence와 7필드 review record, `IN_PROGRESS`
+  dependency 검사, browser owner/조건, `QA-01`~`QA-04` dependency를 보강;
+  Rerun: verifier 18 tests, `./scripts/verify setup`, `./scripts/verify quick`, Vitest
+  34 files/122 tests, `git diff --check`, graph cycle/ready-task audit PASS;
+  Verdict: PASS — unresolved HIGH/MEDIUM 없음, 수동 evidence 진위는 사람 checkpoint 소유
 
 ## 1. 검증 가능한 개발 기반
 
