@@ -1463,7 +1463,7 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 - Evidence: stable domain key, 96px row measurement, bounded DOM 1/3 records와 terminal
   scroll 확인; `docs/quality/evidence/task-discovery.md`
 
-### [ ] TASK-CARD-VIEW-01 task card 화면
+### [x] TASK-CARD-VIEW-01 task card 화면
 
 - Requirements: `TASK-LIST-02`, `TASK-LIST-05`
 - Risk: LOW — 검증된 task item/link의 presentation
@@ -1475,8 +1475,21 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/task`, 390x844/1280x720, card content, pointer/keyboard focus,
   `/task/:id` navigation, console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root` task block owner; branch
+  `feat/task-discovery-loop`; start commit
+  `cc0aa22af488f527cdf8300f298886ffdbe704d1`; requirements `TASK-LIST-02`,
+  `TASK-LIST-05`; plan
+  `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`; focused Card 1 file/1
+  test와 `./scripts/verify quick` hook 86·contract 19·Vitest 38 files/149 tests PASS.
+  Agent-browser `task-card-view-01-rerun`에서 1280x720 pointer와 390x844 keyboard를
+  검증해 title/memo, status UI 부재, `/task/task-1`, dark-gold 2px focus outline,
+  document width 390px를 확인함. Screenshot:
+  `/tmp/kbhc-task-card-view-01-desktop-rerun.png`,
+  `/tmp/kbhc-task-card-view-01-mobile-rerun.png`. 첫 session은 fixture 주입 전 refresh
+  401이 console에 남은 `TEST` failure였고 worker origin에서 storage를 먼저 seed하는
+  fresh session으로 교정; rerun은 refresh/task/detail 200, page error와 예상하지 않은
+  console error 없음. 제품 code/test 변경 없음.
 
 ### [ ] TASK-LIST-VIRTUAL-UX-01 production scroll viewport
 

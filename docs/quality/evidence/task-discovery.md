@@ -51,3 +51,36 @@ Rerun verdict: PASS — focused, quick, core browser, manual accessible-tree/DOM
 and static boundary checks passed; the implementation self-check found and corrected
 the clipped 32px viewport. The prior review note had no reviewer or target commit and
 does not count as an independent review
+
+## TASK-CARD-VIEW-01
+
+Requirement/Journey: `TASK-LIST-02`, `TASK-LIST-05`; `DISC-P1-2`, `DISC-P1-5`
+Commit: `cc0aa22af488f527cdf8300f298886ffdbe704d1`
+Agent-browser session: `task-card-view-01-rerun`
+Route/Viewport: `/task` → `/task/task-1`; Chromium `1280x720`, `390x844`
+Precondition: approved refresh fixture seeded on same-origin worker resource before app
+bootstrap; default reset three-task store; fresh browser session
+Actions: run the Card component test and read-only quick gate; inspect a fresh accessible
+snapshot; hover and click the first whole-card Link at desktop; reopen `/task`, press Tab
+four times and Enter at mobile; inspect active href, computed outline, document width,
+console and page errors; close the named session
+Expected: the first Card Link contains response title and memo without a separate status
+field, has exact `/task/task-1`, works by pointer and keyboard, exposes a visible focus
+outline, and does not overflow the mobile viewport
+Actual: focused Vitest passed 1 file/1 test; quick passed hook 86 tests, verifier contract
+19 tests and Vitest 38 files/149 tests; desktop Link text was `첫 번째 할 일삭제 검증 대상`,
+href `/task/task-1`, status check false; fourth mobile Tab focused the same href with
+`rgb(138, 109, 0) solid 2px`, Enter navigated, and document/viewport widths were both
+390px. MSW console showed successful refresh, task pages and detail responses; no page
+error or unexpected console error remained in the rerun
+Console/Network: initial discarded session logged a refresh 401 because the app booted
+before fixture injection. The rerun seeded storage from `/mockServiceWorker.js` before
+opening the app and logged only successful contract requests. Header/count authority is
+covered again by the mapped Playwright Journey
+Screenshot/Trace: `/tmp/kbhc-task-card-view-01-desktop-rerun.png`,
+`/tmp/kbhc-task-card-view-01-mobile-rerun.png`
+Failure class: `TEST` — browser precondition was installed after auth bootstrap
+Correction: seed auth/task storage on a same-origin non-app resource, then navigate to
+`/task` in a new named session
+Rerun verdict: PASS — component, quick, desktop pointer, mobile keyboard/focus, route,
+responsive width and console/page-error checks passed; no product code/test change
