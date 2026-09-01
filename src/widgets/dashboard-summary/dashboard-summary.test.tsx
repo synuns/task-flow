@@ -69,7 +69,9 @@ describe("DashboardSummary", () => {
     };
     render(<DashboardSummary />, { wrapper: wrapper(client) });
 
-    expect(await screen.findByText("등록된 할 일이 없습니다")).toBeInTheDocument();
+    const emptyMessage = await screen.findByText("등록된 할 일이 없습니다");
+    expect(emptyMessage).toBeInTheDocument();
+    expect(emptyMessage.closest('[data-slot="card"]')).toBeInTheDocument();
     expect(screen.getByRole("progressbar", { name: "업무 완료율" })).toHaveAttribute(
       "aria-valuenow",
       "0",
