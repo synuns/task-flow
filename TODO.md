@@ -597,7 +597,10 @@
   `docs/superpowers/specs/2026-09-01-ui-foundation-contract-design.md`에 Button,
   Input·Label, Card surface, semantic token, focus, disabled와 error 계약 및
   automatic/browser 검증 범위를 확정함; 기능·route·showcase·wrapper·비동기 상태
-  UI·shell·dependency·public API 확장은 제외함; implementation plan과 실행 대기
+  UI·shell·dependency·public API 확장은 제외함;
+  `docs/superpowers/plans/2026-09-01-ui-foundation-contract.md`에 characterization
+  test, 두 viewport browser evidence, plan-completion review와 상태 전이를 분리함;
+  plan 실행 대기
 
 ### [ ] UI-SHELL-01 반응형 application shell
 
