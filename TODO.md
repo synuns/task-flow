@@ -1019,7 +1019,7 @@
   assertion으로 교차 검증함. Task adversarial check: 요구되지 않은 production 변경이나
   새 abstraction/dependency 없음, dependency·범위·접근성·negative path PASS
 
-### [ ] AUTH-SESSION-UX-01 인증 초기화·실패·복귀 화면
+### [x] AUTH-SESSION-UX-01 인증 초기화·실패·복귀 화면
 
 - Requirements: `AUTH-07`, `NAV-02`, `NAV-03`
 - Risk: MEDIUM — auth route와 visible state 통합
@@ -1033,10 +1033,31 @@
   `./scripts/verify quick`
 - Browser verification: `/task/task-1` 직접 진입 → `/sign-in` → 복귀 → reload,
   390x844/1280x720, route/action, refresh network, console/page error
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
   `feat/auth-entry-loop`; dependency `AUTH-ERROR-VIEW-01` `AI_VERIFIED`; target
-  `AUTH-07`, `NAV-02`, `NAV-03`; initializing/unavailable shell continuity RED 진행 중
+  `AUTH-07`, `NAV-02`, `NAV-03`; implementation `be22ce0`. Router RED 1 test는
+  initializing에서 `주요 메뉴`가 없어 실패했고, boundary RED 2 tests는 Skeleton과 shared
+  Alert가 없어 실패함. Auth boundary를 `AppShell` 안으로 이동하고 기존
+  `AsyncLoading`·`AsyncError`·`Skeleton`만 재사용해 shell은 유지하되 보호 content를
+  계속 차단함. GREEN router/boundary 2 files/14 tests, focused auth 4 files/28 tests,
+  `./scripts/verify quick` hook 86·verifier 19·Vitest 38 files/148 tests,
+  `git diff --check` PASS.
+  Agent-browser `auth-session-ux-01-mobile` 390x844에서 styled alert와 shell navigation이
+  공존하고 보호 heading은 없으며 scrollWidth 390px임을 확인; `다시 불러오기` 1회 후
+  anonymous refresh 401과 `/sign-in` 전환 PASS. `auth-session-ux-01-desktop`
+  1280x720에서 `/task/task-1` 직접 진입→`/sign-in`→valid sign-in→동일 detail 복귀→
+  reload 후 동일 route 유지와 profile-only action을 확인; MSW console은 exact sign-in
+  200, reload refresh 200 1회와 detail GET만 기록하고 page error 없음. Screenshots:
+  `/tmp/kbhc-auth-session-ux-01-mobile-error.png`,
+  `/tmp/kbhc-auth-session-ux-01-desktop.png`.
+  Failure/Correction: `TOOLING` — agent-browser route가 MSW service worker 요청을
+  intercept하지 못해 최종 diff에 남지 않는 sessionStorage 기반 임시 MSW network-error
+  fixture로 unavailable을 재현하고 flag 제거 후 retry를 확인한 다음 fixture 변경을
+  완전히 되돌림; Biome 한 줄 format을 `pnpm run format`으로 교정하고 quick 재실행.
+  Task adversarial check: router hierarchy, 보호 content leakage, retry count, approved
+  return route, auth policy와 unrelated diff를 검토했고 provider·transport·API 변경 및
+  새 dependency/abstraction 없음; Verdict: PASS
 
 ### [ ] AUTH-JOURNEY-VERIFY-01 auth-entry 통합 검증
 
