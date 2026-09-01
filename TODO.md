@@ -637,7 +637,8 @@
   keyboard navigation, computed Pretendard, console/page error와 예상 밖 network 없음
 - Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-shell-state`,
-  final correction code target `970d7df`; 기존 shell production을 재사용하고 Tab order,
+  final correction code target `970d7df`, full-verification target `29c927f`; 기존 shell
+  production을 재사용하고 Tab order,
   auth action 상호 배타,
   current route와 named link별 distinct Lucide icon을 characterization함. Integrated focused
   5 files/15 tests, final shell/router 2 files/8 tests와 quick 38 files/132 tests PASS;

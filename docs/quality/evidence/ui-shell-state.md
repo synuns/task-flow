@@ -10,6 +10,7 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
 - Implementation/browser/plan-review target: `e52890f`
 - First completed-state full-verification target: `5cd937f`
 - Final design-correction code target: `970d7df`
+- Final design-correction full-verification target: `29c927f`
 - Task owner: Codex `/root`, 2026-09-01
 - Parallel implementers: `/root/ui_shell`, `/root/ui_state`; isolated worktrees and
   disjoint file ownership
@@ -84,6 +85,8 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
 - `TOOLING`: the first authenticated profile-size `agent-browser eval` expression was
   malformed. A simpler expression immediately reproduced the intended 20x20 result; this was
   not a product failure.
+- `./scripts/verify full` at `29c927f`: setup 86 tests, verifier contract 18 tests,
+  Vitest 38 files/132 tests, build, core E2E 5/5, verifier regression 19 tests PASS.
 - Review target: `5cd937f..53d1a16`.
 - Reviewer: `/root/final_adversarial_review_2`; correction을 작성하지 않은 read-only
   second-pass reviewer.
