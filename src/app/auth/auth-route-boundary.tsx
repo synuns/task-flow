@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { AsyncError, AsyncLoading, Skeleton } from "@/shared/ui";
 import { useAuth } from "./auth-provider";
 import { isProtectedPath, safeReturnTo } from "./return-to";
 
@@ -7,16 +8,23 @@ export function AuthRouteBoundary() {
   const location = useLocation();
 
   if (auth.status.kind === "initializing") {
-    return <p role="status">인증 상태를 확인하고 있습니다.</p>;
+    return (
+      <AsyncLoading
+        className="mx-auto grid max-w-md gap-4"
+        message="인증 상태를 확인하고 있습니다."
+      >
+        <Skeleton className="h-28 w-full" />
+      </AsyncLoading>
+    );
   }
   if (auth.status.kind === "unavailable") {
     return (
-      <section>
-        <p role="alert">{auth.status.message}</p>
-        <button onClick={() => void auth.retryBootstrap()} type="button">
-          다시 확인
-        </button>
-      </section>
+      <AsyncError
+        className="mx-auto max-w-md"
+        message={auth.status.message}
+        onRetry={() => void auth.retryBootstrap()}
+        title="인증 상태를 확인하지 못했습니다."
+      />
     );
   }
   if (auth.status.kind === "anonymous" && isProtectedPath(location.pathname)) {

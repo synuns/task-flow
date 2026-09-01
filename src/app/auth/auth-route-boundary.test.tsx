@@ -73,6 +73,7 @@ describe("AuthRouteBoundary", () => {
     render(<RouterProvider router={router} />);
 
     expect(screen.getByRole("status")).toHaveTextContent("인증 상태를 확인하고 있습니다.");
+    expect(screen.getByRole("status").querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "할 일" })).not.toBeInTheDocument();
   });
 
@@ -117,8 +118,11 @@ describe("AuthRouteBoundary", () => {
     const router = createMemoryRouter(routes, { initialEntries: ["/task"] });
     render(<RouterProvider router={router} />);
 
-    expect(screen.getByRole("alert")).toHaveTextContent("offline");
-    await user.click(screen.getByRole("button", { name: "다시 확인" }));
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveAttribute("data-slot", "alert");
+    expect(alert).toHaveTextContent("인증 상태를 확인하지 못했습니다.");
+    expect(alert).toHaveTextContent("offline");
+    await user.click(screen.getByRole("button", { name: "다시 불러오기" }));
     expect(retryBootstrap).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("heading", { name: "로그인" })).not.toBeInTheDocument();
   });

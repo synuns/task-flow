@@ -102,6 +102,24 @@ describe("app router", () => {
     expect(currentLink).toHaveClass("bg-primary/35", "before:bg-ring");
   });
 
+  it("keeps the application shell while bootstrap blocks protected content", () => {
+    auth.controller = controller({ kind: "initializing" });
+    const router = createMemoryRouter(appRoutes, { initialEntries: ["/task"] });
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ApiClientProvider client={apiClient}>
+          <RouterProvider router={router} />
+        </ApiClientProvider>
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByRole("navigation", { name: "주요 메뉴" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "로그인" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("인증 상태를 확인하고 있습니다.");
+    expect(screen.queryByRole("heading", { name: "할 일" })).not.toBeInTheDocument();
+  });
+
   it("renders the route error boundary for render failures", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     function BrokenPage(): never {

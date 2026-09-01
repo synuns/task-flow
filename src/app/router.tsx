@@ -30,11 +30,11 @@ function SignInRoute() {
 export const appRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <AuthRouteBoundary />,
+    element: <AuthShellRoute />,
     errorElement: <RouteErrorBoundary />,
     children: [
       {
-        element: <AuthShellRoute />,
+        element: <AuthRouteBoundary />,
         children: [
           { index: true, element: <DashboardPage /> },
           { path: "sign-in", element: <SignInRoute /> },
