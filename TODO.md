@@ -1103,7 +1103,7 @@
   provider regression test와 canonical evidence 교정으로 해소 후 재review 대상으로 전환;
   verify-task self-check Verdict: PASS
 
-### [ ] AUTH-JOURNEY-REVIEW-01 auth-entry 독립 review
+### [x] AUTH-JOURNEY-REVIEW-01 auth-entry 독립 review
 
 - Requirements: `NAV-02`, `AUTH-01`~`AUTH-07`
 - Risk: MEDIUM — Journey review gate
@@ -1113,7 +1113,7 @@
   unrelated diff를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
 - Automatic verification: `./scripts/verify quick`
 - Browser verification: finding이 browser behavior에 영향을 주면 해당 auth case 재실행
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
   `feat/auth-entry-loop`; plan
   `docs/superpowers/plans/2026-09-01-auth-entry-remaining-loop.md`; target
@@ -1121,7 +1121,28 @@
   target `7d01a9345c2d7500063e42294d43c441a1fd7808`, merge-base
   `fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d`; fresh review는 Critical 없음,
   Important 2건(`AUTH-E3` direct refresh failure test, evidence exact SHA)으로 FAIL;
-  correction `cbff6b502d14faaec3255fa8cf4fb890279dbf65` 이후 재review 대기
+  correction `cbff6b502d14faaec3255fa8cf4fb890279dbf65`과
+  `a284d90dbb6e51868557eeb3d8824b0e8e64f30b` 이후 재review 완료.
+  Review target: 위 plan, `NAV-02`, `NAV-03`, `AUTH-01`~`AUTH-07`, `auth-entry`,
+  `AUTH-P1-*`, `AUTH-P2-*`, `AUTH-E*`; corrected target
+  `a284d90dbb6e51868557eeb3d8824b0e8e64f30b`, merge-base
+  `fe5e1e8c76b2a3ad13a98da5b9f550e8aa297c5d`.
+  Reviewer: target을 작성·수정하지 않은 fresh read-only
+  `/root/auth_journey_final_review`.
+  Checks: requirement/scenario 누락, auth storage·bearer·refresh·single-flight·bounded
+  replay·terminal/stale session·safe return route, validation/Dialog/session negative,
+  keyboard/focus/responsive 접근성, weak/duplicate test, console/network 분류,
+  evidence 재현성, unrelated diff와 TODO consistency.
+  Findings: initial Important 2건은 위 correction으로 해결; final
+  Critical/Important/Minor 없음, unresolved HIGH/MEDIUM 없음.
+  Corrections: provider authenticated refresh 401 terminal regression test와 full-SHA
+  evidence/ownership/totals 교정; production/browser code 변경 없음.
+  Rerun: focused auth 4 files/29 tests, quick hook 86·verifier 19·Vitest 38 files/149
+  tests, mapped Playwright 2/2, `git diff --check`, clean worktree PASS; browser-tested
+  production target `be22ce004a974251f4579469fc01c03df263d433` 불변으로 기존 두 viewport
+  evidence 적용.
+  Verdict: PASS; plan-completion adversarial review와 Journey review에 동일 record 재사용;
+  사람 `HUMAN_APPROVED`나 `JOURNEY-AUTH-01` acceptance가 아님
 
 ### [ ] JOURNEY-AUTH-01 auth-entry 사람 checkpoint
 
