@@ -114,3 +114,39 @@ Correction: none; the existing remaining-height region, 96px row estimate, stabl
 and measured virtual rows already satisfy the requirement
 Rerun verdict: PASS — focused, quick, 40-record bounded DOM, terminal scroll, resize,
 responsive width and console/page-error checks passed; no product code/test change
+
+## TASK-LIST-PAGING-UX-01
+
+Requirement/Journey: `TASK-LIST-04`; `DISC-P1-4`, `DISC-E2`
+Commit: `7def492e87e61f401159469b34a526efdb12df07`
+Agent-browser sessions: `task-list-paging-ux-01`, `task-list-paging-ux-01-rerun`
+Route/Viewport: `/` → `/task`; production preview Chromium `390x844`
+Precondition: approved auth fixture seeded before bootstrap; default three-task store with
+two-record pages; fresh browser sessions
+Actions: run focused list/API suites and quick; observe the normal request sequence and
+terminal state; attempt page 2 route abort; in a fresh session load the dashboard, install a
+temporary page-local fetch rejection for only `/api/task?page=2`, navigate by SPA Link,
+inspect preserved page 1/error/retry action, restore fetch, click retry, inspect resource
+timing, console and page errors, then close
+Expected: page 1 and page 2 occur once on success, `hasNext:false` removes the next action;
+a page 2 transport failure preserves page 1 and exposes retry; retry requests page 2 rather
+than duplicating page 1 and reaches terminal
+Actual: focused Vitest passed 2 files/8 tests; quick passed hook 86, contract 19 and Vitest
+38 files/149 tests. Normal preview timing was exactly page 1 then page 2 and rendered all
+three task links, terminal text true and next button false. The deliberate rejection rendered
+`네트워크 요청에 실패했습니다.다시 불러오기`, kept both page 1 cards and no terminal;
+after restoring fetch, retry added only successful page 2, rendered task 3 and terminal, and
+removed the next button
+Console/Network: normal and corrected resource timing contained exactly
+`/api/task?page=1`, `/api/task?page=2`; rejected page 2 intentionally failed before
+transmission. MSW logged refresh/dashboard/page 1/page 2 200 after recovery; no page error
+or unexpected console error
+Screenshot/Trace: `/tmp/kbhc-task-list-paging-ux-01-terminal.png`,
+`/tmp/kbhc-task-list-paging-ux-01-partial-error.png`,
+`/tmp/kbhc-task-list-paging-ux-01-retry-terminal.png`
+Failure class: `TOOLING` — agent-browser route abort cannot intercept a request already
+handled by the MSW Service Worker
+Correction: use a temporary page-local fetch wrapper after authenticated bootstrap and
+before SPA task navigation; reject only page 2, restore the original fetch before retry
+Rerun verdict: PASS — focused, quick, exact success sequence, terminal stop, preserved
+partial data, retry sequence and console/page-error checks passed; no product code/test change

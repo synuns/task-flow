@@ -1518,7 +1518,7 @@ src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
   `/tmp/kbhc-task-list-virtual-ux-01-desktop.png`,
   `/tmp/kbhc-task-list-virtual-ux-01-mobile.png`. 제품 code/test 변경 없음.
 
-### [ ] TASK-LIST-PAGING-UX-01 무한 pagination feedback
+### [x] TASK-LIST-PAGING-UX-01 무한 pagination feedback
 
 - Requirements: `TASK-LIST-04`
 - Risk: MEDIUM — scroll trigger와 request lifecycle
@@ -1530,8 +1530,21 @@ src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
 src/shared/api/tasks.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task`, 두 viewport, page 1→2 scroll, request method/query/count,
   in-flight/terminal feedback, console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root` task block owner; branch
+  `feat/task-discovery-loop`; start commit
+  `7def492e87e61f401159469b34a526efdb12df07`; requirements `TASK-LIST-04`;
+  plan `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`. Focused list/API
+  2 files/8 tests와 quick hook 86·contract 19·Vitest 38 files/149 tests PASS.
+  Production preview agent-browser에서 정상 page sequence `1→2` 각 1회, 세 카드,
+  terminal text와 next button 부재를 확인함. 부분 page 2 transport error에서 page 1
+  카드가 유지되고 `다시 불러오기`로 page 2만 성공 재요청해 terminal 복구. MSW
+  Service Worker가 tool route abort를 선점한 첫 시도는 `TOOLING`으로 분류하고 fresh
+  `task-list-paging-ux-01-rerun`에서 page-local rejected fetch로 교정; wrapper는 retry
+  전에 복원했고 제품 code/test 변경 없음. Screenshots:
+  `/tmp/kbhc-task-list-paging-ux-01-terminal.png`,
+  `/tmp/kbhc-task-list-paging-ux-01-partial-error.png`,
+  `/tmp/kbhc-task-list-paging-ux-01-retry-terminal.png`.
 
 ### [ ] TASK-LIST-STATES-01 목록 초기·빈·오류 화면
 
