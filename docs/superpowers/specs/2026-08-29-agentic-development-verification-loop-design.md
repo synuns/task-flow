@@ -451,3 +451,97 @@ final acceptance complete.
   presenting legacy artifacts as reviewed.
 - No React application, dependency, or assignment feature is added by this
   setup work.
+
+## 2026-09-01 Agent Loop Readiness Addendum
+
+### Purpose and scope
+
+현재 구현된 Journey와 검증 하네스를 기준으로 에이전트가 변경 전 관련 Journey를
+찾고, 로컬과 CI에서 같은 판정으로 검증하고, 재현 가능한 evidence를 남길 수
+있는지 보강한다. 새 문서 인덱스, 범용 project-loop skill, GitHub Actions, 제품
+code와 UX는 추가하지 않는다.
+
+Source priority와 네 Golden Journey, failure/recovery scenario, resettable MSW
+fixture는 이미 canonical 문서와 test에 연결되어 있으므로 복제하지 않는다.
+`AGENTS.md`는 짧은 진입점, `docs/quality/verification.md`는 lookup과 실행 정책,
+기존 script와 contract test는 실행 가능한 불변 조건을 소유한다.
+
+### Confirmed baseline
+
+- `package.json`, lockfile과 설치 결과의 `@playwright/test`는 `1.62.1`이다.
+- Playwright `1.62.1`은 `failOnFlakyTests`와 retry 진단을 지원한다.
+- core E2E는 `auth-entry`, `work-overview`, `task-discovery`,
+  `task-resolution` test file과 고정 fixture를 이미 가진다.
+- Playwright는 기존처럼 `reuseExistingServer: false`로 fresh local server를
+  시작한다.
+- 이전 main-checkout full 실행의 read-only failure는 실행 중 다른 session이 같은
+  checkout에 commit한 것이 원인이었다. 격리 worktree baseline quick은 통과했다.
+
+### Document entry points
+
+`AGENTS.md`는 작업 시작 시 requirement ID, route/API/symbol로
+`docs/quality/requirements.md`, `TODO.md`, `src`, `e2e`를 검색하고 변경 영역에
+연결된 Journey를 선택하도록 안내한다. 변경 뒤에는 lowest sufficient focused
+test, `./scripts/verify quick`, 해당 Journey E2E 순으로 검증한다.
+
+`docs/quality/verification.md`는 다음만 추가한다.
+
+- code 영역에서 네 Journey와 focused Playwright file을 찾는 compact lookup
+- local과 CI가 공유하는 Node/pnpm/Chromium 준비 명령
+- `./scripts/verify full`이 두 환경의 동일한 최종 gate라는 정책
+
+문서 문구 자체는 setup 성공 조건이 아니다. 표현 변경이 실행 계약을 깨뜨리지
+않는 한 verifier는 문서의 특정 sentence를 검사하지 않는다.
+
+### Executable invariants
+
+기존 contract test를 다음 실행 가능한 조건으로 보강한다.
+
+1. `package.json`은 `pnpm@10.15.1`과 exact `@playwright/test` version을 제공하고,
+   설치된 Playwright version이 선언과 일치한다.
+2. Playwright version이 `>=1.61.0`이면 config는 환경과 무관하게 `retries: 1`,
+   `failOnFlakyTests: true`다. 지원하지 않는 version이면 dependency를 변경하지 않고
+   `retries: 0`을 사용한다.
+3. CI environment 유무가 retry와 flaky 최종 판정을 바꾸지 않는다.
+4. verifier의 frontend stage는 다른 package manager가 아니라 `pnpm run`만 호출하고
+   child command의 nonzero exit를 그대로 실패로 반환한다.
+5. `test:e2e:core`는 empty selection을 허용하지 않고 Playwright `--list` 결과에
+   네 Journey tag와 실제 test file이 모두 존재한다.
+6. 보호 Journey test는 기존 authenticated fixture를 사용하며 `/api/sign-in`에
+   의존하지 않는다. 실제 core 실행은 새 browser context, 고정 task seed, exact
+   request count와 terminal state를 검증한다.
+7. `./scripts/verify full`은 build, core E2E와 verifier regression 중 하나라도
+   실패하거나 flaky로 분류되면 local과 CI 모두 nonzero다.
+
+이 조건은 `tests/test_verify_contract.py`, `tests/test_verify.py`,
+`src/test/harness-config.test.ts`와 실제 `./scripts/verify full`로 검증한다.
+`AGENTS.md`와 quality 문서의 특정 문구를 실행 계약으로 취급하는
+prose marker 검사는 제거하고, 파일 존재·package manager·fixture·test
+selection·command·exit status를 실제로 확인하는 executable check로 대체한다.
+
+### Deterministic E2E and test data
+
+진단 trace, screenshot과 video는 기존 `retain-on-failure` 정책을 유지한다.
+한 번 실패 후 retry에서 통과한 test도 `failOnFlakyTests: true` 때문에 gate를
+실패한다. 따라서 retry는 성공 은폐가 아니라 재시도 진단 자료 수집에만 쓰인다.
+
+격리 worktree에서 core suite 반복 실행과 local full을 수행한다. CI provider는
+추가하지 않고 문서화된 frozen install, Chromium install, full command만 제공한다.
+격리 상태에서도 duplicate request, fixture leak 또는 flaky verdict가 재현될 때만
+root cause를 수정하며, 추측에 기반한 server/config 변경은 하지 않는다.
+
+### Files and completion
+
+- Modify `AGENTS.md`: Journey lookup과 pre/post-change 진입점
+- Modify `docs/quality/verification.md`: lookup, local/CI bootstrap, 동일 gate 정책
+- Modify `playwright.config.ts`: version-gated retry/flaky contract의 현재 적용
+- Modify `scripts/verify`: pnpm invocation과 failure propagation 유지
+- Modify `src/test/harness-config.test.ts`: installed version과 local/CI config invariant
+- Modify `tests/test_verify_contract.py`: package manager, fixture, test-file/core selection
+- Modify `tests/test_verify.py`: verification-stage nonzero exit contract
+- Modify `TODO.md`: 이 readiness task의 owner와 evidence만 갱신
+
+완료 전 focused contract tests, repeated core E2E, `./scripts/verify quick`,
+`./scripts/verify full`, read-only fingerprint, diff scope와 plan-completion adversarial
+review를 확인한다. 다른 session이 소유한 task block과 `assignment-original/`은
+수정하지 않는다.

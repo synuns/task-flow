@@ -285,6 +285,32 @@
   34 files/122 tests, `git diff --check`, graph cycle/ready-task audit PASS;
   Verdict: PASS — unresolved HIGH/MEDIUM 없음, 수동 evidence 진위는 사람 checkpoint 소유
 
+### [ ] LOOP-READINESS-01 에이전트 작업 루프 준비 상태 보강
+
+- Requirements: 전체 변경의 Journey trace와 verification contract
+- Risk: LOW — accepted behavior를 바꾸지 않는 문서·검증 하네스 보강
+- Depends on: `PLAN-JOURNEY-BACKLOG-01`
+- Deliverable: 변경 전 Journey lookup, local/CI 공통 bootstrap과 동일 flaky 판정,
+  pnpm·fixture·core test·종료 코드의 executable contract
+- Acceptance: 문서는 진입점과 정책만 제공하고 특정 문구가 setup을 결정하지 않으며,
+  Playwright version에 맞는 retry/flaky 설정, pnpm runner, 고정 fixture, 네 core test
+  file, read-only full gate와 nonzero failure가 contract test와 실제 실행으로 강제된다.
+- Automatic verification: focused Python/TypeScript contract tests,
+  repeated core E2E, `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
+- Browser verification: 제품 behavior 변경 없음; 기존 네 core Playwright Journey를
+  격리 worktree에서 반복 실행해 fixture 독립성, request count와 flaky verdict 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root`; Worktree/branch:
+  `.worktrees/agent-loop-readiness`, `docs/agent-loop-readiness`; 사용자 승인 범위는
+  GitHub Actions·새 index·범용 skill·제품 code/UX 없이 기존 control plane과 executable
+  contract만 보강하는 것. 설치·선언 Playwright `1.62.1`과
+  `--fail-on-flaky-tests` 지원 확인; `pnpm install --frozen-lockfile` PASS;
+  baseline `./scripts/verify quick` PASS — setup hook 86, contract 18,
+  Vitest 36 files/128 tests; 설계 자체 검토 후 `./scripts/verify setup` PASS —
+  hook 86, contract 18; 상세 설계는
+  `docs/superpowers/specs/2026-08-29-agentic-development-verification-loop-design.md`
+  readiness addendum; implementation plan과 사용자 문서 검토 대기
+
 ## 1. 검증 가능한 개발 기반
 
 ### [x] SCF-01 package와 toolchain 기반
