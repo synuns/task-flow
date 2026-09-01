@@ -44,16 +44,16 @@
 
 ## 현재 진행 요약
 
-| 단계 | Exit gate | 상태 |
-| --- | --- | --- |
-| 0. 기획·결정 준비 | 상위 기준 연결, HIGH 결정 목록 분리 | AI_VERIFIED |
-| 1. 개발 기반 | quick/full 및 scaffold browser smoke 통과 | AI_VERIFIED |
-| 2. 공통 구조 | provider/router/API 기반 + 실제 UI shell/state | IN_PROGRESS — 로직 기반 검증, UI backlog 시작 전 |
-| 3. auth-entry | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
-| 4. work-overview | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
-| 5. task-discovery | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
-| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint | IN_PROGRESS — 로직 기반만 검증 |
-| 7. 통합·제출 QA | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — Journey UI 구현 전 |
+| 단계               | Exit gate                                       | 상태                                             |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------ |
+| 0. 기획·결정 준비  | 상위 기준 연결, HIGH 결정 목록 분리             | AI_VERIFIED                                      |
+| 1. 개발 기반       | quick/full 및 scaffold browser smoke 통과       | AI_VERIFIED                                      |
+| 2. 공통 구조       | provider/router/API 기반 + 실제 UI shell/state  | IN_PROGRESS — 로직 기반 검증, UI backlog 시작 전 |
+| 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
+| 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
+| 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
+| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
+| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — Journey UI 구현 전                     |
 
 ## 0. 기획·결정 준비
 
@@ -368,7 +368,7 @@
   network 200, computed `Pretendard`, screenshot 또는 trace
 - Status: AI_VERIFIED
 - Evidence: 2026-08-30 `fac27d1`; `pnpm vitest run src/test/scaffold.test.tsx
-  src/test/theme-contract.test.ts` PASS, 2 tests; `./scripts/verify full` build PASS;
+src/test/theme-contract.test.ts` PASS, 2 tests; `./scripts/verify full` build PASS;
   agent-browser `/` 1280x720 computed font `Pretendard`, font request
   `/fonts/PretendardVariable.woff2`, console/page error 없음; 상세 기록
   `docs/quality/evidence/frontend-scaffolding.md`
@@ -542,9 +542,9 @@
   - Expected: light KB Yellow Positive와 dark KB Yellow Negative primary,
     background·foreground 전환
   - Actual: light `background oklch(0.991 0.014 92.978)`, `foreground
-    oklch(0.232 0.006 78.196)`, `primary oklch(0.835 0.172 82.565)`;
+oklch(0.232 0.006 78.196)`, `primary oklch(0.835 0.172 82.565)`;
     dark `background oklch(0.219 0.007 78.185)`, `foreground
-    oklch(0.979 0.008 91.482)`, `primary oklch(0.865 0.177 90.382)`
+oklch(0.979 0.008 91.482)`, `primary oklch(0.865 0.177 90.382)`
   - Console/Network: console error와 page error 없음; color 검증에 API 요청
     적용 없음
   - Screenshot/Trace: `/tmp/kbhc-scf-05-light.png`,
@@ -661,7 +661,7 @@
 - Browser verification: 적용 없음
 - Status: AI_VERIFIED
 - Evidence: 2026-08-30 Codex `/root`; `pnpm vitest run
-  src/test/architecture-contract.test.ts` RED — `test/openapi-contract.test.ts`의
+src/test/architecture-contract.test.ts` RED — `test/openapi-contract.test.ts`의
   generated 직접 import 1건 탐지; 계약 test를 `shared/api`로 이동 후 focused
   Vitest 2 files/3 tests GREEN; Biome fixture는 public API import 허용·deep import
   차단 확인; `./scripts/verify quick` PASS — setup 79 tests, format, lint, typecheck,
@@ -743,7 +743,7 @@
   disabled와 error를 color 외 text/semantics로 구분한다. 기존 저장소와 공식 shadcn
   registry를 먼저 조사하며 새 runtime dependency는 추가하지 않는다.
 - Automatic verification: `pnpm vitest run src/shared/ui/ui-foundation.test.tsx
-  src/test/theme-contract.test.ts`, `./scripts/verify quick`
+src/test/theme-contract.test.ts`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, 390x844/1280x720, keyboard focus와 disabled/error,
   예상 밖 console/page/network error 없음
 - Status: AI_VERIFIED
@@ -787,7 +787,7 @@
 - Acceptance: 다섯 route에서 dashboard/task와 인증 action이 유지되고 current route,
   hover/focus가 구분되며 390x844/1280x720에서 clipping이 없다.
 - Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
-  src/app/router.test.tsx`, `./scripts/verify quick`
+src/app/router.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, `/sign-in`, `/task`, `/task/task-1`, `/user`, 두 viewport,
   keyboard navigation, computed Pretendard, console/page error와 예상 밖 network 없음
 - Status: AI_VERIFIED
@@ -860,7 +860,7 @@
 - Browser verification: 적용 없음
 - Status: AI_VERIFIED
 - Evidence: 2026-08-30 `pnpm vitest run
-  src/features/sign-in/model/sign-in-schema.test.ts` RED — schema module 없음;
+src/features/sign-in/model/sign-in-schema.test.ts` RED — schema module 없음;
   valid와 required/email/길이/기호 경계 6 tests GREEN; `./scripts/verify quick`
   PASS — Vitest 10 files/30 tests; browser 적용 없음
 
@@ -946,7 +946,7 @@
   non-ASCII password, valid, pending 상태가 text와 style로 구분되며 submit 규칙은
   유지된다.
 - Automatic verification: `pnpm vitest run
-  src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
+src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, 390x844/1280x720, keyboard tab order,
   invalid/valid/pending, clipping, console/network
 - Status: AI_VERIFIED
@@ -994,7 +994,7 @@
 - Acceptance: close button과 Escape가 동작하고 focus가 modal 안에 머문 뒤 submit으로
   복귀하며 390x844에서 content와 action이 잘리지 않는다.
 - Automatic verification: `pnpm vitest run
-  src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
+src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/sign-in` credential failure, 390x844/1280x720, focus
   trap/restore, modal overflow, POST status/body, console/page error
 - Status: AI_VERIFIED
@@ -1029,7 +1029,7 @@
   직접 진입, 로그인 복귀와 refresh-cookie reload가 layout jump 없이 승인 정책대로
   전환된다.
 - Automatic verification: `pnpm vitest run src/app/auth/auth-route-boundary.test.tsx
-  src/app/auth/auth-provider.test.tsx src/app/router.test.tsx`,
+src/app/auth/auth-provider.test.tsx src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/task/task-1` 직접 진입 → `/sign-in` → 복귀 → reload,
   390x844/1280x720, route/action, refresh network, console/page error
@@ -1069,9 +1069,9 @@
   current-commit browser record에 trace되고 console/network expected와 actual이
   기록된다.
 - Automatic verification: `pnpm vitest run
-  src/features/sign-in/ui/sign-in-form.test.tsx
-  src/app/auth/auth-route-boundary.test.tsx src/app/auth/auth-provider.test.tsx
-  src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
+src/features/sign-in/ui/sign-in-form.test.tsx
+src/app/auth/auth-route-boundary.test.tsx src/app/auth/auth-provider.test.tsx
+src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   `pnpm exec playwright test e2e/auth-entry.spec.ts`
 - Browser verification: named `agent-browser` session, `/sign-in` invalid/error/success,
   protected direct entry/reload, 두 viewport와 credential/network boundary
@@ -1144,7 +1144,7 @@
   Verdict: PASS; plan-completion adversarial review와 Journey review에 동일 record 재사용;
   사람 `HUMAN_APPROVED`나 `JOURNEY-AUTH-01` acceptance가 아님
 
-### [ ] JOURNEY-AUTH-01 auth-entry 사람 checkpoint
+### [x] JOURNEY-AUTH-01 auth-entry 사람 checkpoint
 
 - Requirements: `NAV-02`, `AUTH-01`~`AUTH-07`
 - Risk: MEDIUM checkpoint
@@ -1154,15 +1154,15 @@
   명시적으로 승인한 경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `AUTH-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
-- Status: BLOCKED
+- Status: HUMAN_APPROVED
 - Evidence: automatic/browser evidence는 `docs/quality/evidence/auth-entry.md`에 보존;
   focused auth 4 files/29 tests, quick 38 files/149 tests, mapped auth Playwright
   2/2, mobile/desktop named browser session PASS. Independent review target
   `a284d90dbb6e51868557eeb3d8824b0e8e64f30b`은 correction 뒤 Critical/Important/
   Minor와 unresolved HIGH/MEDIUM 없이 PASS. Final QA target
   `91f5f6991d88ed7164335771266fe86a14e8ffbe`에서 `./scripts/verify full` build,
-  core E2E 5/5, verifier regression 19 PASS. 사람의 명시적 최종 승인 기록만 대기하며
-  현재 `HUMAN_APPROVED`가 아님
+  core E2E 5/5, verifier regression 19 PASS. 2026-09-01 사람이 최종 evidence를
+  확인하고 checkbox와 `HUMAN_APPROVED` 상태를 직접 기록함
 
 ## 4. work-overview Journey
 
@@ -1221,7 +1221,7 @@
 - Acceptance: 전체/남은/완료 label과 value 관계가 유지되고 loading, error/retry와
   success가 390x844/1280x720에서 layout collapse 없이 구분된다.
 - Automatic verification: `pnpm vitest run
-  src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify quick`
+src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, 두 viewport, fixture 3/2/1, loading/error/retry/success,
   bearer request와 console/page error
 - Status: NOT_STARTED
@@ -1236,7 +1236,7 @@
 - Acceptance: name과 memo hierarchy가 명확하고 loading, error/retry와 success가
   390x844/1280x720에서 layout collapse 없이 구분된다.
 - Automatic verification: `pnpm vitest run
-  src/widgets/user-profile/user-profile.test.tsx`, `./scripts/verify quick`
+src/widgets/user-profile/user-profile.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/user`, 두 viewport, fixture name/memo, state, bearer request,
   console/page error
 - Status: NOT_STARTED
@@ -1251,8 +1251,8 @@
 - Acceptance: 세 action과 current route가 유지되고 content가 두 viewport에서 잘리지
   않으며 keyboard 이동과 computed Pretendard가 확인된다.
 - Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
-  src/widgets/dashboard-summary/dashboard-summary.test.tsx
-  src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
+src/widgets/dashboard-summary/dashboard-summary.test.tsx
+src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/` → `/user` → `/task` → `/`, 390x844/1280x720,
   current route, keyboard, font, console/network
@@ -1268,8 +1268,8 @@
 - Acceptance: `WORK-P1-*`, `WORK-E*`가 fixture, navigation, state, font, accessibility와
   viewport evidence에 trace되고 expected console/network가 기록된다.
 - Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
-  src/widgets/dashboard-summary/dashboard-summary.test.tsx
-  src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
+src/widgets/dashboard-summary/dashboard-summary.test.tsx
+src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
   `./scripts/verify quick`,
   `pnpm exec playwright test e2e/work-overview.spec.ts`
 - Browser verification: named `agent-browser` session, dashboard/task/profile 이동,
@@ -1362,7 +1362,7 @@
 - Acceptance: title과 memo가 구분되고 card 전체가 exact encoded detail route로
   이동하며 hover와 keyboard focus가 명확하다. 원본에 없는 status UI는 추가하지 않는다.
 - Automatic verification: `pnpm vitest run
-  src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
+src/entities/task/ui/task-card.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/task`, 390x844/1280x720, card content, pointer/keyboard focus,
   `/task/:id` navigation, console/page error
 - Status: NOT_STARTED
@@ -1393,7 +1393,7 @@
 - Acceptance: end 도달 시 다음 page를 한 번 요청하고 partial-page failure는 retry할 수
   있으며 `hasNext: false` 뒤 멈춘다. 수동 fallback은 자동 pagination을 대체하지 않는다.
 - Automatic verification: `pnpm vitest run src/widgets/task-list/task-list.test.tsx
-  src/shared/api/tasks.test.ts`, `./scripts/verify quick`
+src/shared/api/tasks.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task`, 두 viewport, page 1→2 scroll, request method/query/count,
   in-flight/terminal feedback, console/page error
 - Status: NOT_STARTED
@@ -1423,7 +1423,7 @@
 - Acceptance: `DISC-P1-*`, `DISC-E*`가 exact page sequence, bounded DOM, real scroll,
   terminal stop와 detail navigation evidence에 trace된다.
 - Automatic verification: `pnpm vitest run src/entities/task/ui/task-card.test.tsx
-  src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
+src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   `./scripts/verify quick`,
   `pnpm exec playwright test e2e/task-discovery.spec.ts`
 - Browser verification: named `agent-browser` session, `/task` → `/task/task-3`,
@@ -1519,7 +1519,7 @@
 - Acceptance: 세 field가 의미 있는 hierarchy로 표시되고 registerDatetime은 readable
   text와 원본 `dateTime` 값을 함께 보존하며 두 viewport에서 clipping이 없다.
 - Automatic verification: `pnpm vitest run
-  src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
+src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, 390x844/1280x720, field/dateTime, hierarchy,
   bearer request와 console/page error
 - Status: NOT_STARTED
@@ -1534,7 +1534,7 @@
 - Acceptance: 404 `errorMessage`와 list action이 일반 error/retry와 구분되고 action을
   keyboard로 실행할 수 있으며 상태 전환 중 shell이 유지된다.
 - Automatic verification: `pnpm vitest run
-  src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
+src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/task/missing`과 recoverable error fixture, 두 viewport,
   recovery action, GET status와 console/page error
 - Status: NOT_STARTED
@@ -1550,8 +1550,8 @@
   값은 disabled, exact 값만 enabled이며 close/Escape/trap/restore와 mobile overflow를
   검증한다.
 - Automatic verification: `pnpm vitest run
-  src/features/delete-task/ui/delete-task-dialog.test.tsx
-  src/features/delete-task/model/attempt-guard.test.ts`, `./scripts/verify quick`
+src/features/delete-task/ui/delete-task-dialog.test.tsx
+src/features/delete-task/model/attempt-guard.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, 두 viewport, modal open/wrong/exact/cancel/Escape,
   focus lifecycle, DELETE 0회와 console/page error
 - Status: NOT_STARTED
@@ -1568,11 +1568,11 @@
   unknown은 GET recheck, network failure는 자동 DELETE 재전송 없이 표시되며 200
   `{ success: true }`만 `/task`로 이동한다.
 - Automatic verification: `pnpm vitest run
-  src/features/delete-task/ui/delete-task-dialog.test.tsx
-  src/features/delete-task/model/delete-task.test.ts
-  src/features/delete-task/model/delete-cache.test.ts
-  src/pages/task-detail/task-detail.test.tsx
-  src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
+src/features/delete-task/ui/delete-task-dialog.test.tsx
+src/features/delete-task/model/delete-task.test.ts
+src/features/delete-task/model/delete-cache.test.ts
+src/pages/task-detail/task-detail.test.tsx
+src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, exact submit, pending/failure/recheck/success,
   390x844/1280x720, DELETE/GET method·count, redirect와 list/detail/dashboard state,
   console/page error
@@ -1588,11 +1588,11 @@
 - Acceptance: `RES-P1-*`, `RES-E*`가 detail/404/modal/guard/request count/redirect와
   list/detail/dashboard 일관성 evidence에 trace된다.
 - Automatic verification: `pnpm vitest run
-  src/features/delete-task/ui/delete-task-dialog.test.tsx
-  src/features/delete-task/model/delete-task.test.ts
-  src/features/delete-task/model/delete-cache.test.ts
-  src/pages/task-detail/task-detail.test.tsx
-  src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
+src/features/delete-task/ui/delete-task-dialog.test.tsx
+src/features/delete-task/model/delete-task.test.ts
+src/features/delete-task/model/delete-cache.test.ts
+src/pages/task-detail/task-detail.test.tsx
+src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   `pnpm exec playwright test e2e/task-resolution.spec.ts`
 - Browser verification: named `agent-browser` session, existing→missing→recovery→delete,
   두 viewport, modal/network/cache/console
@@ -1638,8 +1638,8 @@
 - Acceptance: current session과 stale session의 route/action/protected cache가 승인된
   auth policy대로 전환되고 Journey 사이에 이전 사용자 UI/data가 남지 않는다.
 - Automatic verification: `pnpm vitest run src/app/auth/auth-provider.test.tsx
-  src/app/auth/auth-route-boundary.test.tsx
-  src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
+src/app/auth/auth-route-boundary.test.tsx
+src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/sign-in`, `/`, `/task`, `/task/:id`, `/user`에서 sign-in,
   reload, direct entry, terminal 401, 390x844/1280x720과 console/network
@@ -1656,9 +1656,9 @@
 - Acceptance: 성공 삭제 후 list에서 item이 사라지고 detail은 404, dashboard metric은
   감소하며 failure/unknown result는 승인 정책 밖의 mutation이나 redirect를 만들지 않는다.
 - Automatic verification: `pnpm vitest run src/mocks/fixtures/tasks.test.ts
-  src/mocks/handlers/tasks.test.ts
-  src/features/delete-task/model/delete-cache.test.ts
-  src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
+src/mocks/handlers/tasks.test.ts
+src/features/delete-task/model/delete-cache.test.ts
+src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: detail delete → list → deleted detail → dashboard, request
   method/count, visible data, 390x844/1280x720과 console/network
 - Status: NOT_STARTED
@@ -1673,12 +1673,12 @@
 - Acceptance: 390x844/1280x720과 keyboard-only에서 heading/landmark/label/focus,
   modal trap/restore, clipping, scroll trap과 상태의 비색상 구분에 unresolved finding이 없다.
 - Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
-  src/features/sign-in/ui/sign-in-form.test.tsx
-  src/widgets/dashboard-summary/dashboard-summary.test.tsx
-  src/widgets/user-profile/user-profile.test.tsx
-  src/widgets/task-list/task-list.test.tsx
-  src/pages/task-detail/task-detail.test.tsx
-  src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
+src/features/sign-in/ui/sign-in-form.test.tsx
+src/widgets/dashboard-summary/dashboard-summary.test.tsx
+src/widgets/user-profile/user-profile.test.tsx
+src/widgets/task-list/task-list.test.tsx
+src/pages/task-detail/task-detail.test.tsx
+src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
 - Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
   modal, virtual scroll, screenshot, console/network
 - Status: NOT_STARTED
@@ -1693,10 +1693,10 @@
 - Acceptance: method, path/query, auth scheme, success/error status와 schema가
   `assignment-original/openapi.yaml`과 일치하고 독자 endpoint/field/status가 없다.
 - Automatic verification: `pnpm api:types:check`, `pnpm vitest run
-  src/shared/api/openapi-contract.test.ts src/shared/api/auth.test.ts
-  src/shared/api/dashboard.test.ts src/shared/api/user.test.ts
-  src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
-  src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
+src/shared/api/openapi-contract.test.ts src/shared/api/auth.test.ts
+src/shared/api/dashboard.test.ts src/shared/api/user.test.ts
+src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
+src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: 네 Journey network record에서 실제 method/path/query/status와
   bearer/cookie boundary 대조
 - Status: NOT_STARTED
