@@ -47,7 +47,8 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
   the expected heading/current action. Desktop sidebar was 224px, main width was 1056px,
   document width equaled the 1280px viewport. Keyboard order was dashboard, task, auth;
   computed focus was `rgb(138, 109, 0) solid 2px` with 2px offset, hover had a distinct
-  accent background, and body font was `Pretendard, ui-sans-serif, system-ui, sans-serif`.
+  accent background, body font was `Pretendard, ui-sans-serif, system-ui, sans-serif`, and
+  the screenshot showed distinct dashboard-grid, task-list, and profile-circle icons.
 - Screenshot: `/tmp/kbhc-ui-shell-desktop.png`.
 
 ## Mobile browser verification
@@ -57,7 +58,8 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
   distinguishable, and there is no horizontal clipping.
 - Actual: all three navigation targets measured 48px high; document and viewport widths were
   both 390px on all routes; anonymous sign-in main ended above the bottom navigation; current
-  actions matched each route; keyboard focus retained the 2px dark-gold ring and Pretendard.
+  actions matched each route; keyboard focus retained the 2px dark-gold ring and Pretendard;
+  the three distinct icons and visible labels remained legible.
 - Screenshot: `/tmp/kbhc-ui-shell-mobile.png`.
 
 ## Console, network, and failures

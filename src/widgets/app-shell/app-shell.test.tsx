@@ -22,6 +22,10 @@ describe("AppShell", () => {
 
     const user = userEvent.setup();
     expect(await screen.findByRole("heading", { name: "할 일" })).toBeInTheDocument();
+    const navigation = screen.getByRole("navigation", { name: "주요 메뉴" });
+    for (const icon of ["lucide-layout-dashboard", "lucide-list-todo", "lucide-log-in"]) {
+      expect(navigation.querySelector(`.${icon}`)).toBeInTheDocument();
+    }
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "할 일" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "로그인" })).toHaveAttribute("href", "/sign-in");
