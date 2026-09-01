@@ -141,4 +141,29 @@ describe("AuthProvider", () => {
     expect(view.queryClient.getQueryData(["tasks", 1])).toBeUndefined();
     expect(view.queryClient.getQueryData(["unrelated"])).toEqual({ keep: true });
   });
+
+  it("terminates an authenticated session when refresh returns 401", async () => {
+    refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "missing" });
+    const view = renderProvider();
+    await screen.findByText("anonymous");
+    view.controller().acceptSignIn(tokens("user-1", 1));
+    await screen.findByText("authenticated");
+    view.queryClient.setQueryData(["tasks", 1], { data: [] });
+    view.queryClient.setQueryData(["unrelated"], { keep: true });
+    const current = view.controller().getSnapshot();
+    refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "expired" });
+
+    await expect(view.controller().refresh(current)).rejects.toMatchObject({
+      kind: "http",
+      status: 401,
+    });
+
+    await waitFor(() => expect(view.controller().status.kind).toBe("anonymous"));
+    expect(view.controller().getSnapshot()).toEqual({
+      generation: current.generation + 1,
+      accessToken: null,
+    });
+    expect(view.queryClient.getQueryData(["tasks", 1])).toBeUndefined();
+    expect(view.queryClient.getQueryData(["unrelated"])).toEqual({ keep: true });
+  });
 });
