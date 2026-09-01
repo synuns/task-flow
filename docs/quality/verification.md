@@ -15,10 +15,9 @@ verification fail.
 
 ## Modes
 
-- `setup`: required files, document markers and links, risk/approval rules,
-  journey categories, TODO checkbox/Status/dependency consistency and unsupported
-  checkpoint-approval claims, plan-completion review evidence markers, review/final-QA
-  sections, pending-record ignore rule,
+- `setup`: required entry-point and executable contract files,
+  TODO checkbox/Status/dependency consistency and unsupported checkpoint-approval
+  claims, pending-record ignore rule,
   Stop/SessionEnd hook wiring, AI disclosure headings, and the four focused
   artifact-contract, exporter, index, and publisher unit-test suites. It also
   runs a read-only verifier contract suite without invoking quick or full recursively.
@@ -42,11 +41,11 @@ command, and lists failure classes from `workflow.md`.
 is separate:
 
 ```bash
-npm run format
+pnpm run format
 ```
 
 Review the resulting diff and run `./scripts/verify quick`. No verify command
-may call `npm run format` or another write-mode formatter.
+may call `pnpm run format` or another write-mode formatter.
 
 ## Test-Level Selection
 
@@ -60,6 +59,36 @@ may call `npm run format` or another write-mode formatter.
 
 Choose the lowest level that proves risk reliably. Do not duplicate lower-level
 coverage in E2E.
+
+## Journey Lookup Before a Change
+
+Search a requirement ID, route, API path, or symbol in
+`docs/quality/requirements.md`, `TODO.md`, `src`, and `e2e`, then use this map.
+
+| Journey | Requirements and routes | Primary implementation areas | Focused E2E |
+| --- | --- | --- | --- |
+| `auth-entry` | `NAV-02`, `AUTH-01..07`; `/sign-in`, protected routes | `src/app/auth`, `src/features/sign-in`, `src/shared/api/auth*` | `e2e/auth-entry.spec.ts` |
+| `work-overview` | `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`; `/`, `/user` | `src/widgets/app-shell`, `src/pages/dashboard`, `src/pages/user`, `src/widgets/dashboard-summary`, `src/widgets/user-profile` | `e2e/work-overview.spec.ts` |
+| `task-discovery` | `TASK-LIST-01..05`; `/task`, `GET /api/task` | `src/pages/task-list`, `src/widgets/task-list`, `src/entities/task`, `src/shared/api/tasks.ts` | `e2e/task-discovery.spec.ts` |
+| `task-resolution` | `TASK-DETAIL-01..05`; `/task/:id`, `GET/DELETE /api/task/:id` | `src/pages/task-detail`, `src/features/delete-task`, `src/shared/api/tasks.ts` | `e2e/task-resolution.spec.ts` |
+
+The table is a lookup aid, not a replacement for requirement IDs or focused
+unit, component, and integration tests.
+
+## Local and CI Bootstrap
+
+Use a Node version allowed by `package.json#engines` and pnpm `10.15.1` in both
+environments, then run:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+./scripts/verify full
+```
+
+`./scripts/verify full` is the final verdict in both environments. Playwright
+keeps one retry only for diagnostics and `failOnFlakyTests: true` makes a flaky
+result fail the gate.
 
 ## Core E2E Journeys
 

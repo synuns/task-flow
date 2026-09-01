@@ -37,6 +37,11 @@ before the final completion task or TODO status transition, run a
 plan-completion adversarial review → at each golden journey, reuse or extend that
 review → request one human checkpoint → run full review and final QA.
 
+Before changing code, locate the applicable Journey by searching requirement ID,
+route, API path, or symbol across `docs/quality/requirements.md`, `TODO.md`, `src`,
+and `e2e`. After the lowest sufficient focused test, run `./scripts/verify quick`
+and the mapped Journey E2E before `./scripts/verify full`.
+
 작업 시작 시 `TODO.md`에서 의존성이 해소된 작업 하나를 선택하고, 종료 전
 상태와 재현 가능한 evidence를 갱신한다. 상위 목표·범위·단계는
 `docs/project-plan.md`를 따른다. 세부 기능 설계와 구현 순서는 별도
@@ -62,7 +67,7 @@ Implementation plan 실행은 격리 worktree를 기본으로 한다. 현재 che
 ./scripts/verify full
 ```
 
-Verification is read-only. `npm run format` is a separate mutation command;
+Verification is read-only. `pnpm run format` is a separate mutation command;
 review its diff and rerun `./scripts/verify quick` afterward.
 
 ## Evidence and AI Records

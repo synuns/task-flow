@@ -1834,7 +1834,7 @@ result fail the gate.
 Run:
 
 ```bash
-for path in docs/quality/requirements.md TODO.md src e2e e2e/auth-entry.spec.ts e2e/work-overview.spec.ts e2e/task-discovery.spec.ts e2e/task-resolution.spec.ts; do test -e "$path"; done
+for candidate in docs/quality/requirements.md TODO.md src e2e e2e/auth-entry.spec.ts e2e/work-overview.spec.ts e2e/task-discovery.spec.ts e2e/task-resolution.spec.ts; do test -e "$candidate"; done
 ./scripts/verify quick
 git diff --check
 ```
