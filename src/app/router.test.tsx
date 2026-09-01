@@ -80,6 +80,10 @@ describe("app router", () => {
     );
 
     expect(await screen.findByRole("heading", { name: heading })).toBeInTheDocument();
+    const navigation = screen.getByRole("navigation", { name: "주요 메뉴" });
+    expect(screen.getAllByRole("navigation")).toHaveLength(1);
+    expect(navigation.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(3);
+    expect(screen.getByText("오케어 업무")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "할 일" })).toHaveAttribute("href", "/task");
     if (kind === "authenticated") {
@@ -90,6 +94,12 @@ describe("app router", () => {
       expect(screen.queryByRole("link", { name: "회원정보" })).not.toBeInTheDocument();
       expect(screen.getByRole("textbox", { name: "이메일" })).toBeInTheDocument();
     }
+
+    const currentLabel = path.startsWith("/task") ? "할 일" : heading;
+    expect(screen.getByRole("link", { name: currentLabel })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
   it("renders the route error boundary for render failures", async () => {
