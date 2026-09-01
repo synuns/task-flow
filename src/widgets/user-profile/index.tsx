@@ -1,4 +1,13 @@
 import { getUser, useApiClient } from "@/shared/api";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Card,
+  CardContent,
+  Skeleton,
+} from "@/shared/ui";
 import { useQuery } from "@tanstack/react-query";
 import { userKeys } from "./model/user-keys";
 
@@ -12,28 +21,42 @@ export function UserProfile() {
   const client = useApiClient();
   const query = useQuery({ queryKey: userKeys.all, queryFn: () => getUser(client) });
 
-  if (query.isPending) return <p role="status">회원정보를 불러오고 있습니다.</p>;
+  if (query.isPending) {
+    return (
+      <div className="max-w-2xl" role="status">
+        <span className="sr-only">회원정보를 불러오고 있습니다.</span>
+        <Skeleton className="h-40" />
+      </div>
+    );
+  }
   if (query.isError) {
     return (
-      <section>
-        <p role="alert">{errorMessage(query.error)}</p>
-        <button onClick={() => void query.refetch()} type="button">
-          다시 불러오기
-        </button>
-      </section>
+      <Alert className="max-w-2xl" variant="destructive">
+        <AlertTitle>회원정보를 불러오지 못했습니다.</AlertTitle>
+        <AlertDescription>
+          <p>{errorMessage(query.error)}</p>
+          <Button onClick={() => void query.refetch()} size="sm" type="button" variant="outline">
+            다시 불러오기
+          </Button>
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
-    <dl>
-      <div>
-        <dt>이름</dt>
-        <dd>{query.data.name}</dd>
-      </div>
-      <div>
-        <dt>메모</dt>
-        <dd>{query.data.memo}</dd>
-      </div>
-    </dl>
+    <Card className="max-w-2xl">
+      <CardContent>
+        <dl className="divide-y">
+          <div className="grid gap-1 py-4 first:pt-0 sm:grid-cols-[8rem_1fr] sm:gap-4">
+            <dt className="font-medium text-muted-foreground text-sm">이름</dt>
+            <dd className="font-medium">{query.data.name}</dd>
+          </div>
+          <div className="grid gap-1 py-4 last:pb-0 sm:grid-cols-[8rem_1fr] sm:gap-4">
+            <dt className="font-medium text-muted-foreground text-sm">메모</dt>
+            <dd className="whitespace-pre-wrap">{query.data.memo}</dd>
+          </div>
+        </dl>
+      </CardContent>
+    </Card>
   );
 }

@@ -42,7 +42,8 @@ describe("UserProfile", () => {
     expect(screen.getByRole("status")).toHaveTextContent("회원정보를 불러오고 있습니다.");
     release();
 
-    expect(await screen.findByText("김담당")).toBeInTheDocument();
+    const name = await screen.findByText("김담당");
+    expect(name.closest('[data-slot="card"]')).toBeInTheDocument();
     expect(screen.getByText("오늘도 차근차근")).toBeInTheDocument();
   });
 

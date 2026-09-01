@@ -46,6 +46,31 @@ describe("DashboardSummary", () => {
     expect(screen.getByText("전체 할 일").nextElementSibling).toHaveTextContent("3");
     expect(screen.getByText("남은 할 일").nextElementSibling).toHaveTextContent("2");
     expect(screen.getByText("완료한 일").nextElementSibling).toHaveTextContent("1");
+    expect(screen.getByRole("progressbar", { name: "업무 완료율" })).toHaveAttribute(
+      "aria-valuenow",
+      "33",
+    );
+  });
+
+  it("explains the zero-task state without dividing by zero", async () => {
+    const body: unknown = { numOfTask: 0, numOfRestTask: 0, numOfDoneTask: 0 };
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        _init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        if (!isSuccess(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+    render(<DashboardSummary />, { wrapper: wrapper(client) });
+
+    expect(await screen.findByText("아직 등록된 할 일이 없습니다.")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "업무 완료율" })).toHaveAttribute(
+      "aria-valuenow",
+      "0",
+    );
   });
 
   it("offers an explicit retry after a recoverable error", async () => {
