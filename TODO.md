@@ -48,9 +48,9 @@
 | ------------------ | ----------------------------------------------- | ------------------------------------------------ |
 | 0. 기획·결정 준비  | 상위 기준 연결, HIGH 결정 목록 분리             | AI_VERIFIED                                      |
 | 1. 개발 기반       | quick/full 및 scaffold browser smoke 통과       | AI_VERIFIED                                      |
-| 2. 공통 구조       | provider/router/API 기반 + 실제 UI shell/state  | IN_PROGRESS — 로직 기반 검증, UI backlog 시작 전 |
-| 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
-| 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
+| 2. 공통 구조       | provider/router/API 기반 + 실제 UI shell/state  | AI_VERIFIED                                      |
+| 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                                   |
+| 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — Journey 루프 설계 중               |
 | 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
 | 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                   |
 | 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — Journey UI 구현 전                     |
@@ -1166,6 +1166,32 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 
 ## 4. work-overview Journey
 
+### [ ] WORK-LOOP-DESIGN-01 work-overview Journey 전체 루프 설계
+
+- Requirements: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`
+- Risk: LOW — 승인된 API·화면·인증 계약을 구현 가능한 Journey 순서로 연결
+- Depends on: `JOURNEY-AUTH-01`
+- Deliverable: 기존 구현을 baseline으로 재사용하는 gap-first Journey 설계 문서와
+  TODO dependency 연결
+- Acceptance: 원본 기획, OpenAPI의 dashboard/user bearer 계약, Focus workspace 화면
+  설계, 현재 code/test/evidence가 trace되고 구현·검증·독립 review·사람 checkpoint의
+  입력과 exit가 모순 없이 정의된다.
+- Automatic verification: spec placeholder·contradiction·requirement/API/TODO trace
+  자체 검토, `./scripts/verify setup`, `git diff --check`
+- Browser verification: 설계 task에는 적용 없음 — 실행 plan이 두 viewport와
+  named agent-browser evidence를 소유
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; start commit
+  `edc8142215a9662fe89db3b45453050ab800f4ab`; 사용자와 gap-first 범위, task/data
+  경계, acceptance/evidence 설계를 섹션별 승인;
+  `docs/superpowers/specs/2026-09-01-work-overview-journey-design.md`에 원본 기획,
+  OpenAPI 200/401 bearer 계약, Focus workspace, baseline module, task/data flow,
+  acceptance matrix, gap-first TDD, browser evidence, review/exit를 trace함. Placeholder,
+  contradiction, ambiguity와 scope 자체 검토 및 `git diff --check` PASS. 첫
+  `./scripts/verify setup`은 기존 fixed dependency fixture가 새 prerequisite를 몰라
+  `TEST` 실패; `tests/test_verify_contract.py` mapping을 최소 교정하고 focused 1 test,
+  setup hook 86 tests·verify contract 19 tests PASS. 작성된 spec 사용자 검토 대기
+
 ### [x] NAV-PRIMARY-01 공통 dashboard/task navigation
 
 - Requirements: `NAV-01`
@@ -1216,7 +1242,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 
 - Requirements: `DASH-01`
 - Risk: LOW — 검증된 dashboard data의 presentation
-- Depends on: `UI-SHELL-01`, `UI-STATE-01`, `DASH-01`
+- Depends on: `WORK-LOOP-DESIGN-01`, `UI-SHELL-01`, `UI-STATE-01`, `DASH-01`
 - Deliverable: 세 metric의 responsive state surface
 - Acceptance: 전체/남은/완료 label과 value 관계가 유지되고 loading, error/retry와
   success가 390x844/1280x720에서 layout collapse 없이 구분된다.
@@ -1231,7 +1257,7 @@ src/widgets/dashboard-summary/dashboard-summary.test.tsx`, `./scripts/verify qui
 
 - Requirements: `USER-01`
 - Risk: LOW — 검증된 profile data의 presentation
-- Depends on: `UI-SHELL-01`, `UI-STATE-01`, `USER-01`
+- Depends on: `WORK-LOOP-DESIGN-01`, `UI-SHELL-01`, `UI-STATE-01`, `USER-01`
 - Deliverable: name과 memo의 responsive state surface
 - Acceptance: name과 memo hierarchy가 명확하고 loading, error/retry와 success가
   390x844/1280x720에서 layout collapse 없이 구분된다.

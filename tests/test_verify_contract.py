@@ -240,8 +240,15 @@ class VerifyContractTests(unittest.TestCase):
             "AUTH-JOURNEY-VERIFY-01": ({"AUTH-SESSION-UX-01"}, "NOT_STARTED"),
             "AUTH-JOURNEY-REVIEW-01": ({"AUTH-JOURNEY-VERIFY-01"}, "NOT_STARTED"),
             "JOURNEY-AUTH-01": ({"AUTH-JOURNEY-REVIEW-01"}, "BLOCKED"),
-            "DASHBOARD-VIEW-01": ({"UI-SHELL-01", "UI-STATE-01", "DASH-01"}, "NOT_STARTED"),
-            "PROFILE-VIEW-01": ({"UI-SHELL-01", "UI-STATE-01", "USER-01"}, "NOT_STARTED"),
+            "WORK-LOOP-DESIGN-01": ({"JOURNEY-AUTH-01"}, "NOT_STARTED"),
+            "DASHBOARD-VIEW-01": (
+                {"WORK-LOOP-DESIGN-01", "UI-SHELL-01", "UI-STATE-01", "DASH-01"},
+                "NOT_STARTED",
+            ),
+            "PROFILE-VIEW-01": (
+                {"WORK-LOOP-DESIGN-01", "UI-SHELL-01", "UI-STATE-01", "USER-01"},
+                "NOT_STARTED",
+            ),
             "WORK-NAV-RESPONSIVE-01": (
                 {"DASHBOARD-VIEW-01", "PROFILE-VIEW-01"},
                 "NOT_STARTED",
