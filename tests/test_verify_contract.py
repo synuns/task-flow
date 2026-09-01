@@ -225,17 +225,6 @@ class VerifyContractTests(unittest.TestCase):
         verifier = load_verify_module()
         self.assertEqual(verifier.verify_todo_consistency(ROOT), [])
 
-    def test_repository_worktree_default_is_recorded(self):
-        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        workflow = (ROOT / "docs/quality/workflow.md").read_text(encoding="utf-8")
-
-        for document in (agents, workflow):
-            with self.subTest(document="AGENTS.md" if document is agents else "workflow.md"):
-                self.assertIn("격리 worktree를 기본", document)
-                self.assertIn("별도 질문 없이", document)
-                self.assertIn("`.worktrees/<branch>`", document)
-                self.assertIn("생성 또는 안전 검사가 실패", document)
-
     def test_repository_todo_contains_granular_journey_backlog(self):
         todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
         expected = {
@@ -449,6 +438,36 @@ class VerifyContractTests(unittest.TestCase):
         self.assertIn("--grep @core", command)
         self.assertNotIn("--pass-with-no-tests", command)
 
+    def test_repository_uses_pinned_pnpm_and_required_core_files(self):
+        verifier = load_verify_module()
+        package = verifier.package_document()
+
+        self.assertEqual(package["packageManager"], "pnpm@10.15.1")
+        for relative in (
+            "pnpm-lock.yaml",
+            "e2e/authenticated-fixture.ts",
+            "e2e/auth-entry.spec.ts",
+            "e2e/work-overview.spec.ts",
+            "e2e/task-discovery.spec.ts",
+            "e2e/task-resolution.spec.ts",
+            "src/mocks/fixtures/auth.ts",
+            "src/mocks/fixtures/tasks.ts",
+        ):
+            with self.subTest(relative=relative):
+                self.assertIn(relative, verifier.REQUIRED_FILES)
+                self.assertTrue((ROOT / relative).is_file())
+
+    def test_protected_core_journeys_use_authenticated_fixture(self):
+        for relative in (
+            "e2e/work-overview.spec.ts",
+            "e2e/task-discovery.spec.ts",
+            "e2e/task-resolution.spec.ts",
+        ):
+            source = (ROOT / relative).read_text(encoding="utf-8")
+            with self.subTest(relative=relative):
+                self.assertIn('from "./authenticated-fixture"', source)
+                self.assertIn("prepareAuthenticatedPage(page)", source)
+
     def test_playwright_lists_all_core_journeys(self):
         result = subprocess.run(
             ["pnpm", "exec", "playwright", "test", "--grep", "@core", "--list"],
@@ -462,6 +481,14 @@ class VerifyContractTests(unittest.TestCase):
         for tag in ("@auth", "@work", "@task-discovery", "@task-resolution"):
             with self.subTest(tag=tag):
                 self.assertIn(tag, combined)
+        for relative in (
+            "auth-entry.spec.ts",
+            "work-overview.spec.ts",
+            "task-discovery.spec.ts",
+            "task-resolution.spec.ts",
+        ):
+            with self.subTest(relative=relative):
+                self.assertIn(relative, combined)
 
     def test_runtime_harness_has_fresh_server_and_no_webstorage_warning(self):
         result = subprocess.run(

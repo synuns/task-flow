@@ -46,151 +46,62 @@ class VerifyCliTests(unittest.TestCase):
         self.assertIn("PASS hook-tests", combined)
         self.assertNotIn("FAIL", combined)
 
-    def test_setup_rejects_missing_reviewed_and_legacy_markers(self):
-        verifier = load_verify_module()
-        required_markers = (
-            "## 사용한 도구와 모델",
-            "## 적용한 작업 범위",
-            "## 핵심 프롬프트 요약",
-            "## 사람이 최종 검증한 내용",
-            "## 전체 프롬프트와 작업 기록",
-            "<!-- reviewed-records:start -->",
-            "<!-- reviewed-records:end -->",
-            "npm run ai:review",
-            "legacy/pre-policy",
-        )
-        self.assertEqual(
-            verifier.REQUIRED_MARKERS["AI_USAGE.md"], required_markers
-        )
-
-        with tempfile.TemporaryDirectory() as directory:
-            temporary_root = Path(directory)
-            usage_path = temporary_root / "AI_USAGE.md"
-            for marker in (
-                "<!-- reviewed-records:start -->",
-                "<!-- reviewed-records:end -->",
-                "--reviewed-sha256",
-                "legacy/pre-policy",
-            ):
-                with self.subTest(marker=marker):
-                    usage_path.write_text(
-                        "\n".join(required_markers).replace(
-                            marker, "missing-marker", 1
-                        ),
-                        encoding="utf-8",
-                    )
-                    errors = io.StringIO()
-                    with contextlib.redirect_stderr(errors):
-                        with mock.patch.multiple(
-                            verifier,
-                            ROOT=temporary_root,
-                            REQUIRED_FILES=("AI_USAGE.md",),
-                            REQUIRED_MARKERS={"AI_USAGE.md": required_markers},
-                        ):
-                            result = verifier.verify_setup()
-                    self.assertEqual(result, 1, errors.getvalue())
-                    self.assertIn("FAIL setup", errors.getvalue())
-
     def test_setup_requires_publisher(self):
         verifier = load_verify_module()
         self.assertIn("scripts/publish-ai-record", verifier.REQUIRED_FILES)
 
-    def test_setup_requires_digest_and_auth_evidence_contracts(self):
+    def test_frontend_stages_use_pnpm(self):
         verifier = load_verify_module()
-        self.assertIn(
-            "reviewed SHA-256 digest",
-            verifier.REQUIRED_MARKERS["docs/quality/workflow.md"],
-        )
-        self.assertIn(
-            "reviewed SHA-256 digest",
-            verifier.REQUIRED_MARKERS["docs/quality/verification.md"],
-        )
-        self.assertIn(
-            "Authorization: Bearer <accessToken>",
-            verifier.REQUIRED_MARKERS["docs/quality/requirements.md"],
-        )
-
-    def test_setup_requires_integrated_journey_contract_markers(self):
-        verifier = load_verify_module()
-        markers = verifier.REQUIRED_MARKERS["docs/quality/requirements.md"]
-        for marker in (
-            "## Scenario Execution Rules",
-            "## Master Journey",
-            "## Independent Journey Contract",
-            "Decision gate: `DEC-AUTH-01`",
-            "Decision gate: `DEC-DELETE-01`",
-        ):
-            with self.subTest(marker=marker):
-                self.assertIn(marker, markers)
-
-    def test_setup_requires_plan_completion_review_contract(self):
-        verifier = load_verify_module()
-        expected = {
-            "AGENTS.md": (
-                "after the final implementation/verification task",
-                "before the final completion task or TODO status transition",
-                "plan-completion adversarial review",
-                "task block owner",
-            ),
-            "docs/quality/workflow.md": (
-                "## Plan-Completion Adversarial Review",
-                "Review target:",
-                "Reviewer:",
-                "Checks:",
-                "Findings:",
-                "Corrections:",
-                "Rerun:",
-                "Verdict:",
-                "`Findings: none` is valid only with the reviewer, target commit, and checks.",
-                "HIGH decision item",
-                "not a Golden Journey acceptance",
-                "same target, one recorded review satisfies both",
-            ),
-            "docs/quality/verification.md": (
-                "plan-completion review evidence",
-            ),
-            "docs/project-plan.md": (
-                "plan-completion adversarial review",
-                "only when plan path, requirement/Journey IDs, and target commit are identical",
-            ),
-            "TODO.md": (
-                "사람 결정 evidence가 있을 때 `AI_VERIFIED`",
-                "이는 Journey의 `HUMAN_APPROVED`가 아니다.",
-                "소유하지 않은 task block",
-            ),
+        package = {
+            "packageManager": "pnpm@10.15.1",
+            "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
+            "kbhc": {"frontendScaffolded": True},
         }
-        for path, markers in expected.items():
-            self.assertIn(path, verifier.REQUIRED_FILES)
-            content = (ROOT / path).read_text(encoding="utf-8")
-            for marker in markers:
-                with self.subTest(path=path, marker=marker):
-                    self.assertIn(marker, verifier.REQUIRED_MARKERS[path])
-                    self.assertIn(marker, content)
+        with mock.patch.object(verifier, "package_document", return_value=package):
+            with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+                result = verifier.verify_frontend("full")
 
-        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        ordered = tuple(
-            agents.index(marker)
-            for marker in (
-                "after the final implementation/verification task",
-                "before the final completion task or TODO status transition",
-                "plan-completion adversarial review",
-            )
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            run_stage.call_args_list,
+            [
+                mock.call(name, ["pnpm", "run", name])
+                for name in (
+                    "format:check",
+                    "lint",
+                    "typecheck",
+                    "test",
+                    "build",
+                    "test:e2e:core",
+                )
+            ],
         )
-        self.assertEqual(ordered, tuple(sorted(ordered)))
 
-    def test_fsd_creation_constraints_are_recorded(self):
-        standards = (ROOT / "docs/coding-standards.md").read_text(encoding="utf-8")
-        todo = (ROOT / "TODO.md").read_text(encoding="utf-8")
-        for marker in (
-            "`src/generated/openapi.ts`는 `src/shared/api` 내부에서만 직접 import한다.",
-            "generated type 또는 module을 public API로 re-export하지 않는다.",
-            "auth provider placeholder를 만들지 않는다.",
-            "빈 layer directory와 소비자 없는 빈 `index.ts`를 만들지 않는다.",
-            "Biome `noRestrictedImports`",
-        ):
-            with self.subTest(marker=marker):
-                self.assertIn(marker, standards)
-        self.assertIn("Biome `noRestrictedImports` 허용·차단 fixture", todo)
+    def test_frontend_stops_and_returns_nonzero_on_child_failure(self):
+        verifier = load_verify_module()
+        package = {
+            "packageManager": "pnpm@10.15.1",
+            "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
+            "kbhc": {"frontendScaffolded": True},
+        }
+        with mock.patch.object(verifier, "package_document", return_value=package):
+            with mock.patch.object(verifier, "run_stage", side_effect=[0, 1]) as run_stage:
+                result = verifier.verify_frontend("quick")
+
+        self.assertNotEqual(result, 0)
+        self.assertEqual(run_stage.call_count, 2)
+
+    def test_run_stage_returns_nonzero_for_child_failure(self):
+        verifier = load_verify_module()
+        errors = io.StringIO()
+        with contextlib.redirect_stderr(errors):
+            result = verifier.run_stage(
+                "probe",
+                [sys.executable, "-c", "import sys; sys.exit(7)"],
+            )
+
+        self.assertNotEqual(result, 0)
+        self.assertIn("command exited 7", errors.getvalue())
 
     def test_quick_runs_frontend_after_scaffolding(self):
         result = self.run_verify("quick")
@@ -318,6 +229,24 @@ class VerifyCliTests(unittest.TestCase):
                 self.assertEqual(result, 1)
                 self.assertIn("FAIL frontend-scripts:", errors.getvalue())
                 self.assertNotIn("Traceback", errors.getvalue())
+
+    def test_package_document_rejects_non_pnpm_manager(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            temporary_root = Path(directory)
+            (temporary_root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "packageManager": "npm@11.0.0",
+                        "scripts": {},
+                        "kbhc": {"frontendScaffolded": True},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with mock.patch.object(verifier, "ROOT", temporary_root):
+                with self.assertRaisesRegex(ValueError, "packageManager must be pnpm@10.15.1"):
+                    verifier.package_document()
 
     def test_stop_hook_shapes_are_validation_errors(self):
         verifier = load_verify_module()

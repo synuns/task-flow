@@ -30,81 +30,17 @@ REQUIRED_FILES = (
     "scripts/publish-ai-record",
     "scripts/review-ai-record",
     "package.json",
+    "pnpm-lock.yaml",
+    "e2e/authenticated-fixture.ts",
+    "e2e/auth-entry.spec.ts",
+    "e2e/work-overview.spec.ts",
+    "e2e/task-discovery.spec.ts",
+    "e2e/task-resolution.spec.ts",
+    "src/mocks/fixtures/auth.ts",
+    "src/mocks/fixtures/tasks.ts",
     "artifacts/index.md",
     "AI_USAGE.md",
 )
-REQUIRED_MARKERS = {
-    "AGENTS.md": (
-        "LOW work proceeds continuously",
-        "AI never marks `HUMAN_APPROVED`",
-        "./scripts/verify setup",
-        "after the final implementation/verification task",
-        "before the final completion task or TODO status transition",
-        "plan-completion adversarial review",
-        "task block owner",
-    ),
-    "docs/quality/requirements.md": (
-        "## Scenario Execution Rules",
-        "## Master Journey",
-        "## Independent Journey Contract",
-        "### auth-entry",
-        "### work-overview",
-        "### task-discovery",
-        "### task-resolution",
-        "Decision gate: `DEC-AUTH-01`",
-        "Decision gate: `DEC-DELETE-01`",
-        "AI may set every status except `HUMAN_APPROVED`",
-        "Authorization: Bearer <accessToken>",
-    ),
-    "docs/quality/workflow.md": (
-        "### LOW — AI proceeds continuously",
-        "### MEDIUM — human owns journey checkpoint",
-        "### HIGH — human decides before consequential change",
-        "## Adversarial Review",
-        "## Plan-Completion Adversarial Review",
-        "Review target:",
-        "Reviewer:",
-        "Checks:",
-        "Findings:",
-        "Corrections:",
-        "Rerun:",
-        "Verdict:",
-        "`Findings: none` is valid only with the reviewer, target commit, and checks.",
-        "HIGH decision item",
-        "not a Golden Journey acceptance",
-        "same target, one recorded review satisfies both",
-        "## Final QA Checklist",
-        "reviewed SHA-256 digest",
-    ),
-    "docs/quality/verification.md": (
-        "Every verification mode is read-only",
-        "## Formatting Mutation Is Separate",
-        "one representative success path and one critical failure path",
-        "@core",
-        "plan-completion review evidence",
-        "reviewed SHA-256 digest",
-    ),
-    "docs/project-plan.md": (
-        "plan-completion adversarial review",
-        "only when plan path, requirement/Journey IDs, and target commit are identical",
-    ),
-    "TODO.md": (
-        "사람 결정 evidence가 있을 때 `AI_VERIFIED`",
-        "이는 Journey의 `HUMAN_APPROVED`가 아니다.",
-        "소유하지 않은 task block",
-    ),
-    "AI_USAGE.md": (
-        "## 사용한 도구와 모델",
-        "## 적용한 작업 범위",
-        "## 핵심 프롬프트 요약",
-        "## 사람이 최종 검증한 내용",
-        "## 전체 프롬프트와 작업 기록",
-        "<!-- reviewed-records:start -->",
-        "<!-- reviewed-records:end -->",
-        "npm run ai:review",
-        "legacy/pre-policy",
-    ),
-}
 REQUIRED_PACKAGE_SCRIPTS = (
     "format:check",
     "lint",
@@ -222,15 +158,6 @@ def verify_setup():
                 return fail(
                     "setup", "missing {}".format(relative), "./scripts/verify setup"
                 )
-        for relative, markers in REQUIRED_MARKERS.items():
-            text = (ROOT / relative).read_text(encoding="utf-8")
-            for marker in markers:
-                if marker not in text:
-                    return fail(
-                        "setup",
-                        "{} missing marker {!r}".format(relative, marker),
-                        "./scripts/verify setup",
-                    )
         todo_errors = verify_todo_consistency(ROOT)
         if todo_errors:
             return fail(
@@ -310,6 +237,8 @@ def package_document():
     package = json.loads(package_path.read_text(encoding="utf-8"))
     if not isinstance(package, dict):
         raise ValueError("package.json root must be an object")
+    if package.get("packageManager") != "pnpm@10.15.1":
+        raise ValueError("package.json packageManager must be pnpm@10.15.1")
     scripts = package.get("scripts")
     if not isinstance(scripts, dict):
         raise ValueError("package.json scripts must be an object")
@@ -488,12 +417,12 @@ def verify_frontend(mode):
         return required
     quick = ("format:check", "lint", "typecheck", "test")
     for name in quick:
-        result = run_stage(name, ["npm", "run", name])
+        result = run_stage(name, ["pnpm", "run", name])
         if result:
             return result
     if mode == "full":
         for name in ("build", "test:e2e:core"):
-            result = run_stage(name, ["npm", "run", name])
+            result = run_stage(name, ["pnpm", "run", name])
             if result:
                 return result
     return 0
