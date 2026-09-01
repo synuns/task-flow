@@ -37,7 +37,11 @@ describe("UI foundation contract", () => {
   it("uses semantic tokens for surface, focus, disabled, and error styles", () => {
     renderFoundation();
 
-    expect(screen.getByTestId("foundation-surface")).toHaveClass("bg-card", "text-card-foreground");
+    expect(screen.getByTestId("foundation-surface")).toHaveClass(
+      "border",
+      "bg-card",
+      "text-card-foreground",
+    );
     expect(screen.getByRole("textbox", { name: "이메일" })).toHaveClass(
       "border-input",
       "focus-visible:ring-ring/50",
