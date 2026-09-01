@@ -96,9 +96,12 @@ insufficient.
 
 ## Review Contract Verification
 
-Setup verifies that plan-completion review evidence, HIGH decision state, and TODO
-task ownership rules are present. Marker checks do not prove reviewer independence
-or review quality; a person verifies the recorded reviewer and target commit.
+Setup rejects `IN_PROGRESS` or completed tasks with unfinished dependencies,
+completed tasks with empty evidence, and completed Journey/full-review tasks without
+the seven-field review record. It also verifies that plan-completion review evidence,
+HIGH decision state, and TODO task ownership rules are present. These shape checks do
+not prove reviewer independence, target SHA validity, browser evidence authenticity,
+or review quality; a person verifies the recorded reviewer, target commit, and evidence.
 
 ## Prompt Candidate Verification
 

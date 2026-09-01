@@ -581,11 +581,12 @@
 - Depends on: `UI-FOUNDATION-01`
 - Deliverable: 실제 반복되는 loading, empty, error/retry 상태 UI
 - Acceptance: loading live status, error alert/retry, empty message가 layout을 유지한다.
-  두 소비처 이상이 생길 때만 shared UI로 올리고 generic framework는 만들지 않는다.
+  확정된 downstream 소비처 `/`, `/user`가 같은 semantic contract를 사용하며 generic
+  framework는 만들지 않는다.
 - Automatic verification: `pnpm vitest run src/shared/ui/async-state.test.tsx`,
   `./scripts/verify quick`
-- Browser verification: 첫 실제 두 소비 route `/`, `/user`, 390x844/1280x720,
-  loading/error/retry/success와 console/page/network 확인
+- Browser verification: 적용 없음 — shared semantic contract는 component test로
+  검증하고 실제 `/`, `/user` browser 상태는 `DASHBOARD-VIEW-01`, `PROFILE-VIEW-01`이 소유
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -1397,7 +1398,7 @@
 
 - Requirements: 전체
 - Risk: HIGH — 최종 완료는 사람 소유
-- Depends on: `QA-02`, `QA-03`, `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`,
+- Depends on: `QA-02`, `QA-03`, `QA-HARNESS-01`, `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`,
   `JOURNEY-TASK-LIST-01`, `JOURNEY-TASK-DETAIL-01`
 - Deliverable: intended submission commit의 full 검증·browser evidence·최종 QA 보고
 - Acceptance: `docs/quality/workflow.md` Final QA Checklist 전체가 충족되고

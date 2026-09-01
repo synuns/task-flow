@@ -63,6 +63,7 @@ class VerifyContractTests(unittest.TestCase):
 ### [x] QA-01 audit
 - Depends on: `JOURNEY-AUTH-01`
 - Status: AI_VERIFIED
+- Evidence: focused verification PASS
 """,
                 encoding="utf-8",
             )
@@ -70,6 +71,92 @@ class VerifyContractTests(unittest.TestCase):
                 verifier.verify_todo_consistency(root),
                 ["QA-01 depends on unfinished JOURNEY-AUTH-01"],
             )
+
+    def test_todo_rejects_in_progress_task_with_unfinished_dependency(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [ ] UI-FOUNDATION-01 foundation
+- Depends on: 없음
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] UI-SHELL-01 shell
+- Depends on: `UI-FOUNDATION-01`
+- Status: IN_PROGRESS
+- Evidence: owner session
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                verifier.verify_todo_consistency(root),
+                ["UI-SHELL-01 depends on unfinished UI-FOUNDATION-01"],
+            )
+
+    def test_todo_rejects_completed_task_without_evidence(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [x] UI-FOUNDATION-01 foundation
+- Depends on: 없음
+- Status: AI_VERIFIED
+- Evidence: 없음
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                verifier.verify_todo_consistency(root),
+                ["UI-FOUNDATION-01 missing completion evidence"],
+            )
+
+    def test_todo_rejects_completed_review_without_review_record(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [x] AUTH-JOURNEY-REVIEW-01 review
+- Depends on: 없음
+- Status: AI_VERIFIED
+- Evidence: quick PASS
+""",
+                encoding="utf-8",
+            )
+            errors = verifier.verify_todo_consistency(root)
+
+            self.assertEqual(len(errors), 1)
+            self.assertIn("AUTH-JOURNEY-REVIEW-01 missing review evidence", errors[0])
+            for field in (
+                "Review target:",
+                "Reviewer:",
+                "Checks:",
+                "Findings:",
+                "Corrections:",
+                "Rerun:",
+                "Verdict:",
+            ):
+                self.assertIn(field, errors[0])
+
+    def test_todo_accepts_completed_review_record(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [x] AUTH-JOURNEY-REVIEW-01 review
+- Depends on: 없음
+- Status: AI_VERIFIED
+- Evidence: Review target: plan, AUTH, abc123
+  Reviewer: independent reviewer
+  Checks: requirements and diff
+  Findings: none
+  Corrections: not applicable
+  Rerun: quick PASS
+  Verdict: PASS
+""",
+                encoding="utf-8",
+            )
+            self.assertEqual(verifier.verify_todo_consistency(root), [])
 
     def test_todo_rejects_unapproved_checkpoint_claim(self):
         verifier = load_verify_module()
@@ -271,6 +358,7 @@ class VerifyContractTests(unittest.TestCase):
                 {
                     "QA-02",
                     "QA-03",
+                    "QA-HARNESS-01",
                     "JOURNEY-AUTH-01",
                     "JOURNEY-WORK-01",
                     "JOURNEY-TASK-LIST-01",

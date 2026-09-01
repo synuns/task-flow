@@ -351,24 +351,61 @@ def verify_todo_consistency(root=ROOT):
             if dependency_match
             else []
         )
+        evidence_match = re.search(
+            r"^- Evidence:(.*?)(?=\n- [A-Z]|\Z)",
+            block,
+            re.MULTILINE | re.DOTALL,
+        )
         tasks[task_id] = {
             "checked": match.group(1) == "x",
             "status": status,
             "dependencies": dependencies,
+            "evidence": evidence_match.group(1).strip() if evidence_match else None,
             "block": block,
         }
 
     completed_statuses = {"AI_VERIFIED", "HUMAN_APPROVED"}
+    review_tasks = {
+        "PLAN-JOURNEY-BACKLOG-01",
+        "AUTH-JOURNEY-REVIEW-01",
+        "WORK-JOURNEY-REVIEW-01",
+        "TASK-LIST-JOURNEY-REVIEW-01",
+        "TASK-DETAIL-JOURNEY-REVIEW-01",
+        "QA-02",
+    }
+    review_fields = (
+        "Review target:",
+        "Reviewer:",
+        "Checks:",
+        "Findings:",
+        "Corrections:",
+        "Rerun:",
+        "Verdict:",
+    )
     for task_id, task in tasks.items():
         completed = task["status"] in completed_statuses
         if task["status"] is None:
             errors.append("{} missing Status".format(task_id))
         elif task["checked"] != completed:
             errors.append("{} checkbox does not match status {}".format(task_id, task["status"]))
+        if completed and task["evidence"] in {None, "", "없음"}:
+            errors.append("{} missing completion evidence".format(task_id))
+        if completed and task_id in review_tasks:
+            missing_review_fields = [
+                field for field in review_fields if field not in task["block"]
+            ]
+            if missing_review_fields:
+                errors.append(
+                    "{} missing review evidence {}".format(
+                        task_id, ", ".join(missing_review_fields)
+                    )
+                )
         for dependency in task["dependencies"]:
             if dependency not in tasks:
                 errors.append("{} references missing dependency {}".format(task_id, dependency))
-            elif completed and tasks[dependency]["status"] not in completed_statuses:
+            elif (
+                completed or task["status"] == "IN_PROGRESS"
+            ) and tasks[dependency]["status"] not in completed_statuses:
                 errors.append("{} depends on unfinished {}".format(task_id, dependency))
         if (
             task_id.startswith("JOURNEY-")
