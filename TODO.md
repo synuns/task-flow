@@ -285,7 +285,7 @@
   34 files/122 tests, `git diff --check`, graph cycle/ready-task audit PASS;
   Verdict: PASS — unresolved HIGH/MEDIUM 없음, 수동 evidence 진위는 사람 checkpoint 소유
 
-### [ ] LOOP-READINESS-01 에이전트 작업 루프 준비 상태 보강
+### [x] LOOP-READINESS-01 에이전트 작업 루프 준비 상태 보강
 
 - Requirements: 전체 변경의 Journey trace와 verification contract
 - Risk: LOW — accepted behavior를 바꾸지 않는 문서·검증 하네스 보강
@@ -299,7 +299,7 @@
   repeated core E2E, `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
 - Browser verification: 제품 behavior 변경 없음; 기존 네 core Playwright Journey를
   격리 worktree에서 반복 실행해 fixture 독립성, request count와 flaky verdict 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root`; Worktree/branch:
   `.worktrees/agent-loop-readiness`, `docs/agent-loop-readiness`; 사용자 승인 범위는
   GitHub Actions·새 index·범용 skill·제품 code/UX 없이 기존 control plane과 executable
@@ -311,7 +311,29 @@
   `docs/superpowers/specs/2026-08-29-agentic-development-verification-loop-design.md`
   readiness addendum; 사용자 설계 승인 후 실행 계획은
   `docs/superpowers/plans/2026-08-29-agentic-development-verification-loop.md`
-  readiness execution addendum에 추가
+  readiness execution addendum에 추가. 구현 범위
+  `52d200f3f9103394cbbdc491c1c13c31185910fc..d1a304cafe89230068f9f8101fa4f900c3195434`;
+  Playwright harness 5 tests와 verifier focused 38 tests PASS; core E2E를 fresh
+  server로 두 번 실행해 각각 5/5 PASS, retry/flaky 없음; `./scripts/verify quick`
+  PASS — hook 86, contract 19, Vitest 36 files/130 tests; `./scripts/verify full`과
+  `CI=1 ./scripts/verify full` 모두 build, core 5/5, verifier regression 19/19,
+  read-only fingerprint PASS. 첫 full에서 nested subprocess가 port 4173 해제와
+  경합한 `TOOLING` failure를 재현했고, E2E gate를 생략하지 않으면서 중복 subprocess
+  full test만 mock mode-selection test로 교체해 수정. GitHub Actions·dependency·제품
+  code/UX·사람 소유 Journey status 변경 없음.
+  Review target: readiness design/plan addenda, 전체 Journey trace와
+  `d1a304cafe89230068f9f8101fa4f900c3195434`;
+  Reviewer: fresh read-only `/root/plan_completion_review`;
+  Checks: scope, Playwright version/flaky semantics, local/CI parity, pnpm·fixture·core
+  selection·exit status, nested full control flow, documentation/plan alignment;
+  Findings: initial 0 Critical, 1 Important, 0 Minor — sentinel 직접 설정 시 core와
+  regression을 함께 우회할 수 있었음; correction review 0 Critical, 0 Important,
+  0 Minor;
+  Corrections: core E2E를 sentinel과 무관하게 full에서 강제하고 nested subprocess
+  full test를 mock default-mode selection test로 교체;
+  Rerun: correction reviewer focused 6/6 PASS, local focused 38/38, repeated core
+  5/5·5/5, quick, local full, `CI=1` full, `git diff --check` PASS;
+  Verdict: PASS — prior Important 해결, merge-ready
 
 ## 1. 검증 가능한 개발 기반
 
