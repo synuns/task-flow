@@ -46,6 +46,10 @@ function cssBlock(pattern: RegExp, label: string) {
   return block ?? "";
 }
 
+function hex(value: string) {
+  return `#${value}`;
+}
+
 function sourceFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name);
@@ -69,6 +73,14 @@ describe("global theme contract", () => {
     }
 
     expect(root).toContain("--radius: 0.875rem;");
+    expect(root).toContain(`--primary: ${hex("ffd700")};`);
+    expect(root).toContain(`--secondary: ${hex("e0e8f1")};`);
+    expect(root).toContain(`--card: ${hex("ffffff")};`);
+    expect(root).toContain(`--foreground: ${hex("1f242b")};`);
+    expect(root).toContain(`--muted-foreground: ${hex("616a75")};`);
+    expect(root).toContain(`--destructive: ${hex("b33a32")};`);
+    expect(root).toContain(`--destructive-foreground: ${hex("ffffff")};`);
+    expect(root).toContain(`--ring: ${hex("8a6d00")};`);
     expect(theme).toContain("--radius-lg: var(--radius);");
     expect(theme).toContain('--font-sans: "Pretendard"');
   });
