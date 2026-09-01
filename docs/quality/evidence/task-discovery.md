@@ -1,5 +1,37 @@
 # Task Discovery Evidence
 
+## TASK-LIST-JOURNEY-REVIEW-01 — BLOCKED
+
+Review target: plan `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`;
+`TASK-LIST-01`~`TASK-LIST-05`, `task-discovery`; initial exact target
+`e1e9e0377381f92d00aa376dd436c70a4c423492`; correction target
+`20679f818d7dc931f40f37543740349673220756`
+Reviewer: fresh read-only `/root/task_discovery_review`; did not author, edit or commit
+either target
+Checks: read workflow, verification policy, approved design, plan, requirements, TODO,
+OpenAPI, source, focused tests, E2E and evidence; audited every `DISC-*` case, method/query/
+security/status, session/cache, pagination race/retry/terminal/empty/AbortSignal,
+virtual key/measurement/scroll/DOM, Card route/focus/wrapping, test strength, console/network,
+diff scope, secrets, generated noise and TODO dependencies; reproduced focused, quick,
+mapped E2E and diff checks
+Findings: one unresolved HIGH `REQUIREMENT` — `/api/task` defines only 200 and 401, while
+the mock and its test publish an invalid-page 400 JSON contract. Initial MEDIUM `TEST`
+missing `DISC-E3` task-list integration, MEDIUM `UX_ACCESSIBILITY` Card truncation, LOW
+`TEST` pre-detail error assertion and LOW `REQUIREMENT` open plan steps are resolved at
+the correction target
+Corrections: added actual task GET 401 → refresh 401 → anonymous `/sign-in` return-state
+and task-cache-removal integration; changed title/memo from truncation to wrapping with RED
+then GREEN component coverage; moved console/page-error assertions after detail navigation;
+checked all 37 executed Task 1~5 plan steps. Production-preview mobile
+`task-card-wrap-review-fix` proved title 72px/3 lines, memo 60px/3 lines, measured row
+170px, `white-space: normal`, `overflow-wrap: break-word`, width 390/390 and no error.
+Screenshot: `/tmp/kbhc-task-card-wrap-review-fix-mobile.png`
+Rerun: correction target focused PASS 7 files/31 tests; quick PASS hook 86, contract 19,
+Vitest 38 files/150 tests plus format/lint/typecheck; mapped task-discovery Chromium 1/1
+PASS after final detail assertion; correction diff and whitespace check PASS
+Verdict: BLOCKED — all MEDIUM/LOW findings are resolved, but changing or accepting the
+extra invalid-page 400 behavior requires the project-defined HIGH-risk human decision
+
 ## TASK-LIST-JOURNEY-VERIFY-01 — current target
 
 Requirement/Journey/case trace: `TASK-LIST-01`~`TASK-LIST-05`; `task-discovery`;

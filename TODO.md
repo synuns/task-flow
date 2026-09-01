@@ -1614,8 +1614,26 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   weak test와 console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
 - Automatic verification: `./scripts/verify quick`
 - Browser verification: finding이 browser behavior에 영향을 주면 해당 discovery case 재실행
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: BLOCKED
+- Evidence: Review target: plan
+  `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`, requirements
+  `TASK-LIST-01`~`TASK-LIST-05`, Journey `task-discovery`, initial exact target
+  `e1e9e0377381f92d00aa376dd436c70a4c423492`, correction target
+  `20679f818d7dc931f40f37543740349673220756`; Reviewer: target을 작성·변경하지 않은
+  fresh read-only `/root/task_discovery_review`; Checks: plan/requirement/`DISC-*`/OpenAPI,
+  auth/cache, pagination/virtualization, responsive/accessibility, test strength,
+  console/network, diff/secrets/generated noise와 TODO dependency를 검토하고 focused,
+  quick, mapped E2E, diff check 재현; Findings: initial HIGH `REQUIREMENT` 1건은 OAS가
+  list response를 200/401로 한정하지만 mock/test가 invalid page 400 JSON 계약을
+  발행한 충돌. Initial MEDIUM `TEST` `DISC-E3` 통합 부재, MEDIUM
+  `UX_ACCESSIBILITY` Card truncate, LOW `TEST` detail 전 error assertion, LOW
+  `REQUIREMENT` plan checkbox 불일치는 correction target에서 모두 해결;
+  Corrections: actual task GET 401→refresh 401→anonymous `/sign-in`/task cache removal
+  integration 추가, title/memo wrapping RED→GREEN, E2E error assertion을 detail 뒤로
+  이동, Task 1~5 plan 37 steps reconcile. Long mobile browser는 title/memo 각 3줄,
+  row 170px, width 390, overflow 없음; Rerun: 7 files/31 tests, quick hook 86·contract
+  19·Vitest 38/150, mapped Chromium 1/1, correction diff check PASS; Verdict: BLOCKED —
+  HIGH contract decision 없이 mock 400 behavior를 변경하거나 예외 승인할 수 없음.
 
 ### [ ] JOURNEY-TASK-LIST-01 task-discovery 사람 checkpoint
 

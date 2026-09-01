@@ -598,7 +598,7 @@ Do not stage the E2E file when it did not change. A proven E2E correction uses `
 - Consumes: exact verification target from Task 5
 - Produces: seven-field plan/Journey review record with unresolved HIGH/MEDIUM finding 0
 
-- [ ] **Step 1: Record immutable review target before changing the review block**
+- [x] **Step 1: Record immutable review target before changing the review block**
 
 ```bash
 git rev-parse HEAD
@@ -608,7 +608,7 @@ git show --stat --oneline HEAD
 
 Expected: clean worktree and Task 5 evidence commit at HEAD. Record that full SHA as the review target.
 
-- [ ] **Step 2: Use a fresh reviewer context or explicit non-author second-pass role**
+- [x] **Step 2: Use a fresh reviewer context or explicit non-author second-pass role**
 
 The reviewer identifies itself separately from the final change author and checks:
 
@@ -622,7 +622,7 @@ The reviewer identifies itself separately from the final change author and check
 - weak/duplicate/flaky tests, console/network errors and screenshot-only claims
 - unrelated diff, secrets, generated noise, evidence/TODO dependency/status consistency
 
-- [ ] **Step 3: Reproduce the review target**
+- [x] **Step 3: Reproduce the review target**
 
 ```bash
 pnpm vitest run src/entities/task/ui/task-card.test.tsx src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts src/mocks/fixtures/tasks.test.ts src/app/auth/authenticated-api-bridge.test.tsx src/app/auth/auth-route-boundary.test.tsx
@@ -637,7 +637,7 @@ Expected: focused 7 files/30 tests, quick and mapped Chromium PASS; diff contain
 
 Any HIGH/MEDIUM finding reopens the owning task. For product behavior, first add a minimal test that fails for the finding, record RED, apply the smallest root-cause fix, and rerun focused → quick → mapped E2E when applicable. Review the new target again. LOW findings may remain only with explicit impact and follow-up condition.
 
-- [ ] **Step 5: Record the mandatory review block**
+- [x] **Step 5: Record the mandatory review block**
 
 Add these exact fields to the review task evidence and `docs/quality/evidence/task-discovery.md`:
 
