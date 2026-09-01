@@ -39,6 +39,40 @@ describe("SignInForm", () => {
     expect(submit).toBeDisabled();
   });
 
+  it("shows required messages after entered values are cleared", async () => {
+    const user = userEvent.setup();
+    render(<SignInForm onAuthenticated={vi.fn()} />);
+
+    const email = screen.getByRole("textbox", { name: "이메일" });
+    const password = screen.getByLabelText("비밀번호");
+    await user.type(email, "x");
+    await user.clear(email);
+    await user.type(password, "x");
+    await user.clear(password);
+
+    expect(email).toHaveAccessibleDescription("이메일을 입력해주세요.");
+    expect(password).toHaveAccessibleDescription(
+      "8~24자의 영문과 숫자를 입력하세요. 비밀번호는 8자 이상이어야 합니다.",
+    );
+    expect(screen.getByRole("button", { name: "로그인" })).toBeDisabled();
+  });
+
+  it.each([
+    ["7-character", "Pass123", "비밀번호는 8자 이상이어야 합니다."],
+    ["25-character", "A".repeat(25), "비밀번호는 24자 이하여야 합니다."],
+    ["non-ASCII", "Password한", "비밀번호는 영문과 숫자로만 입력해주세요."],
+  ])("shows the %s password error and keeps submit disabled", async (_case, value, message) => {
+    const user = userEvent.setup();
+    render(<SignInForm onAuthenticated={vi.fn()} />);
+
+    await user.type(screen.getByRole("textbox", { name: "이메일" }), "user@example.com");
+    const password = screen.getByLabelText("비밀번호");
+    await user.type(password, value);
+
+    expect(password).toHaveAccessibleDescription(`8~24자의 영문과 숫자를 입력하세요. ${message}`);
+    expect(screen.getByRole("button", { name: "로그인" })).toBeDisabled();
+  });
+
   it("shows a server error dialog and restores focus when it closes", async () => {
     const user = userEvent.setup();
     render(<SignInForm onAuthenticated={vi.fn()} />);
@@ -76,8 +110,9 @@ describe("SignInForm", () => {
     const submit = screen.getByRole("button", { name: "로그인" });
     expect(submit).toBeEnabled();
     await user.click(submit);
-    expect(submit).toBeDisabled();
-    await user.click(submit);
+    const pendingSubmit = screen.getByRole("button", { name: "로그인 중" });
+    expect(pendingSubmit).toBeDisabled();
+    await user.click(pendingSubmit);
     release();
 
     await waitFor(() => expect(onAuthenticated).toHaveBeenCalledTimes(1));
