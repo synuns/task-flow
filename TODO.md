@@ -1574,7 +1574,7 @@ src/shared/api/tasks.test.ts`, `./scripts/verify quick`
   `/tmp/kbhc-task-list-states-01-error.png`,
   `/tmp/kbhc-task-list-states-01-empty.png`.
 
-### [ ] TASK-LIST-JOURNEY-VERIFY-01 task-discovery 통합 검증
+### [x] TASK-LIST-JOURNEY-VERIFY-01 task-discovery 통합 검증
 
 - Requirements: `TASK-LIST-01`~`TASK-LIST-05`
 - Risk: MEDIUM — Journey evidence gate
@@ -1588,8 +1588,21 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   `pnpm exec playwright test e2e/task-discovery.spec.ts`
 - Browser verification: named `agent-browser` session, `/task` → `/task/task-3`,
   두 viewport, scroll/DOM/network/console
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root` task block owner; branch
+  `feat/task-discovery-loop`; verification target
+  `2123ff2dc42e505359f87f40cc17931c9ab7b980`; requirements `TASK-LIST-01`~
+  `TASK-LIST-05`; plan
+  `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`. Complete trace lookup은
+  page/widget raw fetch와 shared API 밖 generated import가 없음을 확인. Focused 7
+  files/30 tests, quick hook 86·contract 19·Vitest 38/149, mapped task-discovery
+  Chromium 1/1, full hook 86·contract 19·Vitest 38/149·build·core 5/5·verifier
+  regression 19 모두 PASS. Production preview `task-list-journey-verify-01`은 두
+  viewport에서 page `1→2` 각 1회, sign-in 0회, terminal, exact Card/detail route,
+  width 1280/390을 확인하고 `/task/task-3` 200에 도달. Mapped E2E가 bearer와
+  mounted `<3`을 증명하고 40-record browser record가 mounted 6/40을 보강함.
+  Console/page error 없음; screenshots와 전체 case trace는
+  `docs/quality/evidence/task-discovery.md` current-target section에 기록.
 
 ### [ ] TASK-LIST-JOURNEY-REVIEW-01 task-discovery 독립 review
 

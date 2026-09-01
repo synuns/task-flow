@@ -1,5 +1,46 @@
 # Task Discovery Evidence
 
+## TASK-LIST-JOURNEY-VERIFY-01 — current target
+
+Requirement/Journey/case trace: `TASK-LIST-01`~`TASK-LIST-05`; `task-discovery`;
+`DISC-P1-1`~`DISC-P1-5`, `DISC-E1`~`DISC-E3`
+Verification target: `2123ff2dc42e505359f87f40cc17931c9ab7b980`
+Session/branch: Codex `/root`; `feat/task-discovery-loop`
+Automatic checks: focused Card/list/API/mock/auth Vitest PASS, 7 files/30 tests;
+`./scripts/verify quick` PASS, hook 86, contract 19, Vitest 38 files/149 tests;
+`pnpm exec playwright test e2e/task-discovery.spec.ts` PASS, Chromium 1/1;
+`./scripts/verify full` PASS, hook 86, contract 19, Vitest 38/149, build, core 5/5,
+verifier regression 19. Static lookup found no page/widget raw fetch or generated OpenAPI
+import outside shared API
+Agent-browser session: `task-list-journey-verify-01`; production preview; approved auth and
+default three-task fixture seeded before bootstrap
+Route/Viewport: `/task` → `/task/task-3`; Chromium `1280x720`, `390x844`
+Actions/actual: desktop and mobile snapshots rendered three exact title/memo Card Links and
+terminal text; resource timing was exactly page 1 then page 2, `/api/sign-in` count 0; widths
+were 1280/1280 and 390/390. Selecting `완료한 일` reached `/task/task-3`, rendered heading
+`완료한 일`, memo `남아 있는 DONE`, and one detail resource. The 720/844px integrated
+viewports mounted all three fitting rows; mapped E2E at 1280x400 independently asserted the
+mounted count stayed below three before and after terminal scroll. The 40-record manual
+record below bounded mounted rows at 6/40
+Contract/auth/negative paths: mapped E2E proved bearer on exact page 1→2, no sign-in request,
+terminal stop and `/task/task-3`. Focused tests proved schema rejection, AbortSignal, empty
+terminal/intermediate continuation, initial/partial retry, one in-flight page, terminal stop,
+and approved terminal-401 cache/route behavior for `DISC-E1`~`DISC-E3`
+Console/Network: agent-browser request monitor returned `No requests captured`, the known
+MSW Service Worker limitation; resource timing, MSW 200 logs and mapped Playwright are the
+request authorities. Console contained only MSW informational success logs; page errors and
+unexpected console errors were empty
+Screenshot/Trace: `/tmp/kbhc-task-list-journey-verify-01-desktop.png`,
+`/tmp/kbhc-task-list-journey-verify-01-mobile.png`,
+`/tmp/kbhc-task-list-journey-verify-01-detail.png`; passing Playwright attachment
+`task-discovery`; failure trace was not generated
+Failure class/correction: no product, test, API, auth, dependency or architecture gap; the
+MSW monitor limitation remains `TOOLING` and is covered by resource timing/MSW/Playwright
+Rerun verdict: PASS — all `DISC-*` cases trace to current focused, quick, mapped E2E, full
+and named-browser evidence. Human acceptance remains separate and unapproved
+
+## Historical baseline (`d256114`~`0057492`)
+
 Requirement/Journey: `TASK-LIST-01`~`TASK-LIST-05`; `task-discovery`
 Commit: `d256114`~`0057492` (`fix/dec-prefix` worktree)
 Agent-browser session: `task-discovery`, `task-discovery-viewport`
