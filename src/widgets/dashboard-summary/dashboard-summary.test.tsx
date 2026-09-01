@@ -37,9 +37,10 @@ describe("DashboardSummary", () => {
         return body;
       },
     };
-    render(<DashboardSummary />, { wrapper: wrapper(client) });
+    const { container } = render(<DashboardSummary />, { wrapper: wrapper(client) });
 
     expect(screen.getByRole("status")).toHaveTextContent("업무 현황을 불러오고 있습니다.");
+    expect(container.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(1);
     release();
 
     expect(await screen.findByText("오늘의 업무 현황")).toBeInTheDocument();

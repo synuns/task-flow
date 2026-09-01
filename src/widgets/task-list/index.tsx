@@ -145,7 +145,7 @@ export function TaskList() {
           <Skeleton className="h-24" />
         </div>
       )}
-      {query.hasNextPage && (
+      {query.hasNextPage && !query.isError && (
         <Button
           disabled={query.isFetchingNextPage}
           onClick={() => void query.fetchNextPage()}

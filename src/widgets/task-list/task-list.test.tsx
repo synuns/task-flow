@@ -153,4 +153,28 @@ describe("TaskList", () => {
     expect(await screen.findByText("등록된 할 일이 없습니다.")).toBeInTheDocument();
     expect(attempts).toBe(2);
   });
+
+  it("replaces the next-page action with retry after a page request fails", async () => {
+    const client: ApiClient = {
+      request: async <T,>(
+        input: RequestInfo | URL,
+        _init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        const page = Number(new URL(String(input)).searchParams.get("page"));
+        if (page === 2) throw { kind: "network", message: "다음 페이지 요청에 실패했습니다." };
+        const body: unknown = {
+          data: [{ id: "task-1", title: "첫 번째 할 일", memo: "첫 메모", status: "TODO" }],
+          hasNext: true,
+        };
+        if (!isSuccess(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+    render(<TaskList />, { wrapper: wrapper(client) });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("다음 페이지 요청에 실패했습니다.");
+    expect(screen.getByRole("button", { name: "다시 불러오기" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /다음 페이지/ })).not.toBeInTheDocument();
+  });
 });

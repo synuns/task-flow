@@ -30,14 +30,9 @@ export function DashboardSummary() {
 
   if (query.isPending) {
     return (
-      <div className="grid gap-4" role="status">
+      <div role="status">
         <span className="sr-only">업무 현황을 불러오고 있습니다.</span>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Skeleton className="h-28" />
-          <Skeleton className="h-28" />
-          <Skeleton className="h-28" />
-        </div>
-        <Skeleton className="h-28" />
+        <Skeleton className="h-64 rounded-xl" />
       </div>
     );
   }
