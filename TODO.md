@@ -623,7 +623,7 @@
   `assignment-original/` diff 없음; Verdict: PASS. Journey `HUMAN_APPROVED`나 최종
   사람 acceptance를 뜻하지 않음
 
-### [ ] UI-SHELL-01 반응형 application shell
+### [x] UI-SHELL-01 반응형 application shell
 
 - Requirements: `NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`
 - Risk: LOW — 기존 router/auth action의 presentation
@@ -635,9 +635,10 @@
   src/app/router.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, `/sign-in`, `/task`, `/task/task-1`, `/user`, 두 viewport,
   keyboard navigation, computed Pretendard, console/page error와 예상 밖 network 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-shell-state`,
-  target `e52890f`; 기존 shell production을 재사용하고 Tab order, auth action 상호 배타,
+  final correction code target `970d7df`; 기존 shell production을 재사용하고 Tab order,
+  auth action 상호 배타,
   current route와 named link별 distinct Lucide icon을 characterization함. Integrated focused
   5 files/15 tests, final shell/router 2 files/8 tests와 quick 38 files/132 tests PASS;
   agent-browser `ui-shell-desktop` 1280x720와 `ui-shell-mobile` 390x844에서 다섯 route,
@@ -650,8 +651,14 @@
   없음; Corrections: reviewer의 초기 redundant focus style, icon mapping coverage findings를
   production 확장 없이 교정; Rerun: shell/router 2 files/8 tests와 quick 38 files/132 tests
   및 final full build/core 5/5/verifier regression PASS; Verdict: PASS. Golden Journey
-  `HUMAN_APPROVED`나 최종 acceptance가 아님. 2026-09-01 final adversarial review의
-  20px mobile icon·48px evidence oracle·verification target provenance LOW 교정 진행 중
+  `HUMAN_APPROVED`나 최종 acceptance가 아님. Final design correction RED는 Lucide
+  24px를 재현했고 `size={20}` GREEN 후 shell/router 2 files/8 tests, quick 38 files/132
+  tests PASS; agent-browser 390x844에서 anonymous/authenticated 네 icon 20x20, target 48px,
+  width 390, errors `[]` 확인. Review target: `5cd937f..53d1a16`; Reviewer: correction을
+  작성하지 않은 read-only second-pass `/root/final_adversarial_review_2`; Checks: 20px
+  named icon mapping, RED/GREEN, mobile computed size/target/overflow/errors, 48px oracle와
+  target provenance; Findings: Critical/Important/Minor 없음; Corrections: 추가 없음;
+  Rerun: reviewer가 owner focused/quick와 browser evidence 검사; Verdict: PASS
 
 ### [x] UI-STATE-01 공통 비동기 상태 표현
 

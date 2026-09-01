@@ -84,6 +84,17 @@ Requirement: `UI-SHELL-01` (`NAV-01`, `NAV-02`, `NAV-03`, `SYS-03`),
 - `TOOLING`: the first authenticated profile-size `agent-browser eval` expression was
   malformed. A simpler expression immediately reproduced the intended 20x20 result; this was
   not a product failure.
+- Review target: `5cd937f..53d1a16`.
+- Reviewer: `/root/final_adversarial_review_2`; correction을 작성하지 않은 read-only
+  second-pass reviewer.
+- Checks: 네 named link의 20px icon, RED 24→20, focused GREEN, 390x844 browser의
+  20x20/48px/390px/`errors: []`, 48px evidence oracle, 세 target provenance,
+  correction-only scope와 TODO 상태.
+- Findings: Critical, Important, Minor 없음; 이전 Minor 3건 모두 해결.
+- Corrections: 추가 교정 없음.
+- Rerun: reviewer는 재실행하지 않고 owner의 focused 2 files/8 tests, quick 38 files/132
+  tests와 browser screenshot/evidence를 검사.
+- Verdict: PASS; completion transition 준비 완료.
 
 ## Console, network, and failures
 
