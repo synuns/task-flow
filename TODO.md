@@ -936,7 +936,7 @@
   `/sign-in` → 안전 복귀 → reload → `/user` 이동 PASS;
   `docs/quality/evidence/auth-entry.md`
 
-### [ ] AUTH-VIEW-01 로그인 page와 form 화면
+### [x] AUTH-VIEW-01 로그인 page와 form 화면
 
 - Requirements: `AUTH-01`~`AUTH-05`
 - Risk: LOW — 검증된 form behavior의 presentation
@@ -949,7 +949,7 @@
   src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, 390x844/1280x720, keyboard tab order,
   invalid/valid/pending, clipping, console/network
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` task block owner; branch
   `feat/auth-view-01`; start `f5ba414`, test target `19285d6`; design
   `docs/superpowers/specs/2026-09-01-auth-entry-scenario-loop-design.md`, plan
@@ -974,7 +974,16 @@
   fresh invalid-form capture로 교체. Initial fresh review `BLOCKED`: MEDIUM `TEST`
   request count 누락과 MEDIUM `TOOLING` network artifact 누락; request counter assertion과
   named-session fetch 계측/trace로 교정하고 focused/quick/browser rerun PASS.
-  Correction review 전까지 `IN_PROGRESS` 유지
+  Review target: `docs/superpowers/plans/2026-09-01-auth-view-scenario-loop.md`,
+  `AUTH-01`~`AUTH-05` / `AUTH-VIEW-01`, correction target `42950c3` against
+  `f5ba414`; Reviewer: target을 작성·수정하지 않은 fresh `/root/auth_view_review`;
+  Checks: 전체 two-file diff와 correction commit, requirement/spec/plan, request counter,
+  TODO dependency/status, unrelated diff, 두 screenshot과 trace 내부 network/resource,
+  focused/quick/diff; Findings: none — 이전 MEDIUM `TEST`와 `TOOLING` 모두 해결,
+  unresolved HIGH/MEDIUM/LOW 없음; Corrections: `19285d6` request counter/assertion,
+  fresh `auth-view-01-network` trace와 `42950c3` evidence; Rerun: focused Vitest
+  1 file/7 tests, `./scripts/verify quick` hook 86·verifier 19·Vitest 38 files/145 tests,
+  `git diff --check` PASS; Verdict: PASS
 
 ### [ ] AUTH-ERROR-VIEW-01 로그인 오류 modal 화면
 
