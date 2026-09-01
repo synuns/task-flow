@@ -1166,7 +1166,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 
 ## 4. work-overview Journey
 
-### [ ] WORK-LOOP-DESIGN-01 work-overview Journey 전체 루프 설계
+### [x] WORK-LOOP-DESIGN-01 work-overview Journey 전체 루프 설계
 
 - Requirements: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`
 - Risk: LOW — 승인된 API·화면·인증 계약을 구현 가능한 Journey 순서로 연결
@@ -1180,7 +1180,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   자체 검토, `./scripts/verify setup`, `git diff --check`
 - Browser verification: 설계 task에는 적용 없음 — 실행 plan이 두 viewport와
   named agent-browser evidence를 소유
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-01 Codex `/root` task block owner; start commit
   `edc8142215a9662fe89db3b45453050ab800f4ab`; 사용자와 gap-first 범위, task/data
   경계, acceptance/evidence 설계를 섹션별 승인;
@@ -1190,7 +1190,8 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   contradiction, ambiguity와 scope 자체 검토 및 `git diff --check` PASS. 첫
   `./scripts/verify setup`은 기존 fixed dependency fixture가 새 prerequisite를 몰라
   `TEST` 실패; `tests/test_verify_contract.py` mapping을 최소 교정하고 focused 1 test,
-  setup hook 86 tests·verify contract 19 tests PASS. 작성된 spec 사용자 검토 대기
+  setup hook 86 tests·verify contract 19 tests PASS. 설계 commit `fc108dd`; 사용자가
+  2026-09-01 작성된 spec을 명시적으로 승인하고 gap-first Journey 루프 시작을 요청함
 
 ### [x] NAV-PRIMARY-01 공통 dashboard/task navigation
 
