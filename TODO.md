@@ -949,8 +949,10 @@
   src/features/sign-in/ui/sign-in-form.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, 390x844/1280x720, keyboard tab order,
   invalid/valid/pending, clipping, console/network
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; branch
+  `feat/auth-view-01`; start commit `f5ba4140ae7b33f3699c133d58f86770159891f1`;
+  target `AUTH-01`~`AUTH-05`; characterization과 current-commit 검증 진행 중
 
 ### [ ] AUTH-ERROR-VIEW-01 로그인 오류 modal 화면
 
