@@ -10,6 +10,19 @@ vi.mock("@/shared/api", async (importOriginal) => ({
 }));
 
 const refreshMock = vi.mocked(refreshAccessToken);
+const protectedQueryKeys = [["dashboard"], ["tasks", 1], ["task", "task-1"], ["user"]] as const;
+
+function seedProtectedQueries(queryClient: QueryClient) {
+  for (const queryKey of protectedQueryKeys) {
+    queryClient.setQueryData(queryKey, { protected: true });
+  }
+}
+
+function expectProtectedQueriesRemoved(queryClient: QueryClient) {
+  for (const queryKey of protectedQueryKeys) {
+    expect(queryClient.getQueryData(queryKey)).toBeUndefined();
+  }
+}
 
 function tokens(id: string, sequence: number): AuthTokenPair {
   const encode = (value: unknown) =>
@@ -123,32 +136,32 @@ describe("AuthProvider", () => {
     );
   });
 
-  it("clears protected cache only for a matching terminal snapshot", async () => {
+  it("clears every protected cache root only for a matching terminal snapshot", async () => {
     refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "missing" });
     const view = renderProvider();
     await screen.findByText("anonymous");
     view.controller().acceptSignIn(tokens("user-1", 1));
     await screen.findByText("authenticated");
-    view.queryClient.setQueryData(["tasks", 1], { data: [] });
+    seedProtectedQueries(view.queryClient);
     view.queryClient.setQueryData(["unrelated"], { keep: true });
     const current = view.controller().getSnapshot();
 
     view.controller().terminate({ ...current, generation: current.generation - 1 });
-    expect(view.queryClient.getQueryData(["tasks", 1])).toEqual({ data: [] });
+    expect(view.queryClient.getQueryData(["tasks", 1])).toEqual({ protected: true });
     view.controller().terminate(current);
 
     await waitFor(() => expect(view.controller().status.kind).toBe("anonymous"));
-    expect(view.queryClient.getQueryData(["tasks", 1])).toBeUndefined();
+    expectProtectedQueriesRemoved(view.queryClient);
     expect(view.queryClient.getQueryData(["unrelated"])).toEqual({ keep: true });
   });
 
-  it("terminates an authenticated session when refresh returns 401", async () => {
+  it("clears every protected cache root when refresh returns 401", async () => {
     refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "missing" });
     const view = renderProvider();
     await screen.findByText("anonymous");
     view.controller().acceptSignIn(tokens("user-1", 1));
     await screen.findByText("authenticated");
-    view.queryClient.setQueryData(["tasks", 1], { data: [] });
+    seedProtectedQueries(view.queryClient);
     view.queryClient.setQueryData(["unrelated"], { keep: true });
     const current = view.controller().getSnapshot();
     refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "expired" });
@@ -163,7 +176,7 @@ describe("AuthProvider", () => {
       generation: current.generation + 1,
       accessToken: null,
     });
-    expect(view.queryClient.getQueryData(["tasks", 1])).toBeUndefined();
+    expectProtectedQueriesRemoved(view.queryClient);
     expect(view.queryClient.getQueryData(["unrelated"])).toEqual({ keep: true });
   });
 });
