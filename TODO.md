@@ -370,7 +370,7 @@
   - Failure class: TEST — Biome이 test regex 선언 formatting 차이를 탐지
   - Correction/Rerun: 요구 format으로 한 줄 교정 후 같은 quick gate PASS
 
-### [ ] UI-DESIGN-01 화면 구성과 Journey UX 설계
+### [x] UI-DESIGN-01 화면 구성과 Journey UX 설계
 
 - Requirements: `NAV-01`~`NAV-03`, `DASH-01`, `AUTH-01`~`AUTH-06`,
   `TASK-LIST-01`~`TASK-LIST-05`, `TASK-DETAIL-01`~`TASK-DETAIL-05`, `USER-01`,
@@ -389,12 +389,54 @@
   검토, `./scripts/verify setup`, `git diff --check`
 - Browser verification: 구현 전 제품 QA는 적용 없음 — visual companion 시안의
   desktop/mobile layout과 상태 화면을 사용자와 검토
-- Status: IN_PROGRESS
-- Evidence: 2026-09-01 Codex `/root` task block owner; required 문서, OpenAPI,
-  Golden Journey, 현재 desktop/mobile UI 조사; 사용자가 Focus workspace, Journey UX,
-  오케어 App Store 기반 Yellow palette, responsive·상태 화면을 순차 승인하고 mobile
-  navigation에서 distinct icon을 적극 활용하도록 조건 추가; 설계 문서 작성과 자체
-  검토 진행 중
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root` task block owner; design commit `6aadef9`;
+  `docs/superpowers/specs/2026-09-01-frontend-screen-design.md`가 required 문서,
+  OpenAPI, 다섯 route와 네 Golden Journey를 trace하고 Focus workspace, 오케어 Yellow
+  palette, desktop sidebar, distinct icon·visible label 기반 mobile bottom navigation,
+  공통 상태와 shadcn/ui mapping을 확정함; 사용자가 2026-09-01 대화에서 작성된 설계
+  문서를 명시적으로 승인함; 구현 계획
+  `docs/superpowers/plans/2026-09-01-frontend-screen-design.md` 작성; plan/spec
+  placeholder scan no matches, requirement trace 자체 검토 PASS, `git diff --check`
+  PASS, `./scripts/verify setup` PASS. 이 승인은 dependency 변경이나 Golden Journey의
+  `HUMAN_APPROVED`를 뜻하지 않음
+
+### [ ] DEC-UI-01 shadcn/ui runtime dependency 결정
+
+- Requirements: `SYS-02`, `NAV-01`~`NAV-03`, `AUTH-01`~`AUTH-06`,
+  `TASK-DETAIL-03`~`TASK-DETAIL-05`
+- Risk: HIGH — 공식 registry component 추가에 따른 runtime dependency 변경
+- Depends on: `UI-DESIGN-01`
+- Deliverable: shadcn official registry dry-run의 component/file/package diff와 package별
+  필요성을 제시하고 사람이 허용한 dependency 집합을 확정
+- Acceptance: `button`, `input`, `label`, `card`, `alert`, `dialog`, `alert-dialog`,
+  `skeleton`, `progress`에 필요한 package만 열거되고 기존 dependency로 충분한 항목과
+  새 runtime dependency가 구분되며, mutation 전에 사람이 정확한 diff를 명시적으로
+  결정한다.
+- Automatic verification: `pnpm dlx shadcn@latest view ...`, `shadcn add --dry-run`,
+  `git diff --check`
+- Browser verification: dependency 결정에는 적용 없음
+- Status: NOT_STARTED
+- Evidence: 없음 — 구현 session이 시작할 때 task block owner와 exact dry-run을 기록
+
+### [ ] UI-IMPLEMENT-01 Focus workspace 반응형 화면 구현
+
+- Requirements: `NAV-01`~`NAV-03`, `DASH-01`, `AUTH-01`~`AUTH-06`,
+  `TASK-LIST-01`~`TASK-LIST-05`, `TASK-DETAIL-01`~`TASK-DETAIL-05`, `USER-01`,
+  `SYS-02`, `SYS-03`
+- Risk: MEDIUM — 다섯 route와 네 Golden Journey의 공통 시각·responsive pattern 구현
+- Depends on: `UI-DESIGN-01`, `DEC-UI-01`
+- Deliverable: approved Focus workspace, Ocare Yellow semantic palette, shadcn/ui 상태
+  component, desktop sidebar와 distinct icon·visible label mobile bottom navigation
+- Acceptance: `docs/superpowers/specs/2026-09-01-frontend-screen-design.md`의 화면·상태와
+  `docs/superpowers/plans/2026-09-01-frontend-screen-design.md`의 단위를 구현하고 기존
+  auth/API/delete/cache behavior를 보존하며 desktop 1280×800, mobile 390×844에서 네
+  Journey의 접근성·responsive·상태 전환 evidence가 통과한다.
+- Automatic verification: focused unit/component/integration tests,
+  `./scripts/verify quick`, plan-completion adversarial review, `./scripts/verify full`
+- Browser verification: agent-browser desktop/mobile evidence와 기존 네 `@core` Journey
+- Status: NOT_STARTED
+- Evidence: 없음 — `DEC-UI-01` 사람 결정 후 구현 session이 task block owner를 기록
 
 ## 2. 애플리케이션 구조·공통 경계
 
