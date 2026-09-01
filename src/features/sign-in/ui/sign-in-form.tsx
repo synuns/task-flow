@@ -1,5 +1,18 @@
 import { type ApiError, type AuthTokenPair, signIn } from "@/shared/api";
-import { Modal } from "@/shared/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+} from "@/shared/ui";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { signInSchema, type SignInValues } from "../model/sign-in-schema";
@@ -44,46 +57,77 @@ export function SignInForm({ onAuthenticated }: SignInFormProps) {
 
   return (
     <>
-      <form noValidate onSubmit={submit}>
-        <div>
-          <label htmlFor="sign-in-email">이메일</label>
-          <input
-            aria-describedby={errors.email ? "sign-in-email-error" : undefined}
-            aria-invalid={errors.email ? "true" : "false"}
-            id="sign-in-email"
-            type="email"
-            {...register("email", { validate: (value) => validationMessage("email", value) })}
-          />
-          {errors.email && <p id="sign-in-email-error">{errors.email.message}</p>}
-        </div>
-        <div>
-          <label htmlFor="sign-in-password">비밀번호</label>
-          <input
-            aria-describedby={errors.password ? "sign-in-password-error" : undefined}
-            aria-invalid={errors.password ? "true" : "false"}
-            id="sign-in-password"
-            type="password"
-            {...register("password", {
-              validate: (value) => validationMessage("password", value),
-            })}
-          />
-          {errors.password && <p id="sign-in-password-error">{errors.password.message}</p>}
-        </div>
-        <button disabled={!isValid || isSubmitting} ref={submitRef} type="submit">
-          {isSubmitting ? "로그인 중" : "로그인"}
-        </button>
-      </form>
-      <Modal
-        onClose={() => setApiError(null)}
-        open={apiError !== null}
-        returnFocusRef={submitRef}
-        title="로그인 실패"
-      >
-        <p role="alert">{apiError}</p>
-        <button onClick={() => setApiError(null)} type="button">
-          닫기
-        </button>
-      </Modal>
+      <Card>
+        <CardContent>
+          <form className="grid gap-5" noValidate onSubmit={submit}>
+            <div className="grid gap-2">
+              <Label htmlFor="sign-in-email">이메일</Label>
+              <Input
+                aria-describedby={errors.email ? "sign-in-email-error" : undefined}
+                aria-invalid={errors.email ? "true" : "false"}
+                autoComplete="email"
+                className="h-11"
+                id="sign-in-email"
+                type="email"
+                {...register("email", {
+                  validate: (value) => validationMessage("email", value),
+                })}
+              />
+              {errors.email && (
+                <p className="text-destructive text-sm" id="sign-in-email-error">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="sign-in-password">비밀번호</Label>
+              <Input
+                aria-describedby={errors.password ? "sign-in-password-error" : undefined}
+                aria-invalid={errors.password ? "true" : "false"}
+                autoComplete="current-password"
+                className="h-11"
+                id="sign-in-password"
+                type="password"
+                {...register("password", {
+                  validate: (value) => validationMessage("password", value),
+                })}
+              />
+              {errors.password && (
+                <p className="text-destructive text-sm" id="sign-in-password-error">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+            <Button
+              className="h-11 w-full"
+              disabled={!isValid || isSubmitting}
+              ref={submitRef}
+              type="submit"
+            >
+              {isSubmitting ? "로그인 중" : "로그인"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      <Dialog open={apiError !== null} onOpenChange={(open) => !open && setApiError(null)}>
+        <DialogContent
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            submitRef.current?.focus();
+          }}
+          showCloseButton={false}
+        >
+          <DialogHeader>
+            <DialogTitle>로그인 실패</DialogTitle>
+            <DialogDescription role="alert">{apiError}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button">닫기</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -18,11 +18,14 @@ afterAll(() => server.close());
 describe("SignInForm", () => {
   it("keeps submit disabled and associates validation messages with each input", async () => {
     const user = userEvent.setup();
-    render(<SignInForm onAuthenticated={vi.fn()} />);
+    const { container } = render(<SignInForm onAuthenticated={vi.fn()} />);
 
     const email = screen.getByRole("textbox", { name: "이메일" });
     const password = screen.getByLabelText("비밀번호");
     const submit = screen.getByRole("button", { name: "로그인" });
+    expect(container.querySelector('[data-slot="card"]')).toBeInTheDocument();
+    expect(email).toHaveAttribute("data-slot", "input");
+    expect(submit).toHaveAttribute("data-slot", "button");
     expect(submit).toBeDisabled();
 
     await user.type(email, "invalid");
