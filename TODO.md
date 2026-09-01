@@ -1387,6 +1387,34 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 
 ## 5. task-discovery Journey
 
+### [ ] TASK-DISCOVERY-LOOP-DESIGN-01 task-discovery Journey 전체 루프 설계
+
+- Requirements: `TASK-LIST-01`~`TASK-LIST-05`
+- Risk: LOW — 승인된 API·화면·인증 계약을 구현 가능한 Journey 순서로 연결
+- Depends on: `JOURNEY-WORK-01`
+- Deliverable: 기존 구현을 baseline으로 재사용하는 gap-first Journey 설계 문서와
+  TODO dependency 연결
+- Acceptance: 원본 기획, OpenAPI의 bearer task page 계약, Focus workspace 목록 화면,
+  현재 code/test/evidence가 trace되고 구현·검증·독립 review·사람 checkpoint의 입력과
+  exit가 모순 없이 정의된다.
+- Automatic verification: spec placeholder·contradiction·requirement/API/TODO trace
+  자체 검토, `./scripts/verify setup`, `git diff --check`
+- Browser verification: 설계 task에는 적용 없음 — 실행 plan이 두 viewport와 named
+  agent-browser evidence를 소유
+- Status: IN_PROGRESS
+- Evidence: 2026-09-02 Codex `/root` task block owner; branch
+  `feat/task-discovery-loop`; start commit
+  `5b5d60c093099218387ac0f2b6fffb02189c9f13`; 사용자가 Journey 종료 범위,
+  gap-first 접근, requirement/API/module 경계, 화면·상태·오류, 검증·review 설계를
+  순서대로 승인함. RED: `python3 -m unittest
+  tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog
+  -v`가 `TASK-DISCOVERY-LOOP-DESIGN-01` 누락으로 예상대로 FAIL. GREEN: 같은 focused
+  test 1/1 PASS; spec은 requirement·`DISC-*`, OpenAPI 200/401 bearer와 page query,
+  Focus workspace, baseline module/data flow, task/state/browser/review/exit를 trace함.
+  Placeholder, contradiction, ambiguity와 scope 자체 검토, `git diff --check`,
+  `./scripts/verify setup` hook 86 tests·verify contract 19 tests PASS. 작성된 spec의
+  사람 검토 전까지 이 task는 `IN_PROGRESS`를 유지함.
+
 ### [x] TASK-PAGE-01 초기 task page와 card
 
 - Requirements: `TASK-LIST-01`, `TASK-LIST-02`, `TASK-LIST-05`
@@ -1438,7 +1466,7 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 
 - Requirements: `TASK-LIST-02`, `TASK-LIST-05`
 - Risk: LOW — 검증된 task item/link의 presentation
-- Depends on: `UI-FOUNDATION-01`, `TASK-PAGE-01`
+- Depends on: `TASK-DISCOVERY-LOOP-DESIGN-01`, `UI-FOUNDATION-01`, `TASK-PAGE-01`
 - Deliverable: title/memo hierarchy와 전체 action을 가진 task card
 - Acceptance: title과 memo가 구분되고 card 전체가 exact encoded detail route로
   이동하며 hover와 keyboard focus가 명확하다. 원본에 없는 status UI는 추가하지 않는다.

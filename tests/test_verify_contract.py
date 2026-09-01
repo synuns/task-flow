@@ -256,7 +256,11 @@ class VerifyContractTests(unittest.TestCase):
             "WORK-JOURNEY-VERIFY-01": ({"WORK-NAV-RESPONSIVE-01"}, "NOT_STARTED"),
             "WORK-JOURNEY-REVIEW-01": ({"WORK-JOURNEY-VERIFY-01"}, "NOT_STARTED"),
             "JOURNEY-WORK-01": ({"WORK-JOURNEY-REVIEW-01"}, "BLOCKED"),
-            "TASK-CARD-VIEW-01": ({"UI-FOUNDATION-01", "TASK-PAGE-01"}, "NOT_STARTED"),
+            "TASK-DISCOVERY-LOOP-DESIGN-01": ({"JOURNEY-WORK-01"}, "NOT_STARTED"),
+            "TASK-CARD-VIEW-01": (
+                {"TASK-DISCOVERY-LOOP-DESIGN-01", "UI-FOUNDATION-01", "TASK-PAGE-01"},
+                "NOT_STARTED",
+            ),
             "TASK-LIST-VIRTUAL-UX-01": (
                 {"TASK-CARD-VIEW-01", "TASK-PAGE-03"},
                 "NOT_STARTED",
