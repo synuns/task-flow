@@ -19,6 +19,7 @@ const colorTokens = [
   "accent",
   "accent-foreground",
   "destructive",
+  "destructive-foreground",
   "border",
   "input",
   "ring",

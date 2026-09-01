@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @font-face {
   font-family: "Pretendard";
@@ -24,6 +25,7 @@
   --accent: oklch(0.936 0.091 92.686);
   --accent-foreground: oklch(0.352 0.017 78.045);
   --destructive: oklch(0.614 0.174 23.739);
+  --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.886 0.015 84.585);
   --input: oklch(0.886 0.015 84.585);
   --ring: oklch(0.582 0.119 85.036);
@@ -61,6 +63,7 @@
   --accent: oklch(0.374 0.048 91.531);
   --accent-foreground: oklch(0.966 0.053 94.426);
   --destructive: oklch(0.731 0.166 29.521);
+  --destructive-foreground: oklch(0.979 0.008 91.482);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.75 0.153 88.272);
@@ -97,6 +100,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

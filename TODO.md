@@ -428,7 +428,7 @@
   PASS, `./scripts/verify setup` PASS. 이 승인은 dependency 변경이나 Golden Journey의
   `HUMAN_APPROVED`를 뜻하지 않음
 
-### [ ] DEC-UI-01 shadcn/ui runtime dependency 결정
+### [x] DEC-UI-01 shadcn/ui runtime dependency 결정
 
 - Requirements: `SYS-02`, `NAV-01`~`NAV-03`, `AUTH-01`~`AUTH-06`,
   `TASK-DETAIL-03`~`TASK-DETAIL-05`
@@ -443,8 +443,17 @@
 - Automatic verification: `pnpm dlx shadcn@latest view ...`, `shadcn add --dry-run`,
   `git diff --check`
 - Browser verification: dependency 결정에는 적용 없음
-- Status: NOT_STARTED
-- Evidence: 없음 — 구현 session이 시작할 때 task block owner와 exact dry-run을 기록
+- Status: AI_VERIFIED
+- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자가 inline execution,
+  `.worktrees/ui-focus` 격리 worktree와 `radix-ui`, `class-variance-authority`, `clsx`,
+  `tailwind-merge`, `tw-animate-css` runtime dependency를 명시적으로 승인함; official
+  registry `view`에서 9개 component source와 `radix-ui`,
+  `class-variance-authority` import를 확인함; `shadcn add --dry-run`은 정확히 9개
+  `src/shared/ui` file과 자동 dependency `radix-ui`만 보고했으며, `shadcn init` 없이
+  기존 theme을 보존하므로 registry-local `cn`의 `clsx`·`tailwind-merge`와 dialog
+  animation의 `tw-animate-css`를 승인된 수동 추가 대상으로 확정함; 승인 목록 밖
+  package 없음; baseline `./scripts/verify quick` PASS — format, lint, typecheck,
+  Vitest 34 files/122 tests; 이 결정은 Golden Journey `HUMAN_APPROVED`가 아님
 
 ### [ ] UI-IMPLEMENT-01 Focus workspace 반응형 화면 구현
 
@@ -462,8 +471,10 @@
 - Automatic verification: focused unit/component/integration tests,
   `./scripts/verify quick`, plan-completion adversarial review, `./scripts/verify full`
 - Browser verification: agent-browser desktop/mobile evidence와 기존 네 `@core` Journey
-- Status: NOT_STARTED
-- Evidence: 없음 — `DEC-UI-01` 사람 결정 후 구현 session이 task block owner를 기록
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; branch `feat/ui-focus` isolated
+  worktree; Task 1 primitive public contract RED — `Button` export 부재로 focused Vitest
+  1 failed
 
 ## 2. 애플리케이션 구조·공통 경계
 
