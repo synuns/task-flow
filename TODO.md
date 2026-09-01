@@ -1387,7 +1387,7 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 
 ## 5. task-discovery Journey
 
-### [ ] TASK-DISCOVERY-LOOP-DESIGN-01 task-discovery Journey 전체 루프 설계
+### [x] TASK-DISCOVERY-LOOP-DESIGN-01 task-discovery Journey 전체 루프 설계
 
 - Requirements: `TASK-LIST-01`~`TASK-LIST-05`
 - Risk: LOW — 승인된 API·화면·인증 계약을 구현 가능한 Journey 순서로 연결
@@ -1401,7 +1401,7 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
   자체 검토, `./scripts/verify setup`, `git diff --check`
 - Browser verification: 설계 task에는 적용 없음 — 실행 plan이 두 viewport와 named
   agent-browser evidence를 소유
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-02 Codex `/root` task block owner; branch
   `feat/task-discovery-loop`; start commit
   `5b5d60c093099218387ac0f2b6fffb02189c9f13`; 사용자가 Journey 종료 범위,
@@ -1413,7 +1413,8 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
   Focus workspace, baseline module/data flow, task/state/browser/review/exit를 trace함.
   Placeholder, contradiction, ambiguity와 scope 자체 검토, `git diff --check`,
   `./scripts/verify setup` hook 86 tests·verify contract 19 tests PASS. 작성된 spec의
-  사람 검토 전까지 이 task는 `IN_PROGRESS`를 유지함.
+  사람 검토 전까지 이 task는 `IN_PROGRESS`를 유지함. 2026-09-02 사용자가 commit
+  `f4e4a30`의 작성된 spec을 명시적으로 승인하고 구현 계획 작성을 요청함.
 
 ### [x] TASK-PAGE-01 초기 task page와 card
 
