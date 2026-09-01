@@ -591,8 +591,13 @@
   src/test/theme-contract.test.ts`, `./scripts/verify quick`
 - Browser verification: `/sign-in`, 390x844/1280x720, keyboard focus와 disabled/error,
   예상 밖 console/page/network error 없음
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` task block owner; 사용자가 기존 primitive의
+  foundation 계약 검증과 실제 실패의 최소 교정만 승인함;
+  `docs/superpowers/specs/2026-09-01-ui-foundation-contract-design.md`에 Button,
+  Input·Label, Card surface, semantic token, focus, disabled와 error 계약 및
+  automatic/browser 검증 범위를 확정함; 기능·route·showcase·wrapper·비동기 상태
+  UI·shell·dependency·public API 확장은 제외함; implementation plan과 실행 대기
 
 ### [ ] UI-SHELL-01 반응형 application shell
 
