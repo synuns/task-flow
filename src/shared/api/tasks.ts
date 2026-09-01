@@ -53,12 +53,16 @@ export function getTasks(client: ApiClient, page: number, signal?: AbortSignal):
   return client.request(url, { method: "GET", signal }, isTaskPage);
 }
 
-export function getTaskDetail(client: ApiClient, id: string): Promise<TaskDetail> {
+export function getTaskDetail(
+  client: ApiClient,
+  id: string,
+  signal?: AbortSignal,
+): Promise<TaskDetail> {
   const url = new URL(
     `/api/task/${encodeURIComponent(id)}`,
     globalThis.location?.origin ?? "http://localhost",
   );
-  return client.request(url, { method: "GET" }, isTaskDetail);
+  return client.request(url, { method: "GET", signal }, isTaskDetail);
 }
 
 export function deleteTask(client: ApiClient, id: string): Promise<DeleteTaskResult> {

@@ -10,7 +10,7 @@ function isUserProfile(value: unknown): value is GeneratedUserResponse {
   return typeof data.name === "string" && typeof data.memo === "string";
 }
 
-export function getUser(client: ApiClient): Promise<UserProfileData> {
+export function getUser(client: ApiClient, signal?: AbortSignal): Promise<UserProfileData> {
   const url = new URL("/api/user", globalThis.location?.origin ?? "http://localhost");
-  return client.request(url, { method: "GET" }, isUserProfile);
+  return client.request(url, { method: "GET", signal }, isUserProfile);
 }

@@ -11,7 +11,10 @@ function errorMessage(error: unknown): string {
 
 export function UserProfile() {
   const client = useApiClient();
-  const query = useQuery({ queryKey: userKeys.all, queryFn: () => getUser(client) });
+  const query = useQuery({
+    queryKey: userKeys.all,
+    queryFn: ({ signal }) => getUser(client, signal),
+  });
 
   if (query.isPending) {
     return (

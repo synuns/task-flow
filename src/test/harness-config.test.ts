@@ -17,10 +17,19 @@ const installedPlaywright = JSON.parse(
     "utf8",
   ),
 ) as { version: string };
+const mainSource = readFileSync(new URL("../main.tsx", import.meta.url), "utf8");
 
 describe("local verification configuration", () => {
   it("starts a fresh server for every Playwright run", () => {
     expect(playwrightConfig.webServer).toMatchObject({ reuseExistingServer: false });
+  });
+
+  it("tests the production build with the mock worker enabled", () => {
+    expect(playwrightConfig.webServer).toMatchObject({
+      command: "pnpm build && pnpm preview --host 127.0.0.1 --port 4173",
+    });
+    expect(mainSource).not.toContain("import.meta.env.DEV");
+    expect(mainSource).toContain('await import("@/mocks/browser")');
   });
 
   it("rejects focused Playwright and Vitest tests", () => {

@@ -25,7 +25,7 @@ export function TaskDetailPage() {
   const { id = "" } = useParams();
   const query = useQuery({
     queryKey: taskKeys.detail(id),
-    queryFn: () => getTaskDetail(client, id),
+    queryFn: ({ signal }) => getTaskDetail(client, id, signal),
   });
 
   if (query.isPending) {

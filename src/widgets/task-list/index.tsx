@@ -26,7 +26,7 @@ export function TaskList() {
   const query = useInfiniteQuery({
     queryKey: taskKeys.all,
     initialPageParam: 1,
-    queryFn: ({ pageParam }) => getTasks(client, pageParam),
+    queryFn: ({ pageParam, signal }) => getTasks(client, pageParam, signal),
     getNextPageParam: (lastPage, pages) => (lastPage.hasNext ? pages.length + 1 : undefined),
   });
   const tasks = useMemo(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
@@ -41,7 +41,8 @@ export function TaskList() {
   const lastVirtualIndex = virtualItems.at(-1)?.index;
 
   useEffect(() => {
-    if (lastVirtualIndex === tasks.length - 1 && query.hasNextPage && !query.isFetchingNextPage) {
+    const reachedEnd = tasks.length === 0 || lastVirtualIndex === tasks.length - 1;
+    if (reachedEnd && query.hasNextPage && !query.isFetchingNextPage) {
       void query.fetchNextPage();
     }
   }, [
@@ -73,7 +74,7 @@ export function TaskList() {
       </Alert>
     );
   }
-  if (tasks.length === 0) {
+  if (tasks.length === 0 && !query.hasNextPage) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center py-8 text-center">

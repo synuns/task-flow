@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
+import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
-test("@architecture resolves every route and starts the DEV mock worker", async ({ page }) => {
+test("@architecture resolves every route and starts the production mock worker", async ({
+  page,
+}) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   page.on("console", (message) => {
@@ -8,17 +11,22 @@ test("@architecture resolves every route and starts the DEV mock worker", async 
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
+  const anonymousPage = await page.context().newPage();
+  await anonymousPage.goto("/sign-in");
+  await expect(anonymousPage.getByRole("heading", { name: "로그인" })).toBeVisible();
+  await anonymousPage.close();
+
+  await prepareAuthenticatedPage(page);
   for (const [path, heading] of [
     ["/", "대시보드"],
-    ["/sign-in", "로그인"],
     ["/task", "할 일"],
-    ["/task/task-1", "할 일 상세"],
+    ["/task/task-1", "첫 번째 할 일"],
     ["/user", "회원정보"],
   ] as const) {
     await page.goto(path);
-    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
-    await expect(page.getByRole("link", { name: "대시보드" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "할 일" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "대시보드", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "할 일", exact: true })).toBeVisible();
   }
 
   const workerUrl = await page.evaluate(async () => {

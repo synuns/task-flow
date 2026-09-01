@@ -23,7 +23,7 @@ export function DashboardSummary() {
   const client = useApiClient();
   const query = useQuery({
     queryKey: dashboardKeys.all,
-    queryFn: () => getDashboard(client),
+    queryFn: ({ signal }) => getDashboard(client, signal),
   });
 
   if (query.isPending) {

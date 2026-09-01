@@ -66,6 +66,16 @@ describe("task handlers", () => {
     expect(response.body).toMatchObject({ data: expect.any(Array), hasNext: expect.any(Boolean) });
   });
 
+  it.each(["", "?page=0", "?page=-1", "?page=1.5", "?page=invalid"])(
+    "returns ErrorResponse 400 for invalid page query %s",
+    async (query) => {
+      await expect(apiRequest(`/api/task${query}`)).resolves.toEqual({
+        status: 400,
+        body: { errorMessage: "page는 1 이상의 정수여야 합니다." },
+      });
+    },
+  );
+
   it("returns two ordered pages and stops at the terminal page", async () => {
     const first = (await apiRequest("/api/task?page=1")).body as {
       data: Array<{ id: string }>;

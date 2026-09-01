@@ -21,6 +21,7 @@ afterEach(cleanup);
 
 describe("DashboardSummary", () => {
   it("distinguishes loading from the metric result", async () => {
+    let requestSignal: AbortSignal | null | undefined;
     let release: () => void = () => undefined;
     const pending = new Promise<void>((resolve) => {
       release = resolve;
@@ -29,9 +30,10 @@ describe("DashboardSummary", () => {
     const client: ApiClient = {
       request: async <T,>(
         _input: RequestInfo | URL,
-        _init: RequestInit,
+        init: RequestInit,
         isSuccess: (value: unknown) => value is T,
       ) => {
+        requestSignal = init.signal;
         await pending;
         if (!isSuccess(body)) throw new Error("invalid fixture");
         return body;
@@ -53,6 +55,7 @@ describe("DashboardSummary", () => {
       "aria-valuenow",
       "33.33333333333333",
     );
+    expect(requestSignal).toBeInstanceOf(AbortSignal);
   });
 
   it("explains the zero-task state without dividing by zero", async () => {

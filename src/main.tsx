@@ -4,10 +4,8 @@ import { createRoot } from "react-dom/client";
 import { App } from "@/app";
 
 async function bootstrap() {
-  if (import.meta.env.DEV) {
-    const { startWorker } = await import("@/mocks/browser");
-    await startWorker();
-  }
+  const { startWorker } = await import("@/mocks/browser");
+  await startWorker();
 
   const rootElement = document.getElementById("root");
   if (!rootElement) {

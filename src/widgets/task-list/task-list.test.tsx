@@ -104,7 +104,8 @@ describe("TaskList", () => {
     expect(screen.getByText("모든 할 일을 불러왔습니다.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /다음 페이지/ })).not.toBeInTheDocument();
     expect(requestedPages).toEqual([1, 2]);
-    expect(requestSignals).toEqual([undefined, undefined]);
+    expect(requestSignals).toHaveLength(2);
+    expect(requestSignals.every((signal) => signal instanceof AbortSignal)).toBe(true);
   });
 
   it("shows a distinct empty state without requesting another page", async () => {
@@ -125,6 +126,35 @@ describe("TaskList", () => {
 
     expect(await screen.findByText("등록된 할 일이 없습니다.")).toBeInTheDocument();
     expect(requestedPages).toEqual([1]);
+  });
+
+  it("continues after an empty intermediate page when hasNext is true", async () => {
+    const requestedPages: number[] = [];
+    const client: ApiClient = {
+      request: async <T,>(
+        input: RequestInfo | URL,
+        _init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        const page = Number(new URL(String(input)).searchParams.get("page"));
+        requestedPages.push(page);
+        const body: unknown =
+          page === 1
+            ? { data: [], hasNext: true }
+            : {
+                data: [
+                  { id: "task-2", title: "두 번째 페이지 할 일", memo: "메모", status: "TODO" },
+                ],
+                hasNext: false,
+              };
+        if (!isSuccess(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+    render(<TaskList />, { wrapper: wrapper(client) });
+
+    expect(await screen.findByText("두 번째 페이지 할 일")).toBeInTheDocument();
+    expect(requestedPages).toEqual([1, 2]);
   });
 
   it("offers an explicit retry after the initial request fails", async () => {

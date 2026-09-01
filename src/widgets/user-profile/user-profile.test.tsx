@@ -21,6 +21,7 @@ afterEach(cleanup);
 
 describe("UserProfile", () => {
   it("distinguishes loading from the profile result", async () => {
+    let requestSignal: AbortSignal | null | undefined;
     let release: () => void = () => undefined;
     const pending = new Promise<void>((resolve) => {
       release = resolve;
@@ -29,9 +30,10 @@ describe("UserProfile", () => {
     const client: ApiClient = {
       request: async <T,>(
         _input: RequestInfo | URL,
-        _init: RequestInit,
+        init: RequestInit,
         isSuccess: (value: unknown) => value is T,
       ) => {
+        requestSignal = init.signal;
         await pending;
         if (!isSuccess(body)) throw new Error("invalid fixture");
         return body;
@@ -45,6 +47,7 @@ describe("UserProfile", () => {
     const name = await screen.findByText("김담당");
     expect(name.closest('[data-slot="card"]')).toBeInTheDocument();
     expect(screen.getByText("오늘도 차근차근")).toBeInTheDocument();
+    expect(requestSignal).toBeInstanceOf(AbortSignal);
   });
 
   it("offers an explicit retry after a recoverable error", async () => {

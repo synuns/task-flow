@@ -18,7 +18,7 @@ function isDashboardMetrics(value: unknown): value is GeneratedDashboardResponse
   );
 }
 
-export function getDashboard(client: ApiClient): Promise<DashboardMetrics> {
+export function getDashboard(client: ApiClient, signal?: AbortSignal): Promise<DashboardMetrics> {
   const url = new URL("/api/dashboard", globalThis.location?.origin ?? "http://localhost");
-  return client.request(url, { method: "GET" }, isDashboardMetrics);
+  return client.request(url, { method: "GET", signal }, isDashboardMetrics);
 }

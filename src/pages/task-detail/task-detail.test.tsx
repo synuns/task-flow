@@ -37,13 +37,15 @@ afterEach(cleanup);
 describe("TaskDetailPage", () => {
   it("renders the detail fields returned for the route ID", async () => {
     const requests: string[] = [];
+    const requestSignals: Array<AbortSignal | null | undefined> = [];
     const client: ApiClient = {
       request: async <T,>(
         input: RequestInfo | URL,
-        _init: RequestInit,
+        init: RequestInit,
         isSuccess: (value: unknown) => value is T,
       ): Promise<T> => {
         requests.push(String(input));
+        requestSignals.push(init.signal);
         const body: unknown = {
           title: "첫 번째 할 일",
           memo: "삭제 검증 대상",
@@ -68,6 +70,8 @@ describe("TaskDetailPage", () => {
       ),
     ).toBeInTheDocument();
     expect(requests).toEqual([`${globalThis.location.origin}/api/task/task-1`]);
+    expect(requestSignals).toHaveLength(1);
+    expect(requestSignals[0]).toBeInstanceOf(AbortSignal);
   });
 
   it("separates a missing task and offers a list recovery action", async () => {

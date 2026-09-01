@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
 test("@scaffold loads the React root and local Pretendard without browser errors", async ({
   page,
@@ -13,6 +14,7 @@ test("@scaffold loads the React root and local Pretendard without browser errors
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
+  await prepareAuthenticatedPage(page);
   await page.goto("/");
 
   await expect(page.locator("#root")).toHaveCount(1);
