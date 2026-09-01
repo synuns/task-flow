@@ -676,7 +676,7 @@ Expected: review record commit succeeds and final full verification passes on th
 - Consumes: current evidence, exact source target, PASS review record and final full result
 - Produces: auditable human checkpoint request; no AI approval claim
 
-- [ ] **Step 1: Audit the checkpoint inputs**
+- [x] **Step 1: Audit the checkpoint inputs**
 
 ```bash
 ./scripts/verify setup
@@ -686,7 +686,7 @@ git status --short
 
 Expected: implementation tasks, verify and review are `AI_VERIFIED`; checkpoint dependency is complete; setup passes; worktree is clean.
 
-- [ ] **Step 2: Record the pending checkpoint package**
+- [x] **Step 2: Record the pending checkpoint package**
 
 Keep checkbox `[ ]` and `Status: BLOCKED`. Update only its Evidence with:
 
@@ -696,7 +696,7 @@ Keep checkbox `[ ]` and `Status: BLOCKED`. Update only its Evidence with:
 - browser evidence path and both viewport summary
 - explicit `사람 checkpoint 승인 대기; AI가 HUMAN_APPROVED를 기록하지 않음`
 
-- [ ] **Step 3: Commit the checkpoint request and verify setup**
+- [x] **Step 3: Commit the checkpoint request and verify setup**
 
 ```bash
 git add TODO.md
@@ -707,6 +707,6 @@ git commit -m "docs(task): task-discovery 사람 검토 요청"
 
 Expected: setup PASS; `JOURNEY-TASK-LIST-01` remains human-owned and unapproved.
 
-- [ ] **Step 4: Present one human checkpoint**
+- [x] **Step 4: Present one human checkpoint**
 
 Ask the person to review the current `docs/quality/evidence/task-discovery.md`, exact review target and PASS record. Do not start `task-resolution` implementation across this unapproved Journey boundary. Only a person may change the checkpoint to `[x]`, `HUMAN_APPROVED`.

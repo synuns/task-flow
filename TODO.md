@@ -1657,8 +1657,15 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `TASK-LIST-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
 - Status: BLOCKED
-- Evidence: 기존 focused/core/browser baseline은
-  `docs/quality/evidence/task-discovery.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
+- Evidence: reviewed source target
+  `b7790542226fcfb5ff5332692386343797f9b7fb`; 독립 review record
+  `f646f4663acebc58e61095b5cc66bd2bdf98f9c0`, Verdict PASS; focused 7 files/31
+  tests, quick hook 86·contract 19·Vitest 38 files/150 tests, mapped Chromium 1/1
+  PASS; final full은 `f646f4663acebc58e61095b5cc66bd2bdf98f9c0`에서 hook 86·contract
+  19·Vitest 38 files/150 tests·build·core E2E 5/5·verifier regression 19 PASS;
+  browser 근거는 `docs/quality/evidence/task-discovery.md`에 보존되며 desktop/mobile
+  목록·상세 흐름과 mobile 장문 줄바꿈을 포함한다. 사람 checkpoint 승인 대기;
+  AI가 `HUMAN_APPROVED`를 기록하지 않음
 
 ## 6. task-resolution Journey
 
