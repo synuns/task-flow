@@ -77,11 +77,11 @@ Expected: branch는 `feat/task-discovery-loop`, worktree는 clean이며 plan com
 - Consumes: `TaskCardProps`, shared `Card`, global focus ring, React Router `Link`
 - Produces: title/memo hierarchy, status absence, whole-card encoded route, pointer/keyboard evidence
 
-- [ ] **Step 1: Claim only `TASK-CARD-VIEW-01`**
+- [x] **Step 1: Claim only `TASK-CARD-VIEW-01`**
 
 Keep checkbox `[ ]`, set `Status: IN_PROGRESS`, and replace `Evidence: 없음` with executing session `/root`, branch `feat/task-discovery-loop`, `git rev-parse HEAD`, requirements `TASK-LIST-02`, `TASK-LIST-05`, and this plan path. Do not modify another open task block.
 
-- [ ] **Step 2: Re-run Journey lookup before a production edit**
+- [x] **Step 2: Re-run Journey lookup before a production edit**
 
 ```bash
 rg -n 'TASK-CARD-VIEW-01|TASK-LIST-02|TASK-LIST-05|DISC-P1-2|DISC-P1-5|TaskCard|/task/:id|encodeURIComponent' docs/quality/requirements.md TODO.md src e2e
@@ -90,7 +90,7 @@ git status --short
 
 Expected: `TaskList → TaskCard → encoded Link`; title/memo and no status UI already have one focused component test.
 
-- [ ] **Step 3: Run the lowest sufficient Card test**
+- [x] **Step 3: Run the lowest sufficient Card test**
 
 ```bash
 pnpm vitest run src/entities/task/ui/task-card.test.tsx
@@ -98,7 +98,7 @@ pnpm vitest run src/entities/task/ui/task-card.test.tsx
 
 Expected baseline: 1 file and 1 test PASS. If it passes and the component still uses one whole-card Link with global `:focus-visible`, do not edit production or duplicate the test. A real acceptance failure must be recorded as RED in the active TODO block before changing only the Card owner and its existing test.
 
-- [ ] **Step 4: Run quick verification**
+- [x] **Step 4: Run quick verification**
 
 ```bash
 ./scripts/verify quick
@@ -106,7 +106,7 @@ Expected baseline: 1 file and 1 test PASS. If it passes and the component still 
 
 Expected: setup, format check, lint, generated API check, typecheck and all Vitest tests PASS without repository mutation.
 
-- [ ] **Step 5: Start the app for Card browser QA**
+- [x] **Step 5: Start the app for Card browser QA**
 
 Run in a dedicated terminal session and keep it alive only through this task:
 
@@ -116,7 +116,7 @@ pnpm dev --host 127.0.0.1 --port 4173
 
 Expected: Vite serves `http://127.0.0.1:4173`.
 
-- [ ] **Step 6: Establish the independent authenticated fixture**
+- [x] **Step 6: Establish the independent authenticated fixture**
 
 ```bash
 agent-browser --session task-card-view-01 open http://127.0.0.1:4173/sign-in
@@ -132,7 +132,7 @@ agent-browser --session task-card-view-01 wait --load networkidle
 
 Expected: refresh establishes the approved session; `/api/task?page=1` loads without `/api/sign-in`.
 
-- [ ] **Step 7: Verify desktop pointer interaction and exact route**
+- [x] **Step 7: Verify desktop pointer interaction and exact route**
 
 ```bash
 agent-browser --session task-card-view-01 set viewport 1280 720
@@ -147,7 +147,7 @@ agent-browser --session task-card-view-01 get url
 
 Expected: href is `/task/task-1`, text contains title and memo, `TODO` is absent, pointer click reaches exact detail route.
 
-- [ ] **Step 8: Verify mobile keyboard focus and navigation**
+- [x] **Step 8: Verify mobile keyboard focus and navigation**
 
 ```bash
 agent-browser --session task-card-view-01 open http://127.0.0.1:4173/task
@@ -170,11 +170,11 @@ agent-browser --session task-card-view-01 close
 
 Expected: fourth Tab focuses the first Card Link, outline is visible, Enter navigates, and document width does not exceed 390px. No unexpected console/page error remains.
 
-- [ ] **Step 9: Record evidence and close the task**
+- [x] **Step 9: Record evidence and close the task**
 
 Add `## TASK-CARD-VIEW-01` to `docs/quality/evidence/task-discovery.md` with requirement, full commit SHA, focused/quick results, both viewport records, API observation, screenshot paths, expected/actual, failure class/correction/rerun. Set only this task `[x]`, `Status: AI_VERIFIED`.
 
-- [ ] **Step 10: Commit the independently testable result**
+- [x] **Step 10: Commit the independently testable result**
 
 ```bash
 git add TODO.md docs/quality/evidence/task-discovery.md
@@ -200,11 +200,11 @@ If a proven gap required source/test changes, stage only those exact files too a
 - Consumes: completed `TaskCard`, `useVirtualizer`, stable task ID, row measurement
 - Produces: remaining-height scroll region, wrapping, real scroll, bounded mounted DOM evidence
 
-- [ ] **Step 1: Claim only `TASK-LIST-VIRTUAL-UX-01`**
+- [x] **Step 1: Claim only `TASK-LIST-VIRTUAL-UX-01`**
 
 Set `IN_PROGRESS` and record owner, branch, start SHA, requirement `TASK-LIST-03` and plan path after confirming `TASK-CARD-VIEW-01` is `AI_VERIFIED`.
 
-- [ ] **Step 2: Locate the virtual flow and fixed-height history**
+- [x] **Step 2: Locate the virtual flow and fixed-height history**
 
 ```bash
 rg -n 'TASK-LIST-VIRTUAL-UX-01|TASK-LIST-03|DISC-P1-3|useVirtualizer|estimateSize|measureElement|getItemKey|overflow-auto|100svh|96px' docs/quality/requirements.md TODO.md src e2e docs/quality/evidence/task-discovery.md
@@ -213,7 +213,7 @@ git status --short
 
 Expected: 96 is a row estimate; the production scroll region uses remaining viewport height rather than a fixed 96px viewport.
 
-- [ ] **Step 3: Run the focused list suite**
+- [x] **Step 3: Run the focused list suite**
 
 ```bash
 pnpm vitest run src/widgets/task-list/task-list.test.tsx
@@ -221,7 +221,7 @@ pnpm vitest run src/widgets/task-list/task-list.test.tsx
 
 Expected baseline: 1 file and 5 tests PASS. Do not add pixel/class assertions for browser geometry. A deterministic state or key/measurement failure is RED and may change only the page/widget owner plus this existing test.
 
-- [ ] **Step 4: Run quick verification**
+- [x] **Step 4: Run quick verification**
 
 ```bash
 ./scripts/verify quick
@@ -229,7 +229,7 @@ Expected baseline: 1 file and 5 tests PASS. Do not add pixel/class assertions fo
 
 Expected: PASS without mutation.
 
-- [ ] **Step 5: Seed enough schema-conforming tasks for real virtualization**
+- [x] **Step 5: Seed enough schema-conforming tasks for real virtualization**
 
 Start the Vite server on port 4173, then:
 
@@ -247,7 +247,7 @@ agent-browser --session task-list-virtual-ux-01 wait --load networkidle
 
 Expected: list has more data than one viewport can mount; no production debug surface is used.
 
-- [ ] **Step 6: Verify desktop real scroll and DOM bound**
+- [x] **Step 6: Verify desktop real scroll and DOM bound**
 
 ```bash
 agent-browser --session task-list-virtual-ux-01 set viewport 1280 720
@@ -261,7 +261,7 @@ agent-browser --session task-list-virtual-ux-01 screenshot /tmp/kbhc-task-list-v
 
 Expected: `scrollHeight > clientHeight`, scrollTop increases, mounted count remains far below the seeded 40 tasks, and no horizontal overflow appears.
 
-- [ ] **Step 7: Verify mobile wrapping, scroll stability and cleanup**
+- [x] **Step 7: Verify mobile wrapping, scroll stability and cleanup**
 
 ```bash
 agent-browser --session task-list-virtual-ux-01 set viewport 390 844
@@ -278,7 +278,7 @@ agent-browser --session task-list-virtual-ux-01 close
 
 Expected: scroll remains usable after resize, Card content is not clipped horizontally, mounted DOM stays bounded and no unexpected error appears.
 
-- [ ] **Step 8: Record evidence, close and commit**
+- [x] **Step 8: Record evidence, close and commit**
 
 Add `## TASK-LIST-VIRTUAL-UX-01` with seed size, viewport/scroll/mounted measurements, screenshots and command results. Set only this task `[x]`, `AI_VERIFIED`, then:
 
@@ -307,7 +307,7 @@ Use `fix(task): 가상 목록 화면 결함 수정` only when a RED-backed sourc
 - Consumes: completed virtual viewport, `getNextPageParam`, `fetchNextPage`, AbortSignal
 - Produces: automatic end trigger, single in-flight, retry, manual fallback and terminal evidence
 
-- [ ] **Step 1: Claim and locate `TASK-LIST-PAGING-UX-01`**
+- [x] **Step 1: Claim and locate `TASK-LIST-PAGING-UX-01`**
 
 Set `IN_PROGRESS`, record owner/start SHA, then run:
 
@@ -318,7 +318,7 @@ git status --short
 
 Expected: next page derives from loaded page count, automatic end detection is primary, retry reuses the failed page, and terminal false removes the next action.
 
-- [ ] **Step 2: Run pagination/API focused tests**
+- [x] **Step 2: Run pagination/API focused tests**
 
 ```bash
 pnpm vitest run src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts
@@ -326,7 +326,7 @@ pnpm vitest run src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.te
 
 Expected baseline: 2 files and 8 tests PASS. A failure in request sequence, retry or terminal stop is the RED evidence; change only the widget/API owner that causes it.
 
-- [ ] **Step 3: Run quick verification**
+- [x] **Step 3: Run quick verification**
 
 ```bash
 ./scripts/verify quick
@@ -334,7 +334,7 @@ Expected baseline: 2 files and 8 tests PASS. A failure in request sequence, retr
 
 Expected: PASS without mutation.
 
-- [ ] **Step 4: Verify automatic default page sequence and terminal stop**
+- [x] **Step 4: Verify automatic default page sequence and terminal stop**
 
 Start the Vite server on port 4173, then establish a fresh approved fixture:
 
@@ -364,7 +364,7 @@ agent-browser --session task-list-paging-ux-01 screenshot /tmp/kbhc-task-list-pa
 
 Expected: page 1 and page 2 each occur once, terminal text is true, next Button is absent after false.
 
-- [ ] **Step 5: Verify partial-page failure and explicit retry**
+- [x] **Step 5: Verify partial-page failure and explicit retry**
 
 ```bash
 agent-browser --session task-list-paging-ux-01 network route '**/api/task?page=2' --abort
@@ -382,7 +382,7 @@ agent-browser --session task-list-paging-ux-01 close
 
 Expected: page 1 items remain during the page 2 error; retry sends one new page 2 attempt and reaches terminal. The expected aborted request is recorded, not hidden.
 
-- [ ] **Step 6: Record evidence, close and commit**
+- [x] **Step 6: Record evidence, close and commit**
 
 Add `## TASK-LIST-PAGING-UX-01` with success and failure/retry request sequences. Set only this task `[x]`, `AI_VERIFIED`, then commit TODO and evidence with:
 
@@ -408,7 +408,7 @@ Stage exact files and run `git diff --cached --check` first. Use a `fix(task): .
 - Consumes: completed paging lifecycle, shared `Alert`, `Button`, `Skeleton`, `Card`
 - Produces: initial loading, empty, initial/partial error, next loading and terminal state evidence
 
-- [ ] **Step 1: Claim and locate `TASK-LIST-STATES-01`**
+- [x] **Step 1: Claim and locate `TASK-LIST-STATES-01`**
 
 ```bash
 rg -n 'TASK-LIST-STATES-01|TASK-LIST-01|TASK-LIST-04|DISC-E1|role="status"|등록된 할 일이 없습니다|다시 불러오기|모든 할 일을' docs/quality/requirements.md TODO.md src e2e
@@ -417,7 +417,7 @@ git status --short
 
 Record owner/start SHA and set only this task `IN_PROGRESS`.
 
-- [ ] **Step 2: Run the focused state suite**
+- [x] **Step 2: Run the focused state suite**
 
 ```bash
 pnpm vitest run src/widgets/task-list/task-list.test.tsx
@@ -425,7 +425,7 @@ pnpm vitest run src/widgets/task-list/task-list.test.tsx
 
 Expected baseline: 1 file and 5 tests PASS, covering initial status/Skeleton, empty terminal, empty intermediate continuation, initial retry and partial retry. Do not duplicate these assertions.
 
-- [ ] **Step 3: Run quick verification**
+- [x] **Step 3: Run quick verification**
 
 ```bash
 ./scripts/verify quick
@@ -433,7 +433,7 @@ Expected baseline: 1 file and 5 tests PASS, covering initial status/Skeleton, em
 
 Expected: PASS without mutation.
 
-- [ ] **Step 4: Verify recoverable initial failure at desktop**
+- [x] **Step 4: Verify recoverable initial failure at desktop**
 
 Start the Vite server on port 4173, then establish auth and intercept page 1 before entering `/task`:
 
@@ -457,7 +457,7 @@ agent-browser --session task-list-states-01 wait --text '첫 번째 할 일'
 
 Expected: Alert and retry are visible; retry restores list data without duplicate permanent rows.
 
-- [ ] **Step 5: Verify empty terminal at mobile without a new CTA**
+- [x] **Step 5: Verify empty terminal at mobile without a new CTA**
 
 ```bash
 agent-browser --session task-list-states-01 open http://127.0.0.1:4173/sign-in
@@ -478,7 +478,7 @@ agent-browser --session task-list-states-01 close
 
 Expected: empty message is visible, createAction is false, no next-page request or horizontal clipping occurs.
 
-- [ ] **Step 6: Record evidence, close and commit**
+- [x] **Step 6: Record evidence, close and commit**
 
 Add `## TASK-LIST-STATES-01`, set only the state task `[x]`, `AI_VERIFIED`, stage exact TODO/evidence files, run `git diff --cached --check`, and commit:
 
@@ -503,11 +503,11 @@ Use a `fix(task): ...` commit only when a RED-backed widget correction exists.
 - Consumes: four completed implementation tasks and exact current commit
 - Produces: `DISC-P1-1`~`DISC-P1-5`, `DISC-E1`~`DISC-E3`, focused/quick/E2E/full/browser evidence
 
-- [ ] **Step 1: Claim only `TASK-LIST-JOURNEY-VERIFY-01`**
+- [x] **Step 1: Claim only `TASK-LIST-JOURNEY-VERIFY-01`**
 
 Set `IN_PROGRESS`, record owner, target SHA and plan path after confirming all four dependencies are `AI_VERIFIED`.
 
-- [ ] **Step 2: Re-run the complete Journey trace lookup**
+- [x] **Step 2: Re-run the complete Journey trace lookup**
 
 ```bash
 rg -n 'TASK-LIST-0[1-5]|DISC-P1|DISC-E[1-3]|/api/task|TaskList|TaskCard|taskKeys' docs/quality/requirements.md TODO.md src e2e
@@ -516,7 +516,7 @@ git status --short
 
 Expected: every requirement and case maps to a focused test or browser boundary; no raw fetch exists in page/widget and no generated OpenAPI import exists outside shared API.
 
-- [ ] **Step 3: Run the complete focused suite**
+- [x] **Step 3: Run the complete focused suite**
 
 ```bash
 pnpm vitest run src/entities/task/ui/task-card.test.tsx src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts src/mocks/fixtures/tasks.test.ts src/app/auth/authenticated-api-bridge.test.tsx src/app/auth/auth-route-boundary.test.tsx
@@ -524,7 +524,7 @@ pnpm vitest run src/entities/task/ui/task-card.test.tsx src/widgets/task-list/ta
 
 Expected baseline before any Journey correction: 7 files and 30 tests PASS.
 
-- [ ] **Step 4: Run quick, mapped E2E and full in order**
+- [x] **Step 4: Run quick, mapped E2E and full in order**
 
 ```bash
 ./scripts/verify quick
@@ -534,7 +534,7 @@ pnpm exec playwright test e2e/task-discovery.spec.ts
 
 Expected: quick PASS; mapped Chromium 1/1 PASS with page sequence `1,2`, bearer, bounded DOM and `/task/task-3`; full PASS with all core Journeys and verifier regression.
 
-- [ ] **Step 5: Capture one integrated named-browser record**
+- [x] **Step 5: Capture one integrated named-browser record**
 
 Start the Vite server on port 4173 and create a fresh default three-task session:
 
@@ -568,11 +568,11 @@ agent-browser --session task-list-journey-verify-01 screenshot /tmp/kbhc-task-li
 agent-browser --session task-list-journey-verify-01 close
 ```
 
-- [ ] **Step 6: Replace stale summary with current-target evidence**
+- [x] **Step 6: Replace stale summary with current-target evidence**
 
 Update the evidence header and add `## TASK-LIST-JOURNEY-VERIFY-01`. Record exact SHA, all commands/counts, `DISC-*` mapping, both viewports, request method/query/count/bearer, mounted DOM, routes, screenshots/trace, console/errors, failures/corrections and rerun verdict. Preserve historical failure records as baseline history.
 
-- [ ] **Step 7: Close and commit the verification task**
+- [x] **Step 7: Close and commit the verification task**
 
 Set only this task `[x]`, `AI_VERIFIED`, then:
 

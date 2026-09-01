@@ -46,14 +46,14 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
   expect(await page.locator("[data-task-row]").count()).toBeLessThan(3);
   expect(taskRequests.map((request) => request.page)).toEqual(["1", "2"]);
   expect(taskRequests.every((request) => request.authorization?.startsWith("Bearer "))).toBe(true);
-  expect(consoleErrors).toEqual([]);
-  expect(pageErrors).toEqual([]);
   expect(signInRequests).toEqual([]);
 
   const listScreenshot = await page.screenshot({ fullPage: true });
   await page.getByRole("link", { name: /완료한 일/ }).click();
   await expect(page).toHaveURL(/\/task\/task-3$/);
   await expect(page.getByRole("heading", { name: "완료한 일" })).toBeVisible();
+  expect(consoleErrors).toEqual([]);
+  expect(pageErrors).toEqual([]);
 
   await test.info().attach("task-discovery", {
     body: listScreenshot,
