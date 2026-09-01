@@ -1,6 +1,6 @@
 # Task Discovery Evidence
 
-## TASK-LIST-JOURNEY-REVIEW-01 — BLOCKED
+## TASK-LIST-JOURNEY-REVIEW-01 — correction in progress
 
 Review target: plan `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`;
 `TASK-LIST-01`~`TASK-LIST-05`, `task-discovery`; initial exact target
@@ -31,6 +31,11 @@ Vitest 38 files/150 tests plus format/lint/typecheck; mapped task-discovery Chro
 PASS after final detail assertion; correction diff and whitespace check PASS
 Verdict: BLOCKED — all MEDIUM/LOW findings are resolved, but changing or accepting the
 extra invalid-page 400 behavior requires the project-defined HIGH-risk human decision
+Human HIGH decision: on 2026-09-02 the user explicitly approved the recommended immutable-
+OpenAPI option: remove the invalid-page 400 JSON contract and fail closed with a transport
+failure that publishes no new HTTP status/body. TDD evidence: all five replacement cases
+failed because the old handler resolved `{status:400,...}`; after the minimal
+`HttpResponse.error()` correction, the handler suite passed 12/12. Fresh re-review pending
 
 ## TASK-LIST-JOURNEY-VERIFY-01 — current target
 

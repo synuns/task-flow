@@ -67,12 +67,9 @@ describe("task handlers", () => {
   });
 
   it.each(["", "?page=0", "?page=-1", "?page=1.5", "?page=invalid"])(
-    "returns ErrorResponse 400 for invalid page query %s",
+    "fails closed without publishing an HTTP response for invalid page query %s",
     async (query) => {
-      await expect(apiRequest(`/api/task${query}`)).resolves.toEqual({
-        status: 400,
-        body: { errorMessage: "page는 1 이상의 정수여야 합니다." },
-      });
+      await expect(apiRequest(`/api/task${query}`)).rejects.toThrow();
     },
   );
 

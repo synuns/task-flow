@@ -1614,7 +1614,7 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   weak test와 console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
 - Automatic verification: `./scripts/verify quick`
 - Browser verification: finding이 browser behavior에 영향을 주면 해당 discovery case 재실행
-- Status: BLOCKED
+- Status: IN_PROGRESS
 - Evidence: Review target: plan
   `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`, requirements
   `TASK-LIST-01`~`TASK-LIST-05`, Journey `task-discovery`, initial exact target
@@ -1634,6 +1634,10 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   row 170px, width 390, overflow 없음; Rerun: 7 files/31 tests, quick hook 86·contract
   19·Vitest 38/150, mapped Chromium 1/1, correction diff check PASS; Verdict: BLOCKED —
   HIGH contract decision 없이 mock 400 behavior를 변경하거나 예외 승인할 수 없음.
+  Human decision: 2026-09-02 사용자가 권장안, 즉 invalid page 400 JSON 계약을 제거하고
+  HTTP status/body를 발행하지 않는 transport failure로 fail-closed 처리하는 변경을
+  명시적으로 `승인`; handler test 5 cases RED(기존 400 resolve)→12/12 GREEN 후 fresh
+  re-review 대기.
 
 ### [ ] JOURNEY-TASK-LIST-01 task-discovery 사람 checkpoint
 
