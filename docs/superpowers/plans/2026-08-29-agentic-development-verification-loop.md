@@ -1740,6 +1740,10 @@ Change both frontend command sites in `verify_frontend()` to:
 Do not change `run_stage()`; it already converts an `OSError` or nonzero child
 status into a standard nonzero verifier result with reproduction details.
 
+When `KBHC_VERIFY_SELF_TESTING=1`, run `build` but skip the nested
+`test:e2e:core`; the parent full gate has already run core E2E and an immediate
+second Playwright server can race the release of port 4173.
+
 - [ ] **Step 4: Run focused contracts and commit**
 
 Run:

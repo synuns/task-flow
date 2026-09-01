@@ -421,7 +421,10 @@ def verify_frontend(mode):
         if result:
             return result
     if mode == "full":
-        for name in ("build", "test:e2e:core"):
+        full = ("build",)
+        if os.environ.get("KBHC_VERIFY_SELF_TESTING") != "1":
+            full += ("test:e2e:core",)
+        for name in full:
             result = run_stage(name, ["pnpm", "run", name])
             if result:
                 return result

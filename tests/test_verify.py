@@ -57,9 +57,10 @@ class VerifyCliTests(unittest.TestCase):
             "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
             "kbhc": {"frontendScaffolded": True},
         }
-        with mock.patch.object(verifier, "package_document", return_value=package):
-            with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
-                result = verifier.verify_frontend("full")
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with mock.patch.object(verifier, "package_document", return_value=package):
+                with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+                    result = verifier.verify_frontend("full")
 
         self.assertEqual(result, 0)
         self.assertEqual(
@@ -90,6 +91,27 @@ class VerifyCliTests(unittest.TestCase):
 
         self.assertNotEqual(result, 0)
         self.assertEqual(run_stage.call_count, 2)
+
+    def test_self_testing_full_skips_nested_core_e2e(self):
+        verifier = load_verify_module()
+        package = {
+            "packageManager": "pnpm@10.15.1",
+            "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
+            "kbhc": {"frontendScaffolded": True},
+        }
+        with mock.patch.dict(os.environ, {"KBHC_VERIFY_SELF_TESTING": "1"}, clear=True):
+            with mock.patch.object(verifier, "package_document", return_value=package):
+                with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
+                    result = verifier.verify_frontend("full")
+
+        self.assertEqual(result, 0)
+        self.assertEqual(
+            run_stage.call_args_list,
+            [
+                mock.call(name, ["pnpm", "run", name])
+                for name in ("format:check", "lint", "typecheck", "test", "build")
+            ],
+        )
 
     def test_run_stage_returns_nonzero_for_child_failure(self):
         verifier = load_verify_module()
@@ -123,13 +145,13 @@ class VerifyCliTests(unittest.TestCase):
         )
         self.assertEqual(verifier.verify_review_tooling(ROOT), [])
 
-    def test_default_runs_full_frontend_verification(self):
+    def test_self_testing_default_runs_full_without_nested_core_e2e(self):
         result = self.run_verify()
         combined = result.stdout + result.stderr
         self.assertEqual(result.returncode, 0, combined)
         self.assertIn("PASS setup", result.stdout)
         self.assertIn("PASS build", result.stdout)
-        self.assertIn("PASS test:e2e:core", result.stdout)
+        self.assertNotIn("PASS test:e2e:core", result.stdout)
         self.assertNotIn("SKIP frontend not scaffolded", result.stdout)
 
     def test_unknown_mode_fails(self):
