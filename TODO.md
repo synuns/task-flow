@@ -1108,8 +1108,11 @@
   unrelated diff를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
 - Automatic verification: `./scripts/verify quick`
 - Browser verification: finding이 browser behavior에 영향을 주면 해당 auth case 재실행
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-01 Codex `/root` umbrella loop owner; branch
+  `feat/auth-entry-loop`; plan
+  `docs/superpowers/plans/2026-09-01-auth-entry-remaining-loop.md`; target
+  `NAV-02`, `AUTH-01`~`AUTH-07` / `auth-entry`; fresh exact-SHA review 시작
 
 ### [ ] JOURNEY-AUTH-01 auth-entry 사람 checkpoint
 
