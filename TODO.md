@@ -554,7 +554,8 @@
   registry를 먼저 조사하며 새 runtime dependency는 추가하지 않는다.
 - Automatic verification: `pnpm vitest run src/shared/ui/ui-foundation.test.tsx
   src/test/theme-contract.test.ts`, `./scripts/verify quick`
-- Browser verification: `/sign-in`, 390x844/1280x720, keyboard focus와 disabled/error
+- Browser verification: `/sign-in`, 390x844/1280x720, keyboard focus와 disabled/error,
+  예상 밖 console/page/network error 없음
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -569,7 +570,7 @@
 - Automatic verification: `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
   src/app/router.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/`, `/sign-in`, `/task`, `/task/task-1`, `/user`, 두 viewport,
-  keyboard navigation, computed Pretendard, console/page error
+  keyboard navigation, computed Pretendard, console/page error와 예상 밖 network 없음
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -583,7 +584,8 @@
   두 소비처 이상이 생길 때만 shared UI로 올리고 generic framework는 만들지 않는다.
 - Automatic verification: `pnpm vitest run src/shared/ui/async-state.test.tsx`,
   `./scripts/verify quick`
-- Browser verification: 첫 소비 Journey에서 390x844/1280x720 상태별 확인
+- Browser verification: 첫 실제 두 소비 route `/`, `/user`, 390x844/1280x720,
+  loading/error/retry/success와 console/page/network 확인
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -989,7 +991,7 @@
 - Automatic verification: `pnpm vitest run src/widgets/task-list/task-list.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/task`, 390x844/1280x720, 실제 wheel/keyboard scroll,
-  viewport/row size, mounted DOM count와 clipping
+  viewport/row size, mounted DOM count, clipping과 console/page/network 확인
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -1183,7 +1185,8 @@
   src/pages/task-detail/task-detail.test.tsx
   src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, exact submit, pending/failure/recheck/success,
-  DELETE/GET method·count, redirect와 list/detail/dashboard state
+  390x844/1280x720, DELETE/GET method·count, redirect와 list/detail/dashboard state,
+  console/page error
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -1250,7 +1253,7 @@
   src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/sign-in`, `/`, `/task`, `/task/:id`, `/user`에서 sign-in,
-  reload, direct entry, terminal 401와 console/network
+  reload, direct entry, terminal 401, 390x844/1280x720과 console/network
 - Status: NOT_STARTED
 - Evidence: 없음
 
@@ -1268,7 +1271,7 @@
   src/features/delete-task/model/delete-cache.test.ts
   src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: detail delete → list → deleted detail → dashboard, request
-  method/count, visible data와 console/network
+  method/count, visible data, 390x844/1280x720과 console/network
 - Status: NOT_STARTED
 - Evidence: 없음
 

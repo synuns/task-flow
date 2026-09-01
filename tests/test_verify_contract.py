@@ -244,6 +244,27 @@ class VerifyContractTests(unittest.TestCase):
                 {"QA-CROSS-AUTH-01", "QA-CROSS-DATA-01"},
                 "NOT_STARTED",
             ),
+            "QA-01": (
+                {
+                    "JOURNEY-AUTH-01",
+                    "JOURNEY-WORK-01",
+                    "JOURNEY-TASK-LIST-01",
+                    "JOURNEY-TASK-DETAIL-01",
+                    "QA-RESPONSIVE-A11Y-01",
+                    "QA-CONTRACT-01",
+                },
+                "BLOCKED",
+            ),
+            "QA-02": (
+                {
+                    "QA-01",
+                    "JOURNEY-AUTH-01",
+                    "JOURNEY-WORK-01",
+                    "JOURNEY-TASK-LIST-01",
+                    "JOURNEY-TASK-DETAIL-01",
+                },
+                "BLOCKED",
+            ),
             "QA-HARNESS-01": ({"QA-02"}, "BLOCKED"),
             "QA-03": ({"QA-02"}, "BLOCKED"),
             "QA-04": (
@@ -259,7 +280,17 @@ class VerifyContractTests(unittest.TestCase):
             ),
         }
 
-        for task_id, (dependencies, status) in expected.items():
+        human_owned = {
+            "JOURNEY-AUTH-01",
+            "JOURNEY-WORK-01",
+            "JOURNEY-TASK-LIST-01",
+            "JOURNEY-TASK-DETAIL-01",
+            "QA-04",
+        }
+        ai_statuses = {"NOT_STARTED", "IN_PROGRESS", "BLOCKED", "AI_VERIFIED"}
+        human_statuses = {"BLOCKED", "HUMAN_APPROVED"}
+
+        for task_id, (dependencies, _initial_status) in expected.items():
             match = re.search(
                 rf"^### \[[ x]\] {re.escape(task_id)}\b(?P<block>.*?)(?=^### \[[ x]\]|\Z)",
                 todo,
@@ -279,7 +310,13 @@ class VerifyContractTests(unittest.TestCase):
                 "Evidence",
             ):
                 self.assertIn(f"- {field}:", block, f"{task_id} missing {field}")
-            self.assertIn(f"- Status: {status}", block, task_id)
+            status_match = re.search(r"^- Status: ([A-Z_]+)\s*$", block, re.MULTILINE)
+            self.assertIsNotNone(status_match, task_id)
+            self.assertIn(
+                status_match.group(1) if status_match else None,
+                human_statuses if task_id in human_owned else ai_statuses,
+                task_id,
+            )
             dependency_match = re.search(
                 r"^- Depends on:(.*?)(?=\n- [A-Z]|\Z)",
                 block,
