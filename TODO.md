@@ -1155,8 +1155,14 @@
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `AUTH-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
 - Status: BLOCKED
-- Evidence: 기존 automatic, browser, architecture baseline은
-  `docs/quality/evidence/auth-entry.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
+- Evidence: automatic/browser evidence는 `docs/quality/evidence/auth-entry.md`에 보존;
+  focused auth 4 files/29 tests, quick 38 files/149 tests, mapped auth Playwright
+  2/2, mobile/desktop named browser session PASS. Independent review target
+  `a284d90dbb6e51868557eeb3d8824b0e8e64f30b`은 correction 뒤 Critical/Important/
+  Minor와 unresolved HIGH/MEDIUM 없이 PASS. Final QA target
+  `91f5f6991d88ed7164335771266fe86a14e8ffbe`에서 `./scripts/verify full` build,
+  core E2E 5/5, verifier regression 19 PASS. 사람의 명시적 최종 승인 기록만 대기하며
+  현재 `HUMAN_APPROVED`가 아님
 
 ## 4. work-overview Journey
 
