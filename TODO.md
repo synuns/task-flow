@@ -1303,7 +1303,7 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 - Status: AI_VERIFIED
 - Evidence: session `/root/work_task3_nav`; start SHA `73b5050f8aa317574e63fe2ddcc4b6dd9f4de972`; focused shell/router/theme 3 files/12 tests, quick 38 files/149 tests, mapped Chromium 1 test PASS. Authenticated `/` → `/user` → `/task` → `/` desktop snapshots verified each `aria-current`, Pretendard, and 224px header; fresh mobile document verified 48px distinct-icon actions, fixed bottom header, 390px no-overflow, and Tab `대시보드` → `할 일` → `회원정보`. Final console/page-error buffers were empty, network monitor emitted `No requests captured` under MSW, screenshot and close succeeded. Full evidence: `docs/quality/evidence/work-overview.md#work-nav-responsive-01`.
 
-### [ ] WORK-JOURNEY-VERIFY-01 work-overview 통합 검증
+### [x] WORK-JOURNEY-VERIFY-01 work-overview 통합 검증
 
 - Requirements: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`
 - Risk: MEDIUM — Journey evidence gate
@@ -1318,8 +1318,8 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
   `pnpm exec playwright test e2e/work-overview.spec.ts`
 - Browser verification: named `agent-browser` session, dashboard/task/profile 이동,
   두 viewport, fixture 비교와 console/network
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `/root/work_task4_verify`; verified source target `9eedef4d25be84f7b39e30bb9cbc9ac38d32b738`; focused 10 files/41 tests, quick Python 86 + verifier 19 + Vitest 38 files/149 tests, mapped Chromium 1 test PASS. `WORK-P1-1`~`WORK-P1-4` and `WORK-E1` trace AppShell/router, dashboard/profile API, theme, terminal-401/provider/cache and route-boundary contracts. Authenticated desktop/mobile `/` → `/user` → `/task` → `/` snapshots saw profile (not sign-in), dashboard `3/2/1`, profile `김담당`/`오늘도 차근차근`, Pretendard and 390px no-overflow; Playwright proves bearer/zero sign-in. MSW browser monitor returned `No requests captured`; final console had MSW 200 only, page errors empty, both screenshots and session close succeeded. Full evidence: `docs/quality/evidence/work-overview.md#work-journey-verify-01`.
 
 ### [ ] WORK-JOURNEY-REVIEW-01 work-overview 독립 review
 
