@@ -633,7 +633,7 @@ git diff 334dec0..HEAD --check
 
 Expected: focused 7 files/30 tests, quick and mapped Chromium PASS; diff contains only Journey plan/work/evidence and proven corrections.
 
-- [ ] **Step 4: Resolve findings before closing the review**
+- [x] **Step 4: Resolve findings before closing the review**
 
 Any HIGH/MEDIUM finding reopens the owning task. For product behavior, first add a minimal test that fails for the finding, record RED, apply the smallest root-cause fix, and rerun focused → quick → mapped E2E when applicable. Review the new target again. LOW findings may remain only with explicit impact and follow-up condition.
 
@@ -651,7 +651,7 @@ Rerun: exact commands and results
 Verdict: PASS | PASS_WITH_LOW | BLOCKED
 ```
 
-- [ ] **Step 6: Close the review only on PASS and commit**
+- [x] **Step 6: Close the review only on PASS and commit**
 
 Set `TASK-LIST-JOURNEY-REVIEW-01` `[x]`, `AI_VERIFIED` only with PASS/PASS_WITH_LOW and no unresolved HIGH/MEDIUM finding.
 

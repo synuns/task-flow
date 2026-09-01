@@ -1604,7 +1604,7 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   Console/page error 없음; screenshots와 전체 case trace는
   `docs/quality/evidence/task-discovery.md` current-target section에 기록.
 
-### [ ] TASK-LIST-JOURNEY-REVIEW-01 task-discovery 독립 review
+### [x] TASK-LIST-JOURNEY-REVIEW-01 task-discovery 독립 review
 
 - Requirements: `TASK-LIST-01`~`TASK-LIST-05`
 - Risk: MEDIUM — Journey review gate
@@ -1614,7 +1614,7 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   weak test와 console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
 - Automatic verification: `./scripts/verify quick`
 - Browser verification: finding이 browser behavior에 영향을 주면 해당 discovery case 재실행
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: Review target: plan
   `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`, requirements
   `TASK-LIST-01`~`TASK-LIST-05`, Journey `task-discovery`, initial exact target
@@ -1637,7 +1637,14 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   Human decision: 2026-09-02 사용자가 권장안, 즉 invalid page 400 JSON 계약을 제거하고
   HTTP status/body를 발행하지 않는 transport failure로 fail-closed 처리하는 변경을
   명시적으로 `승인`; handler test 5 cases RED(기존 400 resolve)→12/12 GREEN 후 fresh
-  re-review 대기.
+  re-review. Final review target `b7790542226fcfb5ff5332692386343797f9b7fb`;
+  Reviewer `/root/task_discovery_review`; Checks: complete target과 승인된 HIGH correction,
+  prior findings, source/test/E2E, plan/TODO/evidence, scope/secrets/generated noise 및
+  requested gates; Findings: 없음, prior HIGH/MEDIUM/LOW 전부 해결; Corrections: final
+  target의 `HttpResponse.error()` fail-closed와 앞선 네 correction, reviewer 변경 없음;
+  Rerun: focused 7 files/31, quick hook 86·contract 19·Vitest 38/150, mapped Chromium
+  1/1, `334dec0..b779054` diff check와 clean status PASS; Verdict: PASS. 사람 Journey
+  checkpoint는 별도.
 
 ### [ ] JOURNEY-TASK-LIST-01 task-discovery 사람 checkpoint
 
