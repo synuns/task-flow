@@ -24,9 +24,59 @@ The automatic 12-result delete/presence matrix was:
 | recheck | invalid response | unknown | `GET` |
 | recheck | aborted stale response | stale | `GET` |
 
-Pending/exists: fresh approved auth and reset task fixtures opened `/task/task-1`. A page-level fetch wrapper held one DELETE. At 1280x720 and 390x844, the modal had `aria-busy=true`; ID input, cancel and confirmation were disabled; Escape left the modal open. Mobile modal width was 358px inside a 390px document. Rejecting that held DELETE while restoring pass-through GET produced `DELETE, GET`, stayed on detail, showed `삭제를 다시 시도할 수 있습니다.`, and enabled a new explicit attempt.
+Pending/exists: fresh approved auth and reset task fixtures opened `/task/task-1`. A page-level fetch wrapper held one DELETE. At 1280x720 and 390x844, the modal had `aria-busy=true`; ID input, cancel and confirmation were disabled; Escape left the modal open. The fresh correction run measured the desktop alertdialog at `left=384`, `top=201`, `right=896`, `bottom=519`, `width=512`, `height=318`. `agent-browser mouse move 100 100`, `mouse down`, and `mouse up` performed an actual overlay click outside that box; the same dialog remained open with `aria-busy=true` and flow `DELETE`. Escape again left it open and busy. Mobile modal width was 358px inside a 390px document. Rejecting that held DELETE while restoring pass-through GET produced `DELETE, GET`, stayed on detail, showed `삭제를 다시 시도할 수 있습니다.`, and enabled a new explicit attempt.
 
 Unknown/recheck: because MSW preempts `agent-browser network route --abort`, a browser-only fail flag rejected DELETE and the automatic detail GET while recording exact methods. At both viewports the unknown attempt was exactly `DELETE, GET`, with one DELETE and one GET, stayed on detail, and displayed `삭제 결과를 확인할 수 없습니다.`. Disabling failure before `다시 확인` changed the sequence to exactly `DELETE, GET, GET`; DELETE remained one, the recheck returned to exists, and confirmation became enabled. The mobile recovery modal remained 358px wide with `documentWidth=viewport=390`. Screenshot: `/tmp/kbhc-task-delete-outcome-view-01-mobile.png`.
+
+The fresh correction run installed this exact page-level wrapper before opening the dialog. It derives URL and method for string, `URL`, and `Request` inputs, counts only the target detail path, holds the first DELETE, rejects DELETE and automatic GET while the unknown flag is enabled, and passes every other request through the original fetch:
+
+```js
+window.__kbhcOriginalFetch = window.fetch;
+window.__kbhcTaskFlow = [];
+window.__kbhcHoldDelete = true;
+window.__kbhcFailTask = false;
+window.fetch = (input, init = {}) => {
+  const raw = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  const path = new URL(raw, location.origin).pathname;
+  const method = (init.method || (input instanceof Request ? input.method : "GET")).toUpperCase();
+  if (path === "/api/task/task-1") window.__kbhcTaskFlow.push(method);
+  if (path === "/api/task/task-1" && window.__kbhcHoldDelete && method === "DELETE") {
+    return new Promise((_, reject) => {
+      window.__kbhcRejectDelete = () => reject(new TypeError("browser pending fixture"));
+    });
+  }
+  if (
+    path === "/api/task/task-1" &&
+    window.__kbhcFailTask &&
+    (method === "DELETE" || method === "GET")
+  ) {
+    return Promise.reject(new TypeError(`browser unknown fixture ${method}`));
+  }
+  return window.__kbhcOriginalFetch(input, init);
+};
+```
+
+After the pending outside-click and Escape checks, the exact state/action sequence was:
+
+```js
+window.__kbhcHoldDelete = false;
+window.__kbhcRejectDelete();
+// Wait for exists: window.__kbhcTaskFlow === ["DELETE", "GET"]
+
+window.__kbhcTaskFlow = [];
+window.__kbhcFailTask = true;
+// Click button[type=submit], then wait for unknown:
+// window.__kbhcTaskFlow === ["DELETE", "GET"]
+
+window.__kbhcFailTask = false;
+// Click the "다시 확인" button, then wait for exists:
+// window.__kbhcTaskFlow === ["DELETE", "GET", "GET"]
+
+// Click button[type=submit], then wait for /task:
+// window.__kbhcTaskFlow === ["DELETE", "GET", "GET", "DELETE"]
+```
+
+The manual recheck therefore added one GET and zero DELETE; only the following explicit confirmation added the second DELETE and navigated.
 
 Success/cache/store: the next explicit confirmation appended one DELETE, giving `DELETE, GET, GET, DELETE`, and only its 200 `{ success: true }` navigated to `/task`. The list contained task-2/task-3 and no task-1. A new document at `/task/task-1` rendered the contract 404 recovery, and dashboard values were exactly `2/1/1`. Desktop and mobile document widths equaled their 1280px and 390px viewports. Screenshots: `/tmp/kbhc-task-delete-outcome-view-01-desktop.png`, `/tmp/kbhc-task-delete-outcome-view-01-mobile-success.png`.
 

@@ -1802,10 +1802,17 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
   `/tmp/kbhc-task-delete-outcome-view-01-mobile-success.png`; session/server 종료.
   Task self-review target: 위 source SHA와 `.superpowers/sdd/task-4-brief.md`; Checks:
   `DEC-DELETE-01`, pending/404/unknown/exists/stale/success, method counts, cache/store,
-  expected console errors, responsive screenshots, diff scope와 TODO dependency; Findings:
-  unresolved HIGH/MEDIUM/LOW 없음; Corrections: 첫 role-based fill `TOOLING` 실패를 fresh
-  fixture와 stable CSS selector로 재실행, product 변경 없음; Rerun: focused/quick와
-  browser 전체 흐름 PASS; Verdict: PASS. 상세 기록
+  expected console errors, responsive screenshots, diff scope와 TODO dependency. 후속 review가
+  exact wrapper 재현 절차와 pending outside-click 근거 누락을 발견함. Corrections: 첫
+  role-based fill `TOOLING` 실패는 fresh fixture와 stable CSS selector로 재실행했고,
+  correction session `task-delete-outcome-view-01-review`에서 wrapper 원문과 flag/counter
+  전이를 보존함. Desktop alertdialog box `384,201–896,519` 밖 `(100,100)`에 실제
+  mouse move/down/up click 후에도 dialog open·`aria-busy=true`, Escape lock과 disabled
+  controls를 재확인함. Counter reset 뒤 unknown `DELETE, GET`, failure disable 뒤 manual
+  recheck `DELETE, GET, GET`, 새 explicit success `DELETE, GET, GET, DELETE`와 `/task`
+  이동·task-1 부재를 확인함. Expected bootstrap refresh 401 외 unexpected console/page
+  error 없음; product/test 변경 없음. Rerun: focused 5 files/29 tests PASS, browser correction
+  전체 흐름 PASS; Verdict: PASS. 상세 기록
   `docs/quality/evidence/task-resolution.md#task-delete-outcome-view-01`
 
 ### [ ] TASK-DETAIL-JOURNEY-VERIFY-01 task-resolution 통합 검증
