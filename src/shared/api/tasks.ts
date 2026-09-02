@@ -1,4 +1,5 @@
 import type { components } from "@/generated/openapi";
+import { z } from "zod";
 import type { ApiClient } from "./api-client-context";
 import { hasExactKeys } from "./request";
 
@@ -37,7 +38,7 @@ function isTaskDetail(value: unknown): value is TaskDetail {
     hasExactKeys(value, ["title", "memo", "registerDatetime"]) &&
     typeof value.title === "string" &&
     typeof value.memo === "string" &&
-    typeof value.registerDatetime === "string"
+    z.iso.datetime({ offset: true }).safeParse(value.registerDatetime).success
   );
 }
 

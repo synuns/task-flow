@@ -35,6 +35,17 @@ describe("tasks API", () => {
     });
   });
 
+  it("rejects an otherwise valid task detail with an invalid date-time", async () => {
+    const capture: { url?: string; method?: string } = {};
+
+    await expect(
+      getTaskDetail(
+        clientFor({ title: "할 일", memo: "메모", registerDatetime: "not-a-date" }, capture),
+        "task-1",
+      ),
+    ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
   it("requests the exact page and accepts the OpenAPI task-list shape", async () => {
     const capture: { url?: string; method?: string } = {};
     const body = {
