@@ -2254,6 +2254,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Full seven-key family synchronous handoff와 parameterized test, native browser
   verification correction은 `IN_PROGRESS`; 독립 corrected-target re-review 전까지
   QA-02는 `[ ]`/`BLOCKED`이며 `HUMAN_APPROVED`는 변경 없음.
+  Finding 2 implementation/test target
+  `cef5e7e91e2f324063ad0abab66dc103f1ead0d1`: TDD RED task-list 1 file/12 중
+  new Home·PageUp·ArrowUp·ArrowDown·Space 5 fail, 기존 두 key와 나머지 7 pass 뒤
+  기존 한 branch의 key 조건만 full seven-key family로 확장했다. GREEN task-list
+  12/12, focused a11y 7 files/37, quick hook 86·verifier 19·Vitest 38/167, mapped
+  task-discovery Chromium 1/1, build PASS. Fresh production preview의 40-record
+  1280x720/390x844 eight-physical-key matrix에서 모든 focused row가 native scroll로
+  unmount된 뒤 active element는 visible 2px-ring named region을 유지했고, 한 key의
+  delta는 Arrow ±40, Page/Space desktop ±460·mobile ±520와 Home/End boundary로
+  double scroll 없이 일치했다. Mounted 6~7/40, width exact, console/page errors 0,
+  screenshot dimensions와 cleanup/closed port를 확인했다. Finding 2는 `RESOLVED`,
+  QA-02는 corrected-target 독립 re-review 준비 상태이나 완료 전까지 `[ ]`/`BLOCKED`다.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 

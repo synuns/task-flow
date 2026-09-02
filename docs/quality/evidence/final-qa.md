@@ -1155,3 +1155,70 @@ No explicit scrolling, `preventDefault`, state, effect, helper, fake role, depen
 or unrelated change is authorized. Finding 2 correction is `IN_PROGRESS`; QA-02 remains
 `[ ]` / `BLOCKED` pending correction evidence and independent corrected-target review.
 This decision does not record `HUMAN_APPROVED`.
+
+### Finding 2 full-key focus correction — 2026-09-02
+
+Implementation/test target: `cef5e7e91e2f324063ad0abab66dc103f1ead0d1`.
+
+TDD RED: before the production edit, the existing parameterized handoff test was
+expanded to `ArrowDown`, `ArrowUp`, `End`, `Home`, `PageDown`, `PageUp`, and `" "`.
+`pnpm vitest run src/widgets/task-list/task-list.test.tsx` ran 12 tests: the new
+ArrowDown, ArrowUp, Home, PageUp, and Space cases failed at the intended region-focus
+assertion, while the existing PageDown/End cases and five unrelated cases passed
+(5 failed/7 passed). The Space case covers the shared `event.key === " "` branch used
+by both Space and Shift+Space.
+
+Minimal correction: the existing descendant-target `onKeyDown` branch now uses only
+native `Array.includes(event.key)` for the full seven-key family before focusing the
+existing stable region. It preserves `event.target !== event.currentTarget` and adds no
+`preventDefault`, explicit scroll, state, effect, helper, role, or dependency.
+
+Fresh GREEN/automatic verification on the implementation/test target:
+
+- task-list — PASS, 1 file/12 tests.
+- focused accessibility suite — PASS, 7 files/37 tests.
+- `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format, lint,
+  generated API check, typecheck, Vitest 38 files/167 tests.
+- mapped `e2e/task-discovery.spec.ts --project=chromium` — PASS, 1/1.
+- `pnpm build` — PASS; only the existing non-failing chunk-size warning remained.
+
+The first quick attempt stopped at `format:check` after all prior stages passed because
+the two edited files had not yet received repository formatting. This was classified
+`TEST`; targeted Biome formatting changed only those owned files, its diff was reviewed,
+and the focused and complete quick commands above were rerun fresh.
+
+Fresh browser: named `qa02-focus-fix` used the exact product build via production
+preview `http://127.0.0.1:4184`, approved auth, and 40 schema-conforming tasks seeded
+before app bootstrap. After all 20 two-record pages loaded, each physical key started
+with focus on a meaningful mounted Card using setup-only `focus({ preventScroll: true })`.
+The key press itself was native `agent-browser press` with no page scroll injection.
+
+| Physical key | Desktop 1280x720 | Mobile 390x844 |
+| --- | --- | --- |
+| Home | `1920→0`, task-26 unmounted | `1920→0`, task-26 unmounted |
+| End | `0→3340`, task-01 unmounted | `0→3280`, task-01 unmounted |
+| PageUp | `1920→1460`, task-26 unmounted | `1920→1400`, task-26 unmounted |
+| PageDown | `1920→2380`, task-21 unmounted | `1920→2440`, task-21 unmounted |
+| ArrowUp | `1920→1880`, task-26 unmounted | `1960→1920`, task-27 unmounted |
+| ArrowDown | `2000→2040`, task-21 unmounted | `2000→2040`, task-21 unmounted |
+| Space | `1920→2380`, task-21 unmounted | `1920→2440`, task-21 unmounted |
+| Shift+Space | `1920→1460`, task-26 unmounted | `1920→1400`, task-26 unmounted |
+
+All 16 results kept `document.activeElement` on the non-BODY named `할 일 목록` region
+with the visible 2px focus ring. Arrow deltas were exactly 40px; Page/Space deltas were
+exactly `clientHeight - 40` (desktop 460px, mobile 520px); Home/End reached the exact
+boundary. Those one-event native deltas and the source inspection show no double scroll.
+Mounted DOM remained bounded at 6~7/40. Document/viewport widths were `1280/1280` and
+`390/390`; horizontal overflow was false.
+
+`agent-browser errors --json` returned `[]`, console error messages were empty, and all
+21 observed API groups were 200. Screenshots
+`/tmp/kbhc-qa02-focus-fix-desktop.png` (1280x720) and
+`/tmp/kbhc-qa02-focus-fix-mobile.png` (390x844) visibly show the region ring; `sips`
+confirmed both dimensions. The browser session and preview server were closed and port
+4184 had no listener.
+
+Finding 2 verdict: **RESOLVED, READY FOR RE-REVIEW** — the full root-cause key family
+preserves native movement and stable focus when every tested Card unmounts. QA-02 remains
+`[ ]` / `BLOCKED` until the original independent reviewer reviews this corrected target.
+This correction does not claim `HUMAN_APPROVED` or final acceptance.
