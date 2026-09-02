@@ -152,7 +152,7 @@ agent-browser --session task-detail-view-01 network requests --filter api/task/t
 agent-browser --session task-detail-view-01 screenshot /tmp/kbhc-task-detail-view-01-desktop.png
 ```
 
-Expected: title and memo equal the fixture, `datetime` is `2026-08-30T09:00:00.000Z`, readable text is visible, one bearer GET is observed and document width does not exceed 1280px.
+Expected: title and memo equal the fixture, `datetime` is `2026-08-30T09:00:00.000Z`, readable text is visible, an authenticated bearer GET is observed and document width does not exceed 1280px. `TASK-DETAIL-01` does not set an exact browser request-count invariant; Vite development React StrictMode may observe two bearer GET calls, which is recorded as a development observation rather than a pass/fail condition.
 
 - [ ] **Step 8: Verify mobile wrapping and keyboard back action**
 
