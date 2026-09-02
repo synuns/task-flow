@@ -2006,8 +2006,11 @@ src/features/delete-task/model/delete-cache.test.ts
 src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: detail delete → list → deleted detail → dashboard, request
   method/count, visible data, 390x844/1280x720과 console/network
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-02 `/root/qa_cross_data_implementer` task block owner; four
+  `HUMAN_APPROVED` Journey dependencies confirmed; reviewed start target
+  `6f6aacd9f957fade390988caca1e7e8834c9dbfa`. Focused automatic, quick, mapped
+  task-resolution Chromium and fresh cross-route browser evidence pending.
 
 ### [ ] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
 
