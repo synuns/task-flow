@@ -96,7 +96,7 @@ export function TaskList() {
         onKeyDown={(event) => {
           if (
             event.target !== event.currentTarget &&
-            (event.key === "PageDown" || event.key === "End")
+            ["ArrowDown", "ArrowUp", "End", "Home", "PageDown", "PageUp", " "].includes(event.key)
           ) {
             event.currentTarget.focus();
           }
