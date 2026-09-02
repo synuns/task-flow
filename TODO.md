@@ -2041,8 +2041,9 @@ src/pages/task-detail/task-detail.test.tsx
 src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
 - Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
   modal, virtual scroll, screenshot, console/network
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-02 `/root/qa_responsive_a11y_implementer` task block owner;
+  reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`
 
 ### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조
 
