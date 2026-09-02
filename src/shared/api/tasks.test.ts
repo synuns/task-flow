@@ -98,7 +98,15 @@ describe("tasks API", () => {
 
     await expect(
       getTaskDetail(
-        clientFor({ title: "할 일", memo: "메모", registerDatetime: "now", id: "task-1" }, capture),
+        clientFor(
+          {
+            title: "할 일",
+            memo: "메모",
+            registerDatetime: "2026-08-30T09:00:00.000Z",
+            id: "task-1",
+          },
+          capture,
+        ),
         "task-1",
       ),
     ).rejects.toMatchObject({ kind: "invalid-response" });
