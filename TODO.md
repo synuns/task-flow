@@ -2217,7 +2217,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `1`(권장: Zod canonical boundary rejection + full 7-key family handoff)과
   `2`(narrow: UI fallback + Home-only; OAS-invalid cache와 sibling focus defect를
   명시적으로 남기는 exception 필요) 중 선택이다. QA-02는 `BLOCKED`, product/test와
-  `HUMAN_APPROVED`는 변경 없음.
+  `HUMAN_APPROVED`는 변경 없음. 2026-09-02 사용자가 exact decision target
+  `f9e65daceca3d34f39b61b840432c4f102f8ae62`에서 "zod로 검증으로 진행"을
+  명시 승인했다. Finding 1은 direct Zod 4.5.2의
+  `z.iso.datetime({ offset: true })` API-boundary correction `IN_PROGRESS`; rare valid
+  RFC3339 form 축소 caveat는 유지한다. Finding 2의 full 7-key focus handoff는
+  승인되지 않아 unresolved MEDIUM으로 유지하며 QA-02는 `[ ]`/`BLOCKED`다.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 

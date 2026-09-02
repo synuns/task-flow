@@ -1025,3 +1025,21 @@ on the supplemental preview port. `git status --porcelain` was clean at the targ
 Verdict: **BLOCKED** — QA-02 remains blocked pending the decision, correction, and
 corrected-target independent rerun. Product, tests, approval state, and
 `HUMAN_APPROVED` remain unchanged.
+
+### Finding 1 Zod decision — 2026-09-02
+
+Decision target: `f9e65daceca3d34f39b61b840432c4f102f8ae62`.
+
+Human HIGH decision: the user explicitly approved "zod로 검증으로 진행" for finding 1.
+The authorized scope is the existing direct Zod 4.5.2
+`z.iso.datetime({ offset: true })` check at the task-detail API boundary and one
+invalid-date response regression. No UI fallback, dependency, helper, or framework is
+authorized. Canonical `Z` and numeric-offset values remain valid. The narrowing caveat
+remains explicit: rare RFC3339-valid leap seconds, `-00:00`, and lowercase `t/z` are
+rejected by this chosen canonical validator.
+
+Finding 1 correction status: `IN_PROGRESS`.
+
+Finding 2 status: unchanged unresolved MEDIUM. The user did not approve a focus/key
+correction in this decision, so the full seven-key handoff remains untouched and QA-02
+remains `[ ]` / `BLOCKED`.
