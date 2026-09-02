@@ -1,5 +1,16 @@
 # Task Resolution Evidence
 
+## TASK-DETAIL-VIEW-01
+
+Requirement/Journey: `TASK-DETAIL-01`; `RES-P1-1`; `task-resolution`
+Target SHA: `7812b8bfc161ef1d5e9fd45e56edd14dbd6f8951`
+Session/plan: `/root/task_1_implementer`; `.superpowers/sdd/task-1-brief.md`
+Automatic: `pnpm vitest run src/pages/task-detail/task-detail.test.tsx` — PASS (1 file, 5 tests); `./scripts/verify quick` — PASS (setup 105 tests, format, lint, generated API check, typecheck, Vitest 38 files/150 tests).
+Desktop: `/task/task-1`, Chromium 1280x720, fresh approved MSW auth fixture. Expected title, memo, readable Korean date, original datetime and no horizontal overflow; actual heading `첫 번째 할 일`, memo `삭제 검증 대상`, date `2026년 8월 30일 오후 6:00`, `datetime=2026-08-30T09:00:00.000Z`, `scrollWidth=1280`. Screenshot: `/tmp/kbhc-task-detail-view-01-desktop.png`.
+Mobile: `/task/task-1`, Chromium 390x844. Expected no clipping and keyboard-focusable list return; actual `scrollWidth=390`, article width 358, `할 일 목록` Tab focus has `href=/task` and visible 2px focus ring. Screenshot: `/tmp/kbhc-task-detail-view-01-mobile.png`.
+Network/console: fixture refresh established the session without `/api/sign-in`; bearer `GET /api/task/task-1` observed. Post-fixture console and page-error buffers were empty. The request monitor printed duplicate byte-identical entries at one timestamp, classified `TOOLING`; no product correction required, and the rerun retained the authenticated GET and clean buffers.
+Verdict: PASS — existing `TaskDetailPage` and focused test already satisfy the acceptance; no production or test change was needed.
+
 Requirement/Journey: `TASK-DETAIL-01`~`TASK-DETAIL-05`; `task-resolution`
 Commit: `bb506f2`~`e7dbe7f` (`fix/dec-prefix` worktree)
 Agent-browser session: `task-resolution`

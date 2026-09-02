@@ -1719,7 +1719,7 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   list/detail/dashboard 일관성 Chromium 검증;
   `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DETAIL-VIEW-01 task 상세 화면
+### [x] TASK-DETAIL-VIEW-01 task 상세 화면
 
 - Requirements: `TASK-DETAIL-01`
 - Risk: LOW — 검증된 detail data의 presentation
@@ -1731,8 +1731,8 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
 src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, 390x844/1280x720, field/dateTime, hierarchy,
   bearer request와 console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `/root/task_1_implementer`; target `7812b8bfc161ef1d5e9fd45e56edd14dbd6f8951`; focused detail 5/5, `./scripts/verify quick` PASS (38 files/150 tests), Chromium 1280x720·390x844 PASS; title/memo/readable date plus original datetime, bearer GET, overflow 없음과 keyboard focus ring 확인; `docs/quality/evidence/task-resolution.md`
 
 ### [ ] TASK-DETAIL-RECOVERY-VIEW-01 상세 오류·404 복구 화면
 
