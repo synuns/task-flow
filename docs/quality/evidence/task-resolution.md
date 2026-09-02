@@ -1,5 +1,43 @@
 # Task Resolution Evidence
 
+## TASK-DELETE-OUTCOME-VIEW-01
+
+Requirement/Journey: `TASK-DETAIL-05`; `RES-P1-4`, `RES-E3`, `RES-E4`; `task-resolution`
+Source target SHA: `2c1234e09e518abdf06b7fbad53e87427aa41a45`
+Session/plan: `/root/task_4_implementer`; `.superpowers/sdd/task-4-brief.md`
+Automatic: `pnpm vitest run src/features/delete-task/ui/delete-task-dialog.test.tsx src/features/delete-task/model/delete-task.test.ts src/features/delete-task/model/delete-cache.test.ts src/pages/task-detail/task-detail.test.tsx src/shared/api/authenticated-request.test.ts` — PASS (5 files, 29 tests); `./scripts/verify quick` — PASS (setup 105 tests, format, lint, generated API check, typecheck, Vitest 38 files/150 tests). Existing production and tests passed, so no RED-backed product/test change was made.
+
+The automatic 12-result delete/presence matrix was:
+
+| Boundary | Result | Resolution | Methods |
+| --- | --- | --- | --- |
+| delete | 200 `{ success: true }` | success | `DELETE` |
+| delete | direct 404 | absent | `DELETE` |
+| delete | network, then detail 200 | exists | `DELETE, GET` |
+| delete | invalid response, then detail 404 | absent | `DELETE, GET` |
+| delete | network, then network | unknown | `DELETE, GET` |
+| delete | invalid response, then invalid response | unknown | `DELETE, GET` |
+| delete | aborted stale response | stale | `DELETE` |
+| recheck | detail 200 | exists | `GET` |
+| recheck | detail 404 | absent | `GET` |
+| recheck | network | unknown | `GET` |
+| recheck | invalid response | unknown | `GET` |
+| recheck | aborted stale response | stale | `GET` |
+
+Pending/exists: fresh approved auth and reset task fixtures opened `/task/task-1`. A page-level fetch wrapper held one DELETE. At 1280x720 and 390x844, the modal had `aria-busy=true`; ID input, cancel and confirmation were disabled; Escape left the modal open. Mobile modal width was 358px inside a 390px document. Rejecting that held DELETE while restoring pass-through GET produced `DELETE, GET`, stayed on detail, showed `삭제를 다시 시도할 수 있습니다.`, and enabled a new explicit attempt.
+
+Unknown/recheck: because MSW preempts `agent-browser network route --abort`, a browser-only fail flag rejected DELETE and the automatic detail GET while recording exact methods. At both viewports the unknown attempt was exactly `DELETE, GET`, with one DELETE and one GET, stayed on detail, and displayed `삭제 결과를 확인할 수 없습니다.`. Disabling failure before `다시 확인` changed the sequence to exactly `DELETE, GET, GET`; DELETE remained one, the recheck returned to exists, and confirmation became enabled. The mobile recovery modal remained 358px wide with `documentWidth=viewport=390`. Screenshot: `/tmp/kbhc-task-delete-outcome-view-01-mobile.png`.
+
+Success/cache/store: the next explicit confirmation appended one DELETE, giving `DELETE, GET, GET, DELETE`, and only its 200 `{ success: true }` navigated to `/task`. The list contained task-2/task-3 and no task-1. A new document at `/task/task-1` rendered the contract 404 recovery, and dashboard values were exactly `2/1/1`. Desktop and mobile document widths equaled their 1280px and 390px viewports. Screenshots: `/tmp/kbhc-task-delete-outcome-view-01-desktop.png`, `/tmp/kbhc-task-delete-outcome-view-01-mobile-success.png`.
+
+Cache and transport: focused page/cache tests proved success and direct-404 eviction of task list/detail/dashboard snapshots, success-only navigation, exists reconciliation retaining snapshots, and unrelated cache preservation. Transport observed at most two DELETE transmissions only when the second was the bounded auth replay.
+
+Console/network: `agent-browser network requests --filter api` captured no service-worker requests and was not used as count evidence. The page wrapper supplied exact rejected-flow method counts; MSW console supplied the successful DELETE/list/detail/dashboard responses. Expected console resource errors were the initial refresh 401 before fixture installation and the deleted-detail GET 404; `agent-browser errors` was empty and no other console/page error remained.
+
+Failure/correction: `TOOLING` — the first role-based fill left the confirmation input empty, so its exact-ID guard correctly blocked submission and the counter remained empty. The named session/store was reset and the prescribed stable CSS selectors were used for the complete rerun; no product behavior or repository fixture changed.
+
+Verdict: PASS — the existing dialog/model/cache/page/auth flow preserves `DEC-DELETE-01`: pending is locked, 404 is non-success, unknown reconciles with GET only, no DELETE is automatically retried, and only explicit 200 success redirects and mutates visible store state.
+
 ## TASK-DELETE-DIALOG-VIEW-01
 
 Requirement/Journey: `TASK-DETAIL-03`, `TASK-DETAIL-04`; `RES-P1-2`, `RES-P1-3`, `RES-E2`; `task-resolution`

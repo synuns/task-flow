@@ -1766,7 +1766,7 @@ src/features/delete-task/model/attempt-guard.test.ts`, `./scripts/verify quick`
 - Status: AI_VERIFIED
 - Evidence: session `/root/task_3_implementer`; target `d17f7747fc6459ad9838750075518fe395428554`; focused 2 files/5 tests, `./scripts/verify quick` PASS (38 files/150 tests); Chromium 1280x720·390x844 wrong/whitespace/case/exact, DELETE 0, cancel/Escape/trap/restore, overflow 없음; `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DELETE-OUTCOME-VIEW-01 삭제 진행·실패·복구 화면
+### [x] TASK-DELETE-OUTCOME-VIEW-01 삭제 진행·실패·복구 화면
 
 - Requirements: `TASK-DETAIL-05`
 - Risk: HIGH 실행 — 승인된 destructive-data policy 준수
@@ -1785,8 +1785,28 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, exact submit, pending/failure/recheck/success,
   390x844/1280x720, DELETE/GET method·count, redirect와 list/detail/dashboard state,
   console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root/task_4_implementer` task block owner; start SHA
+  `2c1234e09e518abdf06b7fbad53e87427aa41a45`; focused 5 files/29 tests와
+  `./scripts/verify quick` hook 86·contract 19·Vitest 38 files/150 tests PASS. 기존
+  production/model/test가 12-result matrix, direct 404 non-success, GET-only reconciliation,
+  cache eviction/retention과 auth replay 최대 2회를 충족해 RED-backed code/test 변경 없음.
+  Agent-browser `task-delete-outcome-view-01`의 fresh desktop 1280x720와 mobile
+  390x844에서 pending input/submit/cancel/Escape lock, held DELETE failure 뒤
+  `DELETE, GET` exists, unknown `DELETE, GET`, manual recheck `DELETE, GET, GET`, 새
+  success attempt `DELETE, GET, GET, DELETE`를 exact counter로 확인함. 200 뒤 list의
+  task-1 부재, 새 document detail 404와 dashboard `2/1/1`, 두 viewport no-overflow,
+  expected bootstrap 401/deleted-detail 404 외 page error 없음; screenshots
+  `/tmp/kbhc-task-delete-outcome-view-01-desktop.png`,
+  `/tmp/kbhc-task-delete-outcome-view-01-mobile.png`,
+  `/tmp/kbhc-task-delete-outcome-view-01-mobile-success.png`; session/server 종료.
+  Task self-review target: 위 source SHA와 `.superpowers/sdd/task-4-brief.md`; Checks:
+  `DEC-DELETE-01`, pending/404/unknown/exists/stale/success, method counts, cache/store,
+  expected console errors, responsive screenshots, diff scope와 TODO dependency; Findings:
+  unresolved HIGH/MEDIUM/LOW 없음; Corrections: 첫 role-based fill `TOOLING` 실패를 fresh
+  fixture와 stable CSS selector로 재실행, product 변경 없음; Rerun: focused/quick와
+  browser 전체 흐름 PASS; Verdict: PASS. 상세 기록
+  `docs/quality/evidence/task-resolution.md#task-delete-outcome-view-01`
 
 ### [ ] TASK-DETAIL-JOURNEY-VERIFY-01 task-resolution 통합 검증
 
