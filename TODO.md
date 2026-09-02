@@ -2144,10 +2144,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: requirement ID/상태/evidence 정적 audit,
   `./scripts/verify setup`
 - Browser verification: evidence 경로 존재와 대상 commit 확인
-- Status: BLOCKED
-- Evidence: requirement 27개 row의 자동/browser evidence 경로 audit 결과는 보존;
-  네 Journey의 tracked 사람 승인 근거가 없어 dependency 미완료. 각 checkpoint의
-  실제 사람 승인 기록이 확인되어 사람이 상태를 갱신하면 재개
+- Status: IN_PROGRESS
+- Evidence: QA-01 claim base `0bd4fc347ef4059c503d01cf200da4a20b254307`에서 네
+  Journey가 tracked 사람 승인 근거와 함께 `HUMAN_APPROVED`,
+  `QA-RESPONSIVE-A11Y-01`과 `QA-CONTRACT-01`이 `AI_VERIFIED`임을 확인해 27개
+  requirement row와 evidence 경로 정적 audit을 시작함
 
 ### [ ] QA-02 journey 간 full adversarial review
 
