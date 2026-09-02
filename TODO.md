@@ -1955,7 +1955,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 
 ## 7. 통합·제출 QA
 
-### [ ] QA-CROSS-AUTH-01 Journey 간 인증 전환
+### [x] QA-CROSS-AUTH-01 Journey 간 인증 전환
 
 - Requirements: `AUTH-07`, `NAV-02`, `NAV-03`, 모든 보호 API requirement
 - Risk: MEDIUM — route, auth와 cache의 교차 Journey behavior
@@ -1970,10 +1970,23 @@ src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/sign-in`, `/`, `/task`, `/task/:id`, `/user`에서 sign-in,
   reload, direct entry, terminal 401, 390x844/1280x720과 console/network
-- Status: IN_PROGRESS
-- Evidence: 2026-09-02 `/root/qa_cross_auth_implementer` task block owner;
-  requirements `AUTH-07`, `NAV-02`, `NAV-03` and protected API rows; approved start
-  target `48300e534516d702a351980e5661b3851ce02a38`
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 `/root/qa_cross_auth_implementer` task block owner; approved
+  product/start target `48300e534516d702a351980e5661b3851ce02a38`, evidence claim
+  `0ccdc3c8b5d5acfc281577ffd37c19104c555d6f`. Focused auth/provider/route/request/
+  router + authenticated API bridge 5 files/29 tests, quick hook 86·contract 19·Vitest
+  38 files/150 tests, mapped auth Chromium 2/2 PASS. Fresh named browser
+  `qa-cross-auth-01` verified anonymous direct entry for `/`, `/task`, `/task/task-1`,
+  `/user`, protected return/reload, and authenticated dashboard/list/detail/profile at
+  1280x720 and 390x844 without prior-route content. Terminal desktop/mobile audit was
+  `POST /api/sign-in 200` → bearer `GET /api/task/qa-cross-auth-terminal-* 401` →
+  contract-intercepted `POST /api/refresh 401`, then anonymous `/sign-in`, sign-in-only
+  GNB and no protected/prior-user DOM; focused bridge separately proved protected cache
+  eviction and unrelated-cache retention. `agent-browser cookies clear` could not clear
+  the MSW worker cookie store, classified `TOOLING`; refresh-200 diagnostics were excluded
+  from PASS and the smallest deterministic page-boundary 401 was used for visible recovery.
+  Reproducible commands, redacted wrapper, console/network classification, cleanup and
+  screenshot paths: `docs/quality/evidence/final-qa.md#qa-cross-auth-01-journey-간-인증-전환--2026-09-02`
 
 ### [ ] QA-CROSS-DATA-01 삭제 후 data 일관성
 
