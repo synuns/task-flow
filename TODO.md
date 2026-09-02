@@ -2024,7 +2024,7 @@ src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
   classification and cleanup:
   `docs/quality/evidence/final-qa.md#qa-cross-data-01-삭제-후-data-일관성--2026-09-02`
 
-### [x] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
+### [ ] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
 
 - Requirements: 전체 UI requirement와 접근성 invariant
 - Risk: MEDIUM — application-wide interaction review
@@ -2041,7 +2041,7 @@ src/pages/task-detail/task-detail.test.tsx
 src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
 - Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
   modal, virtual scroll, screenshot, console/network
-- Status: AI_VERIFIED
+- Status: BLOCKED
 - Evidence: 2026-09-02 `/root/qa_responsive_a11y_implementer` task block owner;
   reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`, claim/browser/
   automatic target `8b2ba83b90379758b33105a045f4dc7085449f23`. Exact focused 7
@@ -2050,11 +2050,18 @@ src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quic
   `qa-responsive-a11y-01` swept `/sign-in`, `/`, `/task`, `/task/task-1`, `/user`와
   idle delete modal at 1280x720/390x844: one main/named nav, h1/labels/action names,
   `aria-current`, keyboard-visible focus, Card Enter route, exact-ID disabled guard,
-  modal focus wrap/Escape/trigger restore, viewport-contained modal and no horizontal
-  clipping all PASS. Approved unchanged 40-record virtual scroll and reviewed pending
-  lock/focus evidence were explicitly reused, not rerun. Expected anonymous refresh 401
-  외 page error 없음; MSW network-monitor omission은 `TOOLING`; 11 screenshot dimensions,
-  session/server cleanup and closed port verified. Full record:
+  exact-enabled modal 3-control focus wrap/Escape/trigger restore, viewport-contained
+  modal and no horizontal clipping PASS. Reviewer correction의 fresh 40-record mobile
+  keyboard run에서 focused Card에 PageDown/End를 누르면 scrollTop은 `0→224`/
+  `0→3280`, mounted rows는 6/40으로 bounded, terminal task-40은 keyboard focus 가능했으나
+  virtual row unmount 직후 focus가 `BODY`로 손실됐다. Root cause는
+  `src/widgets/task-list/index.tsx`의 `overscan: 0` + `virtualItems`-only render와
+  scroll section에 stable focus node/이관 처리가 없는 점이다. `UX_ACCESSIBILITY`
+  finding의 behavior-changing correction은 HIGH 사람 결정이 필요하다. Option 1
+  (recommended)은 named scroll region을 visible-focus `tabIndex=0` keyboard target으로
+  만들기, option 2는 focused row 보존/인접 row focus 이관이다. Expected anonymous
+  refresh 401 외 page error 없음; MSW network-monitor omission은 `TOOLING`; screenshot
+  dimensions, session/server cleanup and closed port verified. Full record:
   `docs/quality/evidence/final-qa.md#qa-responsive-a11y-01-전체-route-접근성반응형-sweep--2026-09-02`
 
 ### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조

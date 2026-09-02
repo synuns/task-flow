@@ -495,12 +495,13 @@ Fresh idle delete modal: `/task/task-1`에서 `할 일 삭제`를 열자
 dialog containment가 true였다. Exact 입력 상태에서 Escape가 modal을 닫고 focus를
 trigger `할 일 삭제`로 복구했다. Desktop dialog도 `512x282`로 1280x720 안에 있었다.
 
-Explicit reuse, not a fresh run: 40-record bounded-DOM/terminal-scroll acceptance는
-사람이 승인한 unchanged `docs/quality/evidence/task-discovery.md#task-list-virtual-ux-01`
-기록을 재사용한다. 그 기록은 desktop `clientHeight=500`, `scrollHeight=3840`,
-`scrollTop=3340`, 6/40 mounted와 mobile `clientHeight=560`, 6/40 mounted,
-`3280→2780→3280` scroll 및 page/keyboard 가용성을 입증한다. 이번 sweep은 기본
-3-record fixture만 사용했고 fresh 40-record 실행을 주장하지 않는다. Pending 중
+Historical reuse boundary: 사람이 승인한 unchanged
+`docs/quality/evidence/task-discovery.md#task-list-virtual-ux-01`은 desktop
+`clientHeight=500`, `scrollHeight=3840`, `scrollTop=3340`, 6/40 mounted와 mobile
+`clientHeight=560`, 6/40 mounted, `3280→2780→3280` gesture scroll을 입증한다.
+이전 문구는 이를 keyboard focus continuity까지 입증한 것처럼 과대 기술했으므로
+철회한다. 최초 sweep은 기본 3-record fixture만 사용했고 fresh 40-record keyboard
+실행이 아니었다. Pending 중
 입력/취소/Escape/outside-click lock과 focus 보존은 unchanged reviewed
 `docs/quality/evidence/task-resolution.md#task-delete-outcome-view-01`을 재사용했으며,
 이번 browser modal은 idle 상태만 fresh 검증했다.
@@ -525,5 +526,46 @@ Failure class/correction: `TEST/TOOLING` — desktop task keyboard probe가 이�
 Card keyboard sequence, stable `#delete-task-id` selector로 전체 acceptance를 다시
 측정했다. `agent-browser errors`에는 page error가 없었고 제품 수정은 필요 없었다.
 
-Rerun verdict: PASS — unresolved `UX_ACCESSIBILITY`, HIGH 또는 MEDIUM finding 없음.
-Named browser session과 Vite server를 종료했고 port 4173이 닫힌 것을 확인했다.
+Reviewer correction — exact-enabled modal PASS: fresh mobile rerun에서 modal open 직후
+active element는 `취소` Button이고 `alertdialog.contains(activeElement)=true`였다.
+Empty와 `wrong`에서 submit은 disabled, exact `task-1`에서 enabled였고 enabled
+focusables는 input, `취소`, `삭제 확인` 세 개였다. Last `삭제 확인`에서 실제 Tab은
+first `#delete-task-id`로, first input에서 실제 Shift+Tab은 last submit으로 wrap됐고
+두 결과 모두 containment true였다. Escape는 modal을 닫고 trigger `할 일 삭제`로
+focus를 복구했다. Dialog는 `358x326`, document/viewport 390x844였다. Screenshot:
+`/tmp/kbhc-qa-responsive-a11y-01-correction-modal-mobile.png` (390x844).
+
+Reviewer correction — fresh 40-record keyboard diagnosis: approved auth와 40개의
+schema-conforming task를 session storage에 app bootstrap 전에 seed하고 mobile
+390x844 `/task`를 열었다. Initial named region은 `clientHeight=544`,
+`scrollHeight=768`, 6 mounted rows였고 첫 Card가 2px outline focus를 가졌다. 실제
+PageDown은 nested region `scrollTop 0→224`, rows 01~06→03~08로 이동했지만 focused
+Card가 virtual DOM에서 제거되자 `activeElement=BODY`가 됐다. 실제 End 반복은
+terminal `scrollTop=3280`, `clientHeight=560`, `scrollHeight=3840`, mounted 6/40,
+rows 35~40과 `모든 할 일을 불러왔습니다.`에 도달했다. Terminal task-40은 Tab으로
+도달해 2px outline을 보였고, 그 다음 Tab은 `BODY`, 다음 Tab은 `대시보드`로
+빠져나가므로 keyboard trap은 아니었다. 그러나 top task-1 focus에서 실제 End로
+row가 unmount될 때도 focus가 `BODY`로 재현되어 탐색 연속성은 손실됐다.
+Screenshot: `/tmp/kbhc-qa-responsive-a11y-01-correction-virtual-mobile.png` (390x844).
+Console은 refresh/task 200만, `agent-browser errors --json`은 `[]`; Service Worker
+network monitor `[]`는 기존 `TOOLING` 한계다.
+
+Finding/root cause: `UX_ACCESSIBILITY` —
+`src/widgets/task-list/index.tsx`는 `overscan: 0`인 `virtualItems`만 render하고,
+`section[aria-label="할 일 목록"]`은 `tabIndex=-1`이며 stable focus target이나 range
+변경 시 focus 이관이 없다. 따라서 PageDown/End가 focused `TaskCard` Link를 viewport
+밖으로 보내 unmount하면 browser가 focus를 `BODY`로 되돌린다.
+
+Correction options requiring a HIGH human decision:
+
+1. Recommended: named scroll section에 `tabIndex=0`과 visible focus style을 주어
+   PageDown/End의 stable keyboard scroll target으로 만들고, Tab으로 visible Card에
+   진입한다. 가장 작은 변경이나 tab order에 focus stop 하나를 추가한다.
+2. Focused row를 virtual range에 보존하거나 range change 때 가장 가까운 mounted
+   Card로 focus를 이관한다. 기존 tab order는 유지하지만 state/effect와 edge case가
+   늘어난다.
+
+Rerun verdict: BLOCKED — modal Important finding은 해소됐으나 virtual-list keyboard
+focus continuity finding이 unresolved다. Workflow상 behavior-changing correction은
+HIGH 사람 결정 전 구현할 수 없다. Named browser session과 Vite server를 종료했고
+port 4173이 닫힌 것을 확인했다.
