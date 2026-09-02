@@ -2088,8 +2088,10 @@ src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
 src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: 네 Journey network record에서 실제 method/path/query/status와
   bearer/cookie boundary 대조
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-02 `/root/qa_contract_implementer` task block owner; reviewed
+  start target `6e57f9a64c4e277de3b813b2b75413b9d93fb753`; 일곱 OpenAPI operation의
+  generated/MSW/client/Journey network record 대조와 자동 검증 진행 중
 
 ### [ ] QA-01 requirement evidence와 상태 정합성
 
