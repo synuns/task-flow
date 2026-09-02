@@ -2296,7 +2296,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: focused `tests/test_verify.py`, focused MSW Vitest,
   `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
 - Browser verification: fresh Vite server에서 네 core Journey와 console/network 결과
-- Status: BLOCKED
+- Status: IN_PROGRESS
 - Evidence: 2026-08-31 Codex `/root` task block owner; RED에서 보호 Journey의
   `/api/sign-in` 호출, local focused-test 허용, 완료 task의 미완료 dependency,
   canonical full의 `tests/test_verify.py` 누락을 재현. `07323d0`, `9a5ff67`,
@@ -2309,7 +2309,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   verifier regression 19; `git diff --check`와 clean status 확인. `QA-02`가 실제 사람
   checkpoint 근거 부재로 BLOCKED이므로 기존 결과는 baseline으로만 보존하고
   dependency 해소 후 최신 HEAD에서 full gate를 재실행해야 상태 전환 가능;
-  `docs/quality/evidence/final-qa.md`
+  `docs/quality/evidence/final-qa.md`. 2026-09-02 `/root`가 QA-02 completion target
+  `fd0ed596c3e1f3c5a633f0b4eddfe4ece4433f1b`에서 dependency 해소를 확인하고 최신
+  HEAD full-gate 재검증을 시작함
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 
