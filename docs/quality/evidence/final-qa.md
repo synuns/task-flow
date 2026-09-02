@@ -569,3 +569,10 @@ Rerun verdict: BLOCKED — modal Important finding은 해소됐으나 virtual-li
 focus continuity finding이 unresolved다. Workflow상 behavior-changing correction은
 HIGH 사람 결정 전 구현할 수 없다. Named browser session과 Vite server를 종료했고
 port 4173이 닫힌 것을 확인했다.
+
+Human HIGH decision: 2026-09-02 사용자가 exact decision target
+`f7d6f0949d6f4414f581effe22b7b32b34a38718`에서 option 1을 `1로 진행`으로
+명시 승인했다. Named scroll region을 visible-focus `tabIndex=0` keyboard target으로
+만들고 descendant Card의 PageDown/End를 region focus로 synchronously handoff하는
+최소 correction 범위로 작업을 재개한다. 이 결정은 기존 blocker diagnosis를
+지우지 않으며 correction 검증 전 상태는 `IN_PROGRESS`다.

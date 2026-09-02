@@ -2041,7 +2041,7 @@ src/pages/task-detail/task-detail.test.tsx
 src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
 - Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
   modal, virtual scroll, screenshot, console/network
-- Status: BLOCKED
+- Status: IN_PROGRESS
 - Evidence: 2026-09-02 `/root/qa_responsive_a11y_implementer` task block owner;
   reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`, claim/browser/
   automatic target `8b2ba83b90379758b33105a045f4dc7085449f23`. Exact focused 7
@@ -2061,7 +2061,9 @@ src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quic
   (recommended)은 named scroll region을 visible-focus `tabIndex=0` keyboard target으로
   만들기, option 2는 focused row 보존/인접 row focus 이관이다. Expected anonymous
   refresh 401 외 page error 없음; MSW network-monitor omission은 `TOOLING`; screenshot
-  dimensions, session/server cleanup and closed port verified. Full record:
+  dimensions, session/server cleanup and closed port verified. 2026-09-02 사용자가
+  exact decision target `f7d6f0949d6f4414f581effe22b7b32b34a38718`의 option 1을
+  `1로 진행`으로 명시 승인하여 stable focus target 구현을 재개함. Full record:
   `docs/quality/evidence/final-qa.md#qa-responsive-a11y-01-전체-route-접근성반응형-sweep--2026-09-02`
 
 ### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조
