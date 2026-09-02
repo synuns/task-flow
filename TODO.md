@@ -2073,7 +2073,7 @@ src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quic
   width 일치와 console/page error 없음이 확인되어 correction을 PASS로 닫았다. Full record:
   `docs/quality/evidence/final-qa.md#qa-responsive-a11y-01-전체-route-접근성반응형-sweep--2026-09-02`
 
-### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조
+### [x] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조
 
 - Requirements: `SYS-04`와 모든 API requirement
 - Risk: MEDIUM — 제출 mock/API contract 통합
@@ -2088,7 +2088,7 @@ src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
 src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: 네 Journey network record에서 실제 method/path/query/status와
   bearer/cookie boundary 대조
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-02 `/root/qa_contract_implementer` task block owner; reviewed
   start target `6e57f9a64c4e277de3b813b2b75413b9d93fb753`, claim
   `b5d9102d62533d03c0f42534adf7386658500d4f`. `pnpm api:types:check`, exact 7-file
@@ -2110,7 +2110,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   응답은 `1`(strict 강제, 권장) 또는 `2`(forward-compatible OAS 예외)다.
   2026-09-02 사용자가 exact decision target
   `3a9bb04bbbe04aec55ba616627c93e3c63020df6`에 option `1`을 명시 승인해
-  strict exact-key 경계와 negative contract test 교정을 진행 중이다.
+  strict exact-key 경계와 negative contract test 교정을 진행했다. TDD RED는
+  approval record `efdcd722e41e792767ee2ce728883b65208c4a2b`에서 focused 5 files/25
+  중 정확히 9 fail·16 pass로 아홉 schema boundary의 추가 key 수용을 재현했다.
+  Exact implementation target `fcffc7abd9a05e7e7c45de0ba879ffdfc3c087a9`는 새
+  dependency 없이 `Object.keys`/`Object.hasOwn`으로 request·success·nested item·error의
+  exact key를 강제했다. GREEN focused 5 files/25, task 지정 7 files/33,
+  `pnpm api:types:check`, quick hook 86·verifier 19·Vitest 38 files/161,
+  mapped auth-entry/task-resolution Chromium 3/3 PASS. Schema-conforming happy path는
+  변함없으며 invalid boundary를 integration이 직접 증명해 fresh named browser는
+  추가하지 않았다.
   재현 명령·영향 4건·선택지:
   `docs/quality/evidence/final-qa.md#qa-contract-01-openapimswclient-최종-대조--2026-09-02`
 

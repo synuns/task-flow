@@ -693,4 +693,56 @@ Human HIGH decision: 2026-09-02 사용자가 exact decision target
 `3a9bb04bbbe04aec55ba616627c93e3c63020df6`의 option `1`을 명시 승인했다.
 Request, success response, nested `TaskItem`, common error response의 exact key를
 runtime에서 거부하고 negative contract test로 증명하는 권장 교정으로
-재개한다. 교정 검증 완료 전 상태는 `IN_PROGRESS`이다.
+재개했다.
+
+Strict correction TDD RED: production 변경 전 approval record
+`efdcd722e41e792767ee2ce728883b65208c4a2b`에서 `Object.keys`,
+`Object.hasOwn`, exact/unknown/additional-property helper를 `src`에서 다시 검색했으나
+재사용할 공통 helper는 없었다. 먼저 다음 focused command에 아홉 negative
+case를 추가했다.
+
+```bash
+pnpm vitest run src/shared/api/auth.test.ts \
+  src/shared/api/dashboard.test.ts src/shared/api/user.test.ts \
+  src/shared/api/tasks.test.ts src/shared/api/request.test.ts
+```
+
+RED 결과는 5 files/25 tests 중 9 failed/16 passed였다. `SignInRequest`는
+400 기대에 200을 반환했고, success schema 일곱 경계의
+`AuthTokenResponse`, `UserResponse`, `DashboardResponse`, `TaskListResponse`
+top-level/nested `TaskItem`, `TaskDetailResponse`, `DeleteTaskResponse`는 각각
+reject 기대에 resolve했다. 추가 key 401 `ErrorResponse`는 `invalid-response`
+기대에 HTTP error로 분류됐다. 모두 타이포·fixture error가 아닌 승인된
+strict behavior의 부재로 인한 예상된 failure였다.
+
+Minimal implementation: exact product target은
+`fcffc7abd9a05e7e7c45de0ba879ffdfc3c087a9`다. 새 dependency/schema
+framework는 추가하지 않았다. `src/shared/api/request.ts`의 하나의
+`hasExactKeys`가 JSON object만 받고 null/array를 거부한 뒤 `Object.keys`의
+수와 `Object.hasOwn`으로 정확한 key set을 검증한다. Auth/dashboard/user/task
+success guard, nested `TaskItem`, common `ErrorResponse` guard가 이 helper를 공유한다.
+`src/mocks/handlers/auth.ts`는 layer dependency를 추가하지 않고 sign-in JSON object의
+`email`, `password` 두 own key만 허용한다. 기존 happy-path 값, error status,
+auth refresh/terminal과 delete navigation/cache semantics는 변경하지 않았다.
+
+Fresh GREEN verification on `fcffc7abd9a05e7e7c45de0ba879ffdfc3c087a9`:
+
+- 위 focused 5-file command — PASS, 25/25.
+- `pnpm api:types:check` — PASS, generated diff 없음.
+- TODO의 exact 7-file contract suite — PASS, 7 files/33 tests.
+- `./scripts/verify quick` — PASS; hook 86, verifier 19, format, lint,
+  typecheck, 38 Vitest files/161 tests.
+- `pnpm exec playwright test e2e/auth-entry.spec.ts e2e/task-resolution.spec.ts
+  --project=chromium` — PASS, 3/3.
+
+Browser applicability: 교정은 OAS가 금지한 추가 JSON key를 trust boundary에서
+거부하는 behavior에만 한정된다. 기존 named Journey browser evidence의
+request/response는 모두 schema-conforming이고, fresh mapped auth-entry/task-resolution Chromium이
+그 happy path와 auth/delete 전환을 다시 실행했다. 따라서 이 integration-only
+negative boundary에 대한 fresh named browser run은 추가하지 않았으며 추가했다고
+주장하지 않는다. Playwright는 기존 `NO_COLOR`/chunk-size non-failing warning을
+출력했지만 test failure는 없었다.
+
+Correction verdict: PASS — 아홉 schema boundary와 10 non-2xx branch가 strict
+`additionalProperties: false` behavior를 공유하고, conforming happy path는 유지됐다.
+`QA-CONTRACT-01`은 `AI_VERIFIED`이며 최종 승인은 사람 책임으로 남긴다.
