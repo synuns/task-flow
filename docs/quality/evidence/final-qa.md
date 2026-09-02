@@ -1222,3 +1222,76 @@ Finding 2 verdict: **RESOLVED, READY FOR RE-REVIEW** — the full root-cause key
 preserves native movement and stable focus when every tested Card unmounts. QA-02 remains
 `[ ]` / `BLOCKED` until the original independent reviewer reviews this corrected target.
 This correction does not claim `HUMAN_APPROVED` or final acceptance.
+
+## QA-02 corrected-target independent follow-up — 2026-09-02
+
+Review target: exact corrected target
+`49ae7c26115da15c95cbae99eb34097c54b9574a`, reviewed against the original assignment
+requirements, authoritative OpenAPI contract, and the two findings at the original
+QA-02 source target.
+
+Reviewer/independence: `/root/qa_full_adversarial_reviewer`, the original fresh QA-02
+review owner. This reviewer did not author either human decision, production/test
+correction, correction evidence, or browser matrix. No product or test file was changed
+by this follow-up.
+
+Checks: verified the linear review and correction chain: original review `69f36fb` and
+supplement `f9e65da`; Finding 1 decision `2dcb647`, implementation `491cf14`, evidence
+`394bd7c`, corrected caveat `a192c00`; Finding 2 decision request `728edaa`, option 1
+approval `48a1932`, implementation `cef5e7e9`, and evidence target `49ae7c2`.
+
+For Finding 1, rechecked the approved Zod-only boundary scope, credible one-failure RED,
+direct Zod 4.5.2 `z.iso.datetime({ offset: true })` guard, canonical `Z` and numeric
+offset behavior, corrected leap-second/lowercase narrowing caveat, `invalid-response`
+recovery, retained shell/retry UI, absent `RangeError`, and unchanged cache/view/auth/
+delete/dependency behavior. The prior independent approval remains valid.
+
+For Finding 2, the five-failure/seven-pass RED is credible against the parent handler:
+the five new ArrowDown/ArrowUp/Home/PageUp/Space cases lacked handoff while the existing
+PageDown/End and five unrelated tests remained green. The product change is one condition
+containing exactly `ArrowDown`, `ArrowUp`, `End`, `Home`, `PageDown`, `PageUp`, and
+`" "`, guarded by `event.target !== event.currentTarget`. Space and Shift+Space share
+the same key value. No `preventDefault`, explicit scroll, state, effect, helper, role,
+or dependency was added.
+
+Rechecked all 16 recorded physical-key results across 1280x720 and 390x844. Every
+focused Card unmounted after one native key press while `document.activeElement`
+remained the named region with its visible 2px ring. Arrow movement was ±40px,
+Page/Space movement was `clientHeight - 40`, Home/End reached exact bounds, and no
+double scroll appeared. Mounted DOM stayed at 6–7 of 40, widths matched both viewports,
+horizontal overflow was absent, console/page errors were empty, all recorded traffic
+was successful, screenshot dimensions matched, and the session/server were closed.
+
+Findings: no HIGH or MEDIUM finding remains. **LOW — `TEST`:** the first fresh quick run
+hit the fixed five-second timeout in two unrelated dialog files under full-suite load.
+The correction range does not touch either file; running those two files immediately
+passed 2 files/5 tests, and the immediate full quick rerun passed all 38 files/167 tests.
+The failure did not reproduce. No timeout or harness expansion is justified unless it
+recurs.
+
+Corrections: Finding 1 is resolved by `491cf14381555988bc9741c539b702a44bbb0a54`
+with its factual evidence correction at `a192c00a19e477f379b44f3df3e5030ac9c50567`.
+Finding 2 is resolved by `cef5e7e91e2f324063ad0abab66dc103f1ead0d1`. This reviewer
+made no product/test correction; the non-reproducing LOW timeout received no speculative
+change.
+
+Rerun:
+
+- `pnpm vitest run src/shared/api/tasks.test.ts
+  src/widgets/task-list/task-list.test.tsx` — PASS, 2 files/20 tests.
+- `pnpm vitest run src/shared/ui/shadcn-primitives.test.tsx
+  src/features/delete-task/ui/delete-task-dialog.test.tsx` — PASS, 2 files/5 tests.
+- Second fresh `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format,
+  lint, generated API check, typecheck, Vitest 38 files/167 tests.
+- `pnpm exec playwright test e2e/auth-entry.spec.ts e2e/work-overview.spec.ts
+  e2e/task-discovery.spec.ts e2e/task-resolution.spec.ts --project=chromium` — PASS,
+  5/5 against the current build; only the existing non-failing build-size warning.
+- Original-source-to-corrected-target diff, assignment/generated immutability, exact
+  correction file scope, decision provenance, TODO dependencies/status, secret/debug
+  scan, screenshot dimensions, port cleanup, `git diff --check`, and clean worktree —
+  PASS.
+
+Verdict: **PASS_WITH_LOW** — both original MEDIUM findings are resolved and no HIGH or
+MEDIUM remains. QA-02 transitions to `[x]` / `AI_VERIFIED`. The isolated non-reproducing
+LOW timeout does not block that transition. This is independent AI verification, not
+`HUMAN_APPROVED` or final acceptance.

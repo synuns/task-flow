@@ -2169,7 +2169,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Verdict: PASS. 상세 후속 기록:
   `docs/quality/evidence/final-qa.md#qa-01-independent-review-follow-up`
 
-### [ ] QA-02 journey 간 full adversarial review
+### [x] QA-02 journey 간 full adversarial review
 
 - Requirements: 전체 invariant와 Golden Journey
 - Risk: MEDIUM
@@ -2181,7 +2181,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   있고 unresolved high/medium finding이 없다.
 - Automatic verification: 영향 test와 `./scripts/verify quick` 재실행
 - Browser verification: 교차 journey regression, console/network, mobile/desktop
-- Status: BLOCKED
+- Status: AI_VERIFIED
 - Evidence: Review target: exact source target
   `6c097ad52018fc7f89e9589743cd801cee9387a7`; claim commit
   `d55e0516fc9056625a44dfe2af3df094d38ac23c`. Reviewer: fresh independent
@@ -2266,6 +2266,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   double scroll 없이 일치했다. Mounted 6~7/40, width exact, console/page errors 0,
   screenshot dimensions와 cleanup/closed port를 확인했다. Finding 2는 `RESOLVED`,
   QA-02는 corrected-target 독립 re-review 준비 상태이나 완료 전까지 `[ ]`/`BLOCKED`다.
+  Final corrected-target Review target:
+  `49ae7c26115da15c95cbae99eb34097c54b9574a`. Reviewer/independence: original fresh
+  reviewer `/root/qa_full_adversarial_reviewer`; 두 승인·product/test correction·browser
+  evidence를 작성하지 않음. Checks: 원본 finding과 전체 SHA chain, Zod boundary,
+  exact seven-key descendant-only handoff, RED 신빙성, 16 native browser result,
+  cross-Journey regression, diff/TODO/provenance를 재검토. Findings: HIGH/MEDIUM 없음;
+  LOW `TEST` — 첫 quick에서 unrelated dialog 두 test가 5초 timeout했으나 해당 두 파일
+  단독 5/5와 즉시 full quick 38/167에서 재현되지 않음. Corrections: Finding 1은
+  `491cf14381555988bc9741c539b702a44bbb0a54`/`a192c00a19e477f379b44f3df3e5030ac9c50567`,
+  Finding 2는 `cef5e7e91e2f324063ad0abab66dc103f1ead0d1`에서 `RESOLVED`; reviewer는
+  product/test를 변경하지 않음. Rerun: focused tasks+task-list 2 files/20, isolated
+  timeout files 2/5, quick hook 86·verifier 19·Vitest 38/167, current-build mapped 네
+  Journey Chromium 5/5, setup/diff/clean PASS. Verdict: `PASS_WITH_LOW`; 두 original
+  MEDIUM은 해소되어 QA-02를 `AI_VERIFIED`로 전환하며 `HUMAN_APPROVED`나 final
+  acceptance를 주장하지 않음. 상세 record:
+  `docs/quality/evidence/final-qa.md#qa-02-corrected-target-independent-follow-up--2026-09-02`
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 
