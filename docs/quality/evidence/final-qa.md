@@ -1043,3 +1043,59 @@ Finding 1 correction status: `IN_PROGRESS`.
 Finding 2 status: unchanged unresolved MEDIUM. The user did not approve a focus/key
 correction in this decision, so the full seven-key handoff remains untouched and QA-02
 remains `[ ]` / `BLOCKED`.
+
+### Finding 1 Zod correction — 2026-09-02
+
+Implementation/test target: `491cf14381555988bc9741c539b702a44bbb0a54`.
+
+TDD RED: before the production edit, an otherwise exact `TaskDetailResponse` with
+`registerDatetime: "not-a-date"` was added to the existing adjacent API test. The
+following command failed for the intended reason: the malformed response resolved
+instead of rejecting as `invalid-response`.
+
+```bash
+pnpm vitest run src/shared/api/tasks.test.ts
+```
+
+RED result: 1 failed/7 passed in 1 file/8 tests.
+
+Minimal correction: `src/shared/api/tasks.ts` reuses direct Zod 4.5.2 and adds only
+`z.iso.datetime({ offset: true }).safeParse(value.registerDatetime).success` to the
+existing detail response guard. The exact-key guard, API shape, view fallback, auth,
+delete, cache, dependency set, and focus/key finding are unchanged. The approved
+narrowing caveat remains: this canonical validator rejects rare RFC3339-valid leap
+seconds, `-00:00`, and lowercase `t/z` forms.
+
+Fresh GREEN on the implementation/test target:
+
+- `pnpm vitest run src/shared/api/tasks.test.ts` — PASS, 8/8.
+- `pnpm vitest run src/shared/api/tasks.test.ts
+  src/pages/task-detail/task-detail.test.tsx` — PASS, 2 files/13 tests.
+- `pnpm api:types:check` — PASS, generated contract unchanged.
+- `./scripts/verify quick` — PASS; hook 86, verifier contract 19, format, lint,
+  typecheck, 38 Vitest files/162 tests.
+- `pnpm exec playwright test e2e/task-resolution.spec.ts --project=chromium` — PASS,
+  1/1.
+- `pnpm build` — PASS; the existing non-failing chunk-size warning remained.
+
+Fresh browser rerun: named `qa02-datetime-fix` used a production preview at
+`http://127.0.0.1:4183` and viewport 1280x400. After approved auth fixture bootstrap,
+a page-local fetch boundary returned an otherwise schema-shaped
+`GET /api/task/task-bad-date` 200 with `registerDatetime: "not-a-date"`. The app showed
+`할 일 상세를 불러오지 못했습니다.` and `API 응답 형식이 올바르지 않습니다.`,
+retained the dashboard/task/profile navigation shell, and exposed an enabled
+`다시 불러오기` button. Clicking it produced the second audited invalid-date GET and
+kept the same recoverable state. `agent-browser errors --json` was `[]`; body text had
+no `RangeError`. Console contained only the expected anonymous bootstrap refresh 401
+from the pre-fixture opening plus subsequent successful fixture traffic, with no React
+Router caught render error. Screenshot:
+`/tmp/kbhc-qa02-datetime-fix.png` (verified 1280x400). The named session and preview
+server were closed, and port 4183 had no listener.
+
+Finding 1 verdict: **RESOLVED** — malformed date-time no longer reaches render or cache
+as successful detail data, while canonical RFC3339 fixtures and the mapped Journey stay
+green.
+
+Finding 2 verdict: unchanged unresolved MEDIUM. No focus/key source or test was edited.
+QA-02 therefore remains `[ ]` / `BLOCKED` pending that separate correction and the
+corrected-target independent rerun.

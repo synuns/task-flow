@@ -2223,6 +2223,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `z.iso.datetime({ offset: true })` API-boundary correction `IN_PROGRESS`; rare valid
   RFC3339 form 축소 caveat는 유지한다. Finding 2의 full 7-key focus handoff는
   승인되지 않아 unresolved MEDIUM으로 유지하며 QA-02는 `[ ]`/`BLOCKED`다.
+  Finding 1 correction target `491cf14381555988bc9741c539b702a44bbb0a54`에서 TDD
+  RED task API 1 fail/7 pass를 재현한 뒤 direct Zod 한 조건으로 invalid date-time을
+  거부했다. GREEN task API 8/8, tasks+detail page 2 files/13,
+  `api:types:check`, quick hook 86·verifier 19·Vitest 38 files/162, mapped
+  task-resolution Chromium 1/1, build PASS. Fresh named `qa02-datetime-fix`
+  production preview 1280x400에서 schema-shaped invalid-date GET 200이 RangeError/page
+  error 없이 app shell을 유지한 `invalid-response` 복구 UI와 사용 가능한
+  `다시 불러오기`로 전환됐고 click 후 request audit 2건을 확인했다.
+  Finding 1은 `RESOLVED`; rare valid RFC3339 축소 caveat는 유지한다. Finding 2는
+  수정하지 않은 unresolved MEDIUM이므로 QA-02는 `[ ]`/`BLOCKED`를 유지한다.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 
