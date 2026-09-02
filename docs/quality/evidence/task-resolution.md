@@ -178,3 +178,82 @@ module-reload regression and DELETE-specific auth replay characterization
 Rerun verdict: PASS — focused, quick, three related core journeys, manual
 accessible-tree/network/state and static boundary checks passed; the prior review note
 had no reviewer or target commit and does not count as an independent review
+
+## TASK-DETAIL-JOURNEY-VERIFY-01
+
+Requirement/Journey: `TASK-DETAIL-01`~`TASK-DETAIL-05`; `RES-P1-1`~`RES-P1-4`,
+`RES-E1`~`RES-E4`; `task-resolution`
+
+Product target SHA: `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`
+
+Session/plan: `/root/task_5_implementer`;
+`docs/superpowers/plans/2026-09-02-task-resolution-journey.md`;
+`.superpowers/sdd/task-5-brief.md`
+
+| Case | Requirement | Current-target evidence |
+| --- | --- | --- |
+| `RES-P1-1` | `TASK-DETAIL-01` | Detail Vitest plus named browser rendered the fixture title, memo and original `2026-08-30T09:00:00.000Z` datetime through authenticated GET. |
+| `RES-P1-2` | `TASK-DETAIL-03` | Dialog Vitest plus browser exposed an accessible alert dialog with the visible `할 일 ID` label and textbox. |
+| `RES-P1-3` | `TASK-DETAIL-04` | Guard/dialog Vitest plus browser kept submit disabled for `task-1 `, `TASK-1` and `wrong`, enabled only `task-1`, and recorded zero early DELETE. |
+| `RES-P1-4` | `TASK-DETAIL-05` | Delete/cache/page/transport Vitest, mapped E2E and browser proved one bearer DELETE for this success attempt, success-only `/task` navigation, removed list/detail state and dashboard `2/1/1`. |
+| `RES-E1` | `TASK-DETAIL-02` | Page Vitest plus browser showed the contract 404 message and keyboard Enter on `할 일 목록으로 이동` returned to `/task`. |
+| `RES-E2` | `TASK-DETAIL-04` | Dialog/guard Vitest and the browser non-exact matrix recorded disabled submit and DELETE count zero. |
+| `RES-E3` | `AUTH-07`, `TASK-DETAIL-05` | Authenticated transport Vitest covered bounded 401 refresh/replay and current-session isolation; the representative browser did not duplicate the lower transport matrix. |
+| `RES-E4` | `TASK-DETAIL-05` | Delete/page/cache Vitest covered direct 404 as non-success with no redirect; prior view evidence covers its modal recovery while the current representative E2E remained the single success scenario. |
+
+Automatic verification, in the required order:
+
+- `pnpm vitest run src/pages/task-detail/task-detail.test.tsx src/features/delete-task/ui/delete-task-dialog.test.tsx src/features/delete-task/model/attempt-guard.test.ts src/features/delete-task/model/delete-task.test.ts src/features/delete-task/model/delete-cache.test.ts src/shared/api/authenticated-request.test.ts` — PASS, 6 files/30 tests.
+- `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format, lint,
+  generated API check, typecheck and Vitest 38 files/150 tests.
+- `pnpm exec playwright test e2e/task-resolution.spec.ts` — PASS, Chromium 1/1.
+  The existing representative proved no `/api/sign-in`, zero DELETE before exact input,
+  one bearer DELETE after exact input, `/task` redirect, deleted-detail 404, and dashboard
+  `2/1/1`; no E2E edit was necessary.
+- Named browser record below — PASS.
+- `./scripts/verify full` on the product target above — PASS: setup, quick, build,
+  core E2E 5/5, and verifier regression 19/19.
+
+Browser record:
+
+- Agent-browser session: `task-detail-journey-verify-01` (closed); Vite
+  `127.0.0.1:4173` server (stopped).
+- Routes/viewports: `/task/task-1`, `/task/missing`, `/task`, `/` at 1280x720;
+  dashboard also at 390x844.
+- Precondition: fresh approved refresh-cookie/auth fixture, removed
+  `__kbhc_msw_task_fixture__`, fresh document/query state, no sign-in request.
+- Actions/actual: existing detail rendered `첫 번째 할 일`, `삭제 검증 대상`
+  and the original datetime; missing detail rendered `할 일을 찾을 수 없습니다.` and
+  keyboard recovery reached `/task`; reopening the existing detail and filling the three
+  non-exact values left submit disabled and DELETE at zero; exact `task-1` enabled submit,
+  sent exactly one bearer DELETE and navigated to `/task`; the list omitted task-1, a new
+  document rendered deleted-detail 404, and dashboard values were `2/1/1` at both
+  viewports. Document width equalled viewport width at 1280 and 390.
+- Request observation: a page-level `window.fetch` wrapper recorded only method, path and
+  bearer presence, not token values. The success segment was `DELETE /api/task/task-1`
+  once with bearer followed by list GETs. Agent-browser's service-worker network log did
+  not capture that in-session DELETE, so it is not count evidence. A separate client-side
+  existing-detail observation recorded two bearer GETs under Vite React StrictMode; this
+  development count is transparent context, not a `TASK-DETAIL-01` invariant.
+- Console/errors: the pre-fixture `/sign-in` bootstrap refresh 401 was expected and
+  separate. The deliberate missing-detail and deleted-detail GET 404 resource entries
+  were expected. `agent-browser errors` was empty; there were no other unexpected
+  console/page errors.
+- Screenshot/trace: `/tmp/kbhc-task-detail-journey-verify-01.png`; mapped Playwright
+  `task-resolution` attachment (failure trace/video policy was not triggered).
+
+Failure/correction/rerun: no product, test or mapped-E2E failure occurred. The known
+service-worker request-log limitation was handled by the page-level observation above;
+stable CSS selectors were used for all confirmation fills. Focused, quick, mapped E2E,
+named browser and full all passed on the same product target.
+
+Self-review: target `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee` and this Task 5
+record; author second pass checked every `RES-*` row, command order/counts, deliberate
+401/404 separation, request-count source, StrictMode disclosure, responsive result,
+unchanged mapped E2E, diff ownership and TODO dependency. Finding: none. Verdict: PASS.
+This author self-review does not replace `TASK-DETAIL-JOURNEY-REVIEW-01`'s fresh
+independent plan-completion/Journey review.
+
+Verdict: PASS — current-target `task-resolution` integrated evidence is complete;
+`JOURNEY-TASK-DETAIL-01` remains unapproved pending the independent review and human
+checkpoint.

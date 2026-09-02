@@ -1815,7 +1815,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
   전체 흐름 PASS; Verdict: PASS. 상세 기록
   `docs/quality/evidence/task-resolution.md#task-delete-outcome-view-01`
 
-### [ ] TASK-DETAIL-JOURNEY-VERIFY-01 task-resolution 통합 검증
+### [x] TASK-DETAIL-JOURNEY-VERIFY-01 task-resolution 통합 검증
 
 - Requirements: `TASK-DETAIL-01`~`TASK-DETAIL-05`
 - Risk: MEDIUM — Journey evidence gate
@@ -1832,8 +1832,25 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   `pnpm exec playwright test e2e/task-resolution.spec.ts`
 - Browser verification: named `agent-browser` session, existing→missing→recovery→delete,
   두 viewport, modal/network/cache/console
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 Codex `/root/task_5_implementer` task block owner; branch
+  `docs/task-resolution-journey-design`; start SHA
+  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`; requirements
+  `docs/quality/requirements.md` `TASK-DETAIL-01`~`TASK-DETAIL-05`, spec
+  `docs/superpowers/specs/2026-09-02-task-resolution-journey-design.md`, plan
+  `docs/superpowers/plans/2026-09-02-task-resolution-journey.md`, execution brief
+  `.superpowers/sdd/task-5-brief.md`. Product target
+  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`; required-order focused 6 files/30
+  tests, quick hook 86·contract 19·Vitest 38 files/150 tests, mapped Chromium 1/1,
+  named browser `task-detail-journey-verify-01`, full build·core E2E 5/5·verifier
+  regression 19/19 PASS. Browser recorded existing fields, missing 404 keyboard recovery,
+  non-exact DELETE 0, exact bearer DELETE 1, `/task` redirect, deleted-detail 404,
+  dashboard `2/1/1`, desktop/mobile no-overflow and no unexpected page error. Vite
+  StrictMode detail GET 2 is disclosed as a development observation, not an invariant;
+  service-worker log limits were covered by a method/path/bearer-only page fetch wrapper.
+  E2E/product code unchanged; session/server closed. Detailed trace, deliberate 401/404
+  separation and self-review PASS:
+  `docs/quality/evidence/task-resolution.md#task-detail-journey-verify-01`
 
 ### [ ] TASK-DETAIL-JOURNEY-REVIEW-01 task-resolution 독립 review
 
