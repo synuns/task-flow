@@ -1885,8 +1885,22 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   screenshot provenance가 필수일 때 mobile artifact를 재측정한다. Rerun:
   focused 6 files/30 tests PASS; `./scripts/verify quick` hook 86·contract 19·Vitest
   38 files/150 tests PASS; mapped Chromium 1/1 PASS; setup과 base/HEAD^ diff check
-  PASS; server/browser 종료. Verdict: PASS_WITH_LOW — unresolved HIGH/MEDIUM 없음;
-  `docs/quality/evidence/task-resolution.md#task-detail-journey-review-01`
+  PASS; server/browser 종료. Verdict: PASS_WITH_LOW (historical) — unresolved HIGH/MEDIUM
+  없음; `docs/quality/evidence/task-resolution.md#task-detail-journey-review-01`.
+  Follow-up correction review exact target
+  `c0d648ccffd6bc88a7b3185c49ca118d151f6483`, reviewer
+  `/root/final_branch_reviewer`: full branch
+  `3c31324a6cbbe7d950392dd616ebb50580b33c85..c0d648ccffd6bc88a7b3185c49ca118d151f6483`와
+  correction
+  `cba005e0d292253422b4c0a7957b76997bef700c..c0d648ccffd6bc88a7b3185c49ca118d151f6483`를
+  원본 명세, 승인 문서, source/test/E2E와 함께 재검토함. 앞선 Important 2건(spec의
+  exact GET-count 문구, TODO 진행 요약)과 screenshot provenance Minor가 모두 해결되어
+  unresolved HIGH/MEDIUM/LOW 0, Verdict PASS. 교정 전 동일 product target에서 fresh final
+  review focused 6 files/30, full Vitest 150/150·build·core 5/5·verifier 19, mapped 1/1
+  PASS; 문서 전용 교정 뒤 quick 150/150와 diff check PASS. Product target이
+  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`로 동일해 browser/full 재실행은 불필요함.
+  Follow-up record:
+  `docs/quality/evidence/task-resolution.md#follow-up-correction-review`
 
 ### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 사람 checkpoint
 
@@ -1899,11 +1913,13 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `TASK-DETAIL-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
 - Status: BLOCKED
-- Evidence: 사람 checkpoint 승인 대기 package. Independent review exact target
-  `0e2488721eff80996a216529a13f01d72b72381b` (verified product target
-  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`), verdict `PASS_WITH_LOW`, unresolved
-  HIGH 0/MEDIUM 0; review record
-  `docs/quality/evidence/task-resolution.md#task-detail-journey-review-01`. Review한 exact
+- Evidence: 사람 checkpoint 승인 대기 package. Independent correction review exact
+  target `c0d648ccffd6bc88a7b3185c49ca118d151f6483` (verified product target
+  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`), verdict `PASS`, unresolved
+  HIGH/MEDIUM/LOW 0; 앞선 Important 2건과 screenshot provenance Minor 해결. Historical
+  `0e2488721eff80996a216529a13f01d72b72381b` `PASS_WITH_LOW`와 follow-up record는
+  `docs/quality/evidence/task-resolution.md#task-detail-journey-review-01` 및
+  `docs/quality/evidence/task-resolution.md#follow-up-correction-review`. Review한 exact
   source/test는 `src/pages/task-detail/index.tsx`,
   `src/pages/task-detail/task-detail.test.tsx`,
   `src/features/delete-task/model/attempt-guard.ts`와 `.test.ts`,
@@ -1922,10 +1938,17 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   2, unknown 뒤 GET-only recheck와 자동 DELETE 재시도 없음, 성공 후 list/detail/
   dashboard `2/1/1`을 trace함. Screenshot은 named-browser desktop/mobile와 modal/outcome
   artifact, mapped Playwright attachment를 보존하고 failure trace/video policy는 미발동.
-  LOW 2건은 design spec의 stale `bearer GET 한 번` 문구와 Task 1 mobile screenshot의
-  실제 1280x720 provenance 불일치이며, 다른 390x844 artifact·측정치가 responsive behavior를
-  입증함. Vite StrictMode detail bearer GET 2회는 공개된 development 관찰치이고 exact-count
-  invariant가 아님. 사람 checkpoint 승인 대기; AI가 `HUMAN_APPROVED`를 기록하지 않음
+  Full-branch base
+  `3c31324a6cbbe7d950392dd616ebb50580b33c85..c0d648ccffd6bc88a7b3185c49ca118d151f6483`와
+  correction diff
+  `cba005e0d292253422b4c0a7957b76997bef700c..c0d648ccffd6bc88a7b3185c49ca118d151f6483`
+  review 결과 spec은 authenticated bearer GET과 rendered fields를 요구하되 exact browser
+  GET count invariant를 두지 않고, Task 1의 덮어쓴 1280x720 파일은 mobile 증거에서
+  제외되며 독립 390x844 artifact·측정치가 responsive behavior를 입증함. 교정 전 동일
+  product target에서 focused 6 files/30, full Vitest 150/150·build·core 5/5·verifier 19,
+  mapped Chromium 1/1 PASS; 문서 전용 교정 뒤 quick 150/150와 diff check PASS. Product가
+  바뀌지 않아 browser/full 재실행은 불필요함. 사람 checkpoint 승인 대기; AI가
+  `HUMAN_APPROVED`를 기록하지 않음
 
 ## 7. 통합·제출 QA
 

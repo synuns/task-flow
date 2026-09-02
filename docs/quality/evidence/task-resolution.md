@@ -365,3 +365,43 @@ Verdict: PASS_WITH_LOW — the two explicit LOW record/documentation defects do 
 the independently reproduced accepted behavior; there is no unresolved HIGH/MEDIUM
 finding. This record is the plan-completion and `task-resolution` Journey review gate,
 not human checkpoint approval.
+
+### Follow-up correction review
+
+Review target: exact correction target
+`c0d648ccffd6bc88a7b3185c49ca118d151f6483`; unchanged verified product target
+`21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`; full branch
+`3c31324a6cbbe7d950392dd616ebb50580b33c85..c0d648ccffd6bc88a7b3185c49ca118d151f6483`;
+correction diff
+`cba005e0d292253422b4c0a7957b76997bef700c..c0d648ccffd6bc88a7b3185c49ca118d151f6483`.
+
+Reviewer: independent correction reviewer `/root/final_branch_reviewer`, separate from
+the correction author and the historical `/root/task_6_adversarial_reviewer`.
+
+Checks: re-reviewed the original authoritative requirement/OpenAPI, approved decisions,
+task-resolution spec/plan, relevant source, tests, E2E, TODO and evidence across the full
+branch and correction-only ranges. The historical exact target
+`0e2488721eff80996a216529a13f01d72b72381b` and its PASS_WITH_LOW record above remain
+preserved as historical evidence.
+
+Findings: the prior two Important findings (stale exact GET-count wording and stale TODO
+current-progress summary) and the screenshot provenance Minor are resolved. Corrections
+are sound; unresolved HIGH/MEDIUM/LOW findings: 0. No Critical or Minor finding remains.
+
+Corrections: `RES-P1-1` now requires an authenticated bearer GET and rendered fields
+without an exact browser GET-count invariant; the current-progress summary now records
+completed browser verification and independent review with only the human checkpoint
+pending; Task 1 evidence disqualifies the overwritten 1280x720 file as mobile proof and
+uses recorded measurements plus named independent 390x844 artifacts instead. Product,
+tests, E2E, dependencies and accepted behavior are unchanged.
+
+Rerun: the fresh final review at the unchanged pre-correction product target passed the
+focused resolution suite (6 files/30 tests), full verification (Vitest 150/150, build,
+core E2E 5/5 and verifier regression 19), and mapped task-resolution Chromium 1/1. The
+doc-only correction passed `./scripts/verify quick` (Vitest 150/150) and `git diff
+--check`. Browser and full verification were not rerun after the correction because the
+verified product target did not change.
+
+Verdict: PASS — all prior final-review findings are resolved and no unresolved
+HIGH/MEDIUM/LOW finding remains. Human checkpoint approval remains pending; this is not
+`HUMAN_APPROVED`.
