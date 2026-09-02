@@ -73,11 +73,3 @@ artifact atomic rename, public index 갱신 순서로 실행되며 재실행해�
 <!-- reviewed-records:end -->
 
 - [전체 프롬프트와 작업 기록](./artifacts/index.md)
-
-### 기존 정책 기록
-
-- [기록 자동화 설계·구현 세션](./artifacts/codex-session-01a04c3e-0a24-7e30-a767-64f1e2c4f3ae.md) — `legacy/pre-policy`, 사람 검토 대기
-- [에이전트 개발·검증 루프 설계 세션](./artifacts/codex-session-01a04c77-2685-7013-ad38-d81feba1b2a4.md) — `legacy/pre-policy`, 사람 검토 대기
-
-기존 정책 기록은 별도 사람 검토 전까지 검토 완료 managed 영역과
-`artifacts/index.md`에 포함하지 않습니다.

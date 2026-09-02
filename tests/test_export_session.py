@@ -433,26 +433,6 @@ class HookCliTests(unittest.TestCase):
 
 
 class ProjectWiringTests(unittest.TestCase):
-    def test_legacy_artifact_matches_pre_deletion_git_object(self):
-        path = "artifacts/codex-session-01a04c3e-0a24-7e30-a767-64f1e2c4f3ae.md"
-        expected = subprocess.run(
-            ["git", "rev-parse", "9a19193:{}".format(path)],
-            cwd=str(ROOT),
-            text=True,
-            capture_output=True,
-            check=True,
-        ).stdout.strip()
-        artifact = ROOT / path
-        self.assertTrue(artifact.is_file())
-        actual = subprocess.run(
-            ["git", "hash-object", path],
-            cwd=str(ROOT),
-            text=True,
-            capture_output=True,
-            check=True,
-        ).stdout.strip()
-        self.assertEqual(actual, expected)
-
     def test_pending_records_are_ignored(self):
         result = subprocess.run(
             ["git", "check-ignore", "-q", ".codex/review-pending/probe.md"],
@@ -537,11 +517,6 @@ class ProjectWiringTests(unittest.TestCase):
         self.assertNotIn("[세션 기록 디렉터리](./artifacts/)", document)
         self.assertEqual(document.count("<!-- reviewed-records:start -->"), 1)
         self.assertEqual(document.count("<!-- reviewed-records:end -->"), 1)
-        self.assertIn("legacy/pre-policy", document)
-        self.assertIn(
-            "./artifacts/codex-session-01a04c3e-0a24-7e30-a767-64f1e2c4f3ae.md",
-            document,
-        )
         self.assertIn("- [ ]", document)
 
 
