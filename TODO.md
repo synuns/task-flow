@@ -2355,7 +2355,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: `./scripts/verify setup`, secret/generated-noise scan,
   `git diff --check`
 - Browser verification: 적용 없음
-- Status: BLOCKED
+- Status: IN_PROGRESS
 - Evidence: `AI_USAGE.md` 필수 section과 자동 검증, branch diff의 secret/debug/
   generated/unrelated scan PASS; 기존 `legacy/pre-policy` records는 문서상 사람 검토
   대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요.
@@ -2375,7 +2375,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   legacy 보존 assertion만 제거했다. RED setup은 legacy 보존 2건 FAIL; GREEN focused
   ProjectWiring 6/6, quick hook 85·verifier 19·Vitest 38/169, committed setup, diff/clean
   PASS. 현재 tracked artifact는 human-reviewed managed 17개뿐이고 link/metadata exact,
-  pending file 0. 남은 blocker는 AI_USAGE 사람 검증 checkbox 네 항목의 명시적 확인뿐임.
+  pending file 0. Human checklist decision: 2026-09-02 사용자가 네 항목을 직접 확인하고
+  선택 1로 모두 승인. `9b051e558a7e696721d03eb578dc3fd8d011518f`에서 네 checkbox를
+  `[x]`로 반영하고, 항상 미체크를 강제하던 wiring assertion을 미체크/체크 합계 4개
+  계약으로 변경했다. RED focused 1 failure, GREEN focused 1/1, quick hook 85·verifier
+  19·Vitest 38/169, diff/clean PASS. Exact target independent submission review 대기.
   상세: `docs/quality/evidence/final-qa.md#qa-03-submission-and-ai-disclosure-audit--2026-09-02`
 
 ### [ ] QA-04 final verification과 사람 acceptance 요청
