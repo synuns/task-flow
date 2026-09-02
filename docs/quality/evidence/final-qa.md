@@ -135,6 +135,37 @@ contract 19, diff check and clean status PASS; `python3 -m unittest tests/test_v
 Verdict: **FAIL** — bound Vitest suite concurrency and rerun the corrected canonical
 full gate before completing `QA-HARNESS-01`.
 
+### Suite-level correction
+
+Correction target: `2853ff72f825d7ba987b716dc0e5b7594acb3530`.
+
+The moving timeout and independently fast focused cases localized the root cause to
+full-suite fork contention on the eight-CPU verification host, not another individual
+test. A new harness-config assertion first failed because `maxWorkers` was `undefined`.
+The correction adds only `maxWorkers: 4` to the existing Vitest test config. It preserves
+the five-second per-test limit and existing fork pool, product code, dependencies, and
+all test assertions; the central config covers direct test, quick, and nested quick.
+The rejected single-worker diagnostic passed but took 130.39 seconds; four workers
+passed 38/168 in 42.07 seconds before the contract was added, avoiding full serialization.
+
+Corrected verification:
+
+- Harness-config RED: new `maxWorkers === 4` assertion failed with `undefined`; GREEN
+  after the one-line config change: 7/7.
+- `pnpm run test` twice consecutively — PASS, each 38 files/169 tests in 9.44s and
+  10.05s.
+- `python3 -m unittest
+  tests.test_verify.VerifyCliTests.test_quick_runs_frontend_after_scaffolding -v` twice
+  consecutively — PASS in 22.50s and 20.20s.
+- Corrected canonical `./scripts/verify full` — PASS: hook 86, verifier contract 19,
+  format, lint, generated API check, typecheck, outer Vitest 38/169, production build,
+  fresh Chromium core Journeys 5/5, and verifier regression 19/19.
+- No MSW web-storage warning; only the existing non-failing Vite chunk-size advisory.
+  `git diff --check` and clean tracked status PASS; all verification remained read-only.
+
+The task remains `IN_PROGRESS` until independent corrected-target re-review. No
+`HUMAN_APPROVED`, AI record publication, or final acceptance is claimed.
+
 ## Human-owned remainder
 
 `SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its

@@ -2327,7 +2327,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Nested quick의 5초 timeout 대상이 단독 1/1·430ms PASS인
   `shadcn-primitives.test.tsx`로 이동해, dialog 분리만으로 suite-level 병렬 자원 경합을
   해결하지 못했다는 MEDIUM `TEST` finding이다. QA-HARNESS는 `IN_PROGRESS`를 유지하며
-  Vitest worker 상한의 최소 contract 보정과 corrected canonical full 재검증 대기
+  Vitest worker 상한의 최소 contract 보정과 corrected canonical full 재검증 대기.
+  TDD correction `2853ff72f825d7ba987b716dc0e5b7594acb3530`에서 harness-config
+  `maxWorkers === 4` assertion이 RED `undefined`로 실패한 뒤 existing Vitest config에
+  한 줄 상한을 추가해 GREEN 7/7. Timeout/pool/product/dependency는 변경하지 않았다.
+  Full unit 2회 연속 38 files/169 tests PASS(9.44s, 10.05s), nested quick contract 2회
+  연속 PASS(22.50s, 20.20s), corrected canonical full PASS — hook 86, verifier contract
+  19, outer Vitest 38/169, build, fresh core Chromium 5/5, verifier regression 19/19.
+  Corrected evidence target의 independent re-review 대기
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 
