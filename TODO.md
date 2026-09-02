@@ -1899,8 +1899,33 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `TASK-DETAIL-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
 - Status: BLOCKED
-- Evidence: 기존 focused/core/browser baseline은
-  `docs/quality/evidence/task-resolution.md`에 보존; 새 UI 구현·독립 review와 사람 승인 대기
+- Evidence: 사람 checkpoint 승인 대기 package. Independent review exact target
+  `0e2488721eff80996a216529a13f01d72b72381b` (verified product target
+  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`), verdict `PASS_WITH_LOW`, unresolved
+  HIGH 0/MEDIUM 0; review record
+  `docs/quality/evidence/task-resolution.md#task-detail-journey-review-01`. Review한 exact
+  source/test는 `src/pages/task-detail/index.tsx`,
+  `src/pages/task-detail/task-detail.test.tsx`,
+  `src/features/delete-task/model/attempt-guard.ts`와 `.test.ts`,
+  `src/features/delete-task/model/delete-task.ts`와 `.test.ts`,
+  `src/features/delete-task/model/delete-cache.ts`와 `.test.ts`,
+  `src/features/delete-task/ui/delete-task-dialog.tsx`와 `.test.tsx`,
+  `src/shared/api/authenticated-request.ts`와 `.test.ts`, `src/shared/api/tasks.ts`와
+  `.test.ts`, `src/mocks/fixtures/tasks.ts`와 `.test.ts`,
+  `src/mocks/handlers/tasks.ts`와 `.test.ts`, `src/entities/dashboard/model/dashboard-keys.ts`,
+  `src/pages/dashboard/index.tsx`, `e2e/task-resolution.spec.ts`. Current evidence는
+  focused 6 files/30 tests, quick hook 86·contract 19·Vitest 38 files/150 tests, mapped
+  Chromium 1/1, named browser `task-detail-journey-verify-01`, full build·core E2E
+  5/5·verifier regression 19/19 PASS를 기록함. `RES-P1-1`~`RES-P1-4`,
+  `RES-E1`~`RES-E4`에 대해 1280x720·390x844의 detail/404/modal/pending/failure/recheck/
+  success, non-exact DELETE 0·exact success bearer DELETE 1, transport auth replay 최대
+  2, unknown 뒤 GET-only recheck와 자동 DELETE 재시도 없음, 성공 후 list/detail/
+  dashboard `2/1/1`을 trace함. Screenshot은 named-browser desktop/mobile와 modal/outcome
+  artifact, mapped Playwright attachment를 보존하고 failure trace/video policy는 미발동.
+  LOW 2건은 design spec의 stale `bearer GET 한 번` 문구와 Task 1 mobile screenshot의
+  실제 1280x720 provenance 불일치이며, 다른 390x844 artifact·측정치가 responsive behavior를
+  입증함. Vite StrictMode detail bearer GET 2회는 공개된 development 관찰치이고 exact-count
+  invariant가 아님. 사람 checkpoint 승인 대기; AI가 `HUMAN_APPROVED`를 기록하지 않음
 
 ## 7. 통합·제출 QA
 
