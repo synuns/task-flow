@@ -1,5 +1,15 @@
 # Task Discovery Evidence
 
+## JOURNEY-TASK-LIST-01 — HUMAN_APPROVED
+
+Human checkpoint: 2026-09-02 사용자가 current evidence와 수동 체크리스트 검토를
+완료하고 승인 checkbox 기록을 명시했다.
+Approved source/review: `b7790542226fcfb5ff5332692386343797f9b7fb` /
+`f646f4663acebc58e61095b5cc66bd2bdf98f9c0`, independent review PASS
+Approved scope: desktop/mobile 목록, Card 내용·keyboard navigation, virtual scroll,
+terminal pagination, 상세 이동, console/error 확인과 자동 negative-state evidence
+Status: `HUMAN_APPROVED`; 이 기록은 사용자의 명시적 checkpoint 승인을 반영한다.
+
 ## TASK-LIST-JOURNEY-REVIEW-01 — PASS
 
 Review target: plan `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`;
@@ -49,8 +59,8 @@ reviewer made no change
 Rerun: focused PASS 7 files/31 tests; quick PASS hook 86, contract 19, Vitest 38 files/150
 tests and clean format/lint/typecheck; mapped Chromium PASS 1/1; `334dec0..b779054` diff
 check and clean target status PASS
-Verdict: PASS — no unresolved HIGH/MEDIUM/LOW finding. Human Journey checkpoint remains
-separate and unapproved
+Verdict: PASS — no unresolved HIGH/MEDIUM/LOW finding. This review record was subsequently
+accepted by the `JOURNEY-TASK-LIST-01` human checkpoint above
 
 ## TASK-LIST-JOURNEY-VERIFY-01 — current target
 
@@ -89,7 +99,7 @@ Screenshot/Trace: `/tmp/kbhc-task-list-journey-verify-01-desktop.png`,
 Failure class/correction: no product, test, API, auth, dependency or architecture gap; the
 MSW monitor limitation remains `TOOLING` and is covered by resource timing/MSW/Playwright
 Rerun verdict: PASS — all `DISC-*` cases trace to current focused, quick, mapped E2E, full
-and named-browser evidence. Human acceptance remains separate and unapproved
+and named-browser evidence. Human acceptance is recorded by the checkpoint above
 
 ## Historical baseline (`d256114`~`0057492`)
 

@@ -44,16 +44,16 @@
 
 ## 현재 진행 요약
 
-| 단계               | Exit gate                                       | 상태                                                          |
-| ------------------ | ----------------------------------------------- | ------------------------------------------------------------- |
-| 0. 기획·결정 준비  | 상위 기준 연결, HIGH 결정 목록 분리             | AI_VERIFIED                                                   |
-| 1. 개발 기반       | quick/full 및 scaffold browser smoke 통과       | AI_VERIFIED                                                   |
-| 2. 공통 구조       | provider/router/API 기반 + 실제 UI shell/state  | AI_VERIFIED                                                   |
-| 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                                                |
-| 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                                                |
-| 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                                |
-| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증                                |
-| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — Journey UI 구현 전                                  |
+| 단계               | Exit gate                                       | 상태                           |
+| ------------------ | ----------------------------------------------- | ------------------------------ |
+| 0. 기획·결정 준비  | 상위 기준 연결, HIGH 결정 목록 분리             | AI_VERIFIED                    |
+| 1. 개발 기반       | quick/full 및 scaffold browser smoke 통과       | AI_VERIFIED                    |
+| 2. 공통 구조       | provider/router/API 기반 + 실제 UI shell/state  | AI_VERIFIED                    |
+| 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
+| 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
+| 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
+| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증 |
+| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — task-resolution 전   |
 
 ## 0. 기획·결정 준비
 
@@ -1646,7 +1646,7 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   1/1, `334dec0..b779054` diff check와 clean status PASS; Verdict: PASS. 사람 Journey
   checkpoint는 별도.
 
-### [ ] JOURNEY-TASK-LIST-01 task-discovery 사람 checkpoint
+### [x] JOURNEY-TASK-LIST-01 task-discovery 사람 checkpoint
 
 - Requirements: `TASK-LIST-01`~`TASK-LIST-05`
 - Risk: MEDIUM checkpoint
@@ -1656,7 +1656,7 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `TASK-LIST-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
-- Status: BLOCKED
+- Status: HUMAN_APPROVED
 - Evidence: reviewed source target
   `b7790542226fcfb5ff5332692386343797f9b7fb`; 독립 review record
   `f646f4663acebc58e61095b5cc66bd2bdf98f9c0`, Verdict PASS; focused 7 files/31
@@ -1664,8 +1664,8 @@ src/widgets/task-list/task-list.test.tsx src/shared/api/tasks.test.ts`,
   PASS; final full은 `f646f4663acebc58e61095b5cc66bd2bdf98f9c0`에서 hook 86·contract
   19·Vitest 38 files/150 tests·build·core E2E 5/5·verifier regression 19 PASS;
   browser 근거는 `docs/quality/evidence/task-discovery.md`에 보존되며 desktop/mobile
-  목록·상세 흐름과 mobile 장문 줄바꿈을 포함한다. 사람 checkpoint 승인 대기;
-  AI가 `HUMAN_APPROVED`를 기록하지 않음
+  목록·상세 흐름과 mobile 장문 줄바꿈을 포함한다. 2026-09-02 사용자가 수동
+  체크리스트 검토 완료와 승인 checkbox 기록을 명시해 `HUMAN_APPROVED`로 전환함
 
 ## 6. task-resolution Journey
 
