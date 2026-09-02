@@ -2181,11 +2181,23 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   있고 unresolved high/medium finding이 없다.
 - Automatic verification: 영향 test와 `./scripts/verify quick` 재실행
 - Browser verification: 교차 journey regression, console/network, mobile/desktop
-- Status: IN_PROGRESS
-- Evidence: 2026-09-02 fresh independent reviewer
-  `/root/qa_full_adversarial_reviewer`가 exact claim target
-  `6c097ad52018fc7f89e9589743cd801cee9387a7`에서 review 시작. 기존 교차 검토는
-  reviewer와 exact target commit 기록이 없어 이번 독립 review의 근거로 대체하지 않음
+- Status: BLOCKED
+- Evidence: Review target: exact source target
+  `6c097ad52018fc7f89e9589743cd801cee9387a7`; claim commit
+  `d55e0516fc9056625a44dfe2af3df094d38ac23c`. Reviewer: fresh independent
+  `/root/qa_full_adversarial_reviewer`, source·test·evidence 최종 작성과 분리됨.
+  Checks: 원본 requirement/OpenAPI, 27 requirement row, 네 Journey spec/plan/evidence,
+  auth·route·query/cache·API/MSW·상태·반응형/접근성·E2E·diff·비밀정보·TODO provenance를
+  대조하고 focused, quick, 네 mapped Chromium Journey와 두 실제 browser probe를 수행.
+  Findings: MEDIUM `INTEGRATION` — `TaskDetailResponse.registerDatetime`가 OAS
+  `date-time`인지 검증되지 않아 invalid 200이 상세 render를 중단함; MEDIUM
+  `UX_ACCESSIBILITY` — virtual Card의 `Home` scroll 뒤 row가 unmount되면 focus가
+  `BODY`로 손실됨. Corrections: review-only owner는 product/test를 변경하지 않음;
+  최소 date-time boundary test/guard와 역방향 virtual-scroll focus handoff test/fix가
+  필요. Rerun: `api:types:check`, focused 3 files/19, quick hook 86·verifier 19·Vitest
+  38 files/161, mapped Chromium 5/5 PASS이나 두 browser reproduction은 FAIL 유지.
+  Verdict: BLOCKED — unresolved MEDIUM 2건. 상세 record:
+  `docs/quality/evidence/final-qa.md#qa-02-journey-간-full-adversarial-review--2026-09-02`
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 

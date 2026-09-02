@@ -870,3 +870,95 @@ contract 19); `git diff --check` and `git status --short` PASS.
 
 Verdict: PASS — QA-01 evidence and status are independently approved with no unresolved
 finding. This is an AI verification review, not `HUMAN_APPROVED` or final acceptance.
+
+## QA-02 journey 간 full adversarial review — 2026-09-02
+
+Review target: `assignment-original/requirement.md`, authoritative
+`assignment-original/openapi.yaml`, 27 requirement rows, the four Golden Journey
+specifications/plans/evidence records, source/unit/integration/E2E, cross-QA and strict
+contract changes at exact source target
+`6c097ad52018fc7f89e9589743cd801cee9387a7`. Review claim commit:
+`d55e0516fc9056625a44dfe2af3df094d38ac23c`.
+
+Reviewer: fresh independent `/root/qa_full_adversarial_reviewer`. This reviewer did not
+author the reviewed product, tests, Journey evidence, cross-QA corrections, strict
+contract correction, or QA-01 record. Its tracked ownership is limited to this QA-02
+TODO/review record; no product or test correction was authored.
+
+Checks: read and cross-checked the assignment sources, project plan, coding/stack and
+quality policies, approved auth/delete decisions, all requirement rows and Journey
+contracts. Traced auth bootstrap/sign-in/refresh/single-flight/replay/terminal/stale
+generation/cache transitions, route allowlist and navigation; query roots, pagination,
+virtualization and delete reconciliation; all seven OpenAPI operations, exact object
+keys, generated types, client guards and shared MSW fixtures; loading/empty/error/success
+presentation; heading/landmark/label/modal/focus/responsive behavior; core E2E size,
+overlap and retry policy; console/network records; full branch diff, assignment/generated
+immutability, secrets/debug/generated noise, TODO dependencies, checkpoint authorship and
+evidence provenance. Existing evidence was used only as trace context. The two suspected
+gaps below were independently reproduced in a named browser session.
+
+Findings:
+
+1. **MEDIUM — `INTEGRATION`: invalid `registerDatetime` passes the OpenAPI client
+   boundary and crashes the detail route.** Authoritative
+   `assignment-original/openapi.yaml:279-293` defines
+   `TaskDetailResponse.registerDatetime` as `string` with `format: date-time`, but
+   `src/shared/api/tasks.ts:35-41` checks only exact keys and `typeof === "string"`.
+   `src/pages/task-detail/index.tsx:86-91` then constructs and formats the value without
+   an invalid-date guard. A fresh 1280x400 production-preview browser document with an
+   authenticated, otherwise schema-shaped detail response containing
+   `registerDatetime: "not-a-date"` received `GET /api/task/task-bad-date` 200, emitted
+   `RangeError: Invalid time value` plus React Router's caught render error, removed the
+   application shell, and showed only `화면을 불러오지 못했습니다`. The existing
+   `src/shared/api/tasks.test.ts:23-36` happy case and exact-key negative cases do not
+   exercise the format. Impact: a malformed server response bypasses the intended
+   `invalid-response`/recoverable detail error boundary and turns one field into a whole
+   route failure. Minimal correction: add one invalid date-time response regression at
+   the API guard boundary and reject it before the view formats it; retain the current
+   valid RFC3339 fixture.
+2. **MEDIUM — `UX_ACCESSIBILITY`: reverse virtual-list keyboard scrolling loses focus.**
+   `src/widgets/task-list/index.tsx:96-103` hands descendant focus to the stable named
+   region only for `PageDown` and `End`; its test matrix at
+   `src/widgets/task-list/task-list.test.tsx:42-75` has the same one-way coverage. In a
+   fresh 1280x400 authenticated 40-record list, focus on a mounted Card followed by
+   `End` correctly moved to the region. After focusing a lower mounted Card, native
+   `Home` changed the list to `scrollTop=0` and mounted rows `task-1`/`task-2`; the
+   previously focused row unmounted and `document.activeElement` became `BODY` instead
+   of the stable `할 일 목록` region. Impact: keyboard users lose their location when
+   reversing through the virtualized list and the next Tab restarts at global
+   navigation. Minimal correction: extend the existing single handoff branch and its
+   parameterized test to reverse scroll keys that can unmount the focused row, beginning
+   with `Home`/`PageUp`; verify native scrolling and visible region focus in a growing
+   list.
+
+Corrections: none in this review-only task. Both changes affect accepted runtime
+behavior, so implementation belongs to a separately approved fixer. No OAS, generated
+file, dependency, architecture, authentication policy, deletion semantics, product,
+test or E2E file was changed by the reviewer.
+
+Rerun:
+
+- `pnpm api:types:check` — PASS; generated contract unchanged.
+- `pnpm vitest run src/shared/api/tasks.test.ts
+  src/pages/task-detail/task-detail.test.tsx src/widgets/task-list/task-list.test.tsx` —
+  PASS, 3 files/19 tests. This confirms the current focused suite does not detect either
+  reproduced gap.
+- `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format, lint,
+  generated API check, typecheck, Vitest 38 files/161 tests.
+- `pnpm exec playwright test e2e/auth-entry.spec.ts e2e/work-overview.spec.ts
+  e2e/task-discovery.spec.ts e2e/task-resolution.spec.ts` — PASS, Chromium 5/5 with a
+  fresh server. The representative success/error cases remain green but do not cover
+  malformed date-time or reverse virtual focus.
+- Named `qa02-review` production-preview session — expected happy-path navigation
+  remained usable; the two finding reproductions above remained failing. Screenshots:
+  `/tmp/kbhc-qa02-invalid-date.png` and
+  `/tmp/kbhc-qa02-virtual-home-focus-loss.png`, both 1280x400. Session/server closed and
+  ports 4173/4182 had no listener.
+- Full branch `3c31324a6cbbe7d950392dd616ebb50580b33c85..6c097ad52018fc7f89e9589743cd801cee9387a7`
+  `git diff --check`, assignment/generated diff, secret/debug/noise scan, 27-row count,
+  four human checkpoint blame/provenance and TODO dependency/status audit — PASS apart
+  from the two findings recorded above.
+
+Verdict: **BLOCKED** — two unresolved MEDIUM findings remain. Green quick and mapped
+Journey tests do not override their fresh runtime reproductions. This review neither
+marks QA-02 complete nor claims `HUMAN_APPROVED` or final acceptance.
