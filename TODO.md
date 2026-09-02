@@ -2409,4 +2409,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   네 Golden Journey 의존성이 모두 해소되어 제출 예정 target `ca3d603`에서 canonical
   full 검증, browser evidence, adversarial review를 시작한다. QA-04는 사람 소유이므로
   자동 검증 중에도 `BLOCKED`를 유지하며, 최종 acceptance는 사람 checkpoint 전까지
-  미승인 상태를 유지한다.
+  미승인 상태를 유지한다. 첫 claim 편집에서 status를 `IN_PROGRESS`로 두어 setup verifier
+  18/19 FAIL; 사람 소유 task 허용 상태 계약 위반으로 `REQUIREMENT` 분류하고 `BLOCKED`로
+  즉시 복구해 setup 19/19 PASS. Claim target
+  `65196671c378073af43cf68314d906ca3b83c514`의 canonical `./scripts/verify full` PASS —
+  hook 85, verifier contract 19, format/lint/typecheck, Vitest 38 files/169 tests, build,
+  fresh Chromium core 5/5, verifier regression 19/19. Core는 네 Journey tag, console/page
+  error assertion과 390x844 responsive case를 포함한다. Product/E2E는 QA-02 corrected
+  target 뒤 불변이므로 기존 desktop/mobile accessibility·responsive matrix를 재사용한다.
+  요구사항 27개 status/evidence, 네 `HUMAN_APPROVED` checkpoint, assignment/generated
+  immutability와 branch diff check도 PASS. 상세:
+  `docs/quality/evidence/final-qa.md#qa-04-final-gate-candidate--2026-09-03`.
+  Plan-completion adversarial review와 사람 최종 acceptance 대기.

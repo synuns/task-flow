@@ -1512,3 +1512,49 @@ Verdict: **PASS_WITH_LOW** — both original MEDIUM findings are resolved and no
 MEDIUM remains. QA-02 transitions to `[x]` / `AI_VERIFIED`. The isolated non-reproducing
 LOW timeout does not block that transition. This is independent AI verification, not
 `HUMAN_APPROVED` or final acceptance.
+
+## QA-04 Final Gate Candidate — 2026-09-03
+
+Requirement/Journey: assignment-wide final QA; task `QA-04`.
+
+Claim target: `65196671c378073af43cf68314d906ca3b83c514`. Preconditions: all 27
+requirement rows are `AI_VERIFIED` or `HUMAN_APPROVED`; all four Golden Journey
+checkpoints are `HUMAN_APPROVED`; QA-02, QA-03, and QA-HARNESS-01 are complete with
+independent review records.
+
+Failure and correction: the first task-claim edit set human-owned QA-04 to
+`IN_PROGRESS`, and setup failed one verifier contract case, 18/19. Classified
+`REQUIREMENT`: the repository permits only `BLOCKED` or `HUMAN_APPROVED` for this task.
+The status was restored to `BLOCKED`, the ownership/evidence note was retained, and
+setup passed 19/19. Automatic work continues without claiming the human decision.
+
+Canonical verification: `./scripts/verify full` exited zero on the clean claim target.
+It passed hook 85, verifier contract 19, format, lint, generated OpenAPI check,
+TypeScript, Vitest 38 files/169 tests, production build, fresh-server Chromium core 5/5,
+and verifier regression 19/19. The only build output was the existing non-failing chunk
+size advisory.
+
+Browser/evidence reuse: the five current core cases cover all four Journey tags, assert
+their expected console/page-error boundaries, and include 390x844 responsive checks in
+the auth-entry and work-overview paths plus the 1280x400 virtual-list case. Product and
+E2E files are unchanged from the independently approved QA-02 corrected product target;
+only harness tests/config and submission/evidence files changed afterward. Therefore the
+recorded 1280x720 and 390x844 accessibility/responsive matrix, full seven-key physical
+focus matrix, request audits, and screenshots remain applicable without duplicating a
+manual browser run.
+
+Final checklist audit before adversarial review:
+
+- all requirement status/evidence rows, four human Journey checkpoints, corrected QA-02
+  findings, cross-auth/data behavior, and harness review are present;
+- the current full gate and all four core browser Journeys pass;
+- console/network, auth/navigation/stale/error paths, responsive/accessibility evidence,
+  and OpenAPI/MSW matching have focused records and current automated coverage;
+- all 17 submitted AI records have human-review receipts and exact index/disclosure
+  links; the user confirmed the four disclosure checks;
+- `git diff --check main...HEAD` passes, the authoritative assignment and generated
+  artifacts are unchanged, and the worktree is clean.
+
+Current verdict: automated final-gate candidate **PASS**. QA-04 remains `[ ]` /
+`BLOCKED` pending the required plan-completion adversarial review and a person's final
+acceptance; no `HUMAN_APPROVED` status is claimed here.
