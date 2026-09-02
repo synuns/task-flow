@@ -688,3 +688,9 @@ Decision options:
 Verdict: BLOCKED — 두 option 모두 계약 behavior를 확정하므로 HIGH 사람
 결정이 필요하다. 결정 전 product/test는 변경하지 않았고
 `QA-CONTRACT-01`의 checklist는 미완료로 유지한다.
+
+Human HIGH decision: 2026-09-02 사용자가 exact decision target
+`3a9bb04bbbe04aec55ba616627c93e3c63020df6`의 option `1`을 명시 승인했다.
+Request, success response, nested `TaskItem`, common error response의 exact key를
+runtime에서 거부하고 negative contract test로 증명하는 권장 교정으로
+재개한다. 교정 검증 완료 전 상태는 `IN_PROGRESS`이다.

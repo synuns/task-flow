@@ -2088,7 +2088,7 @@ src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
 src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: 네 Journey network record에서 실제 method/path/query/status와
   bearer/cookie boundary 대조
-- Status: BLOCKED
+- Status: IN_PROGRESS
 - Evidence: 2026-09-02 `/root/qa_contract_implementer` task block owner; reviewed
   start target `6e57f9a64c4e277de3b813b2b75413b9d93fb753`, claim
   `b5d9102d62533d03c0f42534adf7386658500d4f`. `pnpm api:types:check`, exact 7-file
@@ -2108,6 +2108,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   결정이므로 HIGH 사람 결정 대기 중이며 product/test는 변경하지 않았다.
   결정 질문은 "OAS `additionalProperties: false`를 runtime에서 강제할까요?"이며
   응답은 `1`(strict 강제, 권장) 또는 `2`(forward-compatible OAS 예외)다.
+  2026-09-02 사용자가 exact decision target
+  `3a9bb04bbbe04aec55ba616627c93e3c63020df6`에 option `1`을 명시 승인해
+  strict exact-key 경계와 negative contract test 교정을 진행 중이다.
   재현 명령·영향 4건·선택지:
   `docs/quality/evidence/final-qa.md#qa-contract-01-openapimswclient-최종-대조--2026-09-02`
 
