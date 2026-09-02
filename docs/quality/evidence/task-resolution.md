@@ -1,5 +1,16 @@
 # Task Resolution Evidence
 
+## TASK-DETAIL-RECOVERY-VIEW-01
+
+Requirement/Journey: `TASK-DETAIL-02`; `RES-E1`; `task-resolution`
+Target SHA: `62189a279ec4724dd1242be2d81834f443cd107a`
+Session/plan: `/root/task_2_implementer`; `.superpowers/sdd/task-2-brief.md`
+Automatic: `pnpm vitest run src/pages/task-detail/task-detail.test.tsx` — PASS (1 file, 5 tests); `./scripts/verify quick` — PASS (setup 105 tests, format, lint, generated API check, typecheck, Vitest 38 files/150 tests).
+404 desktop: fresh approved MSW fixture at `/task/missing`, Chromium 1280x720. Expected one API missing message, list recovery and retained shell; actual alert `요청한 할 일이 없습니다.할 일을 찾을 수 없습니다.할 일 목록으로 이동`, `scrollWidth=1280`, and dashboard/task/profile navigation remained. Screenshot: `/tmp/kbhc-task-detail-recovery-view-01-404-desktop.png`.
+404 mobile/keyboard: Chromium 390x844, `scrollWidth=390`. Four Tab presses focused `할 일 목록으로 이동` with `href=/task`; Enter navigated to `/task` and retained the app shell. Screenshot: `/tmp/kbhc-task-detail-recovery-view-01-404-mobile.png`.
+General error/retry: the prescribed `agent-browser network route '**/api/task/task-1' --abort` was installed but MSW's service worker handled the request first, so it produced its normal 200 detail response rather than an abort (`TOOLING`, not product behavior). In a fresh approved `/task` document, a temporary page-level fetch wrapper rejected every `GET /api/task/task-1` during client-side navigation; actual `/task/task-1` alert was `할 일 상세를 불러오지 못했습니다.네트워크 요청에 실패했습니다.다시 불러오기` with the shell links intact. The wrapper was then disabled and the accessible retry Button activated; it returned to existing heading `첫 번째 할 일`, `/task/task-1`, with no alert. MSW console recorded the retry GET 200. `agent-browser network requests --filter api/task` captured no service-worker requests; this is a tool limitation. Console's initial refresh 401 preceded fixture installation and is separate from the scenario; the deliberate 404 resource errors are expected. No unexpected error attributable to either recovery state.
+Verdict: PASS — the existing 404/list and general-error/refetch branches meet the accepted recovery behavior; no production or test change was made.
+
 ## TASK-DETAIL-VIEW-01
 
 Requirement/Journey: `TASK-DETAIL-01`; `RES-P1-1`; `task-resolution`

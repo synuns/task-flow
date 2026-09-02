@@ -1734,7 +1734,7 @@ src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Status: AI_VERIFIED
 - Evidence: session `/root/task_1_implementer`; target `7812b8bfc161ef1d5e9fd45e56edd14dbd6f8951`; focused detail 5/5, `./scripts/verify quick` PASS (38 files/150 tests), Chromium 1280x720·390x844 PASS; title/memo/readable date plus original datetime, bearer GET, overflow 없음과 keyboard focus ring 확인; `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DETAIL-RECOVERY-VIEW-01 상세 오류·404 복구 화면
+### [x] TASK-DETAIL-RECOVERY-VIEW-01 상세 오류·404 복구 화면
 
 - Requirements: `TASK-DETAIL-02`
 - Risk: LOW — 검증된 error states의 presentation
@@ -1746,8 +1746,8 @@ src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: `/task/missing`과 recoverable error fixture, 두 viewport,
   recovery action, GET status와 console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `/root/task_2_implementer`; start/target `62189a279ec4724dd1242be2d81834f443cd107a`; focused detail 5/5, `./scripts/verify quick` PASS (38 files/150 tests); Chromium 404 desktop/mobile, Tab→Enter list recovery and deliberate general-error retry PASS; `docs/quality/evidence/task-resolution.md`
 
 ### [ ] TASK-DELETE-DIALOG-VIEW-01 삭제 확인 modal 화면
 
