@@ -2355,10 +2355,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: `./scripts/verify setup`, secret/generated-noise scan,
   `git diff --check`
 - Browser verification: 적용 없음
-- Status: BLOCKED
+- Status: IN_PROGRESS
 - Evidence: `AI_USAGE.md` 필수 section과 자동 검증, branch diff의 secret/debug/
   generated/unrelated scan PASS; 기존 `legacy/pre-policy` record는 문서상 사람 검토
-  대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요
+  대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요.
+  2026-09-02 Codex `/root` task block owner; `QA-02` dependency 해소 뒤 README 실행 정보,
+  공개 managed record/index/disclosure 일치, pending/noise/secret 범위의 최신 감사를 시작함
 
 ### [ ] QA-04 final verification과 사람 acceptance 요청
 
