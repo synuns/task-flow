@@ -2088,10 +2088,23 @@ src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
 src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: 네 Journey network record에서 실제 method/path/query/status와
   bearer/cookie boundary 대조
-- Status: IN_PROGRESS
+- Status: BLOCKED
 - Evidence: 2026-09-02 `/root/qa_contract_implementer` task block owner; reviewed
-  start target `6e57f9a64c4e277de3b813b2b75413b9d93fb753`; 일곱 OpenAPI operation의
-  generated/MSW/client/Journey network record 대조와 자동 검증 진행 중
+  start target `6e57f9a64c4e277de3b813b2b75413b9d93fb753`, claim
+  `b5d9102d62533d03c0f42534adf7386658500d4f`. `pnpm api:types:check`, exact 7-file
+  contract suite 25/25, quick hook 86·verifier 19·Vitest 38 files/152 tests가
+  PASS했지만 negative additional-property boundary가 없어 OAS
+  `additionalProperties: false`와 runtime 수용 behavior의 차이를 검출하지
+  못했다. `SignInRequest`의 추가 key를 mock이 200으로 수용하고, 일곱
+  operation success response 경계와 10개 non-2xx `ErrorResponse` 분기의 client
+  guard가 추가 key를 수용한다; `TaskListResponse` 내 `TaskItem`도 같다.
+  문서화된 key만 사용하는 현재 happy path의 method/path/query/auth/status/schema는
+  일치하며 변함없다. 권장 option 1은 request·success·error의 exact key를
+  runtime에서 거부하고 negative contract test를 추가한다. Option 2는 forward-compatible
+  추가 key 수용을 OAS 예외로 명시 승인한다. 둘 다 계약 behavior
+  결정이므로 HIGH 사람 결정 대기 중이며 product/test는 변경하지 않았다.
+  재현 명령·영향 4건·선택지:
+  `docs/quality/evidence/final-qa.md#qa-contract-01-openapimswclient-최종-대조--2026-09-02`
 
 ### [ ] QA-01 requirement evidence와 상태 정합성
 

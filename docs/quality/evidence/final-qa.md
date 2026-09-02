@@ -617,3 +617,62 @@ Correction verdict: PASS — 사람 승인 범위 그대로 native keyboard scro
 유지하면서 virtual Card unmount 이후 focus가 BODY로 손실되는 finding을 해소했다.
 QA-RESPONSIVE-A11Y-01은 `AI_VERIFIED`이며 사람이 승인하지 않은
 `HUMAN_APPROVED` 상태는 기록하지 않는다.
+
+## QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조 — 2026-09-02
+
+Requirement: `QA-CONTRACT-01`, `SYS-04`와 모든 API requirement
+
+Target: reviewed start `6e57f9a64c4e277de3b813b2b75413b9d93fb753`; task claim
+`b5d9102d62533d03c0f42534adf7386658500d4f`
+
+Automatic verification:
+
+- `pnpm api:types:check` — PASS; `assignment-original/openapi.yaml`에서 generated
+  `src/generated/openapi.ts`를 재생성할 diff가 없음.
+- `pnpm vitest run src/shared/api/openapi-contract.test.ts src/shared/api/auth.test.ts
+  src/shared/api/dashboard.test.ts src/shared/api/user.test.ts
+  src/shared/api/tasks.test.ts src/mocks/handlers/tasks.test.ts
+  src/mocks/handlers/user.test.ts` — PASS, 7 files/25 tests.
+- `./scripts/verify quick` — PASS; hook 86, verifier contract 19, format, lint,
+  generated API check, TypeScript, 38 Vitest files/152 tests.
+
+Conforming happy-path invariant: 일곱 operation의 documented method/path/query,
+bearer 또는 HttpOnly refresh-cookie 경계, success/non-2xx status와 필수 field는
+generated type·shared API·MSW·기존 네 Journey network record에서 일치했다.
+문서화된 key만 사용하는 현재 happy path는 두 correction option 모두에서
+변하지 않는다. Invalid `GET /api/task` page는 승인된 fail-closed transport
+error를 유지하며 OAS에 없는 400을 게시하지 않는다.
+
+HIGH blocker: OAS의 response-side object schema 여덟 개
+(`AuthTokenResponse`, `UserResponse`, `DashboardResponse`, `TaskItem`,
+`TaskListResponse`, `TaskDetailResponse`, `DeleteTaskResponse`, `ErrorResponse`)와
+request-side `SignInRequest`는 모두 `additionalProperties: false`다. 현재 runtime은
+다음 추가 key를 거부하지 않는다.
+
+1. `src/mocks/handlers/auth.ts`는 승인된 email/password에 문서 밖 request key를
+   더해도 `POST /api/sign-in` 200을 반환한다.
+2. `src/shared/api/auth.ts`, `dashboard.ts`, `user.ts`, `tasks.ts`의 guard는 일곱
+   operation success response shape의 필수 field만 검사하고 추가 key를 수용한다.
+3. `TaskListResponse` guard의 nested `TaskItem`도 필수 field/status만 검사해
+   item-level 추가 key를 수용한다.
+4. `src/shared/api/request.ts`의 공통 `ErrorResponse` guard는 sign-in 400,
+   refresh 400/401, user 401, dashboard 401, task list 401, task detail 401/404,
+   task delete 401/404의 10개 non-2xx 분기 모두에서 문서 밖 error key를
+   수용한다.
+
+Root cause/test gap: generated type 재생성과 현재 25개 contract test는 exact
+happy-path 필수 field, method/path/status를 주로 증명하고 unknown-key negative
+boundary를 실행하지 않는다. 그러므로 green 결과는 위 차이를 검출하지
+못하며 exact-schema acceptance의 완료 근거가 아니다.
+
+Decision options:
+
+1. Recommended — request, success response, nested `TaskItem`, common error response에서
+   exact object key를 runtime으로 거부하고 각 경계의 최소 negative contract
+   test를 추가한다.
+2. Forward-compatible — 추가 key 수용을 의도한 OAS 예외로 명시하고
+   최종 contract acceptance에서 사람이 승인한다.
+
+Verdict: BLOCKED — 두 option 모두 계약 behavior를 확정하므로 HIGH 사람
+결정이 필요하다. 결정 전 product/test는 변경하지 않았고
+`QA-CONTRACT-01`의 checklist는 미완료로 유지한다.
