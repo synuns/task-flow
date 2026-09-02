@@ -39,6 +39,41 @@ function wrapper(client: ApiClient) {
 afterEach(cleanup);
 
 describe("TaskList", () => {
+  it.each(["{PageDown}", "{End}"])(
+    "%s from a task card hands focus to the scroll region",
+    async (key) => {
+      const user = userEvent.setup();
+      const client: ApiClient = {
+        request: async <T,>(
+          _input: RequestInfo | URL,
+          _init: RequestInit,
+          isSuccess: (value: unknown) => value is T,
+        ) => {
+          const body: unknown = {
+            data: [{ id: "task-1", title: "첫 번째 할 일", memo: "첫 메모", status: "TODO" }],
+            hasNext: false,
+          };
+          if (!isSuccess(body)) throw new Error("invalid fixture");
+          return body;
+        },
+      };
+      render(<TaskList />, { wrapper: wrapper(client) });
+
+      const card = await screen.findByRole("link", { name: "첫 번째 할 일 첫 메모" });
+      const region = screen.getByRole("region", { name: "할 일 목록" });
+      card.focus();
+      await user.keyboard(key);
+
+      expect(region).toHaveFocus();
+      expect(region).toHaveAttribute("tabindex", "0");
+      expect(region).toHaveClass(
+        "outline-none",
+        "focus-visible:ring-2",
+        "focus-visible:ring-ring/50",
+      );
+    },
+  );
+
   it("requests each page once and stops after the terminal page", async () => {
     let releaseFirst: () => void = () => undefined;
     let releaseSecond: () => void = () => undefined;

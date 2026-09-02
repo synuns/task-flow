@@ -92,8 +92,18 @@ export function TaskList() {
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <section
         aria-label="할 일 목록"
-        className="min-h-0 flex-1 overflow-auto rounded-xl"
+        className="min-h-0 flex-1 overflow-auto rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        onKeyDown={(event) => {
+          if (
+            event.target !== event.currentTarget &&
+            (event.key === "PageDown" || event.key === "End")
+          ) {
+            event.currentTarget.focus();
+          }
+        }}
         ref={scrollRef}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: This named scroll region is the stable keyboard target while virtual rows unmount.
+        tabIndex={0}
       >
         <ul
           className="relative m-0 list-none p-0"
