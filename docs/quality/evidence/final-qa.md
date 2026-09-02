@@ -64,6 +64,50 @@ Vitest 34 files/122 tests, build, core Chromium 5, verifier regression 19, diff 
 clean status all PASS
 Verdict: PASS
 
+## QA-HARNESS-01 Latest Full Gate — 2026-09-02
+
+Requirement/Journey: `QA-HARNESS-01`, `SYS-05`, all four core Golden Journeys
+
+Claim target: `df157e6fae0f4aa1c8426589ebc81a5913ba74f6`; correction target:
+`468619abc2d9d3c6e370fbc6ec86da9b45d146b4`. The previously reviewed harness behavior
+at `9cabebf343fed5ab1c82f7432ce1134e4d1ac157` remains unchanged.
+
+Initial result: the latest canonical `./scripts/verify full` passed its outer Vitest
+38 files/167 tests, production build, and fresh-server core Chromium 5/5, then failed
+inside verifier regression. `test_quick_runs_frontend_after_scaffolding` invoked its
+required nested quick, where the single dialog case `requires byte-exact input and locks
+every dismiss path during one pending attempt` exceeded the fixed five-second Vitest
+limit. This reproduced the prior QA-02 LOW under canonical nested load, so it was promoted
+to a blocking `TEST` finding rather than hidden with a timeout increase.
+
+Root cause and correction: the case serialized a pure controlled-input value matrix and
+the pending request/dismiss/focus lifecycle through repeated asynchronous `userEvent`
+operations. The correction splits those two independently testable behaviors and uses
+synchronous `fireEvent.change` only for controlled value assignment. Real open, submit,
+duplicate-submit, Escape, cancel, focus restoration, and reopen interactions still use
+`userEvent`; all assertions remain. No product, verifier, Playwright/Vitest config,
+dependency, or timeout changed.
+
+Verification:
+
+- `python3 -m unittest tests/test_verify_contract.py -v` — PASS, 19/19.
+- `pnpm vitest run src/test/harness-config.test.ts` — PASS, 6/6.
+- Focused `delete-task-dialog.test.tsx` five consecutive runs — PASS, each 5/5.
+- Full `pnpm run test` two consecutive runs — PASS, each 38 files/168 tests.
+- Corrected `./scripts/verify full` — PASS: hook 86, verifier contract 19, format,
+  lint, generated API check, typecheck, outer Vitest 38/168, production build, fresh
+  Chromium core Journeys 5/5, and verifier regression 19/19 including the formerly
+  failing nested quick.
+- `git diff --check` and clean worktree — PASS. Verification remained read-only.
+
+Console/Network: all five core tests passed against the verifier-owned fresh Vite server.
+No Node 25 MSW web-storage warning appeared. The only emitted warning was the existing
+non-failing Vite chunk-size advisory; no product console/network failure was reported.
+
+Verdict: corrected gate PASS; `QA-HARNESS-01` remains `IN_PROGRESS` until an independent
+review validates this exact correction and evidence target. No `HUMAN_APPROVED`, AI
+record publication, or final acceptance is claimed.
+
 ## Human-owned remainder
 
 `SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its

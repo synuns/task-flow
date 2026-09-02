@@ -2311,7 +2311,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   dependency 해소 후 최신 HEAD에서 full gate를 재실행해야 상태 전환 가능;
   `docs/quality/evidence/final-qa.md`. 2026-09-02 `/root`가 QA-02 completion target
   `fd0ed596c3e1f3c5a633f0b4eddfe4ece4433f1b`에서 dependency 해소를 확인하고 최신
-  HEAD full-gate 재검증을 시작함
+  HEAD full-gate 재검증을 시작함. Claim target
+  `df157e6fae0f4aa1c8426589ebc81a5913ba74f6`의 첫 full은 outer Vitest 38 files/167
+  tests와 core Chromium 5/5 뒤 verifier regression 내부 nested quick에서 delete dialog
+  단일 test의 5초 timeout을 재현해 `TEST`로 분류했다. Product/config/timeout을 바꾸지
+  않고 `468619abc2d9d3c6e370fbc6ec86da9b45d146b4`에서 byte-exact value matrix와 pending
+  interaction을 두 test로 분리했다. Focused dialog 5회 연속 각 5/5, full Vitest 2회
+  연속 각 38 files/168 tests, corrected canonical `./scripts/verify full` PASS — hook 86,
+  verifier contract 19, outer Vitest 38/168, build, fresh core Chromium 5/5, verifier
+  regression 19/19. MSW web-storage warning 없음, 기존 non-failing chunk-size warning만
+  존재, diff check와 clean status PASS. Exact evidence:
+  `docs/quality/evidence/final-qa.md#qa-harness-01-latest-full-gate--2026-09-02`;
+  independent corrected-target review 대기
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 
