@@ -37,6 +37,10 @@ describe("local verification configuration", () => {
     expect(vitestConfig).toMatchObject({ test: { allowOnly: false } });
   });
 
+  it("caps Vitest workers for stable full-suite timing", () => {
+    expect(vitestConfig.test?.maxWorkers).toBe(4);
+  });
+
   it("uses the exact installed Playwright version declared by the project", () => {
     expect(installedPlaywright.version).toBe(packageDocument.devDependencies["@playwright/test"]);
     const [major, minor] = installedPlaywright.version.split(".").map(Number);
