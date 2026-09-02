@@ -768,3 +768,74 @@ Fresh correction verification:
 
 Follow-up verdict: PASS — Minor를 교정했고 strict exact-key behavior와
 `QA-CONTRACT-01` `AI_VERIFIED` 상태는 유지된다.
+
+## QA-01 requirement evidence와 상태 정합성 — 2026-09-02
+
+Requirement: `QA-01`; `docs/quality/requirements.md`의 27개 requirement row 전체.
+
+Target: claim base `0bd4fc347ef4059c503d01cf200da4a20b254307`; claim 및 exact
+read-only audit target `e990930586c286092b31948312385808733a4429`. Product, test,
+E2E, dependency와 requirement acceptance text는 변경하지 않았다.
+
+Audit method: temporary file이나 repository helper를 만들지 않고 `python3 - <<'PY'`
+형태의 read-only Python standard-library parser로 `## Requirement Checklist` 표를
+분리해 열 수, ID, status, automatic/browser evidence를 assertion했다. Backtick path는
+`git ls-files --error-unmatch`로 존재·tracked 여부를 확인하고, Markdown evidence는
+heading과 직접 ID 또는 같은 prefix의 range coverage를 검사했다. 이어 모든 ID를
+`rg -l --fixed-strings <ID> TODO.md src e2e`로 역추적하고, 네 Journey TODO block의
+checkbox/status/person-approval 문구와 `git blame --porcelain` provenance를 대조했다.
+
+Audit result:
+
+- Requirement ID 27/27, unique 27/27, 표 열 수 일치, 허용 status 27/27 PASS.
+- Status는 `AI_VERIFIED` 26개와 `IN_PROGRESS` 1개이며 requirement row에
+  `HUMAN_APPROVED`는 0개다.
+- Automatic evidence는 27/27 nonempty다. Browser evidence는 tracked path 26/27,
+  적용되지 않는 `SYS-01`의 명시적 `—` 1/27이다.
+- Automated/browser cell의 path reference 30/30이 존재하고 tracked되며, 고유 경로는
+  9개다. Browser Markdown의 heading 및 직접 ID/range coverage는 26/26 PASS다.
+- 27개 ID 모두 `TODO.md`, `src`, `e2e` 범위에서 하나 이상 역추적됐다. Stale path,
+  중복 ID, 빈 evidence, 허용되지 않은 status는 없어서
+  `docs/quality/requirements.md` 교정은 필요하지 않았다.
+
+27-row matrix summary:
+
+| Checkpoint | Rows | Requirement status | Browser evidence | Checkpoint owner state |
+| --- | ---: | --- | --- | --- |
+| final | 4 | `AI_VERIFIED` 3, `IN_PROGRESS` 1 | tracked path 3, `—` 1 | final human/publication gates remain |
+| auth-entry | 8 | `AI_VERIFIED` 8 | tracked path 8 | `JOURNEY-AUTH-01` `HUMAN_APPROVED` |
+| work-overview | 5 | `AI_VERIFIED` 5 | tracked path 5 | `JOURNEY-WORK-01` `HUMAN_APPROVED` |
+| task-discovery | 5 | `AI_VERIFIED` 5 | tracked path 5 | `JOURNEY-TASK-LIST-01` `HUMAN_APPROVED` |
+| task-resolution | 5 | `AI_VERIFIED` 5 | tracked path 5 | `JOURNEY-TASK-DETAIL-01` `HUMAN_APPROVED` |
+| Total | 27 | `AI_VERIFIED` 26, `IN_PROGRESS` 1 | tracked path 26, `—` 1 | four Journey approvals present |
+
+Checkpoint provenance: the four tracked `HUMAN_APPROVED` status lines blame to commits
+`edc8142215a9662fe89db3b45453050ab800f4ab`,
+`5b5d60c093099218387ac0f2b6fffb02189c9f13`,
+`2c0591b6c2779a371e9f886729a24d05c733c2a3`, and
+`48300e534516d702a351980e5661b3851ce02a38`, all authored by `synuns`; each TODO block
+contains explicit person review/approval provenance. The requirement table correctly
+keeps all 23 Journey-mapped rows at `AI_VERIFIED` rather than copying the human-owned
+checkpoint status.
+
+Dependency evidence: `QA-RESPONSIVE-A11Y-01` is `AI_VERIFIED` after its approved
+keyboard-focus correction and responsive rerun. `QA-CONTRACT-01` is `AI_VERIFIED`; the
+strict exact-key correction target is
+`fcffc7abd9a05e7e7c45de0ba879ffdfc3c087a9`, the fixture-only follow-up target is
+`a1fa0a4a682720acb49a0a232b314d8a35fc48f5`, and tracked evidence/claim target is
+`15c83206313617d87bdf7552667830c09a6bb6f0`.
+
+Final-owned remainder: `SYS-01`, `SYS-02`, and `SYS-04` have sufficient automatic and
+browser/equivalent evidence for `AI_VERIFIED`. `SYS-05` remains `IN_PROGRESS` because
+human verification, AI record publication, and final acceptance are still pending.
+`QA-02`, `QA-HARNESS-01`, `QA-03`, and `QA-04` remain separate final-QA ownership; this
+audit neither publishes `AI_USAGE` records nor records `HUMAN_APPROVED` or final
+acceptance.
+
+Verification: the claim transition passed `git diff --check` and
+`./scripts/verify setup` (hook 86, verifier contract 19). Completion rerun is recorded
+with the QA-01 evidence commit.
+
+Verdict: PASS — all 27 requirement rows have consistent status and reproducible
+automatic/browser evidence references. `QA-01` is `AI_VERIFIED`; no final human-owned
+gate is overclaimed.

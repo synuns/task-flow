@@ -2131,7 +2131,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   재현 명령·영향 4건·선택지:
   `docs/quality/evidence/final-qa.md#qa-contract-01-openapimswclient-최종-대조--2026-09-02`
 
-### [ ] QA-01 requirement evidence와 상태 정합성
+### [x] QA-01 requirement evidence와 상태 정합성
 
 - Requirements: 전체
 - Risk: MEDIUM
@@ -2144,11 +2144,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: requirement ID/상태/evidence 정적 audit,
   `./scripts/verify setup`
 - Browser verification: evidence 경로 존재와 대상 commit 확인
-- Status: IN_PROGRESS
-- Evidence: QA-01 claim base `0bd4fc347ef4059c503d01cf200da4a20b254307`에서 네
-  Journey가 tracked 사람 승인 근거와 함께 `HUMAN_APPROVED`,
-  `QA-RESPONSIVE-A11Y-01`과 `QA-CONTRACT-01`이 `AI_VERIFIED`임을 확인해 27개
-  requirement row와 evidence 경로 정적 audit을 시작함
+- Status: AI_VERIFIED
+- Evidence: claim base `0bd4fc347ef4059c503d01cf200da4a20b254307`, exact audit
+  target `e990930586c286092b31948312385808733a4429`. Read-only Python stdlib parser와
+  `git ls-files`/`rg`/`git blame` audit 결과 ID 27/27 unique, allowed status 27/27
+  (`AI_VERIFIED` 26, `IN_PROGRESS` 1), automatic evidence 27/27, browser evidence
+  tracked path 26/27와 명시적 `—` 1/27, path reference 30/30(고유 9개), Markdown
+  heading와 requirement ID/range coverage 26/26 PASS. 네 checkpoint는 각각
+  auth-entry 8, work-overview 5, task-discovery 5, task-resolution 5개 row를
+  `AI_VERIFIED`로 연결하고, corresponding Journey는 explicit person provenance와 함께
+  `HUMAN_APPROVED`; requirement row에는 AI가 기록한 `HUMAN_APPROVED` 0건. Final-owned
+  `SYS-01`/`SYS-02`/`SYS-04`는 `AI_VERIFIED`, 사람 검증·publication/final acceptance가
+  남은 `SYS-05`는 `IN_PROGRESS`가 맞아 표 수정 없음. `QA-RESPONSIVE-A11Y-01`과
+  `QA-CONTRACT-01` `AI_VERIFIED`, setup과 diff check PASS. Matrix와 재현 방법:
+  `docs/quality/evidence/final-qa.md#qa-01-requirement-evidence와-상태-정합성--2026-09-02`.
+  QA-02/QA-HARNESS-01/QA-03/QA-04와 최종 사람 acceptance는 별도 owner 범위이며 이
+  task가 완료 또는 `HUMAN_APPROVED`로 전환하지 않음
 
 ### [ ] QA-02 journey 간 full adversarial review
 
