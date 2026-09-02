@@ -2024,7 +2024,7 @@ src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
   classification and cleanup:
   `docs/quality/evidence/final-qa.md#qa-cross-data-01-삭제-후-data-일관성--2026-09-02`
 
-### [ ] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
+### [x] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
 
 - Requirements: 전체 UI requirement와 접근성 invariant
 - Risk: MEDIUM — application-wide interaction review
@@ -2041,8 +2041,9 @@ src/pages/task-detail/task-detail.test.tsx
 src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
 - Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
   modal, virtual scroll, screenshot, console/network
-- Status: IN_PROGRESS
-- Evidence: 2026-09-02 `/root/qa_responsive_a11y_implementer` task block owner;
+- Status: AI_VERIFIED
+- Evidence: 2026-09-02 `/root/qa_responsive_a11y_implementer` initial task block owner;
+  `/root/qa_a11y_fix_recovery` recovery owner;
   reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`, claim/browser/
   automatic target `8b2ba83b90379758b33105a045f4dc7085449f23`. Exact focused 7
   files/30 tests, quick hook 86·contract 19·Vitest 38 files/150 tests, mapped
@@ -2063,7 +2064,13 @@ src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quic
   refresh 401 외 page error 없음; MSW network-monitor omission은 `TOOLING`; screenshot
   dimensions, session/server cleanup and closed port verified. 2026-09-02 사용자가
   exact decision target `f7d6f0949d6f4414f581effe22b7b32b34a38718`의 option 1을
-  `1로 진행`으로 명시 승인하여 stable focus target 구현을 재개함. Full record:
+  `1로 진행`으로 명시 승인했다. RED 1 file/7 중 PageDown·End 2 fail 뒤 exact
+  implementation target `2099c745b0076f09f1eb42f2bcafb573415d26fc`에서 GREEN
+  task-list 7/7, focused 7 files/32, quick hook 86·contract 19·Vitest 38/152,
+  mapped task-discovery Chromium 1/1 PASS. Fresh 40-record named browser의
+  390x844/1280x720에서 region과 다음 Card의 2px keyboard focus, Card PageDown
+  `0→224`/`0→284`, terminal End `3280`/`3340`, focus non-BODY, mounted 6/40,
+  width 일치와 console/page error 없음이 확인되어 correction을 PASS로 닫았다. Full record:
   `docs/quality/evidence/final-qa.md#qa-responsive-a11y-01-전체-route-접근성반응형-sweep--2026-09-02`
 
 ### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조

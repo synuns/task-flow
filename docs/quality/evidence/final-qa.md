@@ -576,3 +576,44 @@ Human HIGH decision: 2026-09-02 사용자가 exact decision target
 만들고 descendant Card의 PageDown/End를 region focus로 synchronously handoff하는
 최소 correction 범위로 작업을 재개한다. 이 결정은 기존 blocker diagnosis를
 지우지 않으며 correction 검증 전 상태는 `IN_PROGRESS`다.
+
+Approved option 1 correction — PASS: TDD RED는 production 변경 전에
+`pnpm vitest run src/widgets/task-list/task-list.test.tsx`로 관찰했다. 7개 case 중
+기존 5개는 통과했고 PageDown/End 두 case는 line 67에서 named region focus를
+기대했으나 실패했다. 최소 구현은 named section의 `tabIndex=0`, 기존 UI와 같은
+2px `focus-visible` ring, descendant Card의 PageDown/End에서 section으로 동기 focus
+handoff뿐이며 명시적 scroll, helper, 가짜 role은 추가하지 않았다. Exact product
+SHA는 `2099c745b0076f09f1eb42f2bcafb573415d26fc`다.
+
+Fresh GREEN/automatic verification은 task-list 1 file/7 tests, exact focused 7
+files/32 tests, quick hook 86·verifier contract 19·Vitest 38 files/152 tests,
+mapped `e2e/task-discovery.spec.ts` Chromium 1/1이었다. Fresh named
+`qa-responsive-a11y-fix-01` session은 exact product SHA의 Vite와 app bootstrap 전
+approved auth/40 schema-conforming task fixture를 사용했다.
+
+- Mobile 390x844: 실제 Tab 네 번으로 region에 도달해 2px ring을 보였고 다음
+  Tab은 first Card의 2px outline이었다. Card PageDown은 native scrollTop `0→224`,
+  focus는 region/non-BODY, mounted 6이었다. Fresh top Card End handoff 뒤 실제 End
+  반복은 terminal `scrollTop=3280`, `clientHeight=560`, `scrollHeight=3840`,
+  rows 35~40과 mounted 6/40에 도달하면서 region focus를 유지했다. 다음 Tab은
+  viewport 안 task-35 Card와 2px outline을 보였다.
+- Desktop 1280x720: 같은 Tab 순서와 2px region/Card focus를 확인했다. Card
+  PageDown은 `0→284`, focus region/non-BODY, mounted 6이었다. Fresh top End는
+  terminal `scrollTop=3340`, `clientHeight=500`, `scrollHeight=3840`, rows 35~40,
+  mounted 6/40에서 focus를 유지했고 다음 Tab은 visible task-35 Card였다.
+
+두 viewport의 document/viewport width는 각각 `390/390`, `1280/1280`이었고
+horizontal overflow는 없었다. `agent-browser errors --json`은 `[]`, console의
+error message는 0개였으며 관찰된 58개 API group은 모두 200이었다. Dev Vite
+forwarder는 반복적인 virtual row resize 중 Chromium의 `ResizeObserver loop
+completed with undelivered notifications` 두 건을 server log로 전달했지만 browser
+page-error/console-error, overlay, UI 실패는 없었고 production mapped E2E도
+통과하여 `TOOLING` notification으로 분류했다. Screenshot은
+`/tmp/kbhc-qa-responsive-a11y-01-focus-fix-mobile.png` (390x844),
+`/tmp/kbhc-qa-responsive-a11y-01-focus-fix-desktop.png` (1280x720)이며 `sips`로
+dimensions를 확인했다. Named session과 server를 닫고 port 4173도 닫았다.
+
+Correction verdict: PASS — 사람 승인 범위 그대로 native keyboard scroll을
+유지하면서 virtual Card unmount 이후 focus가 BODY로 손실되는 finding을 해소했다.
+QA-RESPONSIVE-A11Y-01은 `AI_VERIFIED`이며 사람이 승인하지 않은
+`HUMAN_APPROVED` 상태는 기록하지 않는다.
