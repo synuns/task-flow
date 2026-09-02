@@ -1,5 +1,24 @@
 # Task Resolution Evidence
 
+## TASK-DELETE-DIALOG-VIEW-01
+
+Requirement/Journey: `TASK-DETAIL-03`, `TASK-DETAIL-04`; `RES-P1-2`, `RES-P1-3`, `RES-E2`; `task-resolution`
+Target SHA: `d17f7747fc6459ad9838750075518fe395428554`
+Session/plan: `/root/task_3_implementer`; `.superpowers/sdd/task-3-brief.md`
+Automatic: `pnpm vitest run src/features/delete-task/ui/delete-task-dialog.test.tsx src/features/delete-task/model/attempt-guard.test.ts` — PASS (2 files, 5 tests); `./scripts/verify quick` — PASS (setup 105 tests, format, lint, generated API check, typecheck, Vitest 38 files/150 tests).
+Desktop: fresh approved MSW fixture at `/task/task-1`, Chromium 1280x720. Modal accessible name was `할 일 삭제`; its ID textbox, monospace `task-1`, cancel, and initially disabled confirmation were present. `task-1 `, `TASK-1`, and `wrong` each left confirmation disabled; the page-level fetch observation recorded DELETE 0. Exact `task-1` enabled confirmation. Cancel closed the dialog, returned focus to `할 일 삭제`, and kept DELETE 0. Screenshot: `/tmp/kbhc-task-delete-dialog-view-01-desktop.png`.
+Mobile/focus: Chromium 390x844. Open dialog measured `left=16`, `right=374`, `width=358`, `documentWidth=390`; no horizontal overflow. Tab focused `#delete-task-id`, Shift+Tab focused `취소`; both active elements remained inside the alert dialog. Idle Escape closed it, returned focus to `할 일 삭제`, and page-level fetch observation remained DELETE 0. Screenshot: `/tmp/kbhc-task-delete-dialog-view-01-mobile.png`.
+Console/network: `agent-browser network requests --filter api` captured no service-worker requests, so the page-level fetch observation supplied the DELETE count. Console contained only Vite/MSW startup output plus an initial refresh 401 before the approved fixture was installed, then fixture refresh 200 and detail GET 200 responses; no scenario DELETE or unexpected page error appeared.
+Verdict: PASS — the existing dialog and synchronous attempt guard satisfy exact-ID, idle dismiss/focus lifecycle, and responsive modal acceptance; no production or test change was required.
+
+Review target: `.superpowers/sdd/task-3-brief.md`, `TASK-DETAIL-03`, `TASK-DETAIL-04`, `RES-P1-2`, `RES-P1-3`, `RES-E2`; target SHA `d17f7747fc6459ad9838750075518fe395428554`
+Reviewer: `/root/task_3_implementer` explicit second-pass role, separate from acceptance execution
+Checks: re-read dialog/guard and all callers; matched requirements and brief; reviewed focused/quick output, fresh desktop/mobile snapshots, keyboard focus containment and restore, modal bounds, DELETE counter, console/network limitation, and scoped diff.
+Findings: none
+Corrections: not applicable
+Rerun: `pnpm vitest run src/features/delete-task/ui/delete-task-dialog.test.tsx src/features/delete-task/model/attempt-guard.test.ts` and `./scripts/verify quick` — PASS
+Verdict: PASS
+
 ## TASK-DETAIL-RECOVERY-VIEW-01
 
 Requirement/Journey: `TASK-DETAIL-02`; `RES-E1`; `task-resolution`

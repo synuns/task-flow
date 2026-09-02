@@ -1749,7 +1749,7 @@ src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Status: AI_VERIFIED
 - Evidence: session `/root/task_2_implementer`; start/target `62189a279ec4724dd1242be2d81834f443cd107a`; focused detail 5/5, `./scripts/verify quick` PASS (38 files/150 tests); Chromium 404 desktop/mobile, Tab→Enter list recovery and deliberate general-error retry PASS; `docs/quality/evidence/task-resolution.md`
 
-### [ ] TASK-DELETE-DIALOG-VIEW-01 삭제 확인 modal 화면
+### [x] TASK-DELETE-DIALOG-VIEW-01 삭제 확인 modal 화면
 
 - Requirements: `TASK-DETAIL-03`, `TASK-DETAIL-04`
 - Risk: MEDIUM — destructive modal과 focus lifecycle
@@ -1763,8 +1763,8 @@ src/features/delete-task/ui/delete-task-dialog.test.tsx
 src/features/delete-task/model/attempt-guard.test.ts`, `./scripts/verify quick`
 - Browser verification: `/task/task-1`, 두 viewport, modal open/wrong/exact/cancel/Escape,
   focus lifecycle, DELETE 0회와 console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: session `/root/task_3_implementer`; target `d17f7747fc6459ad9838750075518fe395428554`; focused 2 files/5 tests, `./scripts/verify quick` PASS (38 files/150 tests); Chromium 1280x720·390x844 wrong/whitespace/case/exact, DELETE 0, cancel/Escape/trap/restore, overflow 없음; `docs/quality/evidence/task-resolution.md`
 
 ### [ ] TASK-DELETE-OUTCOME-VIEW-01 삭제 진행·실패·복구 화면
 
