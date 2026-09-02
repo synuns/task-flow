@@ -2283,7 +2283,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   acceptance를 주장하지 않음. 상세 record:
   `docs/quality/evidence/final-qa.md#qa-02-corrected-target-independent-follow-up--2026-09-02`
 
-### [ ] QA-HARNESS-01 최종 검증 하네스 강화
+### [x] QA-HARNESS-01 최종 검증 하네스 강화
 
 - Requirements: 전체 verification contract, `SYS-05`
 - Risk: LOW — accepted behavior를 바꾸지 않는 검증 도구 보강
@@ -2296,7 +2296,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: focused `tests/test_verify.py`, focused MSW Vitest,
   `./scripts/verify quick`, `./scripts/verify full`, `git diff --check`
 - Browser verification: fresh Vite server에서 네 core Journey와 console/network 결과
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-08-31 Codex `/root` task block owner; RED에서 보호 Journey의
   `/api/sign-in` 호출, local focused-test 허용, 완료 task의 미완료 dependency,
   canonical full의 `tests/test_verify.py` 누락을 재현. `07323d0`, `9a5ff67`,
@@ -2334,7 +2334,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Full unit 2회 연속 38 files/169 tests PASS(9.44s, 10.05s), nested quick contract 2회
   연속 PASS(22.50s, 20.20s), corrected canonical full PASS — hook 86, verifier contract
   19, outer Vitest 38/169, build, fresh core Chromium 5/5, verifier regression 19/19.
-  Corrected evidence target의 independent re-review 대기
+  Final Review target `fe3da84da54603b853fa7ea17f3f4d3f5223e59f`; Reviewer:
+  correction/evidence를 작성하지 않은 fresh read-only `/root/qa_harness_latest_reviewer`;
+  Checks: `673db8f..fe3da84` exact diff, `maxWorkers: 4` RED/GREEN, dialog assertion과
+  interaction 보존, 전체 harness acceptance, 제품/config/dependency 경계; Findings:
+  HIGH/MEDIUM/LOW 없음; Corrections: 이전 MEDIUM `TEST`는 중앙 Vitest worker 상한 한
+  줄과 contract test로 해소; Rerun: reviewer full unit 38/169, nested quick 1/1,
+  harness config 7/7, dialog 5/5, setup hook 86+contract 19, diff/status clean PASS;
+  Verdict: PASS — `HUMAN_APPROVED`나 final acceptance를 주장하지 않음
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 

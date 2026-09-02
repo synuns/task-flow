@@ -166,6 +166,30 @@ Corrected verification:
 The task remains `IN_PROGRESS` until independent corrected-target re-review. No
 `HUMAN_APPROVED`, AI record publication, or final acceptance is claimed.
 
+### Independent corrected-target review
+
+Review target: `fe3da84da54603b853fa7ea17f3f4d3f5223e59f`.
+
+Reviewer: `/root/qa_harness_latest_reviewer`, a fresh read-only reviewer that authored
+neither the correction nor its evidence.
+
+Checks: inspected exact `673db8f..fe3da84` diff and QA records, the `maxWorkers: 4`
+RED/GREEN contract, retained dialog assertions/interactions, every QA-HARNESS acceptance
+condition, and product/config/dependency boundaries.
+
+Findings: none at HIGH, MEDIUM, or LOW. Timeout, pool, product code, dependencies, and
+accepted behavior are unchanged.
+
+Corrections: the prior MEDIUM `TEST` finding is resolved by the central Vitest worker
+cap. The implementation is one config line plus one contract test.
+
+Rerun: full unit 38 files/169 tests PASS in 14.22s; nested quick target 1/1 PASS in
+21.495s; harness config 7/7, dialog 5/5, setup hook 86 plus contract 19, diff check, and
+clean status PASS.
+
+Verdict: **PASS** — `QA-HARNESS-01` transitions to `[x]` / `AI_VERIFIED`. This does not
+claim `HUMAN_APPROVED`, AI record publication, or final acceptance.
+
 ## Human-owned remainder
 
 `SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its
