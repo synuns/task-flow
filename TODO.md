@@ -1991,7 +1991,7 @@ src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
   Reproducible commands, redacted wrapper, console/network classification, cleanup and
   screenshot paths: `docs/quality/evidence/final-qa.md#qa-cross-auth-01-journey-간-인증-전환--2026-09-02`
 
-### [ ] QA-CROSS-DATA-01 삭제 후 data 일관성
+### [x] QA-CROSS-DATA-01 삭제 후 data 일관성
 
 - Requirements: `DASH-01`, `TASK-LIST-01`, `TASK-DETAIL-01`~`TASK-DETAIL-05`
 - Risk: MEDIUM — mutation 이후 cross-route state
@@ -2006,11 +2006,23 @@ src/features/delete-task/model/delete-cache.test.ts
 src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
 - Browser verification: detail delete → list → deleted detail → dashboard, request
   method/count, visible data, 390x844/1280x720과 console/network
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-02 `/root/qa_cross_data_implementer` task block owner; four
   `HUMAN_APPROVED` Journey dependencies confirmed; reviewed start target
-  `6f6aacd9f957fade390988caca1e7e8834c9dbfa`. Focused automatic, quick, mapped
-  task-resolution Chromium and fresh cross-route browser evidence pending.
+  `6f6aacd9f957fade390988caca1e7e8834c9dbfa`, evidence claim target
+  `9602f0222c9a274d550f91bf40c4d93c1e6367fa`. Focused fixture/handler/cache/detail
+  4 files/19 tests, quick hook 86·contract 19·Vitest 38 files/150 tests, mapped
+  task-resolution Chromium 1/1 PASS. Fresh named `qa-cross-data-01` desktop 1280x720
+  and mobile 390x844 reset cases each recorded exactly one explicit bearer DELETE 200,
+  task-1 list absence with task-2/task-3 retained, direct deleted-detail 404/list
+  recovery, dashboard `2/1/1`, no stale task-1 content or horizontal overflow. Expected
+  StrictMode GET abort/completion pairs were separated from the one DELETE; page errors
+  were empty, only the deliberate 404 console resource line remained. The unchanged
+  reviewed task-resolution target supplies explicit reused failure/unknown nonmutation,
+  nonredirect and no-auto-DELETE proof; no fresh browser rerun is claimed for it.
+  Reproducible redacted audit, reset boundaries, screenshots, console/network
+  classification and cleanup:
+  `docs/quality/evidence/final-qa.md#qa-cross-data-01-삭제-후-data-일관성--2026-09-02`
 
 ### [ ] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
 

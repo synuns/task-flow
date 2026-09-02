@@ -280,3 +280,160 @@ Rerun verdict: PASS — focused 5/29, quick 38/150, mapped Chromium 2/2, anonymo
 authenticated cross-route sweeps, plus the fresh correction-session terminal desktop/
 mobile `reset 이후 app-flow audit`, screenshot dimensions, session/server cleanup, and
 closed port all passed. No accepted auth or security behavior change was required.
+
+## QA-CROSS-DATA-01 삭제 후 data 일관성 — 2026-09-02
+
+Requirement/Journey: `QA-CROSS-DATA-01`; `DASH-01`, `TASK-LIST-01`,
+`TASK-DETAIL-01`~`TASK-DETAIL-05`; approved `DEC-DELETE-01`
+
+Commit: reviewed product/start target
+`6f6aacd9f957fade390988caca1e7e8834c9dbfa`; evidence claim target
+`9602f0222c9a274d550f91bf40c4d93c1e6367fa`. `git diff --name-only` from the
+reviewed task-resolution product target
+`21a0d07c653f3e0f3e5cab158d0f8f78d9538cee` to the start target contained only
+TODO/evidence/spec documentation, so the reviewed product, tests, E2E, API and delete
+semantics were unchanged.
+
+Agent-browser session: fresh named session `qa-cross-data-01`, closed and recreated
+between viewport cases. Fresh Vite server `127.0.0.1:4173` was stopped and the port was
+confirmed closed.
+
+Route/Viewport: `/task/task-1` → `/task` → direct SPA route entry
+`/task/task-1` → `/`; Chromium 1280x720 and 390x844.
+
+Precondition: all four Journey dependencies were `HUMAN_APPROVED`. Each viewport began
+after clearing cookies and browser storage, then installing the approved refresh-cookie
+fixture, removing `__kbhc_msw_task_fixture__`, and opening a fresh document. That reset
+restored the three-task store and an empty application query cache. No sign-in request,
+credential, access token, refresh token, or cookie value was retained in evidence.
+
+Actions: run the focused fixture/handler/cache/detail suite, `./scripts/verify quick`,
+and mapped task-resolution Playwright. At each viewport confirm the existing detail title,
+memo and original datetime, install and reset the redacted page fetch audit, open the
+delete modal, enter exact `task-1`, and submit once. Inspect the redirected list, directly
+enter the deleted detail path through the SPA router, use dashboard navigation, and check
+fresh snapshots, URL, visible data, document width, audit, console/errors/network and
+screenshots.
+
+Expected: the explicit success attempt sends one bearer DELETE and only its 200 result
+navigates to `/task`; task-1 disappears while task-2/task-3 remain; direct deleted detail
+returns the contract 404 with list recovery and no stale task-1 content; dashboard values
+become `2/1/1`; failure/unknown paths remain non-success without unauthorized mutation or
+redirect under the approved decision.
+
+Actual: both fresh viewport cases first rendered `첫 번째 할 일`,
+`삭제 검증 대상`, and `datetime=2026-08-30T09:00:00.000Z`. Exact input enabled
+confirmation and one click produced exactly one `DELETE /api/task/task-1` with bearer and
+status 200, then `/task`. The list contained task-2 and task-3 and contained neither the
+task-1 title nor memo. Direct SPA entry to `/task/task-1` displayed exactly one
+`할 일을 찾을 수 없습니다.` message and `할 일 목록으로 이동`, with no stale
+task-1 title/memo. Dashboard displayed total/rest/done `2/1/1`. Document width equaled
+viewport width at 1280 and 390.
+
+Automatic verification:
+
+- `pnpm vitest run src/mocks/fixtures/tasks.test.ts
+  src/mocks/handlers/tasks.test.ts
+  src/features/delete-task/model/delete-cache.test.ts
+  src/pages/task-detail/task-detail.test.tsx` — PASS, 4 files/19 tests. The shared
+  fixture/handler test proved the before `3/2/1` → DELETE 200 → remaining list →
+  detail 404 → dashboard `2/1/1` transaction; cache/page tests proved protected-root
+  eviction, success-only navigation, direct-404 non-success, and unrelated-cache retention.
+- `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format, lint, generated
+  API check, typecheck and Vitest 38 files/150 tests.
+- `pnpm exec playwright test e2e/task-resolution.spec.ts` — PASS, Chromium 1/1; exact-ID
+  success, bearer DELETE count 1, list absence, deleted-detail 404, dashboard `2/1/1`,
+  expected console 404 and empty page errors passed.
+
+Redacted browser request wrapper: after the initial detail rendered, console/error/network
+buffers and this audit were reset. Therefore the arrays below intentionally begin at the
+explicit delete attempt and exclude fixture bootstrap and initial detail GET. The wrapper
+used `new Request(input, init)` so `init` overrides for string, URL, and Request inputs were
+preserved, forwarded the untouched arguments, and retained only method, path, status, and
+bearer presence:
+
+```js
+window.__qaCrossDataOriginalFetch = window.fetch;
+window.__qaCrossDataAudit = [];
+window.fetch = async (input, init) => {
+  const request = new Request(input, init);
+  const url = new URL(request.url);
+  const entry = {
+    method: request.method.toUpperCase(),
+    path: url.pathname + url.search,
+    bearer: request.headers.get("Authorization")?.startsWith("Bearer ") === true,
+  };
+  try {
+    const response = await window.__qaCrossDataOriginalFetch(input, init);
+    window.__qaCrossDataAudit.push({ ...entry, status: response.status });
+    return response;
+  } catch (error) {
+    window.__qaCrossDataAudit.push({
+      ...entry,
+      status:
+        error instanceof DOMException && error.name === "AbortError"
+          ? "aborted"
+          : "network-error",
+    });
+    throw error;
+  }
+};
+window.__qaCrossDataAudit = [];
+```
+
+Desktop and mobile produced the same reset-boundary audit:
+
+```json
+[
+  { "method": "DELETE", "path": "/api/task/task-1", "bearer": true, "status": 200 },
+  { "method": "GET", "path": "/api/task?page=1", "bearer": true, "status": "aborted" },
+  { "method": "GET", "path": "/api/task?page=1", "bearer": true, "status": 200 },
+  { "method": "GET", "path": "/api/task/task-1", "bearer": true, "status": "aborted" },
+  { "method": "GET", "path": "/api/task/task-1", "bearer": true, "status": 404 },
+  { "method": "GET", "path": "/api/dashboard", "bearer": true, "status": "aborted" },
+  { "method": "GET", "path": "/api/dashboard", "bearer": true, "status": 200 }
+]
+```
+
+The Vite React StrictMode development fetches aborted the first GET in each pair; the
+following bearer GET supplied the visible list, 404, and dashboard result. They are not
+extra user delete attempts. Each viewport audit contains exactly one DELETE, status 200,
+with no auth replay observed.
+
+Failure/unknown reuse: this fresh cross-data browser pass did not repeat destructive
+failure injections. The unchanged product target's reviewed
+`docs/quality/evidence/task-resolution.md#task-delete-outcome-view-01` record and its
+focused delete outcome/cache/page/transport suites already prove direct 404 as
+non-success, network/invalid-response GET-only reconciliation, unknown without redirect,
+no automatic DELETE retry, and no mutation before 200. The fresh 4/19 suite additionally
+reproved unauthorized DELETE nonmutation and repeated-delete 404 at the shared-store
+boundary. Reuse is explicit and is not claimed as a fresh browser failure rerun.
+
+Console/Network: after the reset boundary, MSW console showed DELETE 200, remaining-list
+200, deliberate deleted-detail 404 and dashboard 200. The sole console error was the
+expected 404 resource line; `agent-browser --json errors` returned `[]`. As in the reviewed
+Journey, `agent-browser network requests --filter api` returned `No requests captured`
+for service-worker-owned traffic and was not used as count evidence; the redacted page
+audit and MSW console establish the requests. No unexpected response, console/page error,
+or secret-bearing output remained.
+
+Screenshot/Trace: `/tmp/kbhc-qa-cross-data-01-desktop-list.png`,
+`/tmp/kbhc-qa-cross-data-01-desktop-deleted-detail.png`,
+`/tmp/kbhc-qa-cross-data-01-desktop-dashboard.png` are 1280x720;
+`/tmp/kbhc-qa-cross-data-01-mobile-list.png`,
+`/tmp/kbhc-qa-cross-data-01-mobile-deleted-detail.png`, and
+`/tmp/kbhc-qa-cross-data-01-mobile-dashboard.png` are 390x844. `file` and `sips`
+confirmed all six dimensions. Passing mapped E2E produced no failure trace.
+
+Failure class: `TOOLING` — the agent-browser network monitor did not expose MSW
+service-worker requests. No product failure occurred.
+
+Correction: used the already-reviewed page-level redacted audit, kept StrictMode aborts
+distinct from completed responses, and used the MSW console only for response
+corroboration. No product, test, E2E, dependency, architecture or accepted behavior
+changed.
+
+Rerun verdict: PASS — focused 4/19, quick 38/150, mapped Chromium 1/1 and both fresh
+success cross-route browser cases passed; failure/unknown semantics were reused only from
+the unchanged reviewed target. Session/server cleanup, screenshot dimensions and closed
+port passed.
