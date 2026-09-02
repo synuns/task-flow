@@ -2095,14 +2095,19 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   contract suite 25/25, quick hook 86·verifier 19·Vitest 38 files/152 tests가
   PASS했지만 negative additional-property boundary가 없어 OAS
   `additionalProperties: false`와 runtime 수용 behavior의 차이를 검출하지
-  못했다. `SignInRequest`의 추가 key를 mock이 200으로 수용하고, 일곱
-  operation success response 경계와 10개 non-2xx `ErrorResponse` 분기의 client
-  guard가 추가 key를 수용한다; `TaskListResponse` 내 `TaskItem`도 같다.
+  못했다. Runtime 영향 4건은 추가 key가 있는 token response의 auth state
+  성립, 추가 key가 있는 401/error의 HTTP·refresh·terminal 경로 진입,
+  추가 key가 있는 `{ success: true }`의 destructive success navigation/cache 전환,
+  추가 key가 있는 sign-in request의 200/session 생성이다. 일곱 operation
+  success response 경계와 10개 non-2xx `ErrorResponse` 분기의 client guard가 추가
+  key를 수용하며 `TaskListResponse` 내 `TaskItem`도 같다.
   문서화된 key만 사용하는 현재 happy path의 method/path/query/auth/status/schema는
   일치하며 변함없다. 권장 option 1은 request·success·error의 exact key를
   runtime에서 거부하고 negative contract test를 추가한다. Option 2는 forward-compatible
   추가 key 수용을 OAS 예외로 명시 승인한다. 둘 다 계약 behavior
   결정이므로 HIGH 사람 결정 대기 중이며 product/test는 변경하지 않았다.
+  결정 질문은 "OAS `additionalProperties: false`를 runtime에서 강제할까요?"이며
+  응답은 `1`(strict 강제, 권장) 또는 `2`(forward-compatible OAS 예외)다.
   재현 명령·영향 4건·선택지:
   `docs/quality/evidence/final-qa.md#qa-contract-01-openapimswclient-최종-대조--2026-09-02`
 

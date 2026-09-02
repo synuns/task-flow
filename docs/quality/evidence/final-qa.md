@@ -647,18 +647,26 @@ HIGH blocker: OAS의 response-side object schema 여덟 개
 (`AuthTokenResponse`, `UserResponse`, `DashboardResponse`, `TaskItem`,
 `TaskListResponse`, `TaskDetailResponse`, `DeleteTaskResponse`, `ErrorResponse`)와
 request-side `SignInRequest`는 모두 `additionalProperties: false`다. 현재 runtime은
-다음 추가 key를 거부하지 않는다.
+일곱 operation success response, `TaskListResponse`의 nested `TaskItem`, 공통
+`ErrorResponse`와 sign-in request의 추가 key를 거부하지 않는다.
+이 차이의 실제 runtime 영향은 다음 네 건이다.
 
-1. `src/mocks/handlers/auth.ts`는 승인된 email/password에 문서 밖 request key를
-   더해도 `POST /api/sign-in` 200을 반환한다.
-2. `src/shared/api/auth.ts`, `dashboard.ts`, `user.ts`, `tasks.ts`의 guard는 일곱
-   operation success response shape의 필수 field만 검사하고 추가 key를 수용한다.
-3. `TaskListResponse` guard의 nested `TaskItem`도 필수 field/status만 검사해
-   item-level 추가 key를 수용한다.
-4. `src/shared/api/request.ts`의 공통 `ErrorResponse` guard는 sign-in 400,
-   refresh 400/401, user 401, dashboard 401, task list 401, task detail 401/404,
-   task delete 401/404의 10개 non-2xx 분기 모두에서 문서 밖 error key를
-   수용한다.
+1. `src/shared/api/auth.ts`의 `isAuthTokenPair`가 추가 key를 포함한 token
+   response를 success로 반환해 sign-in 또는 refresh 결과가 auth state를 성립시킨다.
+2. `src/shared/api/request.ts`의 `isErrorResponse`가 추가 key를 포함한 401/error를
+   `invalid-response`가 아닌 HTTP error로 반환해 auth refresh/replay/terminal 경로에
+   진입시킨다. 이 guard는 sign-in 400, refresh 400/401, user 401,
+   dashboard 401, task list 401, task detail 401/404, task delete 401/404의 10개
+   non-2xx 분기에 공통 적용된다.
+3. `src/shared/api/tasks.ts`의 `isDeleteTaskResult`가 추가 key를 포함한
+   `{ success: true }`를 성공으로 수용해 destructive success navigation과
+   list/detail/dashboard cache transition을 시작한다.
+4. `src/mocks/handlers/auth.ts`가 승인된 email/password와 추가 key를 함께
+   보낸 sign-in request에 200/token pair/cookie를 반환해 session을 생성한다.
+
+나머지 user, dashboard, task list/detail success guard와 nested `TaskItem` guard도
+문서화된 필수 field만 검사해 추가 key를 수용한다. 현재 consumer가 그
+key를 UI에 사용하지는 않지만 exact OAS schema와는 다르다.
 
 Root cause/test gap: generated type 재생성과 현재 25개 contract test는 exact
 happy-path 필수 field, method/path/status를 주로 증명하고 unknown-key negative
@@ -672,6 +680,10 @@ Decision options:
    test를 추가한다.
 2. Forward-compatible — 추가 key 수용을 의도한 OAS 예외로 명시하고
    최종 contract acceptance에서 사람이 승인한다.
+
+사람 결정 질문: **OAS `additionalProperties: false`를 runtime에서
+강제할까요?** 응답은 `1`(strict 강제, 권장) 또는
+`2`(forward-compatible OAS 예외) 중 하나로 기록한다.
 
 Verdict: BLOCKED — 두 option 모두 계약 behavior를 확정하므로 HIGH 사람
 결정이 필요하다. 결정 전 product/test는 변경하지 않았고
