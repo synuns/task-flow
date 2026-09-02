@@ -2181,10 +2181,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   있고 unresolved high/medium finding이 없다.
 - Automatic verification: 영향 test와 `./scripts/verify quick` 재실행
 - Browser verification: 교차 journey regression, console/network, mobile/desktop
-- Status: BLOCKED
-- Evidence: 기존 교차 검토 내용에는 reviewer와 exact target commit 기록이 없어
-  독립 review 완료 근거로 인정하지 않음. 네 Journey `HUMAN_APPROVED`와 `QA-01`
-  완료 후 실제 fresh review를 수행해야 재개
+- Status: IN_PROGRESS
+- Evidence: 2026-09-02 fresh independent reviewer
+  `/root/qa_full_adversarial_reviewer`가 exact claim target
+  `6c097ad52018fc7f89e9589743cd801cee9387a7`에서 review 시작. 기존 교차 검토는
+  reviewer와 exact target commit 기록이 없어 이번 독립 review의 근거로 대체하지 않음
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 
