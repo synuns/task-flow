@@ -1113,3 +1113,29 @@ verified rejected forms: leap seconds and lowercase `t/z`.
 
 No product or test file changed. Finding 2 remains unresolved MEDIUM, so QA-02 remains
 `[ ]` / `BLOCKED`.
+
+### Finding 2 focus decision request — 2026-09-02
+
+Decision target: `a192c00a19e477f379b44f3df3e5030ac9c50567`.
+
+Partial-decision state: Finding 1 date-time validation has the user's Zod approval,
+verified correction, corrected caveat, and `RESOLVED` verdict. The virtual-list focus
+finding is the only unresolved QA-02 finding. The fresh eight-key matrix established
+that a Home-only change would not correct the root cause, so it is removed as an
+option.
+
+Remaining HIGH question: how should descendant Card focus be handled when native
+vertical scrolling can unmount the focused virtual row?
+
+1. **Recommended:** for the full seven-key family `ArrowDown`, `ArrowUp`, `End`, `Home`,
+   `PageDown`, `PageUp`, and `" "`, synchronously hand focus from a descendant Card to
+   the stable named region. Extend the existing PageDown/End branch, add parameterized
+   tests, and verify native scroll movement plus stable region focus in the browser.
+2. **Final-acceptance exception:** retain the current PageDown/End-only handoff and
+   explicitly approve the observed Home/PageUp/ArrowUp/ArrowDown/Space/Shift+Space
+   focus losses as a final acceptance exception.
+
+No focus product or test correction is authorized by the partial date-time decision.
+QA-02 remains `[ ]` / `BLOCKED` until option 1 is corrected and independently rerun or
+option 2 is explicitly accepted by a person. This record changes no product, test, or
+`HUMAN_APPROVED` state.

@@ -2238,6 +2238,17 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   실제 probe와 불일치했다. 해당 주장을 제거하고 실제 거부되는 leap second와
   lowercase `t/z` caveat만 유지했다. 제품/테스트와 Finding 1 `RESOLVED`, Finding 2
   unresolved MEDIUM, QA-02 `[ ]`/`BLOCKED` 상태는 불변이다.
+  Partial-decision reconciliation target
+  `a192c00a19e477f379b44f3df3e5030ac9c50567`: date-time은 사용자 Zod 승인과
+  독립 재검토를 거쳐 `RESOLVED`; focus finding만 unresolved다. Home-only는 8-key
+  matrix상 root-cause correction이 아니므로 선택지에서 제거했다. 남은 HIGH 질문은
+  `1`(권장: 기존 PageDown/End를 포함한 full 7-key family `ArrowDown`, `ArrowUp`,
+  `End`, `Home`, `PageDown`, `PageUp`, `" "`에서 descendant Card→stable region
+  synchronous handoff + parameterized tests + native-scroll/browser verification)과
+  `2`(exception: 현재 PageDown/End only를 유지하고 Home/PageUp/ArrowUp/ArrowDown/
+  Space/Shift+Space focus loss를 final acceptance exception으로 명시 승인) 중
+  선택이다. 결정·correction·독립 rerun 전까지 QA-02는 `[ ]`/`BLOCKED`; product/test와
+  `HUMAN_APPROVED`는 변경 없음.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 
