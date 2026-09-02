@@ -2370,6 +2370,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `unredacted_secret` BLOCKING review 대상이고, AI_USAGE 사람 검증 checkbox 네 개도
   미체크다. 두 기록을 사람이 직접 검수해 승인 또는 제출 제외하고 checklist를 확인할
   때까지 QA-03은 BLOCKED; AI는 TTY selection/publication·삭제·사람 체크를 대신하지 않음.
+  Human decision: 2026-09-02 사용자가 권장안 1, 두 legacy record 제출 제외를 명시
+  승인. `7b44edb5fc40ea2cd6516ea35272d3a040154c6e`에서 두 file과 disclosure link,
+  legacy 보존 assertion만 제거했다. RED setup은 legacy 보존 2건 FAIL; GREEN focused
+  ProjectWiring 6/6, quick hook 85·verifier 19·Vitest 38/169, committed setup, diff/clean
+  PASS. 현재 tracked artifact는 human-reviewed managed 17개뿐이고 link/metadata exact,
+  pending file 0. 남은 blocker는 AI_USAGE 사람 검증 checkbox 네 항목의 명시적 확인뿐임.
   상세: `docs/quality/evidence/final-qa.md#qa-03-submission-and-ai-disclosure-audit--2026-09-02`
 
 ### [ ] QA-04 final verification과 사람 acceptance 요청

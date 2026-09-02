@@ -233,13 +233,32 @@ approve any record.
 Verdict: **BLOCKED** at the human disclosure checkpoint. All automatic submission checks
 currently pass; `QA-03`, `SYS-05`, and dependent `QA-04` remain incomplete.
 
+Human decision and correction: on 2026-09-02 the user explicitly selected option 1,
+excluding both legacy records from the submission. Commit
+`7b44edb5fc40ea2cd6516ea35272d3a040154c6e` removes only the two recoverable tracked
+files, their disclosure links, and the obsolete test assertions that required legacy
+preservation. Initial setup RED failed exactly those two assertions. Focused
+`ProjectWiringTests` then passed 6/6; `./scripts/verify quick` passed hook 85, verifier
+contract 19, and Vitest 38 files/169 tests; committed-state setup, diff check, and clean
+status passed.
+
+Post-correction audit: the submission contains exactly 17 session artifacts, all 17 are
+managed `.s0001` records with human-reviewed status, reviewer, and digest metadata, and
+the same 17 filenames appear in both public indexes. There is no non-managed/legacy
+artifact, legacy disclosure marker, pending file, generated/lockfile diff, tracked
+runtime noise, or product debug statement. The removed files remain recoverable from Git
+history.
+
+Updated verdict: **BLOCKED only on human checklist confirmation** — the four
+`AI_USAGE.md` human-verification boxes remain unchecked until the user explicitly
+confirms them. AI did not infer or record that confirmation.
+
 ## Human-owned remainder
 
-`SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its
-four human-verification checkboxes are intentionally unchecked and two legacy pre-policy
-records are explicitly marked as awaiting human review. No AI record was reviewed or
-published by the agent. Final acceptance therefore remains a human action after the
-full automatic gate.
+`SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections and all 17
+submitted records have human-review receipts, but its four human-verification checkboxes
+are intentionally unchecked. No AI record was reviewed or published by the agent. Final
+acceptance therefore remains a human action after the full automatic gate.
 
 ## QA-CROSS-AUTH-01 Journey 간 인증 전환 — 2026-09-02
 
