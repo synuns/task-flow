@@ -1902,7 +1902,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   Follow-up record:
   `docs/quality/evidence/task-resolution.md#follow-up-correction-review`
 
-### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 사람 checkpoint
+### [x] JOURNEY-TASK-DETAIL-01 task-resolution 사람 checkpoint
 
 - Requirements: `TASK-DETAIL-01`~`TASK-DETAIL-05`
 - Risk: MEDIUM checkpoint
@@ -1912,8 +1912,8 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   경우에만 사람이 `HUMAN_APPROVED`를 기록한다.
 - Automatic verification: review target/evidence/status audit, `./scripts/verify setup`
 - Browser verification: `TASK-DETAIL-JOURNEY-VERIFY-01`의 current-commit record를 사람이 검토
-- Status: BLOCKED
-- Evidence: 사람 checkpoint 승인 대기 package. Independent correction review exact
+- Status: HUMAN_APPROVED
+- Evidence: 사람 checkpoint 검토 package. Independent correction review exact
   target `c0d648ccffd6bc88a7b3185c49ca118d151f6483` (verified product target
   `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`), verdict `PASS`, unresolved
   HIGH/MEDIUM/LOW 0; 앞선 Important 2건과 screenshot provenance Minor 해결. Historical
@@ -1947,8 +1947,11 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   제외되며 독립 390x844 artifact·측정치가 responsive behavior를 입증함. 교정 전 동일
   product target에서 focused 6 files/30, full Vitest 150/150·build·core 5/5·verifier 19,
   mapped Chromium 1/1 PASS; 문서 전용 교정 뒤 quick 150/150와 diff check PASS. Product가
-  바뀌지 않아 browser/full 재실행은 불필요함. 사람 checkpoint 승인 대기; AI가
-  `HUMAN_APPROVED`를 기록하지 않음
+  바뀌지 않아 browser/full 재실행은 불필요함. 2026-09-02 사람이 `승인 구현 진행`으로
+  current correction-review package target
+  `c0d648ccffd6bc88a7b3185c49ca118d151f6483`을 명시적으로 승인함; tracked follow-up
+  record commit `2cfda5b655d6b53675cc375cafb3f8001f8a2bdd`. 이 `HUMAN_APPROVED`는 사람의
+  명시적 승인 근거를 기록한 것이며 AI의 자체 승인이 아님
 
 ## 7. 통합·제출 QA
 
