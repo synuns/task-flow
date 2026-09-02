@@ -1978,11 +1978,14 @@ src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
   38 files/150 tests, mapped auth Chromium 2/2 PASS. Fresh named browser
   `qa-cross-auth-01` verified anonymous direct entry for `/`, `/task`, `/task/task-1`,
   `/user`, protected return/reload, and authenticated dashboard/list/detail/profile at
-  1280x720 and 390x844 without prior-route content. Terminal desktop/mobile audit was
-  `POST /api/sign-in 200` → bearer `GET /api/task/qa-cross-auth-terminal-* 401` →
-  contract-intercepted `POST /api/refresh 401`, then anonymous `/sign-in`, sign-in-only
-  GNB and no protected/prior-user DOM; focused bridge separately proved protected cache
-  eviction and unrelated-cache retention. `agent-browser cookies clear` could not clear
+  1280x720 and 390x844 without prior-route content. Terminal desktop/mobile setup used
+  a successful fixture `POST /api/sign-in 200` to replace the handler's accepted access
+  token, then reset the app-flow audit after cookie clear; the reset audit was bearer
+  `GET /api/task/qa-cross-auth-app-flow-* 401` → contract-intercepted
+  `POST /api/refresh 401`, then anonymous `/sign-in`, sign-in-only GNB and no protected/
+  prior-user DOM. Provider cases proved all protected-root eviction; the bridge case
+  proved task-root eviction, route recovery and unrelated-cache retention.
+  `agent-browser cookies clear` could not clear
   the MSW worker cookie store, classified `TOOLING`; refresh-200 diagnostics were excluded
   from PASS and the smallest deterministic page-boundary 401 was used for visible recovery.
   Reproducible commands, redacted wrapper, console/network classification, cleanup and

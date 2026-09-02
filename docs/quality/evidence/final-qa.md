@@ -80,7 +80,8 @@ Requirement/Journey: `QA-CROSS-AUTH-01`; `AUTH-07`, `NAV-02`, `NAV-03`,
 Commit: approved product/start target
 `48300e534516d702a351980e5661b3851ce02a38`; browser and automatic evidence claim
 target `0ccdc3c8b5d5acfc281577ffd37c19104c555d6f`. Product, test, API, auth policy,
-dependency and architecture files were unchanged.
+dependency and architecture files were unchanged. The terminal reproducibility
+correction was rerun on evidence target `f2b568a7880fcd7539704c3749d1d63481fbe48f`.
 
 Agent-browser session: fresh named session `qa-cross-auth-01`, closed. Fresh Vite
 server `127.0.0.1:4173` was stopped and the port was confirmed closed.
@@ -97,10 +98,14 @@ Actions: run the focused auth/provider/route/request/router suite plus the
 authenticated API bridge, `./scripts/verify quick`, and mapped auth Playwright. At both
 viewports directly enter each protected route while anonymous; sign in from an original
 protected target; reload through the refresh cookie; navigate dashboard, task list,
-task detail, and profile; invalidate the current access-token fixture, clear cookies,
-then enter a fresh detail route and force the terminal refresh response at the page
-fetch boundary. Inspect fresh snapshots, URL, protected text, navigation actions,
-redacted request audit, console/errors/network, responsive width, and screenshots.
+task detail, and profile. For each terminal viewport, send a successful fixture
+`POST /api/sign-in` while the app remains on an authenticated route; this calls the
+existing MSW `startAuthSession`, replaces the handler's accepted access token, and
+leaves the provider holding its prior token. Clear cookies, reset the audit after that
+setup request, then enter a fresh detail route and force the terminal refresh response
+at the page fetch boundary. Inspect fresh snapshots, URL, protected text, navigation
+actions, redacted request audit, console/errors/network, responsive width, and
+screenshots.
 
 Expected: every anonymous protected direct entry lands on `/sign-in` without protected
 or prior-route content; successful sign-in returns to the preserved protected target;
@@ -126,10 +131,11 @@ Automatic verification:
 - `pnpm vitest run src/app/auth/auth-provider.test.tsx
   src/app/auth/auth-route-boundary.test.tsx
   src/shared/api/authenticated-request.test.ts src/app/router.test.tsx
-  src/app/auth/authenticated-api-bridge.test.tsx` — PASS, 5 files/29 tests. The bridge
-  case independently proves terminal task 401 + refresh 401, anonymous route recovery,
-  all protected query-root eviction, unrelated-cache retention, and bounded request
-  counts.
+  src/app/auth/authenticated-api-bridge.test.tsx` — PASS, 5 files/29 tests. The provider
+  cases prove terminal refresh 401 removes all protected query roots (`dashboard`,
+  `tasks`, `task`, `user`) while retaining unrelated cache. The bridge case proves an
+  actual task request's 401 + refresh 401, task-root removal, anonymous route recovery,
+  unrelated-cache retention, and bounded request counts.
 - `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format, lint,
   generated API check, typecheck, Vitest 38 files/150 tests.
 - `pnpm exec playwright test e2e/auth-entry.spec.ts` — PASS, Chromium 2/2; protected
@@ -188,24 +194,57 @@ window.fetch = async (input, init) => {
 };
 ```
 
-Browser commands used the exact session/route form
-`agent-browser --session qa-cross-auth-01 open http://127.0.0.1:4173/<route>`,
+The initial sweep used `agent-browser --session qa-cross-auth-01`; the terminal-only
+rerun used the exact form `agent-browser --session qa-cross-auth-01-correction open
+http://127.0.0.1:4173/<route>`. Both used
 `set viewport 1280 720` / `set viewport 390 844`, `wait --url`, `snapshot -i`,
 `cookies clear`, `console`, `errors`, `network requests --filter api`, `screenshot`,
 and `close`. Complex redacted audit/setup expressions were supplied with `eval --stdin`.
-The exact final sequence at both viewports was:
+
+The exact invalidation setup was the following successful request. The literal fixture
+values are documented in `auth-entry.md`; this record keeps credentials, body values,
+and the token response redacted. The page script did not read the response body; the
+setup console buffer was cleared before evidence inspection and no body/token was
+retained.
+
+```js
+fetch("/api/sign-in", {
+  method: "POST",
+  credentials: "include",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    email: "[approved fixture email]",
+    password: "[approved fixture password]",
+  }),
+}).then((response) => ({
+  method: "POST",
+  path: "/api/sign-in",
+  status: response.status,
+}));
+```
+
+After that request returned 200 and `agent-browser ... cookies clear` completed, the
+precise boundary was:
+
+```js
+window.__qaRequestAudit = [];
+window.__qaForceRefresh401 = true;
+```
+
+Console, page-error, and network buffers were then cleared before the uncached SPA
+route transition. Therefore the invalidation setup POST is intentionally excluded from
+the following `reset 이후 app-flow audit`; this list is not a complete network sequence:
 
 ```json
 [
-  { "method": "POST", "path": "/api/sign-in", "bearer": false, "status": 200, "source": "transport" },
-  { "method": "GET", "path": "/api/task/qa-cross-auth-terminal-*", "bearer": true, "status": 401, "source": "transport" },
+  { "method": "GET", "path": "/api/task/qa-cross-auth-app-flow-*", "bearer": true, "status": 401, "source": "transport" },
   { "method": "POST", "path": "/api/refresh", "bearer": false, "status": 401, "source": "contract-intercept" }
 ]
 ```
 
 No protected replay followed the terminal refresh failure. Cache semantics are not
-inferred from browser DOM alone; they are established by the focused bridge/provider
-integration tests above.
+inferred from browser DOM alone: the provider cases establish all protected-root
+eviction, while the bridge case establishes task-root eviction and route recovery.
 
 Console/Network: normal protected sweeps recorded successful bearer responses after
 expected StrictMode aborts and no page error. The final terminal console contained only
@@ -219,9 +258,11 @@ Screenshot/Trace: `/tmp/kbhc-qa-cross-auth-01-desktop-anonymous.png`,
 `/tmp/kbhc-qa-cross-auth-01-mobile-authenticated.png`,
 `/tmp/kbhc-qa-cross-auth-01-mobile-return-user.png`,
 `/tmp/kbhc-qa-cross-auth-01-desktop-terminal-401.png`,
-`/tmp/kbhc-qa-cross-auth-01-mobile-terminal-401.png`. `file` and `sips` confirmed the
-named desktop files are 1280x720 and mobile files are 390x844. Passing mapped E2E used
-attachments only; no failure trace was generated.
+`/tmp/kbhc-qa-cross-auth-01-mobile-terminal-401.png`,
+`/tmp/kbhc-qa-cross-auth-01-correction-desktop-terminal-401.png`, and
+`/tmp/kbhc-qa-cross-auth-01-correction-mobile-terminal-401.png`. `file` and `sips`
+confirmed the named desktop files are 1280x720 and mobile files are 390x844. Passing
+mapped E2E used attachments only; no failure trace was generated.
 
 Failure class: `TOOLING` — `agent-browser cookies clear` removed browser-context cookies
 but did not remove the MSW service-worker cookie store. Two diagnostic attempts therefore
@@ -231,10 +272,11 @@ received refresh 200 and ended in the expected missing-detail 404; they are not 
 Correction: stopped probing the browser/MSW cookie implementation. Kept the required
 cookie-clear action, then used the smallest deterministic page-boundary alternative: a
 single contract-shaped refresh 401 response. Used browser evidence only for visible
-route/navigation/DOM recovery and the focused authenticated API bridge for protected
-cache/session semantics. No product or test source changed.
+route/navigation/DOM recovery, provider cases for all protected-root eviction, and the
+bridge case for task-root eviction plus route recovery. No product or test source
+changed.
 
 Rerun verdict: PASS — focused 5/29, quick 38/150, mapped Chromium 2/2, anonymous and
-authenticated cross-route sweeps, corrected terminal desktop/mobile records, screenshot
-dimensions, session/server cleanup, and closed port all passed. No accepted auth or
-security behavior change was required.
+authenticated cross-route sweeps, plus the fresh correction-session terminal desktop/
+mobile `reset 이후 app-flow audit`, screenshot dimensions, session/server cleanup, and
+closed port all passed. No accepted auth or security behavior change was required.
