@@ -2024,7 +2024,7 @@ src/pages/task-detail/task-detail.test.tsx`, `./scripts/verify quick`
   classification and cleanup:
   `docs/quality/evidence/final-qa.md#qa-cross-data-01-삭제-후-data-일관성--2026-09-02`
 
-### [ ] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
+### [x] QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep
 
 - Requirements: 전체 UI requirement와 접근성 invariant
 - Risk: MEDIUM — application-wide interaction review
@@ -2041,9 +2041,21 @@ src/pages/task-detail/task-detail.test.tsx
 src/features/delete-task/ui/delete-task-dialog.test.tsx`, `./scripts/verify quick`
 - Browser verification: named `agent-browser` route sweep, 두 viewport, keyboard,
   modal, virtual scroll, screenshot, console/network
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-02 `/root/qa_responsive_a11y_implementer` task block owner;
-  reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`
+  reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`, claim/browser/
+  automatic target `8b2ba83b90379758b33105a045f4dc7085449f23`. Exact focused 7
+  files/30 tests, quick hook 86·contract 19·Vitest 38 files/150 tests, mapped
+  auth-entry/task-discovery/task-resolution Chromium 4/4 PASS. Fresh named browser
+  `qa-responsive-a11y-01` swept `/sign-in`, `/`, `/task`, `/task/task-1`, `/user`와
+  idle delete modal at 1280x720/390x844: one main/named nav, h1/labels/action names,
+  `aria-current`, keyboard-visible focus, Card Enter route, exact-ID disabled guard,
+  modal focus wrap/Escape/trigger restore, viewport-contained modal and no horizontal
+  clipping all PASS. Approved unchanged 40-record virtual scroll and reviewed pending
+  lock/focus evidence were explicitly reused, not rerun. Expected anonymous refresh 401
+  외 page error 없음; MSW network-monitor omission은 `TOOLING`; 11 screenshot dimensions,
+  session/server cleanup and closed port verified. Full record:
+  `docs/quality/evidence/final-qa.md#qa-responsive-a11y-01-전체-route-접근성반응형-sweep--2026-09-02`
 
 ### [ ] QA-CONTRACT-01 OpenAPI·MSW·client 최종 대조
 

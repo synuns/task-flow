@@ -437,3 +437,93 @@ Rerun verdict: PASS — focused 4/19, quick 38/150, mapped Chromium 1/1 and both
 success cross-route browser cases passed; failure/unknown semantics were reused only from
 the unchanged reviewed target. Session/server cleanup, screenshot dimensions and closed
 port passed.
+
+## QA-RESPONSIVE-A11Y-01 전체 route 접근성·반응형 sweep — 2026-09-02
+
+Requirement/Journey: `QA-RESPONSIVE-A11Y-01`; 전체 UI requirement와 접근성
+invariant. 선행 `QA-CROSS-AUTH-01`과 `QA-CROSS-DATA-01`은 모두 `AI_VERIFIED`였다.
+
+Commit: reviewed start target `1cba1e1258f96a96e3966d508a22f977fb13f8e5`;
+claim 및 browser/automatic target `8b2ba83b90379758b33105a045f4dc7085449f23`.
+제품, test, E2E, dependency, architecture와 accepted behavior는 변경하지 않았다.
+
+Automatic verification:
+
+- `pnpm vitest run src/widgets/app-shell/app-shell.test.tsx
+  src/features/sign-in/ui/sign-in-form.test.tsx
+  src/widgets/dashboard-summary/dashboard-summary.test.tsx
+  src/widgets/user-profile/user-profile.test.tsx
+  src/widgets/task-list/task-list.test.tsx
+  src/pages/task-detail/task-detail.test.tsx
+  src/features/delete-task/ui/delete-task-dialog.test.tsx` — PASS, 7 files/30 tests.
+- `./scripts/verify quick` — PASS: hook 86, verifier contract 19, format, lint,
+  generated API check, typecheck, Vitest 38 files/150 tests.
+- `pnpm exec playwright test e2e/auth-entry.spec.ts e2e/task-discovery.spec.ts
+  e2e/task-resolution.spec.ts` — PASS, Chromium 4/4. 이미 lower-level에서 입증한
+  화면 조건을 새 E2E로 복제하지 않았다.
+
+Agent-browser session: fresh named `qa-responsive-a11y-01`; Vite
+`pnpm dev --host 127.0.0.1 --port 4173`. Anonymous `/sign-in`을 먼저 확인한 뒤
+기존 승인 auth fixture와 기본 3-record task fixture를 새 문서에 설치했다. Route나
+DOM 변경 뒤마다 fresh `snapshot -i`를 얻고, `set viewport 1280 720`과
+`set viewport 390 844`, keyboard `Tab`/`Shift+Tab`/`Enter`/`Escape`, DOM measure,
+`console --json`, `errors --json`, `network requests --filter api --json`, screenshot과
+`sips` dimension 검사를 사용했다.
+
+Fresh route results:
+
+| Route | Accessible/visible result | Responsive and keyboard result |
+| --- | --- | --- |
+| `/sign-in` | `main` 1, `주요 메뉴` navigation 1, h1 `로그인`; `로그인`에 `aria-current=page`; visible `이메일`/`비밀번호` labels가 `sign-in-email`/`sign-in-password`와 연결되고 초기 submit은 native disabled | widths 1280/1280, 390/390; mobile form 308px; Tab으로 `대시보드`에 도달했고 `2px solid` outline 확인 |
+| `/` | `main`/navigation 각 1, h1와 current action `대시보드`; `전체 할 일/3`, `남은 할 일/2`, `완료한 일/1` | widths 1280/1280, 390/390; mobile navigation은 fixed bottom; 대표 nav action의 `2px solid` keyboard outline 확인 |
+| `/task` | `main`/navigation 각 1, h1와 current action `할 일`; named region `할 일 목록`; 세 Card Link가 title+memo accessible name과 정확한 `/task/task-*` href, terminal text를 노출 | widths 1280/1280, 390/390; region desktop 960x500, mobile 358x560; nav에서 Tab이 Card까지 빠져나와 첫 Card의 `2px solid` outline을 보였고 Enter가 `/task/task-1`로 이동 |
+| `/task/task-1` | `main`/navigation 각 1, h1 `첫 번째 할 일`; task navigation에 `aria-current=page`; memo, original `datetime=2026-08-30T09:00:00.000Z`, `할 일 목록` Link와 `할 일 삭제` Button | widths 1280/1280, 390/390; mobile article 358px; list-return keyboard focus는 2px ring box-shadow로 비색상 표시 |
+| `/user` | `main`/navigation 각 1, h1와 current action `회원정보`; `이름/김담당`, `메모/오늘도 차근차근` | widths 1280/1280, 390/390; Tab으로 navigation action에 도달했고 `2px solid` outline 확인 |
+
+각 route에서 dashboard/task/profile 또는 sign-in 중 현재 상태에 맞는 세 action이
+유지됐고 current route는 색상만이 아니라 `aria-current=page`로 전달됐다. 모든
+fresh document에서 `documentElement.scrollWidth <= innerWidth`였으며 horizontal
+clipping은 없었다.
+
+Fresh idle delete modal: `/task/task-1`에서 `할 일 삭제`를 열자
+`role=alertdialog`, accessible name `할 일 삭제`, visible `할 일 ID` label과
+`#delete-task-id` association, 빈 값의 native-disabled `삭제 확인`이 확인됐다.
+`wrong`은 disabled를 유지하고 exact `task-1`만 enabled로 바뀌었으며 submit하지
+않았다. Mobile dialog는 left/right `16/374`, `358x326`으로 390x844 viewport 안에
+있었고 document width도 390이었다. Idle enabled focusables는 input과 `취소`였으며
+`취소`에서 Tab은 input으로, input에서 Shift+Tab은 `취소`로 wrap되고 두 경우 모두
+dialog containment가 true였다. Exact 입력 상태에서 Escape가 modal을 닫고 focus를
+trigger `할 일 삭제`로 복구했다. Desktop dialog도 `512x282`로 1280x720 안에 있었다.
+
+Explicit reuse, not a fresh run: 40-record bounded-DOM/terminal-scroll acceptance는
+사람이 승인한 unchanged `docs/quality/evidence/task-discovery.md#task-list-virtual-ux-01`
+기록을 재사용한다. 그 기록은 desktop `clientHeight=500`, `scrollHeight=3840`,
+`scrollTop=3340`, 6/40 mounted와 mobile `clientHeight=560`, 6/40 mounted,
+`3280→2780→3280` scroll 및 page/keyboard 가용성을 입증한다. 이번 sweep은 기본
+3-record fixture만 사용했고 fresh 40-record 실행을 주장하지 않는다. Pending 중
+입력/취소/Escape/outside-click lock과 focus 보존은 unchanged reviewed
+`docs/quality/evidence/task-resolution.md#task-delete-outcome-view-01`을 재사용했으며,
+이번 browser modal은 idle 상태만 fresh 검증했다.
+
+Console/Network: anonymous sign-in bootstrap의 contract `POST /api/refresh 401`만
+예상 console error였고, auth fixture 설치 뒤 dashboard/task/detail/user는 MSW 200
+log였다. `agent-browser errors --json`은 `[]`. Service Worker가 처리한 API는
+`network requests --filter api --json`에 `[]`로 나타나는 기존 `TOOLING` 한계가 있어
+request-count 증거로 사용하지 않았고 mapped Playwright가 cross-boundary 요청을
+입증한다. Console inspection 과정의 auth response body나 token은 evidence에
+보존하지 않았다.
+
+Screenshot/Trace: `/tmp/kbhc-qa-responsive-a11y-01-{sign-in,dashboard,task,detail,user}-desktop.png`
+각 1280x720, 대응 `-mobile.png` 각 390x844;
+`/tmp/kbhc-qa-responsive-a11y-01-delete-modal-mobile.png` 390x844. `sips`가 11개
+파일의 dimensions를 확인했다. Passing Playwright는 failure trace를 만들지 않았다.
+
+Failure class/correction: `TEST/TOOLING` — desktop task keyboard probe가 이전 focus를
+상속해 task-3 Card Enter에는 성공했지만 task-1 wait와 불일치하여 acceptance에서
+제외했고, 첫 desktop modal fill은 fresh snapshot의 `@e1` 대신 stale `@e6`을 사용해 실행되지 않았다. 제품
+실패로 간주하지 않고 fresh direct `/task/task-1` snapshot과 mobile navigation-to-
+Card keyboard sequence, stable `#delete-task-id` selector로 전체 acceptance를 다시
+측정했다. `agent-browser errors`에는 page error가 없었고 제품 수정은 필요 없었다.
+
+Rerun verdict: PASS — unresolved `UX_ACCESSIBILITY`, HIGH 또는 MEDIUM finding 없음.
+Named browser session과 Vite server를 종료했고 port 4173이 닫힌 것을 확인했다.
