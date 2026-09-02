@@ -2389,7 +2389,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `HUMAN_APPROVED`나 final acceptance를 주장하지 않음.
   상세: `docs/quality/evidence/final-qa.md#qa-03-submission-and-ai-disclosure-audit--2026-09-02`
 
-### [ ] QA-04 final verification과 사람 acceptance 요청
+### [x] QA-04 final verification과 사람 acceptance 요청
 
 - Requirements: 전체
 - Risk: HIGH — 최종 완료는 사람 소유
@@ -2401,7 +2401,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: `./scripts/verify full`
 - Browser verification: 네 core journey의 최종 commit evidence, console/network,
   accessibility, responsive spot check
-- Status: BLOCKED
+- Status: HUMAN_APPROVED
 - Evidence: `./scripts/verify full` PASS on `8a09746` — setup 79 tests, 33 Vitest
   files/118 tests, build, Chromium core 5건; 네 Journey의 tracked 사람 승인 근거가
   없어 checkpoint 미승인, `QA-02`/`QA-03`과 사람 최종 acceptance 대기.
@@ -2429,4 +2429,5 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   exit 0 — hook 85, verifier 19, Vitest 38/169, build, fresh Chromium 5/5, verifier
   regression 19/19; requirement 27/27, Journey 4/4, artifact/index/disclosure 17/17/17,
   scanner/pending/non-managed/assignment/generated/package/diff/status audit PASS;
-  Verdict: PASS. 필수 plan-completion adversarial review 완료, 사람 최종 acceptance 대기.
+  Verdict: PASS. 필수 plan-completion adversarial review 완료. Human decision:
+  2026-09-03 사용자가 최종 acceptance 요청에 선택 1로 명시 승인했다.

@@ -1594,3 +1594,8 @@ assignment/generated/package diff 0, `git diff --check`, and clean worktree.
 Verdict: **PASS**. The required plan-completion adversarial review and independent QA-04
 review are complete with no unresolved finding. QA-04 remains `[ ]` / `BLOCKED`; final
 acceptance and `HUMAN_APPROVED` are reserved for a separate person decision.
+
+Human decision: on 2026-09-03 the user explicitly selected option 1 and approved final
+acceptance after receiving the full-gate and independent-review results. QA-04 therefore
+transitions to `[x]` / `HUMAN_APPROVED`; this records the person's decision rather than
+an AI acceptance judgment.
