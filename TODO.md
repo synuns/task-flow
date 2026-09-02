@@ -2212,8 +2212,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Shift+Space sibling defect를 남긴다. 저장소 date-time pattern은 없지만 direct
   Zod 4.5.2의 `z.iso.datetime({ offset: true })`를 canonical API boundary에
   재사용할 수 있다. `Date.parse`와 UI fallback은 strict OAS guard를 대신하지 못하고,
-  fallback-only는 invalid cached data를 남긴다. Zod는 leap second, `-00:00`,
-  lowercase `t/z` 같은 rare RFC3339 form을 좁게 거부한다. HIGH 결정 질문은
+  fallback-only는 invalid cached data를 남긴다. Zod는 leap second와 lowercase
+  `t/z` 같은 rare RFC3339 form을 좁게 거부한다. HIGH 결정 질문은
   `1`(권장: Zod canonical boundary rejection + full 7-key family handoff)과
   `2`(narrow: UI fallback + Home-only; OAS-invalid cache와 sibling focus defect를
   명시적으로 남기는 exception 필요) 중 선택이다. QA-02는 `BLOCKED`, product/test와
@@ -2233,6 +2233,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `다시 불러오기`로 전환됐고 click 후 request audit 2건을 확인했다.
   Finding 1은 `RESOLVED`; rare valid RFC3339 축소 caveat는 유지한다. Finding 2는
   수정하지 않은 unresolved MEDIUM이므로 QA-02는 `[ ]`/`BLOCKED`를 유지한다.
+  Finding 1 reviewer target `394bd7c8c35d2218b9d7ad79b2c95388eb43af67`의
+  verdict는 `APPROVE_WITH_MINOR`: Zod가 `-00:00`을 거부한다는 evidence 주장만
+  실제 probe와 불일치했다. 해당 주장을 제거하고 실제 거부되는 leap second와
+  lowercase `t/z` caveat만 유지했다. 제품/테스트와 Finding 1 `RESOLVED`, Finding 2
+  unresolved MEDIUM, QA-02 `[ ]`/`BLOCKED` 상태는 불변이다.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 

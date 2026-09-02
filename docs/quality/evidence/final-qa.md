@@ -1004,8 +1004,8 @@ invalid offset syntax. Zod's own JSON Schema converter maps `format: date-time` 
 check, making it the minimum no-new-dependency canonical API-boundary guard.
 `Date.parse` is unsuitable because it also accepts non-date-time or extended forms such
 as date-only, lowercase separators, and `24:00`. Literal full-RFC3339 acceptance has a
-narrowing caveat: Zod rejects rare permitted forms including leap seconds, `-00:00`, and
-lowercase `t/z`. That caveat should remain explicit rather than be hidden behind a
+narrowing caveat: Zod rejects rare permitted forms including leap seconds and lowercase
+`t/z`. That caveat should remain explicit rather than be hidden behind a
 custom parser. A view-only fallback prevents `Intl.DateTimeFormat` from throwing but
 still treats an OAS-invalid response as successful data and leaves it in the query
 cache; it is not a substitute for boundary rejection.
@@ -1035,7 +1035,7 @@ The authorized scope is the existing direct Zod 4.5.2
 `z.iso.datetime({ offset: true })` check at the task-detail API boundary and one
 invalid-date response regression. No UI fallback, dependency, helper, or framework is
 authorized. Canonical `Z` and numeric-offset values remain valid. The narrowing caveat
-remains explicit: rare RFC3339-valid leap seconds, `-00:00`, and lowercase `t/z` are
+remains explicit: rare RFC3339-valid leap seconds and lowercase `t/z` are
 rejected by this chosen canonical validator.
 
 Finding 1 correction status: `IN_PROGRESS`.
@@ -1064,7 +1064,7 @@ Minimal correction: `src/shared/api/tasks.ts` reuses direct Zod 4.5.2 and adds o
 existing detail response guard. The exact-key guard, API shape, view fallback, auth,
 delete, cache, dependency set, and focus/key finding are unchanged. The approved
 narrowing caveat remains: this canonical validator rejects rare RFC3339-valid leap
-seconds, `-00:00`, and lowercase `t/z` forms.
+seconds and lowercase `t/z` forms.
 
 Fresh GREEN on the implementation/test target:
 
@@ -1099,3 +1099,17 @@ green.
 Finding 2 verdict: unchanged unresolved MEDIUM. No focus/key source or test was edited.
 QA-02 therefore remains `[ ]` / `BLOCKED` pending that separate correction and the
 corrected-target independent rerun.
+
+### Finding 1 review follow-up — 2026-09-02
+
+Reviewer target: `394bd7c8c35d2218b9d7ad79b2c95388eb43af67`.
+
+Verdict: **APPROVE_WITH_MINOR**. The implementation, regression test, and browser
+evidence support Finding 1 `RESOLVED`. The reviewer found one documentation-only
+accuracy issue: the evidence said Zod rejects the RFC3339 `-00:00` offset, while a
+direct `z.iso.datetime({ offset: true })` probe accepts it. That false claim has been
+removed from all QA-02 tracked evidence. The narrowing caveat now names only the
+verified rejected forms: leap seconds and lowercase `t/z`.
+
+No product or test file changed. Finding 2 remains unresolved MEDIUM, so QA-02 remains
+`[ ]` / `BLOCKED`.
