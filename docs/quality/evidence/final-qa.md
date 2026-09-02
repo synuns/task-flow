@@ -267,13 +267,27 @@ Current verdict: all QA-03 acceptance conditions are satisfied pending independe
 submission review of the exact target. The task returns to `IN_PROGRESS`; no final
 acceptance is claimed.
 
+Independent review — Review target:
+`2a94d8025edc3d67e253e48f7fb9f9d39f88ecca`. Reviewer/independence: changes were not
+written by the read-only `/root/qa_submission_reviewer`. Checks: README runtime and
+verification commands; public artifact/index/AI_USAGE `17/17/17` identity and metadata;
+legacy exclusion scope; the four person-confirmed checklist entries; local links;
+secret, debug, generated, and runtime-noise boundaries; and approval claims. Findings:
+no HIGH, MEDIUM, or LOW finding. Corrections: none. Rerun: `./scripts/verify setup`
+passed hook 85 and verifier contract 19; `./scripts/verify quick` passed format, lint,
+typecheck, and Vitest 38 files/169 tests; `git diff --check main...2a94d80`, exact-target
+diff, staging, and worktree status were clean. Verdict: **PASS**.
+
+QA-03 and `SYS-05` transition to `AI_VERIFIED`. This does not claim
+`HUMAN_APPROVED` or final acceptance.
+
 ## Human-owned remainder
 
-`SYS-05` remains `IN_PROGRESS` pending QA-03 independent review: `AI_USAGE.md` contains
-the required sections, all 17 submitted records have human-review receipts, and the user
-explicitly confirmed all four human-verification checkboxes. No AI record was reviewed
-or published by the agent. Final acceptance remains a separate human action after the
-full automatic gate.
+`SYS-05` is `AI_VERIFIED`: `AI_USAGE.md` contains the required sections, all 17 submitted
+records have human-review receipts, the user explicitly confirmed all four
+human-verification checkboxes, and the independent QA-03 review passed. No AI record was
+reviewed or published by the agent. Final acceptance remains a separate human action
+after the full automatic gate.
 
 ## QA-CROSS-AUTH-01 Journey 간 인증 전환 — 2026-09-02
 
