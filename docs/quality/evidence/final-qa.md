@@ -190,11 +190,54 @@ clean status PASS.
 Verdict: **PASS** — `QA-HARNESS-01` transitions to `[x]` / `AI_VERIFIED`. This does not
 claim `HUMAN_APPROVED`, AI record publication, or final acceptance.
 
+## QA-03 Submission and AI Disclosure Audit — 2026-09-02
+
+Requirement: `SYS-05`; task: `QA-03`.
+
+Targets: README correction `9f2bc9f522cf1987b8054eb1b9cb30b09deba462`;
+legacy disclosure correction `a2d83d6b74fabe56760367ed0948f4aca351678d`; audit target is
+the latter commit.
+
+Automatic result:
+
+- README now states the package-declared Node range and pnpm 10.15.1, frozen install,
+  development and production-preview commands, submitted MSW behavior, local test
+  account, three canonical verify modes, and Chromium bootstrap.
+- `AI_USAGE.md` contains every assignment-required section and the actual Codex/model,
+  scope, prompt summary, human-verification checklist, publication policy, and records.
+- The 17 managed public artifacts each contain `human-reviewed` status, reviewer, and
+  reviewed digest metadata. Their filenames exactly match all 17 links in both
+  `artifacts/index.md` and the managed `AI_USAGE.md` region.
+- Ignored `.codex/review-pending` contains zero files. The branch has no generated API,
+  lockfile, or `public/mockServiceWorker.js` diff; no tracked runtime report/log/temp
+  artifact; and no product `console.log`, `console.debug`, `console.trace`, or `debugger`.
+  The `main...HEAD` files are limited to task-resolution and final-QA implementation,
+  tests, plans, evidence, config, and submission documentation.
+- `pnpm run format:check`, `./scripts/verify setup` (hook 86, verifier contract 19), and
+  `git diff --check` PASS.
+
+Human blocker: two tracked pre-policy artifacts have no current review receipt and retain
+the `Human review required before submission` banner:
+
+- `artifacts/codex-session-01a04c3e-0a24-7e30-a767-64f1e2c4f3ae.md`
+- `artifacts/codex-session-01a04c77-2685-7013-ad38-d81feba1b2a4.md`
+
+Both are explicitly labeled `legacy/pre-policy`, excluded from the public managed index,
+and listed as awaiting human review. The current scanner reports
+`unredacted_secret` BLOCKING on each, so neither may be treated as reviewed from an old
+commit title. A person must inspect the underlying context and either approve a safe
+submission treatment or exclude the artifact. The four `AI_USAGE.md` human-verification
+checkboxes also remain intentionally unchecked. AI did not select, publish, delete, or
+approve any record.
+
+Verdict: **BLOCKED** at the human disclosure checkpoint. All automatic submission checks
+currently pass; `QA-03`, `SYS-05`, and dependent `QA-04` remain incomplete.
+
 ## Human-owned remainder
 
 `SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its
-four human-verification checkboxes are intentionally unchecked and a legacy pre-policy
-record is explicitly marked as awaiting human review. No AI record was reviewed or
+four human-verification checkboxes are intentionally unchecked and two legacy pre-policy
+records are explicitly marked as awaiting human review. No AI record was reviewed or
 published by the agent. Final acceptance therefore remains a human action after the
 full automatic gate.
 

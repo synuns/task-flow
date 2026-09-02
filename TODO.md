@@ -2355,12 +2355,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: `./scripts/verify setup`, secret/generated-noise scan,
   `git diff --check`
 - Browser verification: 적용 없음
-- Status: IN_PROGRESS
+- Status: BLOCKED
 - Evidence: `AI_USAGE.md` 필수 section과 자동 검증, branch diff의 secret/debug/
-  generated/unrelated scan PASS; 기존 `legacy/pre-policy` record는 문서상 사람 검토
+  generated/unrelated scan PASS; 기존 `legacy/pre-policy` records는 문서상 사람 검토
   대기이며 네 사람 검증 checkbox도 미체크; AI record 검토·게시는 사람 TTY 승인 필요.
   2026-09-02 Codex `/root` task block owner; `QA-02` dependency 해소 뒤 README 실행 정보,
-  공개 managed record/index/disclosure 일치, pending/noise/secret 범위의 최신 감사를 시작함
+  공개 managed record/index/disclosure 일치, pending/noise/secret 범위의 최신 감사를
+  실행했다. `9f2bc9f522cf1987b8054eb1b9cb30b09deba462`에서 Node/pnpm install, dev,
+  production preview, MSW, test account와 세 verify mode를 README에 정확히 기록했다.
+  Managed artifact 17개는 모두 `human-reviewed` metadata가 있고 index/AI_USAGE 각 17개
+  link와 exact 일치, ignored pending file 0, generated/lockfile diff와 tracked runtime
+  noise 0, product debug statement 0, format/setup/diff check PASS. 그러나 현재 receipt가
+  없는 legacy artifact 두 개가 제출 tree에 남아 current scanner의
+  `unredacted_secret` BLOCKING review 대상이고, AI_USAGE 사람 검증 checkbox 네 개도
+  미체크다. 두 기록을 사람이 직접 검수해 승인 또는 제출 제외하고 checklist를 확인할
+  때까지 QA-03은 BLOCKED; AI는 TTY selection/publication·삭제·사람 체크를 대신하지 않음.
+  상세: `docs/quality/evidence/final-qa.md#qa-03-submission-and-ai-disclosure-audit--2026-09-02`
 
 ### [ ] QA-04 final verification과 사람 acceptance 요청
 
