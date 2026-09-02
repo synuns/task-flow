@@ -242,6 +242,56 @@ Browser record:
 - Screenshot/trace: `/tmp/kbhc-task-detail-journey-verify-01.png`; mapped Playwright
   `task-resolution` attachment (failure trace/video policy was not triggered).
 
+Review correction — exact DELETE audit: fresh named session
+`task-detail-journey-verify-01-review` re-established the approved fixture at
+`/task/task-1`. After a fresh snapshot it installed the following page-level wrapper.
+`new Request(input, init)` applies `init` overrides while accepting string, `URL`, or
+`Request` input; the audit retains only method, path and bearer presence and the original
+fetch receives the untouched arguments.
+
+```js
+window.__task5OriginalFetch = window.fetch;
+window.__task5DeleteAudit = [];
+window.fetch = (input, init) => {
+  const request = new Request(input, init);
+  const method = request.method.toUpperCase();
+  const path = new URL(request.url).pathname;
+  if (method === "DELETE" && path === "/api/task/task-1") {
+    window.__task5DeleteAudit.push({
+      method,
+      path,
+      bearer: request.headers.get("Authorization")?.startsWith("Bearer ") === true,
+    });
+  }
+  return window.__task5OriginalFetch(input, init);
+};
+```
+
+The audit was reset immediately before stable-selector fills. `wrong`, `task-1 ` and
+`TASK-1` each left `button[type=submit]` disabled, and the structured audit output after
+the complete non-exact matrix was:
+
+```json
+[]
+```
+
+Exact `task-1` enabled `button[type=submit]`; its click navigated to `/task`, and the
+structured audit output was exactly:
+
+```json
+[
+  { "method": "DELETE", "path": "/api/task/task-1", "bearer": true }
+]
+```
+
+`agent-browser network requests --filter api/task` returned `No requests captured`
+because the service-worker request log omitted the in-session DELETE; it is not count
+evidence. The page audit above and MSW's DELETE 200 console entry are the evidence.
+Console contained only Vite/MSW diagnostics plus the expected pre-fixture refresh 401;
+`agent-browser errors` was empty. Screenshot:
+`/tmp/kbhc-task-detail-journey-verify-01-review.png`. The correction session and Vite
+server were closed.
+
 Failure/correction/rerun: no product, test or mapped-E2E failure occurred. The known
 service-worker request-log limitation was handled by the page-level observation above;
 stable CSS selectors were used for all confirmation fills. Focused, quick, mapped E2E,

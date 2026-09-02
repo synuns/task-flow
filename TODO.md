@@ -1825,6 +1825,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`
   list/detail/dashboard 일관성 evidence에 trace된다.
 - Automatic verification: `pnpm vitest run
 src/features/delete-task/ui/delete-task-dialog.test.tsx
+src/features/delete-task/model/attempt-guard.test.ts
 src/features/delete-task/model/delete-task.test.ts
 src/features/delete-task/model/delete-cache.test.ts
 src/pages/task-detail/task-detail.test.tsx
