@@ -4,12 +4,18 @@ import type { ApiError } from "./api-error";
 type ErrorResponse = components["schemas"]["ErrorResponse"];
 type Guard<T> = (value: unknown) => value is T;
 
-function isErrorResponse(value: unknown): value is ErrorResponse {
+export function hasExactKeys(
+  value: unknown,
+  keys: readonly string[],
+): value is Record<string, unknown> {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
   return (
-    value !== null &&
-    typeof value === "object" &&
-    typeof (value as Record<string, unknown>).errorMessage === "string"
+    Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key))
   );
+}
+
+function isErrorResponse(value: unknown): value is ErrorResponse {
+  return hasExactKeys(value, ["errorMessage"]) && typeof value.errorMessage === "string";
 }
 
 function invalidResponse(status: number): ApiError {

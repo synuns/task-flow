@@ -1,6 +1,7 @@
 import { resetAuthFixture } from "@/mocks/fixtures/auth";
 import { authHandlers } from "@/mocks/handlers/auth";
 import { server } from "@/mocks/server";
+import { HttpResponse, http } from "msw";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { refreshAccessToken, signIn } from "./auth";
 
@@ -22,6 +23,35 @@ describe("auth API", () => {
 
     expect(tokens.accessToken.split(".")).toHaveLength(3);
     expect(tokens.refreshToken.split(".")).toHaveLength(3);
+  });
+
+  it("rejects a sign-in request with an undocumented property", async () => {
+    const response = await fetch(new URL("/api/sign-in", globalThis.location.origin), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "user@example.com",
+        password: "Password1",
+        role: "admin",
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      errorMessage: "이메일 또는 비밀번호가 올바르지 않습니다.",
+    });
+  });
+
+  it("rejects a token response with an undocumented property", async () => {
+    server.use(
+      http.post("/api/sign-in", () =>
+        HttpResponse.json({ accessToken: "access", refreshToken: "refresh", role: "admin" }),
+      ),
+    );
+
+    await expect(
+      signIn({ email: "user@example.com", password: "Password1" }),
+    ).rejects.toMatchObject({ kind: "invalid-response", status: 200 });
   });
 
   it("uses the response cookie to rotate both tokens", async () => {

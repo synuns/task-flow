@@ -38,4 +38,14 @@ describe("dashboard API", () => {
       getDashboard(clientFor({ numOfTask: 3, numOfRestTask: 2 }, capture)),
     ).rejects.toMatchObject({ kind: "invalid-response" });
   });
+
+  it("rejects a dashboard response with an undocumented property", async () => {
+    const capture: { url?: string; method?: string } = {};
+
+    await expect(
+      getDashboard(
+        clientFor({ numOfTask: 3, numOfRestTask: 2, numOfDoneTask: 1, owner: "user-1" }, capture),
+      ),
+    ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
 });

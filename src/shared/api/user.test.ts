@@ -35,4 +35,12 @@ describe("user API", () => {
       kind: "invalid-response",
     });
   });
+
+  it("rejects a profile response with an undocumented property", async () => {
+    const capture: { url?: string; method?: string } = {};
+
+    await expect(
+      getUser(clientFor({ name: "김담당", memo: "오늘도 차근차근", role: "admin" }, capture)),
+    ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
 });

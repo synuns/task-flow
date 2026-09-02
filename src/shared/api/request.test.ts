@@ -51,6 +51,25 @@ describe("requestJson", () => {
     ).rejects.toEqual({ kind: "http", status: 401, message: "인증이 필요합니다." });
   });
 
+  it("classifies an error response with an undocumented property as invalid", async () => {
+    server.use(
+      http.get("http://localhost/api/dashboard", () =>
+        HttpResponse.json(
+          { errorMessage: "인증이 필요합니다.", reason: "expired" },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    await expect(
+      requestJson("http://localhost/api/dashboard", { method: "GET" }, isDashboardResponse),
+    ).rejects.toEqual({
+      kind: "invalid-response",
+      status: 401,
+      message: "API 응답 형식이 올바르지 않습니다.",
+    });
+  });
+
   it("classifies non-JSON as an invalid response", async () => {
     server.use(
       http.get(

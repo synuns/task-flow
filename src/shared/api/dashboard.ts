@@ -1,5 +1,6 @@
 import type { components } from "@/generated/openapi";
 import type { ApiClient } from "./api-client-context";
+import { hasExactKeys } from "./request";
 
 type GeneratedDashboardResponse = components["schemas"]["DashboardResponse"];
 export type DashboardMetrics = {
@@ -9,12 +10,11 @@ export type DashboardMetrics = {
 };
 
 function isDashboardMetrics(value: unknown): value is GeneratedDashboardResponse {
-  if (!value || typeof value !== "object") return false;
-  const data = value as Record<string, unknown>;
   return (
-    Number.isInteger(data.numOfTask) &&
-    Number.isInteger(data.numOfRestTask) &&
-    Number.isInteger(data.numOfDoneTask)
+    hasExactKeys(value, ["numOfTask", "numOfRestTask", "numOfDoneTask"]) &&
+    Number.isInteger(value.numOfTask) &&
+    Number.isInteger(value.numOfRestTask) &&
+    Number.isInteger(value.numOfDoneTask)
   );
 }
 

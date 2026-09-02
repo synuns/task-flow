@@ -8,7 +8,15 @@ const expiredRefreshCookie = "token=; Path=/api/refresh; HttpOnly; Max-Age=0; Sa
 export const authHandlers = [
   http.post("/api/sign-in", async ({ request }) => {
     const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-    if (body?.email !== "user@example.com" || body.password !== "Password1") {
+    if (
+      body === null ||
+      Array.isArray(body) ||
+      Object.keys(body).length !== 2 ||
+      !Object.hasOwn(body, "email") ||
+      !Object.hasOwn(body, "password") ||
+      body.email !== "user@example.com" ||
+      body.password !== "Password1"
+    ) {
       return HttpResponse.json(
         { errorMessage: "이메일 또는 비밀번호가 올바르지 않습니다." },
         { status: 400 },

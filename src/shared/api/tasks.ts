@@ -1,5 +1,6 @@
 import type { components } from "@/generated/openapi";
 import type { ApiClient } from "./api-client-context";
+import { hasExactKeys } from "./request";
 
 type GeneratedTaskListResponse = components["schemas"]["TaskListResponse"];
 export type TaskListItem = {
@@ -13,38 +14,35 @@ export type TaskDetail = { title: string; memo: string; registerDatetime: string
 export type DeleteTaskResult = { success: true };
 
 function isTaskItem(value: unknown): value is TaskListItem {
-  if (!value || typeof value !== "object") return false;
-  const data = value as Record<string, unknown>;
   return (
-    typeof data.id === "string" &&
-    typeof data.title === "string" &&
-    typeof data.memo === "string" &&
-    (data.status === "TODO" || data.status === "DONE")
+    hasExactKeys(value, ["id", "title", "memo", "status"]) &&
+    typeof value.id === "string" &&
+    typeof value.title === "string" &&
+    typeof value.memo === "string" &&
+    (value.status === "TODO" || value.status === "DONE")
   );
 }
 
 function isTaskPage(value: unknown): value is GeneratedTaskListResponse {
-  if (!value || typeof value !== "object") return false;
-  const data = value as Record<string, unknown>;
   return (
-    Array.isArray(data.data) && data.data.every(isTaskItem) && typeof data.hasNext === "boolean"
+    hasExactKeys(value, ["data", "hasNext"]) &&
+    Array.isArray(value.data) &&
+    value.data.every(isTaskItem) &&
+    typeof value.hasNext === "boolean"
   );
 }
 
 function isTaskDetail(value: unknown): value is TaskDetail {
-  if (!value || typeof value !== "object") return false;
-  const data = value as Record<string, unknown>;
   return (
-    typeof data.title === "string" &&
-    typeof data.memo === "string" &&
-    typeof data.registerDatetime === "string"
+    hasExactKeys(value, ["title", "memo", "registerDatetime"]) &&
+    typeof value.title === "string" &&
+    typeof value.memo === "string" &&
+    typeof value.registerDatetime === "string"
   );
 }
 
 function isDeleteTaskResult(value: unknown): value is DeleteTaskResult {
-  return (
-    !!value && typeof value === "object" && (value as Record<string, unknown>).success === true
-  );
+  return hasExactKeys(value, ["success"]) && value.success === true;
 }
 
 export function getTasks(client: ApiClient, page: number, signal?: AbortSignal): Promise<TaskPage> {

@@ -1,5 +1,5 @@
 import type { components } from "@/generated/openapi";
-import { requestJson } from "./request";
+import { hasExactKeys, requestJson } from "./request";
 
 type GeneratedAuthTokenResponse = components["schemas"]["AuthTokenResponse"];
 export type AuthTokenPair = { accessToken: string; refreshToken: string };
@@ -10,9 +10,11 @@ function apiUrl(path: string): URL {
 }
 
 function isAuthTokenPair(value: unknown): value is GeneratedAuthTokenResponse {
-  if (!value || typeof value !== "object") return false;
-  const data = value as Record<string, unknown>;
-  return typeof data.accessToken === "string" && typeof data.refreshToken === "string";
+  return (
+    hasExactKeys(value, ["accessToken", "refreshToken"]) &&
+    typeof value.accessToken === "string" &&
+    typeof value.refreshToken === "string"
+  );
 }
 
 export function signIn(credentials: SignInCredentials): Promise<AuthTokenPair> {
