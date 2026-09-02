@@ -52,8 +52,8 @@
 | 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
-| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | BLOCKED — 검증·review 완료, 사람 checkpoint 대기 |
-| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — task-resolution 사람 checkpoint 전     |
+| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
+| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | IN_PROGRESS                    |
 
 ## 0. 기획·결정 준비
 
@@ -1970,8 +1970,10 @@ src/shared/api/authenticated-request.test.ts src/app/router.test.tsx`,
   `./scripts/verify quick`
 - Browser verification: `/sign-in`, `/`, `/task`, `/task/:id`, `/user`에서 sign-in,
   reload, direct entry, terminal 401, 390x844/1280x720과 console/network
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-02 `/root/qa_cross_auth_implementer` task block owner;
+  requirements `AUTH-07`, `NAV-02`, `NAV-03` and protected API rows; approved start
+  target `48300e534516d702a351980e5661b3851ce02a38`
 
 ### [ ] QA-CROSS-DATA-01 삭제 후 data 일관성
 
