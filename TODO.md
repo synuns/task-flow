@@ -2322,7 +2322,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   regression 19/19. MSW web-storage warning 없음, 기존 non-failing chunk-size warning만
   존재, diff check와 clean status PASS. Exact evidence:
   `docs/quality/evidence/final-qa.md#qa-harness-01-latest-full-gate--2026-09-02`;
-  independent corrected-target review 대기
+  exact review target `8ff7bbd268b72b2af392b706f447c37c91ebd87a`의 fresh read-only
+  `/root/qa_harness_latest_reviewer`가 verifier regression 18/19 FAIL을 재현했다.
+  Nested quick의 5초 timeout 대상이 단독 1/1·430ms PASS인
+  `shadcn-primitives.test.tsx`로 이동해, dialog 분리만으로 suite-level 병렬 자원 경합을
+  해결하지 못했다는 MEDIUM `TEST` finding이다. QA-HARNESS는 `IN_PROGRESS`를 유지하며
+  Vitest worker 상한의 최소 contract 보정과 corrected canonical full 재검증 대기
 
 ### [ ] QA-03 제출 산출물과 AI disclosure
 

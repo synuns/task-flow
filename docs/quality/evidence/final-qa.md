@@ -108,6 +108,33 @@ Verdict: corrected gate PASS; `QA-HARNESS-01` remains `IN_PROGRESS` until an ind
 review validates this exact correction and evidence target. No `HUMAN_APPROVED`, AI
 record publication, or final acceptance is claimed.
 
+### Independent review — first target
+
+Review target: `8ff7bbd268b72b2af392b706f447c37c91ebd87a`.
+
+Reviewer: `/root/qa_harness_latest_reviewer`, a fresh read-only reviewer that authored
+neither the correction nor its evidence.
+
+Checks: inspected the baseline/start/correction/evidence range and harness contracts;
+ran focused dialog, verifier contract, harness config, setup, diff/status, and the full
+verifier regression suite.
+
+Findings: **MEDIUM / `TEST`** — verifier regression was 18/19 FAIL. Its nested quick
+timed out in `shadcn-primitives.test.tsx` instead of the corrected delete dialog: the
+full Vitest result was 37/38 files and 167/168 tests, while that file alone passed 1/1
+in 430ms. The dialog split retains its assertions and interaction semantics, but it
+does not resolve the suite-level five-second timeout reliability problem.
+
+Corrections: N/A in this read-only review. Product, config, timeout, and dependencies
+were unchanged at the reviewed target.
+
+Rerun: dialog 5/5, verifier contract 19/19, harness config 6/6, setup hook 86 plus
+contract 19, diff check and clean status PASS; `python3 -m unittest tests/test_verify.py
+-v` FAIL as above.
+
+Verdict: **FAIL** — bound Vitest suite concurrency and rerun the corrected canonical
+full gate before completing `QA-HARNESS-01`.
+
 ## Human-owned remainder
 
 `SYS-05` remains `IN_PROGRESS`: `AI_USAGE.md` contains the required sections, but its
