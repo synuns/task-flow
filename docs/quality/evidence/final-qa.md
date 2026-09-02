@@ -746,3 +746,23 @@ negative boundary에 대한 fresh named browser run은 추가하지 않았으며
 Correction verdict: PASS — 아홉 schema boundary와 10 non-2xx branch가 strict
 `additionalProperties: false` behavior를 공유하고, conforming happy path는 유지됐다.
 `QA-CONTRACT-01`은 `AI_VERIFIED`이며 최종 승인은 사람 책임으로 남긴다.
+
+Approval review follow-up: review target
+`d9b563f20678c47fb62bf32953dae9048a421b40`의 verdict는 `PASS_WITH_LOW`였다.
+유효한 Minor는 `src/shared/api/tasks.test.ts`의 task-detail extra-property case가
+`registerDatetime: "now"`를 사용해, 추가 key 외에 OAS `date-time` field도 동시에
+무효한 fixture였다는 점이다. Correction/evidence target
+`a1fa0a4a682720acb49a0a232b314d8a35fc48f5`에서 이미 사용 중인
+`2026-08-30T09:00:00.000Z`로 교체해 추가 `id` key만 reject 원인으로
+격리했다. Product code는 변경하지 않았다.
+
+Fresh correction verification:
+
+- `pnpm vitest run src/shared/api/tasks.test.ts` — PASS, 7/7.
+- `pnpm vitest run src/shared/api/auth.test.ts src/shared/api/dashboard.test.ts
+  src/shared/api/user.test.ts src/shared/api/tasks.test.ts
+  src/shared/api/request.test.ts` — PASS, 5 files/25 tests.
+- `pnpm run format:check`, `git diff --check` — PASS.
+
+Follow-up verdict: PASS — Minor를 교정했고 strict exact-key behavior와
+`QA-CONTRACT-01` `AI_VERIFIED` 상태는 유지된다.
