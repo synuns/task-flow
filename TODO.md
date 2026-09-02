@@ -2404,4 +2404,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Status: BLOCKED
 - Evidence: `./scripts/verify full` PASS on `8a09746` — setup 79 tests, 33 Vitest
   files/118 tests, build, Chromium core 5건; 네 Journey의 tracked 사람 승인 근거가
-  없어 checkpoint 미승인, `QA-02`/`QA-03`과 사람 최종 acceptance 대기
+  없어 checkpoint 미승인, `QA-02`/`QA-03`과 사람 최종 acceptance 대기.
+  2026-09-03 Codex `/root` task block owner; `QA-02`, `QA-03`, `QA-HARNESS-01`과
+  네 Golden Journey 의존성이 모두 해소되어 제출 예정 target `ca3d603`에서 canonical
+  full 검증, browser evidence, adversarial review를 시작한다. QA-04는 사람 소유이므로
+  자동 검증 중에도 `BLOCKED`를 유지하며, 최종 acceptance는 사람 checkpoint 전까지
+  미승인 상태를 유지한다.
