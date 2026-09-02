@@ -2198,6 +2198,26 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   38 files/161, mapped Chromium 5/5 PASS이나 두 browser reproduction은 FAIL 유지.
   Verdict: BLOCKED — unresolved MEDIUM 2건. 상세 record:
   `docs/quality/evidence/final-qa.md#qa-02-journey-간-full-adversarial-review--2026-09-02`
+  Supplemental diagnosis target
+  `69f36fb8da6cc892f72a1c22dce82808dde97b02`: fresh 1280x720/40-record
+  matrix에서 `Home` 1920→0/task-24 unmount/`BODY`, `End`
+  0→3340/task-1 unmount/region, `PageUp` 1920→1460/task-26 unmount/`BODY`,
+  `PageDown` 1920→2380/task-21 unmount/region, `ArrowUp`
+  1920→1880/task-26 unmount/`BODY`, `ArrowDown`
+  2000→2040/task-21 unmount/`BODY`, `Space`
+  1920→2380/task-21 unmount/`BODY`, `Shift+Space`
+  1920→1460/task-26 unmount/`BODY`를 확인. 안정 handoff의 최소 key family는
+  `ArrowDown`, `ArrowUp`, `End`, `Home`, `PageDown`, `PageUp`, `" "`이며 기존 두
+  key에 다섯 key를 추가해야 한다. Home-only는 PageUp/ArrowUp/ArrowDown/Space/
+  Shift+Space sibling defect를 남긴다. 저장소 date-time pattern은 없지만 direct
+  Zod 4.5.2의 `z.iso.datetime({ offset: true })`를 canonical API boundary에
+  재사용할 수 있다. `Date.parse`와 UI fallback은 strict OAS guard를 대신하지 못하고,
+  fallback-only는 invalid cached data를 남긴다. Zod는 leap second, `-00:00`,
+  lowercase `t/z` 같은 rare RFC3339 form을 좁게 거부한다. HIGH 결정 질문은
+  `1`(권장: Zod canonical boundary rejection + full 7-key family handoff)과
+  `2`(narrow: UI fallback + Home-only; OAS-invalid cache와 sibling focus defect를
+  명시적으로 남기는 exception 필요) 중 선택이다. QA-02는 `BLOCKED`, product/test와
+  `HUMAN_APPROVED`는 변경 없음.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 

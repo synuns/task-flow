@@ -962,3 +962,66 @@ Rerun:
 Verdict: **BLOCKED** — two unresolved MEDIUM findings remain. Green quick and mapped
 Journey tests do not override their fresh runtime reproductions. This review neither
 marks QA-02 complete nor claims `HUMAN_APPROVED` or final acceptance.
+
+### Supplemental blocker diagnosis — 2026-09-02
+
+Review target: exact QA-02 record target
+`69f36fb8da6cc892f72a1c22dce82808dde97b02`. Product and test content is unchanged from
+the reviewed source target; this supplemental pass only narrows the two blocker root
+causes and the required HIGH decision.
+
+Checks: used a fresh authenticated Chromium production-preview document at 1280x720
+with 40 task records. Each native vertical-scroll key started at a meaningful list
+position with focus on an actual mounted Card descendant. The table records list
+`scrollTop` before and after the key, whether that focused row remained mounted, and
+the resulting `document.activeElement`.
+
+| Key | Before: `scrollTop` / focused row | After `scrollTop` | Focused row mounted | Active element |
+| --- | --- | ---: | --- | --- |
+| `Home` | 1920 / `task-24` | 0 | no | `BODY` |
+| `End` | 0 / `task-1` | 3340 | no | named list region |
+| `PageUp` | 1920 / `task-26` | 1460 | no | `BODY` |
+| `PageDown` | 1920 / `task-21` | 2380 | no | named list region |
+| `ArrowUp` | 1920 / `task-26` | 1880 | no | `BODY` |
+| `ArrowDown` | 2000 / `task-21` | 2040 | no | `BODY` |
+| `Space` | 1920 / `task-21` | 2380 | no | `BODY` |
+| `Shift+Space` | 1920 / `task-26` | 1460 | no | `BODY` |
+
+Findings: the existing `PageDown`/`End` handoff does not conflict with native scrolling:
+it focuses the stable region before virtualization unmounts the Card, preserves the
+native scroll movement, and showed no double scroll. The minimum root-cause key family
+for the actual Card descendants is `ArrowDown`, `ArrowUp`, `End`, `Home`, `PageDown`,
+`PageUp`, and `" "`; Space and Shift+Space share `event.key === " "`. The existing
+branch therefore needs five additions: `Home`, `PageUp`, `ArrowUp`, `ArrowDown`, and
+`" "`. A Home-only correction leaves the same focus-loss defect for PageUp, ArrowUp,
+ArrowDown, Space, and Shift+Space.
+
+The repository has no existing RFC3339/date-time validation pattern. It does have the
+direct dependency Zod 4.5.2 and an established Zod schema use. Read-only probes showed
+that `z.iso.datetime({ offset: true })` accepts canonical `Z` and numeric-offset values
+while rejecting malformed calendar values, date-only strings, missing offsets, and
+invalid offset syntax. Zod's own JSON Schema converter maps `format: date-time` to this
+check, making it the minimum no-new-dependency canonical API-boundary guard.
+`Date.parse` is unsuitable because it also accepts non-date-time or extended forms such
+as date-only, lowercase separators, and `24:00`. Literal full-RFC3339 acceptance has a
+narrowing caveat: Zod rejects rare permitted forms including leap seconds, `-00:00`, and
+lowercase `t/z`. That caveat should remain explicit rather than be hidden behind a
+custom parser. A view-only fallback prevents `Intl.DateTimeFormat` from throwing but
+still treats an OAS-invalid response as successful data and leaves it in the query
+cache; it is not a substitute for boundary rejection.
+
+Corrections: none. The combined HIGH decision question is: which correction boundary
+is authorized?
+
+1. **Recommended:** use Zod canonical rejection at the task-detail API boundary and
+   hand off focus for the full seven-key native vertical-scroll family.
+2. **Narrow exception:** add a UI fallback and Home-only handoff. This explicitly leaves
+   OAS-invalid data cached and the PageUp/ArrowUp/ArrowDown/Space/Shift+Space sibling
+   focus defects unresolved, so it requires an accepted exception.
+
+Rerun: the named browser session and preview server were closed; no listener remained
+on the supplemental preview port. `git status --porcelain` was clean at the target.
+
+Verdict: **BLOCKED** — QA-02 remains blocked pending the decision, correction, and
+corrected-target independent rerun. Product, tests, approval state, and
+`HUMAN_APPROVED` remain unchanged.
