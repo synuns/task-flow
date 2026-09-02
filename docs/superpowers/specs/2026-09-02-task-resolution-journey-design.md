@@ -52,7 +52,7 @@
 
 | Journey case | 경계 | Expected |
 | --- | --- | --- |
-| `RES-P1-1` | 기존 `/task/:id` | bearer GET 한 번, response의 세 표시 field |
+| `RES-P1-1` | 기존 `/task/:id` | bearer 인증 GET과 response의 세 표시 field; browser GET 횟수는 exact invariant가 아님 |
 | `RES-P1-2` | 삭제 확인 열기 | accessible AlertDialog와 visible ID input |
 | `RES-P1-3` | 틀린 값부터 exact ID까지 입력 | exact equality 전 disabled, DELETE 0회 |
 | `RES-P1-4` | exact ID submit | attempt당 DELETE 한 번과 auth replay 최대 한 번, 200만 `/task` 이동 |

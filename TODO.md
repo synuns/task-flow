@@ -52,8 +52,8 @@
 | 3. auth-entry      | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
-| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | IN_PROGRESS — 로직 기반만 검증 |
-| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — task-resolution 전   |
+| 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | BLOCKED — 검증·review 완료, 사람 checkpoint 대기 |
+| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | BLOCKED — task-resolution 사람 checkpoint 전     |
 
 ## 0. 기획·결정 준비
 
