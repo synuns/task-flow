@@ -1853,7 +1853,7 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   separation and self-review PASS:
   `docs/quality/evidence/task-resolution.md#task-detail-journey-verify-01`
 
-### [ ] TASK-DETAIL-JOURNEY-REVIEW-01 task-resolution 독립 review
+### [x] TASK-DETAIL-JOURNEY-REVIEW-01 task-resolution 독립 review
 
 - Requirements: `TASK-DETAIL-01`~`TASK-DETAIL-05`
 - Risk: MEDIUM — Journey review gate
@@ -1863,8 +1863,30 @@ src/shared/api/authenticated-request.test.ts`, `./scripts/verify quick`,
   weak test와 console/network를 검토하고 HIGH/MEDIUM finding을 모두 수정·재검증한다.
 - Automatic verification: `./scripts/verify quick`
 - Browser verification: finding이 browser behavior에 영향을 주면 해당 resolution case 재실행
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: Review target:
+  `docs/superpowers/plans/2026-09-02-task-resolution-journey.md`,
+  `TASK-DETAIL-01`~`TASK-DETAIL-05` / `task-resolution`, exact target
+  `0e2488721eff80996a216529a13f01d72b72381b` (product target
+  `21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`). Reviewer: Tasks 1~5 최종
+  변경 작성자와 분리된 fresh 독립 reviewer
+  `/root/task_6_adversarial_reviewer`. Checks: 승인 spec/plan, 원본 requirement,
+  OpenAPI GET/DELETE bearer·200/401/404 schema, auth/delete 결정, 관련
+  source·test·E2E, 전체 task-resolution evidence와 TODO, screenshot 크기,
+  `7812b8bfc161ef1d5e9fd45e56edd14dbd6f8951..0e2488721eff80996a216529a13f01d72b72381b`
+  diff, secret/generated/unrelated noise를 검토함. Findings: unresolved HIGH/MEDIUM
+  0; LOW `REQUIREMENT` 승인 spec의 `RES-P1-1` `bearer GET 한 번` 문구가
+  사람이 승인한 no-exact-count plan/evidence 교정 전 문구로 남아
+  있으나 상위 requirement와 제품 수용 기준은 영향 없음; LOW `TEST`
+  `/tmp/kbhc-task-detail-view-01-mobile.png`이 기록과 달리 1280x720이지만
+  다른 390x844 detail/modal artifact와 수치 기록이 동일 layout을 독립
+  입증함. Corrections: 제품·test·이전 owner record 변경 없음;
+  request-count-sensitive 기준이 생기면 spec을 재정합하고, 해당 단일
+  screenshot provenance가 필수일 때 mobile artifact를 재측정한다. Rerun:
+  focused 6 files/30 tests PASS; `./scripts/verify quick` hook 86·contract 19·Vitest
+  38 files/150 tests PASS; mapped Chromium 1/1 PASS; setup과 base/HEAD^ diff check
+  PASS; server/browser 종료. Verdict: PASS_WITH_LOW — unresolved HIGH/MEDIUM 없음;
+  `docs/quality/evidence/task-resolution.md#task-detail-journey-review-01`
 
 ### [ ] JOURNEY-TASK-DETAIL-01 task-resolution 사람 checkpoint
 

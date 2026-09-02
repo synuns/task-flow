@@ -307,3 +307,61 @@ independent plan-completion/Journey review.
 Verdict: PASS — current-target `task-resolution` integrated evidence is complete;
 `JOURNEY-TASK-DETAIL-01` remains unapproved pending the independent review and human
 checkpoint.
+
+## TASK-DETAIL-JOURNEY-REVIEW-01
+
+Review target: `docs/superpowers/plans/2026-09-02-task-resolution-journey.md`, approved
+`docs/superpowers/specs/2026-09-02-task-resolution-journey-design.md`,
+`TASK-DETAIL-01`~`TASK-DETAIL-05` / `RES-P1-1`~`RES-P1-4` / `RES-E1`~`RES-E4` /
+`task-resolution`, exact target
+`0e2488721eff80996a216529a13f01d72b72381b`; verified product target
+`21a0d07c653f3e0f3e5cab158d0f8f78d9538cee`.
+
+Reviewer: fresh independent context `/root/task_6_adversarial_reviewer`; the reviewer
+did not author Tasks 1~5 or their final implementation/evidence changes.
+
+Checks: inspected `assignment-original/requirement.md` and `openapi.yaml`,
+`docs/quality/requirements.md`, the approved auth/delete decisions, task-resolution
+spec/plan, relevant detail/delete/auth/cache/store source and tests,
+`e2e/task-resolution.spec.ts`, all accumulated task-resolution evidence and TODO state.
+The review traced exact/encoded IDs, GET/DELETE bearer boundaries, 200/401/404 schemas,
+bounded auth replay, stale-session isolation, absence of feature-level token access,
+synchronous duplicate admission, pending Escape/outside-click/controls lock, focus
+lifecycle, direct-404 non-success, GET-only unknown reconciliation, no automatic DELETE
+retry, 200-only navigation/cache eviction, single-store list/detail/dashboard results,
+loading/404/general retry/keyboard/responsive states, test overlap/flakiness, deliberate
+versus unexpected console/network failures, screenshot dimensions, secret/generated
+noise, and TODO ownership/dependencies. The complete branch range
+`7812b8bfc161ef1d5e9fd45e56edd14dbd6f8951..0e2488721eff80996a216529a13f01d72b72381b`
+contains only TODO/evidence plus the human-approved plan wording correction; no product,
+test, E2E, dependency, generated contract or assignment-original file changed.
+
+Findings: unresolved HIGH 0 and MEDIUM 0. LOW `REQUIREMENT` — the approved design
+spec's `RES-P1-1` table still says `bearer GET 한 번`, while the human explicitly
+decided that authoritative `TASK-DETAIL-01` has no exact browser GET-count invariant and
+the plan/evidence were corrected accordingly. This stale lower-level wording does not
+change current acceptance or product behavior, but can mislead a future count-sensitive
+review. LOW `TEST` — `/tmp/kbhc-task-detail-view-01-mobile.png` is currently 1280x720
+although its record labels it 390x844. The 390x844 detail surface is independently
+present in `/tmp/kbhc-task-delete-dialog-view-01-mobile.png`, and the outcome/dialog
+mobile artifacts plus recorded 390px measurements cover the responsive risk, so this is
+an artifact-to-record provenance defect rather than a missing product-behavior result.
+
+Corrections: not applicable in this review-only ownership. No product, test, E2E,
+approved spec or prior owner's evidence was changed. Reconcile the spec wording if a
+future accepted requirement makes detail GET count significant; recapture/rebind the
+Task 1 mobile screenshot if that single artifact becomes required for acceptance.
+
+Rerun: `./scripts/verify setup` PASS (hook 86, verifier contract 19);
+`pnpm vitest run src/pages/task-detail/task-detail.test.tsx src/features/delete-task/ui/delete-task-dialog.test.tsx src/features/delete-task/model/attempt-guard.test.ts src/features/delete-task/model/delete-task.test.ts src/features/delete-task/model/delete-cache.test.ts src/shared/api/authenticated-request.test.ts`
+PASS (6 files, 30 tests); `./scripts/verify quick` PASS (hook 86, verifier contract 19,
+format, lint, generated API check, typecheck, Vitest 38 files/150 tests);
+`pnpm exec playwright test e2e/task-resolution.spec.ts` PASS (Chromium 1/1);
+`git diff 7812b8bfc161ef1d5e9fd45e56edd14dbd6f8951..0e2488721eff80996a216529a13f01d72b72381b --check`
+and `git diff 0e2488721eff80996a216529a13f01d72b72381b^..0e2488721eff80996a216529a13f01d72b72381b --check`
+PASS. Playwright's server exited and no process listens on port 4173.
+
+Verdict: PASS_WITH_LOW — the two explicit LOW record/documentation defects do not weaken
+the independently reproduced accepted behavior; there is no unresolved HIGH/MEDIUM
+finding. This record is the plan-completion and `task-resolution` Journey review gate,
+not human checkpoint approval.
