@@ -2122,11 +2122,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   추가하지 않았다. 승인 리뷰 target
   `d9b563f20678c47fb62bf32953dae9048a421b40`의 verdict는 `PASS_WITH_LOW`였다.
   Minor는 task-detail extra-key case의 `registerDatetime: "now"`가 OAS-valid field까지
-  없애 실패 원인을 혼합한 점이었다. Correction/evidence target
+  없애 실패 원인을 혼합한 점이었다. Correction/test target
   `a1fa0a4a682720acb49a0a232b314d8a35fc48f5`에서 기존 RFC3339 fixture로
   교체해 추가 `id` key만 실패 원인으로 격리했고 task API 7/7,
   exact focused 5 files/25, format/diff check가 PASS했다. Product code는 변경하지
-  않았다.
+  않았다. Tracked evidence/claim target은
+  `15c83206313617d87bdf7552667830c09a6bb6f0`이다.
   재현 명령·영향 4건·선택지:
   `docs/quality/evidence/final-qa.md#qa-contract-01-openapimswclient-최종-대조--2026-09-02`
 
