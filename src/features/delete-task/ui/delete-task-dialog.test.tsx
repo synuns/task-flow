@@ -1,5 +1,5 @@
 import { ApiClientProvider, type ApiClient } from "@/shared/api";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -39,7 +39,27 @@ afterEach(() => {
 });
 
 describe("DeleteTaskDialog", () => {
-  it("requires byte-exact input and locks every dismiss path during one pending attempt", async () => {
+  it("requires byte-exact input before a delete attempt", async () => {
+    renderDialog();
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "할 일 삭제" }));
+    const dialog = screen.getByRole("alertdialog", { name: "할 일 삭제" });
+    expect(dialog).toHaveAttribute("data-slot", "alert-dialog-content");
+    expect(screen.getByText("task-1")).toHaveClass("font-mono");
+    const input = screen.getByRole("textbox", { name: "할 일 ID" });
+    const submit = screen.getByRole("button", { name: "삭제 확인" });
+
+    for (const value of ["task-1 ", "TASK-1", "wrong"]) {
+      fireEvent.change(input, { target: { value } });
+      expect(submit).toBeDisabled();
+    }
+    expect(resolution.resolve).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: "task-1" } });
+    expect(submit).toBeEnabled();
+  });
+
+  it("locks dismiss paths during a pending attempt and resets after cancel", async () => {
     const user = userEvent.setup();
     let release: (value: { kind: "exists"; message: string }) => void = () => undefined;
     resolution.resolve.mockReturnValueOnce(
@@ -52,21 +72,9 @@ describe("DeleteTaskDialog", () => {
     const trigger = screen.getByRole("button", { name: "할 일 삭제" });
     await user.click(trigger);
     const dialog = screen.getByRole("alertdialog", { name: "할 일 삭제" });
-    expect(dialog).toHaveAttribute("data-slot", "alert-dialog-content");
-    expect(screen.getByText("task-1")).toHaveClass("font-mono");
     const input = screen.getByRole("textbox", { name: "할 일 ID" });
     const submit = screen.getByRole("button", { name: "삭제 확인" });
-
-    for (const value of ["task-1 ", "TASK-1", "wrong"]) {
-      await user.clear(input);
-      await user.type(input, value);
-      expect(submit).toBeDisabled();
-    }
-    expect(resolution.resolve).not.toHaveBeenCalled();
-
-    await user.clear(input);
-    await user.type(input, "task-1");
-    expect(submit).toBeEnabled();
+    fireEvent.change(input, { target: { value: "task-1" } });
     await user.click(submit);
     await user.click(submit);
 
