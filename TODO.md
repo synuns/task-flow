@@ -2249,6 +2249,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Space/Shift+Space focus loss를 final acceptance exception으로 명시 승인) 중
   선택이다. 결정·correction·독립 rerun 전까지 QA-02는 `[ ]`/`BLOCKED`; product/test와
   `HUMAN_APPROVED`는 변경 없음.
+  2026-09-02 사용자가 exact decision target
+  `728edaa26dd457eb55eafb49f5f6e7094f3f2f55`의 option 1을 `1`로 명시 승인했다.
+  Full seven-key family synchronous handoff와 parameterized test, native browser
+  verification correction은 `IN_PROGRESS`; 독립 corrected-target re-review 전까지
+  QA-02는 `[ ]`/`BLOCKED`이며 `HUMAN_APPROVED`는 변경 없음.
 
 ### [ ] QA-HARNESS-01 최종 검증 하네스 강화
 

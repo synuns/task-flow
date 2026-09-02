@@ -1139,3 +1139,19 @@ No focus product or test correction is authorized by the partial date-time decis
 QA-02 remains `[ ]` / `BLOCKED` until option 1 is corrected and independently rerun or
 option 2 is explicitly accepted by a person. This record changes no product, test, or
 `HUMAN_APPROVED` state.
+
+### Finding 2 focus decision — 2026-09-02
+
+Decision target: `728edaa26dd457eb55eafb49f5f6e7094f3f2f55`.
+
+Human HIGH decision: the user explicitly selected option 1 with `1`. The authorized
+scope is the full seven-key family `ArrowDown`, `ArrowUp`, `End`, `Home`, `PageDown`,
+`PageUp`, and `" "`, using the existing descendant Card to stable named region
+synchronous handoff. The existing parameterized test is extended and native scrolling
+is verified in a fresh browser matrix. Space and Shift+Space share the same
+`event.key === " "` branch.
+
+No explicit scrolling, `preventDefault`, state, effect, helper, fake role, dependency,
+or unrelated change is authorized. Finding 2 correction is `IN_PROGRESS`; QA-02 remains
+`[ ]` / `BLOCKED` pending correction evidence and independent corrected-target review.
+This decision does not record `HUMAN_APPROVED`.
