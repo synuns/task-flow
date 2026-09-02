@@ -2159,7 +2159,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `QA-CONTRACT-01` `AI_VERIFIED`, setup과 diff check PASS. Matrix와 재현 방법:
   `docs/quality/evidence/final-qa.md#qa-01-requirement-evidence와-상태-정합성--2026-09-02`.
   QA-02/QA-HARNESS-01/QA-03/QA-04와 최종 사람 acceptance는 별도 owner 범위이며 이
-  task가 완료 또는 `HUMAN_APPROVED`로 전환하지 않음
+  task가 완료 또는 `HUMAN_APPROVED`로 전환하지 않음. Independent review target
+  `5e07e8c8c222924636479ca79ce690b2cf25bc9b`, range
+  `e990930586c286092b31948312385808733a4429..5e07e8c8c222924636479ca79ce690b2cf25bc9b`;
+  reviewer `/root/final_branch_reviewer`는 final author와 분리된 fresh independent
+  reviewer. 27/27 parser·path·heading·ID trace, 네 approval blame/provenance, 여섯
+  dependency, `SYS-05`, setup hook 86·verifier 19, diff check와 clean status를
+  재검토함. Findings 없음; Corrections N/A; 같은 read-only audit과 setup 재실행 PASS;
+  Verdict: PASS. 상세 후속 기록:
+  `docs/quality/evidence/final-qa.md#qa-01-independent-review-follow-up`
 
 ### [ ] QA-02 journey 간 full adversarial review
 
