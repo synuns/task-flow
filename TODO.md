@@ -2523,7 +2523,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `z.iso.datetime({ offset: true })` 한 경계로 교정; GREEN fixture/handler/API 3 files
   25 tests; `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/179 tests
 
-### [ ] REM-BOOTSTRAP-01 mock 시작 실패 복구
+### [x] REM-BOOTSTRAP-01 mock 시작 실패 복구
 
 - Requirements: `SYS-04`
 - Risk: LOW — worker 시작 실패 시 blank root를 복구 UI로 교체
@@ -2533,8 +2533,13 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   다시 시도 button을 표시하며 click은 reload를 한 번 요청한다.
 - Automatic verification: bootstrap/architecture Vitest, `./scripts/verify quick`
 - Browser verification: production preview 정상 bootstrap과 console/page error
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-MOCK-CONTRACT-01` 완료 후 착수
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-MOCK-CONTRACT-01` 완료 후 착수;
+  RED bootstrap test는 새 module 부재로 suite FAIL; worker 성공 후 app render, rejection
+  후 failure render와 한국어 alert/reload button을 최소 callback 경계로 구현;
+  GREEN bootstrap/architecture 2 files/5 tests; 첫 quick은 `main.tsx` 들여쓰기 한 곳의
+  Biome format 차이로 `TOOLING` FAIL, formatter 1-file diff 검토 후 corrected
+  `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 39 files/182 tests
 
 ### [ ] REM-VERIFY-01 read-only 구조 검사와 국소 dead code 정리
 
@@ -2547,8 +2552,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: architecture/attempt/dialog Vitest, diff/status check,
   `./scripts/verify quick`
 - Browser verification: task-resolution dialog focus와 delete Journey 회귀
-- Status: NOT_STARTED
-- Evidence: 구현 전
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-BOOTSTRAP-01` 완료 후 착수
 
 ### [ ] REM-FINAL-01 코드 리뷰 후속 수정 최종 검증
 
