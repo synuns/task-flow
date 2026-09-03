@@ -2911,4 +2911,28 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Evidence: exact review target `27d07dc136adae16bd77200f4cf7a61a6e01fbfe`에 대한 AI
   Verdict PASS와 focused/quick/E2E/browser/full 근거를
   `docs/quality/evidence/user-crud.md`에 연결하고 사람 checkpoint를 요청할 준비가 됨.
-  사람 결정 근거 없음; AI가 `HUMAN_APPROVED` 상태를 기록하지 않음.
+  수동 검토 중 로그아웃 요구사항이 추가되어 새 구현·검증·review 전까지 사람 결정 근거
+  없음; AI가 `HUMAN_APPROVED` 상태를 기록하지 않음.
+
+## 10. User 로그아웃 확장
+
+### [x] USER-LOGOUT-DESIGN-01 서버 session 로그아웃과 확인 modal 설계
+
+- Requirements: proposed `USER-LOGOUT-01`~`USER-LOGOUT-05`
+- Risk: HIGH — 원본 범위 밖 endpoint와 인증 session 폐기 동작 추가
+- Depends on: `USER-CRUD-JOURNEY-REVIEW-01`
+- Deliverable: `docs/superpowers/specs/2026-09-03-user-logout-design.md`, 정합한
+  `docs/project-plan.md`
+- Acceptance: server-side sign-out, refresh cookie 폐기, client session/cache 정리,
+  확인 modal의 focus/pending/failure UX와 Journey 재검증 경계가 모순 없이 확정된다.
+- Automatic verification: placeholder·contradiction·ambiguity·scope self-review,
+  `pnpm verify setup`, `git diff --check`
+- Browser verification: 설계 task에는 적용 없음 — 구현 task가 두 viewport를 소유
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; 사용자가 서버 session을 폐기하는
+  방식 A와 로그아웃 확인 modal을 명시 승인함. 원본 OpenAPI 무변경, body 없는
+  `POST /api/sign-out`, 200 뒤 session/cache 정리, non-terminal 실패 보존, modal
+  focus/pending/cancel, 기존 core E2E 확장과 새 exact-target review를 설계함. 작성 명세의
+  placeholder·내부 모순·범위·모호성을 self-review했고 미해결 항목 없음;
+  `pnpm verify setup` PASS — hook 85, verifier 20; 원본 OpenAPI/generated와 lockfile
+  무변경, `git diff --check` PASS.

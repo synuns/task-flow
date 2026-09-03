@@ -80,14 +80,15 @@ React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 
 - sign-in validation, 요청, 오류 modal, 인증 상태
 - dashboard metrics
 - task 가상 목록, 무한 pagination, 상세, 404 복구, 확인 후 삭제
-- user 회원가입, profile 조회, name/memo 단일 필드 수정, 비밀번호 확인 탈퇴
+- user 회원가입, profile 조회, name/memo 단일 필드 수정, session 로그아웃,
+  비밀번호 확인 탈퇴
 - OAS 3.1 기반 생성 타입과 제출 가능한 MSW API 대체 구현
 - 명명된 색상 token과 local Pretendard font
 - 자동 검증, browser evidence, Golden Journey checkpoint, AI 사용 공개
 
 ### 제외
 
-- 이메일·비밀번호 변경, 관리자용 user CRUD, 로그아웃 UI, task 생성·수정,
+- 이메일·비밀번호 변경, 관리자용 user CRUD, 전체 기기 로그아웃, task 생성·수정,
   검색, 정렬, filter
 - 별도 production backend와 database
 - 원본에 없는 role·permission 체계
@@ -129,7 +130,8 @@ dashboard와 task action의 노출 여부와 보호 route 접근 정책은 원�
 9. profile에서 canonical email, name과 memo를 확인한다.
 10. name 또는 memo 오른쪽 연필을 눌러 한 항목만 수정하고 체크로 완료하거나
     X로 취소한다.
-11. 현재 비밀번호를 확인한 뒤 탈퇴하고 `/sign-in`으로 돌아간다.
+11. 확인 modal을 거쳐 현재 기기에서 로그아웃하고 reload 뒤에도 `/sign-in`을 유지한다.
+12. 다시 로그인한 뒤 현재 비밀번호를 확인해 탈퇴하고 `/sign-in`으로 돌아간다.
 
 ## 화면·route 기획
 
@@ -140,7 +142,7 @@ dashboard와 task action의 노출 여부와 보호 route 접근 정책은 원�
 | `/sign-up` | 계정 생성 | invalid, submitting, API error, outcome unknown, success | `USER-CRUD-01`~`USER-CRUD-03`, `USER-CRUD-08` |
 | `/task` | task 탐색 | initial loading, empty, page loading, error, terminal page | `TASK-LIST-01`~`TASK-LIST-05` |
 | `/task/:id` | task 확인·삭제 | loading, 404, error, success, delete modal | `TASK-DETAIL-01`~`TASK-DETAIL-05` |
-| `/user` | profile 확인·수정·탈퇴 | loading, error, success, field editing, delete modal | `USER-01`, `NAV-03`, `USER-CRUD-04`~`USER-CRUD-08` |
+| `/user` | profile 확인·수정·로그아웃·탈퇴 | loading, error, success, field editing, sign-out/delete modal | `USER-01`, `NAV-03`, `USER-CRUD-04`~`USER-CRUD-08`, `USER-LOGOUT-01`~`USER-LOGOUT-05` |
 
 공통 shell은 현재 route를 표시하고 dashboard/task action을 유지한다. 인증
 action은 sign-in과 profile 중 정확히 하나만 표시한다. 아이콘은 항목별로
@@ -152,6 +154,7 @@ action은 sign-in과 profile 중 정확히 하나만 표시한다. 아이콘은 
 | --- | --- | --- |
 | 로그인 | `POST /api/sign-in` | email/password JSON, 200 token 응답, non-200 `errorMessage` |
 | 갱신 | `POST /api/refresh` | refresh cookie credential, 200 token, 400/401 error |
+| 로그아웃 | `POST /api/sign-out` | bearer/refresh cookie, body 없음, 200 success 뒤 session 정리 |
 | 회원가입 | `POST /api/user` | public email/password/name, 201 user, 400/409 error |
 | profile | `GET /api/user` | bearer token, canonical email/name/memo |
 | profile 수정 | `PATCH /api/user` | bearer token, name 또는 memo 한 field, 200 user |
