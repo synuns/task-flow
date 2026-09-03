@@ -3264,7 +3264,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Verdict: PASS. Golden Journey 최종 수용은 아래 사람 checkpoint 소유이며 AI 승인을
   주장하지 않음. 상세 기록은 `docs/quality/evidence/task-crud.md`.
 
-### [ ] JOURNEY-TASK-CRUD-01 Task CRUD 사람 checkpoint
+### [x] JOURNEY-TASK-CRUD-01 Task CRUD 사람 checkpoint
 
 - Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`, `task-crud`
 - Risk: HIGH — Task CRUD Golden Journey acceptance는 사람 소유
@@ -3273,7 +3273,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
 - Automatic verification: 적용 없음 — 사람 결정 gate
 - Browser verification: `docs/quality/evidence/task-crud.md`의 named evidence 검토
-- Status: BLOCKED
+- Status: HUMAN_APPROVED
 - Evidence: Task CRUD 구현·검증과 `TASK-CRUD-JOURNEY-REVIEW-01` PASS 완료. 사람이 exact
   target `c53903a7004b75009e31a61c2c8a6e77214bf45e` 및
   `docs/quality/evidence/task-crud.md`를 검토해 승인 또는 correction을 명시해야 함.
+  2026-09-04 사용자가 제시된 Task CRUD 수동 checklist를 검토한 뒤 `승인`을 명시해
+  review/evidence 포함 exact target `e01c7d8f87e8d34786395da9d22f038e35586945`를 승인함.

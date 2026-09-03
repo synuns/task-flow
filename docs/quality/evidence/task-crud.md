@@ -82,3 +82,10 @@ no UI correction required a browser rerun.
 
 Verdict: **PASS**. No unresolved finding remains on the reviewed target. This does not mark
 `JOURNEY-TASK-CRUD-01` as `HUMAN_APPROVED`; final Golden Journey acceptance belongs to a person.
+
+## JOURNEY-TASK-CRUD-01 Human Decision
+
+On 2026-09-04 the user reviewed the presented Task CRUD manual checklist and explicitly replied
+`승인`. The approved exact target is `e01c7d8f87e8d34786395da9d22f038e35586945`, which includes
+the implementation, automatic/browser evidence, and adversarial review. This records the person's
+decision; it is not an AI acceptance judgment.
