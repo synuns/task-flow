@@ -24,4 +24,3 @@ Focused shell/router test, `./scripts/verify quick`, mapped `work-overview` E2E�
 실행한다. Agent-browser에서 390×844와 1280×720 selected navigation을 확인하고
 computed `::before`가 선을 그리지 않으며 배경색, `aria-current`, keyboard focus가
 유지되는 evidence를 기록한다.
-
