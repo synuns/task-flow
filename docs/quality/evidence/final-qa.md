@@ -1599,3 +1599,47 @@ Human decision: on 2026-09-03 the user explicitly selected option 1 and approved
 acceptance after receiving the full-gate and independent-review results. QA-04 therefore
 transitions to `[x]` / `HUMAN_APPROVED`; this records the person's decision rather than
 an AI acceptance judgment.
+
+## Review Remediation Integrated Browser Evidence — 2026-09-03
+
+Requirement/Journey: `REM-AUTH-ID-01`, `REM-RESPONSIVE-01`,
+`REM-MOCK-CONTRACT-01`, `REM-BOOTSTRAP-01`, `REM-VERIFY-01`; `AUTH-07`,
+`NAV-03`, `SYS-04`, `TASK-LIST-05`, `TASK-DETAIL-01`, `TASK-DETAIL-03`,
+`TASK-DETAIL-04`.
+
+Exact source target: `37ecd3c`. Browser session: fresh named agent-browser session
+`review-remediation`, Chromium 390x844, closed after inspection. Production preview ran
+on `127.0.0.1:4173`; it was stopped and the listening port was confirmed closed.
+
+Precondition: cookies, local storage and session storage were cleared. The mock task store
+was then seeded with an OAS-conforming `task/A` record whose title and memo were each 500
+unbroken characters, plus a second OAS-conforming record whose ID was 500 unbroken
+characters. Credential and token values were not retained in this record.
+
+Actions and actual results:
+
+- Anonymous direct entry to `/task/task%2FA` redirected to `/sign-in` without protected
+  detail content. Successful sign-in returned to the exact `/task/task%2FA` URL and rendered
+  the seeded detail.
+- The encoded detail's document width and client width were both 390px. Its 500-character
+  heading occupied 358px and memo 308px; neither expanded the document.
+- Navigation to the 500-character ID record returned its detail successfully. In the delete
+  confirmation dialog, the dialog rect was `left=16`, `right=374`, `width=358`; the ID code
+  rect was `left=41`, `right=349`, `width=308`, so it remained inside the dialog. Document
+  and client widths both remained 390px.
+- The only browser console errors were the expected anonymous bootstrap refresh 401
+  responses. MSW showed encoded task detail 200 responses and no page error was reported.
+- A 390x844 screenshot was captured during the dialog measurement as an ignored temporary
+  QA artifact and was not added to the submission tree.
+
+Automatic verification:
+
+- `./scripts/verify quick` after the final product/test change — PASS: hook 85, verifier
+  contract 19, format, lint, OpenAPI type check, TypeScript, Vitest 39 files/182 tests.
+- `pnpm exec playwright test e2e/auth-entry.spec.ts e2e/task-resolution.spec.ts` — PASS,
+  Chromium 3/3 including encoded direct entry, sign-in return, reload and delete Journey.
+- `pnpm build` — PASS. The existing non-failing chunk-size advisory remained; no new build
+  warning was introduced.
+
+Verdict: integration and browser checks PASS. Final plan-completion adversarial review,
+human checkpoint and canonical full gate remain; no final acceptance is claimed here.

@@ -2504,7 +2504,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   GREEN 2 files/12 tests; 첫 quick은 dialog test 한 줄 Biome format 차이로
   `TOOLING` FAIL, `pnpm run format`이 해당 1 file만 수정한 diff를 검토하고 재실행;
   corrected `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/175 tests;
-  실제 mobile bounding rect는 `REM-FINAL-01` browser evidence에서 확인
+  fresh 390x844 agent-browser에서 500자 title/memo document/client width 390/390,
+  heading 358, memo 308; 500자 ID dialog code rect 41..349가 dialog 16..374 내부임을
+  확인하고 session/server/port 정리
 
 ### [x] REM-MOCK-CONTRACT-01 저장된 mock task 계약 검증
 
@@ -2575,4 +2577,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: encoded auth return과 390x844 long-string detail/dialog
 - Status: IN_PROGRESS
 - Evidence: 2026-09-03 Codex `/root` task block owner; 앞선 다섯 remediation task의
-  focused test와 quick gate 완료 후 통합·browser·adversarial review 착수
+  focused test와 quick gate 완료 후 통합·browser·adversarial review 착수; exact source
+  target `37ecd3c`; mapped auth/task-resolution Chromium 3/3 PASS; production build PASS;
+  named agent-browser encoded auth return과 390x844 long-string detail/dialog 측정 PASS,
+  예상 anonymous refresh 401 외 console error와 page error 없음; session과 preview 종료,
+  4173 port closed; 상세
+  `docs/quality/evidence/final-qa.md#review-remediation-integrated-browser-evidence--2026-09-03`
