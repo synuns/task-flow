@@ -37,6 +37,7 @@ REQUIRED_FILES = (
     "e2e/task-discovery.spec.ts",
     "e2e/task-resolution.spec.ts",
     "e2e/user-crud.spec.ts",
+    "e2e/task-crud.spec.ts",
     "src/mocks/fixtures/auth.ts",
     "src/mocks/fixtures/tasks.ts",
     "artifacts/index.md",

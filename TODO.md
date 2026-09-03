@@ -3214,7 +3214,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   focused 6 files/46 tests와 `pnpm verify quick` PASS — hook 85, verifier 20, Vitest
   47 files/248 tests; 삭제 browser 검증은 Journey verify task로 이관.
 
-### [ ] TASK-CRUD-JOURNEY-VERIFY-01 Task CRUD Journey 통합 검증
+### [x] TASK-CRUD-JOURNEY-VERIFY-01 Task CRUD Journey 통합 검증
 
 - Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`, `task-crud`
 - Risk: HIGH — create/edit/status/delete와 소유권 경계 통합
@@ -3223,8 +3223,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: success와 failed-status critical case가 독립 fixture에서 통과하고 생성 위치를 가정하지 않는다.
 - Automatic verification: focused suite, quick, mapped E2E, `pnpm verify full`
 - Browser verification: agent-browser `390x844`, `1280x720`, create/edit/status/delete/failure와 diagnostics
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-DELETE-REGRESSION-01`
+  commit `8ecda7e` 뒤 authenticated fixture, core registry, evidence 형식을 조사함. verifier
+  RED 4건으로 source/tag/fixture 미등록을 확인하고 success/failed-status core 2건을 추가.
+  focused 5 files/52, quick hook 85/verifier 20/Vitest 47 files/248, mapped Chromium 2/2,
+  full build/core 9/9/verifier regression 19/19/read-only PASS. 첫 E2E partial locator 실패는
+  `TEST`로 exact match 교정 후 무재시도 PASS. agent-browser named session에서 390x844와
+  1280x720 create/edit/status/dashboard/failure/exact-delete, focus/aria/overflow/errors를 확인하고
+  정상 close함. 상세 evidence: `docs/quality/evidence/task-crud.md`.
 
 ### [ ] TASK-CRUD-JOURNEY-REVIEW-01 Task CRUD 계획 완료 적대적 검토
 
