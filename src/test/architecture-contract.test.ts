@@ -2,7 +2,8 @@
 // @vitest-environment node
 
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
@@ -142,19 +143,23 @@ describe("architecture imports", () => {
   });
 
   it("keeps the Biome alias guard executable", () => {
-    const fixtureDirectory = resolve(sourceRoot, "pages/.biome-boundary-fixture");
+    const fixtureDirectory = mkdtempSync(resolve(tmpdir(), "kbhc-biome-"));
     const run = (name: string, source: string) => {
       const path = resolve(fixtureDirectory, name);
       writeFileSync(path, source);
       const result = spawnSync(
         resolve(projectRoot, "node_modules/.bin/biome"),
-        ["lint", "--only=lint/style/noRestrictedImports", path],
+        [
+          "lint",
+          `--config-path=${resolve(projectRoot, "biome.json")}`,
+          "--only=lint/style/noRestrictedImports",
+          path,
+        ],
         { cwd: projectRoot, encoding: "utf8" },
       );
       return { status: result.status, output: `${result.stdout}${result.stderr}` };
     };
 
-    mkdirSync(fixtureDirectory, { recursive: true });
     try {
       const allowed = run("allowed.ts", 'import type { Api } from "@/shared/api";\n');
       const blocked = run("blocked.ts", 'import type { Api } from "@/shared/api/request";\n');

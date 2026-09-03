@@ -2541,7 +2541,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Biome format 차이로 `TOOLING` FAIL, formatter 1-file diff 검토 후 corrected
   `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 39 files/182 tests
 
-### [ ] REM-VERIFY-01 read-only 구조 검사와 국소 dead code 정리
+### [x] REM-VERIFY-01 read-only 구조 검사와 국소 dead code 정리
 
 - Requirements: 전체 architecture와 verification contract
 - Risk: LOW — 제품 동작을 바꾸지 않는 test fixture 위치와 미사용 표면 정리
@@ -2552,8 +2552,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: architecture/attempt/dialog Vitest, diff/status check,
   `./scripts/verify quick`
 - Browser verification: task-resolution dialog focus와 delete Journey 회귀
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-BOOTSTRAP-01` 완료 후 착수
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-BOOTSTRAP-01` 완료 후 착수;
+  변경 전 architecture/attempt/dialog 3 files/9 tests와 status fingerprint PASS;
+  Biome fixture를 `mkdtempSync` OS temp와 exact project `biome.json`으로 이동하고
+  repository `src` write 제거; 미사용 `AttemptGuard.pending()`과 dialog `triggerRef`만
+  삭제; 변경 후 같은 3 files/9 tests, allowed 0/blocked 1, status fingerprint와
+  `git diff --check` PASS; `./scripts/verify quick` PASS — hook 85, verifier 19,
+  Vitest 39 files/182 tests
 
 ### [ ] REM-FINAL-01 코드 리뷰 후속 수정 최종 검증
 
@@ -2567,5 +2573,6 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: focused test, `./scripts/verify quick`, `./scripts/verify full`,
   `git diff --check`
 - Browser verification: encoded auth return과 390x844 long-string detail/dialog
-- Status: NOT_STARTED
-- Evidence: 구현 전
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; 앞선 다섯 remediation task의
+  focused test와 quick gate 완료 후 통합·browser·adversarial review 착수

@@ -35,7 +35,6 @@ export type DeleteTaskDialogProps = {
 
 export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDialogProps) {
   const client = useApiClient();
-  const triggerRef = useRef<HTMLButtonElement>(null);
   const guardRef = useRef(createAttemptGuard());
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -119,7 +118,6 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
             setInput("");
             setState({ kind: "idle" });
           }}
-          ref={triggerRef}
           type="button"
           variant="destructive"
         >
