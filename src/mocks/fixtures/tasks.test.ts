@@ -19,6 +19,7 @@ describe("task fixture persistence", () => {
   afterEach(async () => {
     const fixture = await import("./tasks");
     fixture.resetTaskStore();
+    vi.useRealTimers();
   });
 
   it("keeps a delete transaction across a page module reload", async () => {
@@ -40,7 +41,7 @@ describe("task fixture persistence", () => {
   it.each([
     ["an additional property", { ...storedTask, unexpected: true }],
     ["an invalid date-time", { ...storedTask, registerDatetime: "not-a-date" }],
-    ["an invalid status", { ...storedTask, status: "IN_PROGRESS" }],
+    ["an invalid status", { ...storedTask, status: "BLOCKED" }],
   ])("restores the seed instead of accepting %s", async (_label, invalidTask) => {
     sessionStorage.setItem(fixtureStorageKey, JSON.stringify([invalidTask]));
 
@@ -69,5 +70,50 @@ describe("task fixture persistence", () => {
       numOfRestTask: 0,
       numOfDoneTask: 0,
     });
+  });
+
+  it("creates a trimmed TODO task with server-owned fields and persists it", async () => {
+    vi.setSystemTime(new Date("2026-09-03T10:00:00.000Z"));
+    const firstModule = await import("./tasks");
+
+    const created = firstModule.createStoredTask("user-1", { title: " 새 할 일 " });
+
+    expect(created).toEqual({
+      id: "task-4",
+      ownerId: "user-1",
+      title: "새 할 일",
+      memo: "",
+      status: "TODO",
+      registerDatetime: "2026-09-03T10:00:00.000Z",
+    });
+    vi.resetModules();
+    const reloadedModule = await import("./tasks");
+    expect(reloadedModule.findTask("user-1", created.id)).toEqual(created);
+  });
+
+  it("updates one field while counting IN_PROGRESS as remaining work", async () => {
+    const fixture = await import("./tasks");
+
+    expect(fixture.updateStoredTask("user-1", "task-1", { status: "IN_PROGRESS" })).toMatchObject({
+      id: "task-1",
+      status: "IN_PROGRESS",
+    });
+    expect(fixture.updateStoredTask("user-1", "task-1", { title: " 수정된 제목 " })).toMatchObject({
+      id: "task-1",
+      title: "수정된 제목",
+      status: "IN_PROGRESS",
+    });
+    expect(fixture.getDashboardMetrics("user-1")).toEqual({
+      numOfTask: 3,
+      numOfRestTask: 2,
+      numOfDoneTask: 1,
+    });
+  });
+
+  it("does not update a task owned by another user", async () => {
+    const fixture = await import("./tasks");
+
+    expect(fixture.updateStoredTask("user-2", "task-1", { memo: "침범" })).toBeNull();
+    expect(fixture.findTask("user-1", "task-1")?.memo).toBe("삭제 검증 대상");
   });
 });

@@ -3097,7 +3097,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   무변경 검사를 통과했고 `pnpm verify quick` PASS — hook 85, verifier 20, Vitest
   45 files/227 tests; browser는 contract task라 적용 없음.
 
-### [ ] TASK-CRUD-STORE-01 소유자별 Task 생성·수정 저장소 구현
+### [x] TASK-CRUD-STORE-01 소유자별 Task 생성·수정 저장소 구현
 
 - Requirements: `TASK-CRUD-02`, `TASK-CRUD-06`, `TASK-CRUD-08`
 - Risk: HIGH — 사용자별 데이터 격리와 dashboard 계산 의미 구현
@@ -3106,8 +3106,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: server-owned ID/date/default TODO, one-field update, cross-user 404와 rest/done 수치가 일치한다.
 - Automatic verification: task fixture/handler Vitest, `pnpm verify quick`
 - Browser verification: 적용 없음 — store/transport integration task
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-CONTRACT-01`
+  commit `8f3c3cf` 뒤 기존 owner-aware 배열/sessionStorage store와 모든 caller를
+  조사함. RED `pnpm vitest run src/mocks/fixtures/tasks.test.ts
+  src/mocks/handlers/tasks.test.ts`에서 create/update 함수 부재 3건과 POST/PATCH
+  handler 부재 3건을 확인. 기존 store에 `IN_PROGRESS`, fixture sequence ID,
+  server-owned ISO date, create/update/persist만 추가하고 strict Zod request 경계로
+  multi-field·invalid body를 400 처리함. 다른 user의 list/detail/PATCH/DELETE는
+  동일 404이고 dashboard rest는 TODO+IN_PROGRESS로 계산함. focused GREEN은 task
+  fixture/handler와 user cascade 3 files/28 tests PASS. 첫 quick의 Biome format 3건은
+  `TOOLING`으로 분류해 제시된 줄바꿈만 교정했고 재실행 `pnpm verify quick` PASS —
+  hook 85, verifier 20, Vitest 45 files/232 tests; browser는 store/handler task라 적용 없음.
 
 ### [ ] TASK-CRUD-TRANSPORT-01 Task entity와 API 경계 확장
 

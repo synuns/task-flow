@@ -4,7 +4,7 @@ type TaskItem = {
   id: string;
   title: string;
   memo: string;
-  status: "TODO" | "DONE";
+  status: "TODO" | "IN_PROGRESS" | "DONE";
 };
 type TaskListResponse = { data: TaskItem[]; hasNext: boolean };
 type DashboardResponse = {
@@ -18,7 +18,7 @@ const storedTaskSchema = z.strictObject({
   ownerId: z.string(),
   title: z.string(),
   memo: z.string(),
-  status: z.enum(["TODO", "DONE"]),
+  status: z.enum(["TODO", "IN_PROGRESS", "DONE"]),
   registerDatetime: z.iso.datetime({ offset: true }),
 });
 
@@ -71,6 +71,8 @@ function loadTasks(): StoredTask[] {
 }
 
 let tasks = loadTasks();
+let nextTaskSequence =
+  Math.max(0, ...tasks.map(({ id }) => Number(/^task-(\d+)$/.exec(id)?.[1] ?? 0))) + 1;
 const taskPageSize = 2;
 
 function persistTasks(): void {
@@ -83,7 +85,39 @@ function persistTasks(): void {
 
 export function resetTaskStore(): void {
   tasks = structuredClone(seed);
+  nextTaskSequence = seed.length + 1;
   persistTasks();
+}
+
+export function createStoredTask(
+  ownerId: string,
+  input: { title: string; memo?: string },
+): StoredTask {
+  const task: StoredTask = {
+    id: `task-${nextTaskSequence++}`,
+    ownerId,
+    title: input.title.trim(),
+    memo: input.memo ?? "",
+    status: "TODO",
+    registerDatetime: new Date().toISOString(),
+  };
+  tasks.push(task);
+  persistTasks();
+  return structuredClone(task);
+}
+
+export function updateStoredTask(
+  ownerId: string,
+  id: string,
+  patch: { title: string } | { memo: string } | { status: StoredTask["status"] },
+): StoredTask | null {
+  const task = findTask(ownerId, id);
+  if (!task) return null;
+  if ("title" in patch) task.title = patch.title.trim();
+  else if ("memo" in patch) task.memo = patch.memo;
+  else task.status = patch.status;
+  persistTasks();
+  return structuredClone(task);
 }
 
 export function listTaskPage(ownerId: string, page: number): TaskListResponse {
@@ -121,7 +155,7 @@ export function getDashboardMetrics(ownerId: string): DashboardResponse {
   const ownedTasks = tasks.filter((task) => task.ownerId === ownerId);
   return {
     numOfTask: ownedTasks.length,
-    numOfRestTask: ownedTasks.filter((task) => task.status === "TODO").length,
+    numOfRestTask: ownedTasks.filter((task) => task.status !== "DONE").length,
     numOfDoneTask: ownedTasks.filter((task) => task.status === "DONE").length,
   };
 }

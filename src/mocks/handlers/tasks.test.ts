@@ -6,10 +6,14 @@ import { taskHandlers } from "./tasks";
 
 let accessToken = "";
 
-async function apiRequest(path: string, method = "GET", token = accessToken) {
+async function apiRequest(path: string, method = "GET", token = accessToken, body?: unknown) {
   const response = await fetch(new URL(path, globalThis.location.origin), {
     method,
-    headers: { Authorization: `Bearer ${token}` },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
   return { status: response.status, body: (await response.json()) as unknown };
 }
@@ -108,6 +112,9 @@ describe("task handlers", () => {
       body: { data: [], hasNext: false },
     });
     expect((await apiRequest("/api/task/task-1", "GET", otherToken)).status).toBe(404);
+    expect(
+      (await apiRequest("/api/task/task-1", "PATCH", otherToken, { status: "DONE" })).status,
+    ).toBe(404);
     expect((await apiRequest("/api/task/task-1", "DELETE", otherToken)).status).toBe(404);
     expect(await apiRequest("/api/dashboard", "GET", otherToken)).toEqual({
       status: 200,
@@ -132,6 +139,43 @@ describe("task handlers", () => {
       numOfTask: 3,
       numOfRestTask: 2,
       numOfDoneTask: 1,
+    });
+  });
+
+  it("creates and updates an owned task through exact request bodies", async () => {
+    const created = await apiRequest("/api/task", "POST", accessToken, {
+      title: " 새 할 일 ",
+    });
+    const id = "task-4";
+
+    expect(created).toMatchObject({
+      status: 201,
+      body: { id: "task-4", title: "새 할 일", memo: "", status: "TODO" },
+    });
+    expect(
+      await apiRequest(`/api/task/${id}`, "PATCH", accessToken, { status: "IN_PROGRESS" }),
+    ).toMatchObject({ status: 200, body: { status: "IN_PROGRESS" } });
+    expect(await apiRequest(`/api/task/${id}`)).toMatchObject({
+      status: 200,
+      body: { title: "새 할 일", memo: "", status: "IN_PROGRESS" },
+    });
+    expect((await apiRequest("/api/dashboard")).body).toEqual({
+      numOfTask: 4,
+      numOfRestTask: 3,
+      numOfDoneTask: 1,
+    });
+  });
+
+  it("rejects a multi-field task update without mutating the task", async () => {
+    expect(
+      await apiRequest("/api/task/task-1", "PATCH", accessToken, {
+        title: "수정",
+        memo: "동시 수정",
+      }),
+    ).toEqual({ status: 400, body: { errorMessage: "할 일 수정 값이 올바르지 않습니다." } });
+    expect(await apiRequest("/api/task/task-1")).toMatchObject({
+      status: 200,
+      body: { title: "첫 번째 할 일", memo: "삭제 검증 대상", status: "TODO" },
     });
   });
 });
