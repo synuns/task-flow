@@ -85,6 +85,19 @@ export function findTask(ownerId: string, id: string): StoredTask | null;
 export function getDashboardMetrics(ownerId: string): DashboardResponse;
 ```
 
+## Requirement Coverage
+
+| Requirement | Owning task |
+| --- | --- |
+| `TASK-CRUD-01` | `TASK-CRUD-CREATE-01` |
+| `TASK-CRUD-02` | `TASK-CRUD-CONTRACT-01`, `TASK-CRUD-STORE-01`, `TASK-CRUD-CREATE-01` |
+| `TASK-CRUD-03` | `TASK-CRUD-CREATE-01`, `TASK-CRUD-JOURNEY-VERIFY-01` |
+| `TASK-CRUD-04` | `TASK-CRUD-TRANSPORT-01`, `TASK-CRUD-EDIT-01` |
+| `TASK-CRUD-05` | `TASK-CRUD-EDIT-01` |
+| `TASK-CRUD-06` | `TASK-CRUD-STATUS-01` |
+| `TASK-CRUD-07` | `TASK-CRUD-DELETE-REGRESSION-01` |
+| `TASK-CRUD-08` | `TASK-CRUD-STORE-01`, `TASK-CRUD-DELETE-REGRESSION-01` |
+
 ---
 
 ### Task 1: `TASK-CRUD-CONTRACT-01` Task 확장 계약과 작업 통제면을 추가한다
@@ -340,7 +353,7 @@ Expected RED: status와 field edit controls가 없다.
 
 - [ ] **Step 3: success response로 detail/list cache를 갱신한다**
 
-성공 시 detail key를 response로 바꾸고 active task list는 invalidate/refetch한다. `onMutate`와 rollback snapshot은 만들지 않는다. 실패 시 기존 render와 cache를 그대로 두고 row alert만 보인다.
+성공 시 detail key를 response로 바꾸고 active task list는 invalidate/refetch한다. `onMutate`와 사전 cache snapshot은 만들지 않는다. 실패 시 기존 render와 cache를 그대로 두고 row alert만 보인다.
 
 - [ ] **Step 4: 검증하고 commit한다**
 

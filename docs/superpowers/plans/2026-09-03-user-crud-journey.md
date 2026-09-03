@@ -83,6 +83,19 @@ export function revokeAuthSession(userId: string): void;
 export function removeTasksByOwner(ownerId: string): number;
 ```
 
+## Requirement Coverage
+
+| Requirement | Owning task |
+| --- | --- |
+| `USER-CRUD-01` | `USER-CRUD-SIGNUP-01` |
+| `USER-CRUD-02` | `USER-CRUD-SIGNUP-01` |
+| `USER-CRUD-03` | `USER-CRUD-CONTRACT-01`, `USER-CRUD-SIGNUP-01` |
+| `USER-CRUD-04` | `USER-CRUD-TRANSPORT-01`, `USER-CRUD-PROFILE-01` |
+| `USER-CRUD-05` | `USER-CRUD-PROFILE-01` |
+| `USER-CRUD-06` | `USER-CRUD-DELETE-01` |
+| `USER-CRUD-07` | `USER-CRUD-STORE-01`, `USER-CRUD-DELETE-01` |
+| `USER-CRUD-08` | `USER-CRUD-SIGNUP-01`, `USER-CRUD-PROFILE-01`, `USER-CRUD-DELETE-01` |
+
 ---
 
 ### Task 1: `USER-CRUD-CONTRACT-01` 확장 계약과 작업 통제면을 추가한다
@@ -369,7 +382,7 @@ onSuccess: (user) => {
 }
 ```
 
-`onMutate`, rollback snapshot과 optimistic render는 사용하지 않는다. pending 동안 현재 행 action만 잠근다.
+`onMutate`, 사전 cache snapshot과 optimistic render는 사용하지 않는다. pending 동안 현재 행 action만 잠근다.
 
 - [ ] **Step 4: 검증하고 commit한다**
 
