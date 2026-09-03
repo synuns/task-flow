@@ -1,6 +1,7 @@
 import { createBrowserRouter, type RouteObject } from "react-router-dom";
 import { DashboardPage } from "@/pages/dashboard";
 import { SignInPage } from "@/pages/sign-in";
+import { SignUpPage } from "@/pages/sign-up";
 import { TaskDetailPage } from "@/pages/task-detail";
 import { TaskListPage } from "@/pages/task-list";
 import { UserPage } from "@/pages/user";
@@ -38,6 +39,7 @@ export const appRoutes: RouteObject[] = [
         children: [
           { index: true, element: <DashboardPage /> },
           { path: "sign-in", element: <SignInRoute /> },
+          { path: "sign-up", element: <SignUpPage /> },
           { path: "task", element: <TaskListPage /> },
           { path: "task/:id", element: <TaskDetailPage /> },
           { path: "user", element: <UserPage /> },

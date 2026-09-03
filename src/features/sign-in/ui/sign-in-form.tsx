@@ -15,6 +15,7 @@ import {
 } from "@/shared/ui";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { signInSchema, type SignInValues } from "../model/sign-in-schema";
 
 export type SignInFormProps = { onAuthenticated(tokens: AuthTokenPair): void };
@@ -47,7 +48,7 @@ export function SignInForm({ onAuthenticated }: SignInFormProps) {
     if (submittingRef.current) return;
     submittingRef.current = true;
     try {
-      onAuthenticated(await signIn(values));
+      onAuthenticated(await signIn(signInSchema.parse(values)));
     } catch (error) {
       setApiError(isApiError(error) ? error.message : "로그인 요청을 처리하지 못했습니다.");
     } finally {
@@ -114,6 +115,15 @@ export function SignInForm({ onAuthenticated }: SignInFormProps) {
               {isSubmitting ? "로그인 중" : "로그인"}
             </Button>
           </form>
+          <p className="mt-5 text-center text-muted-foreground text-sm">
+            계정이 없으신가요?{" "}
+            <Link
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+              to="/sign-up"
+            >
+              회원가입
+            </Link>
+          </p>
         </CardContent>
       </Card>
       <Dialog open={apiError !== null} onOpenChange={(open) => !open && setApiError(null)}>

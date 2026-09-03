@@ -31,7 +31,10 @@ export function AuthRouteBoundary() {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
     return <Navigate replace state={{ returnTo }} to="/sign-in" />;
   }
-  if (auth.status.kind === "authenticated" && location.pathname === "/sign-in") {
+  if (
+    auth.status.kind === "authenticated" &&
+    (location.pathname === "/sign-in" || location.pathname === "/sign-up")
+  ) {
     const state = location.state as { returnTo?: unknown } | null;
     return (
       <Navigate

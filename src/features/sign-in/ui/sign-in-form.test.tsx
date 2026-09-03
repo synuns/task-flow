@@ -1,11 +1,17 @@
 import { resetAuthFixture, startAuthSession } from "@/mocks/fixtures/auth";
 import { authHandlers } from "@/mocks/handlers/auth";
 import { server } from "@/mocks/server";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render as testingRender, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
+import type { ReactNode } from "react";
+import { MemoryRouter } from "react-router-dom";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { SignInForm } from "./sign-in-form";
+
+function render(ui: ReactNode) {
+  return testingRender(<MemoryRouter>{ui}</MemoryRouter>);
+}
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 beforeEach(() => {

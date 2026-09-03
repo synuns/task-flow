@@ -1,6 +1,6 @@
 import { ApiClientProvider, type ApiClient } from "@/shared/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AuthController, AuthStatus } from "./auth/auth-provider";
@@ -37,7 +37,7 @@ const apiClient: ApiClient = {
       pathname === "/api/dashboard"
         ? { numOfTask: 3, numOfRestTask: 2, numOfDoneTask: 1 }
         : pathname === "/api/user"
-          ? { name: "김담당", memo: "오늘도 차근차근" }
+          ? { email: "user@example.com", name: "김담당", memo: "오늘도 차근차근" }
           : pathname === "/api/task/task-1"
             ? {
                 title: "첫 번째 할 일",
@@ -60,6 +60,7 @@ describe("app router", () => {
   it.each([
     ["/", "대시보드", "authenticated"],
     ["/sign-in", "로그인", "anonymous"],
+    ["/sign-up", "회원가입", "anonymous"],
     ["/task", "할 일", "authenticated"],
     ["/task/task-1", "첫 번째 할 일", "authenticated"],
     ["/user", "회원정보", "authenticated"],
@@ -91,15 +92,24 @@ describe("app router", () => {
       expect(screen.getByRole("link", { name: "회원정보" })).toHaveAttribute("href", "/user");
       expect(screen.queryByRole("link", { name: "로그인" })).not.toBeInTheDocument();
     } else {
-      expect(screen.getByRole("link", { name: "로그인" })).toHaveAttribute("href", "/sign-in");
+      expect(within(navigation).getByRole("link", { name: "로그인" })).toHaveAttribute(
+        "href",
+        "/sign-in",
+      );
       expect(screen.queryByRole("link", { name: "회원정보" })).not.toBeInTheDocument();
       expect(screen.getByRole("textbox", { name: "이메일" })).toBeInTheDocument();
+      expect(navigation).not.toHaveTextContent("회원가입");
+      if (path === "/sign-in") {
+        expect(screen.getByRole("link", { name: "회원가입" })).toHaveAttribute("href", "/sign-up");
+      }
     }
 
-    const currentLabel = path.startsWith("/task") ? "할 일" : heading;
-    const currentLink = screen.getByRole("link", { name: currentLabel });
-    expect(currentLink).toHaveAttribute("aria-current", "page");
-    expect(currentLink).toHaveClass("bg-primary/35");
+    if (path !== "/sign-up") {
+      const currentLabel = path.startsWith("/task") ? "할 일" : heading;
+      const currentLink = screen.getByRole("link", { name: currentLabel });
+      expect(currentLink).toHaveAttribute("aria-current", "page");
+      expect(currentLink).toHaveClass("bg-primary/35");
+    }
   });
 
   it("keeps the application shell while bootstrap blocks protected content", () => {

@@ -51,6 +51,7 @@ const routes: RouteObject[] = [
         element: <LocationProbe />,
         children: [
           { path: "/sign-in", element: <h1>로그인</h1> },
+          { path: "/sign-up", element: <h1>회원가입</h1> },
           { path: "/", element: <h1>대시보드</h1> },
           { path: "/task", element: <h1>할 일</h1> },
           { path: "/task/:id", element: <h1>할 일 상세</h1> },
@@ -107,6 +108,19 @@ describe("AuthRouteBoundary", () => {
     render(<RouterProvider router={router} />);
 
     expect(await screen.findByTestId("location")).toHaveTextContent(expected);
+  });
+
+  it("redirects an authenticated user away from sign-up", async () => {
+    auth.controller = controller({
+      kind: "authenticated",
+      generation: 1,
+      accessToken: "token",
+      userId: "user-1",
+    });
+    const router = createMemoryRouter(routes, { initialEntries: ["/sign-up"] });
+    render(<RouterProvider router={router} />);
+
+    expect(await screen.findByTestId("location")).toHaveTextContent("/");
   });
 
   it("exposes retry without treating unavailable as anonymous", async () => {

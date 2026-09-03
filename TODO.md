@@ -2781,7 +2781,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   method/path/body를 포함. `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 40
   files/195 tests; `pnpm typecheck`, `git diff --check` PASS. Browser 적용 없음.
 
-### [ ] USER-CRUD-SIGNUP-01 회원가입 화면과 진입 UX 구현
+### [x] USER-CRUD-SIGNUP-01 회원가입 화면과 진입 UX 구현
 
 - Requirements: `USER-CRUD-01`~`USER-CRUD-03`, `USER-CRUD-08`
 - Risk: MEDIUM — public route, form validation과 결과 미확정 처리
@@ -2792,9 +2792,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: sign-up schema/component/router/auth-boundary Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: `390x844`, `1280x720` form, error, focus와 route probe
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; transport 검증 완료 후
-  `/sign-up` validation/form/router Journey lookup 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; sign-up RED는 schema/form
+  module, `/sign-up` route와 로그인 form link 부재로 focused 3 files 실패. 공용
+  email/password schema를 sign-in/sign-up이 재사용하고 trim/lowercase, email 254,
+  ASCII password 8~24, confirmation, trimmed name 1~50를 적용함. familiar single-card
+  form은 field별 연결 오류, generic form alert, 409 email 오류, network/invalid
+  outcome-unknown과 로그인 확인 link, pending guard, 201 뒤 자동 로그인 없이
+  `/sign-in` 이동을 구현함. Focused 6 files/48 tests와 `pnpm verify quick` PASS — hook
+  85, verifier 20, Vitest 42 files/213 tests; `pnpm typecheck`, `git diff --check` PASS.
+  Agent-browser session `user-crud-signup`에서 390x844 invalid field 4개 연결, disabled
+  submit, navigation에 가입 action 없음, no-overflow/Pretendard와 canonical 201 request
+  body(confirmation/memo 없음)→`/sign-in`을 확인함. 1280x720에서 duplicate 409가 email
+  아래 표시되고 focus가 email로 복원됨; expected bootstrap refresh 401과 duplicate 409
+  외 page error 없음. Screenshots: `/tmp/user-crud-signup-mobile.png`,
+  `/tmp/user-crud-signup-desktop.png`, `/tmp/user-crud-signup-duplicate-desktop.png`;
+  session close 완료.
 
 ### [ ] USER-CRUD-PROFILE-01 회원정보 한 필드 수정 UX 구현
 
@@ -2807,8 +2820,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: update-user와 user-profile component Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 두 viewport icon label, focus 진입/복원과 실패 상태
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; sign-up browser 검증 완료 후
+  canonical email과 name/memo 단일 필드 수정 Journey lookup 착수.
 
 ### [ ] USER-CRUD-DELETE-01 비밀번호 확인 회원 탈퇴 구현
 
