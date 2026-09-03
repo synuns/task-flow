@@ -2758,7 +2758,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   dashboard 격리 포함. `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 40
   files/189 tests; `pnpm typecheck`, `git diff --check` PASS. Browser 적용 없음.
 
-### [ ] USER-CRUD-TRANSPORT-01 User entity와 API boundary 구현
+### [x] USER-CRUD-TRANSPORT-01 User entity와 API boundary 구현
 
 - Requirements: `USER-CRUD-03`~`USER-CRUD-08`
 - Risk: MEDIUM — generated DTO, runtime guard와 MSW mutation 연결
@@ -2769,9 +2769,17 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: user API/handler/architecture Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — transport/entity task
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; store와 인증 소유권 검증 후
-  User entity/API/handler boundary Journey lookup 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; transport RED는 create/update/
+  delete export 부재, email 포함 User guard 불일치와 POST/PATCH/DELETE handler 부재로
+  focused 2 files에서 8 failed/2 passed. `entities/user`에 credential 없는 User model과
+  기존 `['user']` key를 이동하고, generated DTO 기반 public POST와 bearer GET/PATCH/
+  DELETE를 기존 request 경계에 연결함. Handler는 exact body validation, canonical
+  201, duplicate-email 전용 409, one-field PATCH, wrong-password 무변경과 200 뒤
+  auth/cookie revoke를 구현함. Focused user API/handler/architecture/profile 4 files/15
+  tests PASS; public entity exact type와 password 미노출, exact response, fieldless 400,
+  method/path/body를 포함. `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 40
+  files/195 tests; `pnpm typecheck`, `git diff --check` PASS. Browser 적용 없음.
 
 ### [ ] USER-CRUD-SIGNUP-01 회원가입 화면과 진입 UX 구현
 
@@ -2784,8 +2792,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: sign-up schema/component/router/auth-boundary Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: `390x844`, `1280x720` form, error, focus와 route probe
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; transport 검증 완료 후
+  `/sign-up` validation/form/router Journey lookup 착수.
 
 ### [ ] USER-CRUD-PROFILE-01 회원정보 한 필드 수정 UX 구현
 

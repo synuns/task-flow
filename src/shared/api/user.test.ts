@@ -1,8 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ApiClient } from "./api-client-context";
-import { getUser } from "./user";
+import { createUser, deleteUser, getUser, updateUser } from "./user";
 
-function clientFor(body: unknown, capture: { url?: string; method?: string }): ApiClient {
+type Capture = { url?: string; init?: RequestInit };
+const user = { email: "user@example.com", name: "김담당", memo: "오늘도 차근차근" };
+
+function clientFor(body: unknown, capture: Capture): ApiClient {
   return {
     request: async <T>(
       input: RequestInfo | URL,
@@ -10,7 +13,7 @@ function clientFor(body: unknown, capture: { url?: string; method?: string }): A
       isSuccess: (value: unknown) => value is T,
     ) => {
       capture.url = String(input);
-      capture.method = init.method;
+      capture.init = init;
       if (!isSuccess(body)) {
         throw { kind: "invalid-response", status: 200, message: "invalid" };
       }
@@ -19,28 +22,87 @@ function clientFor(body: unknown, capture: { url?: string; method?: string }): A
   };
 }
 
-describe("user API", () => {
-  it("requests the current user with GET and accepts the OpenAPI profile shape", async () => {
-    const capture: { url?: string; method?: string } = {};
-    const body = { name: "김담당", memo: "오늘도 차근차근" };
+afterEach(() => vi.unstubAllGlobals());
 
-    await expect(getUser(clientFor(body, capture))).resolves.toEqual(body);
-    expect(capture).toEqual({ url: `${globalThis.location.origin}/api/user`, method: "GET" });
+describe("user API", () => {
+  it("posts exact public signup fields and accepts a 201 User response", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(Response.json(user, { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      createUser({ email: "new@example.com", password: "Password1", name: "새 사용자" }),
+    ).resolves.toEqual(user);
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL("/api/user", globalThis.location.origin),
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          email: "new@example.com",
+          password: "Password1",
+          name: "새 사용자",
+        }),
+      }),
+    );
   });
 
-  it("rejects a response with a missing profile field", async () => {
-    const capture: { url?: string; method?: string } = {};
+  it("uses GET, one-field PATCH, and password-body DELETE for protected requests", async () => {
+    const getCapture: Capture = {};
+    const patchCapture: Capture = {};
+    const deleteCapture: Capture = {};
 
-    await expect(getUser(clientFor({ name: "김담당" }, capture))).rejects.toMatchObject({
+    await expect(getUser(clientFor(user, getCapture))).resolves.toEqual(user);
+    await expect(updateUser(clientFor(user, patchCapture), { name: "새 이름" })).resolves.toEqual(
+      user,
+    );
+    await expect(
+      deleteUser(clientFor({ success: true }, deleteCapture), "Password1"),
+    ).resolves.toEqual({ success: true });
+
+    expect(getCapture).toMatchObject({
+      url: `${globalThis.location.origin}/api/user`,
+      init: { method: "GET" },
+    });
+    expect(patchCapture).toMatchObject({
+      url: `${globalThis.location.origin}/api/user`,
+      init: { method: "PATCH", body: JSON.stringify({ name: "새 이름" }) },
+    });
+    expect(deleteCapture).toMatchObject({
+      url: `${globalThis.location.origin}/api/user`,
+      init: { method: "DELETE", body: JSON.stringify({ password: "Password1" }) },
+    });
+  });
+
+  it.each([
+    ["missing User field", { email: "user@example.com", name: "김담당" }],
+    ["extra User field", { ...user, password: "Password1" }],
+  ])("rejects an invalid %s", async (_case, body) => {
+    await expect(getUser(clientFor(body, {}))).rejects.toMatchObject({
       kind: "invalid-response",
     });
   });
 
-  it("rejects a profile response with an undocumented property", async () => {
-    const capture: { url?: string; method?: string } = {};
+  it("rejects a non-literal delete success response", async () => {
+    await expect(deleteUser(clientFor({ success: false }, {}), "Password1")).rejects.toMatchObject({
+      kind: "invalid-response",
+    });
+  });
+
+  it("keeps a fieldless 400 as a form-level HTTP error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          Response.json({ errorMessage: "가입 정보를 확인해주세요." }, { status: 400 }),
+        ),
+    );
 
     await expect(
-      getUser(clientFor({ name: "김담당", memo: "오늘도 차근차근", role: "admin" }, capture)),
-    ).rejects.toMatchObject({ kind: "invalid-response" });
+      createUser({ email: "new@example.com", password: "Password1", name: "새 사용자" }),
+    ).rejects.toEqual({
+      kind: "http",
+      status: 400,
+      message: "가입 정보를 확인해주세요.",
+    });
   });
 });

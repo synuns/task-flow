@@ -1,7 +1,7 @@
+import { userKeys } from "@/entities/user";
 import { getUser, useApiClient } from "@/shared/api";
 import { AsyncError, AsyncLoading, Card, CardContent, Skeleton } from "@/shared/ui";
 import { useQuery } from "@tanstack/react-query";
-import { userKeys } from "./model/user-keys";
 
 function errorMessage(error: unknown): string {
   return error && typeof error === "object" && "message" in error

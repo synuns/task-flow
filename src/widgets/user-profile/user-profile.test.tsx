@@ -26,7 +26,11 @@ describe("UserProfile", () => {
     const pending = new Promise<void>((resolve) => {
       release = resolve;
     });
-    const body: unknown = { name: "김담당", memo: "오늘도 차근차근" };
+    const body: unknown = {
+      email: "user@example.com",
+      name: "김담당",
+      memo: "오늘도 차근차근",
+    };
     const client: ApiClient = {
       request: async <T,>(
         _input: RequestInfo | URL,
@@ -55,7 +59,11 @@ describe("UserProfile", () => {
     const request = vi
       .fn()
       .mockRejectedValueOnce({ kind: "network", message: "네트워크 요청에 실패했습니다." })
-      .mockResolvedValueOnce({ name: "김담당", memo: "오늘도 차근차근" });
+      .mockResolvedValueOnce({
+        email: "user@example.com",
+        name: "김담당",
+        memo: "오늘도 차근차근",
+      });
     render(<UserProfile />, {
       wrapper: wrapper({ request: request as ApiClient["request"] }),
     });

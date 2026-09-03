@@ -17,7 +17,16 @@ export {
   type SignInCredentials,
 } from "./auth";
 export { type DashboardMetrics, getDashboard } from "./dashboard";
-export { getUser, type UserProfileData } from "./user";
+export {
+  createUser,
+  type CreateUserInput,
+  deleteUser,
+  type DeleteUserResult,
+  getUser,
+  updateUser,
+  type UpdateUserInput,
+  type UserProfileData,
+} from "./user";
 export {
   deleteTask,
   getTaskDetail,

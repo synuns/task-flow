@@ -7,7 +7,8 @@ import { tmpdir } from "node:os";
 import { dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type { User } from "@/entities/user";
 
 const sourceRoot = fileURLToPath(new URL("../", import.meta.url));
 const projectRoot = resolve(sourceRoot, "..");
@@ -138,6 +139,10 @@ function violations(): string[] {
 }
 
 describe("architecture imports", () => {
+  it("keeps credentials out of the public User entity", () => {
+    expectTypeOf<User>().toEqualTypeOf<{ email: string; name: string; memo: string }>();
+  });
+
   it("keeps FSD direction, public APIs, mocks, and generated boundaries", () => {
     expect(violations()).toEqual([]);
   });
