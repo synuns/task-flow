@@ -2898,23 +2898,25 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   verifier regression 19/19 + read-only check, `git diff --check` PASS; Verdict: PASS. 상세 기록은
   `docs/quality/evidence/user-crud.md`이며 사람 결정은 주장하지 않음.
 
-### [ ] JOURNEY-USER-CRUD-01 User CRUD 사람 checkpoint
+### [x] JOURNEY-USER-CRUD-01 User CRUD 사람 checkpoint
 
-- Requirements: `USER-CRUD-01`~`USER-CRUD-08`, `user-crud`
+- Requirements: `USER-CRUD-01`~`USER-CRUD-08`, `USER-LOGOUT-01`~`USER-LOGOUT-05`,
+  `user-crud`
 - Risk: HIGH — User CRUD Golden Journey acceptance는 사람 소유
 - Depends on: `USER-LOGOUT-JOURNEY-REVIEW-01`
 - Deliverable: automatic/browser/review evidence에 대한 사람 결정
 - Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
 - Automatic verification: 적용 없음 — 사람 결정 gate
 - Browser verification: `docs/quality/evidence/user-crud.md`의 named evidence 검토
-- Status: BLOCKED
+- Status: HUMAN_APPROVED
 - Evidence: exact review target `27d07dc136adae16bd77200f4cf7a61a6e01fbfe`에 대한 AI
   Verdict PASS와 focused/quick/E2E/browser/full 근거를
   `docs/quality/evidence/user-crud.md`에 연결하고 사람 checkpoint를 요청할 준비가 됨.
   수동 검토 중 로그아웃 요구사항이 추가되어 새 구현·검증·review 전까지 사람 결정 근거
   없음. 로그아웃 포함 exact target `d4966571b8b3b2fdb31ba05dcedb2fcfb1f63c0b`에
-  대한 fresh review Verdict PASS와 focused/quick/E2E/browser/full 근거가 추가됐으며,
-  AI가 `HUMAN_APPROVED` 상태를 기록하지 않음.
+  대한 fresh review Verdict PASS와 focused/quick/E2E/browser/full 근거가 추가됨.
+  2026-09-03 사용자가 수동 검토 뒤 `승인하고 main merge`라고 명시해 User CRUD와
+  로그아웃 확장 exact target `8b6171a0f216653e5dd6d4cddfe96444c6f8df93`를 승인함.
 
 ## 10. User 로그아웃 확장
 
