@@ -1,4 +1,5 @@
-import { resetAuthFixture } from "@/mocks/fixtures/auth";
+import { bearerUserId, resetAuthFixture } from "@/mocks/fixtures/auth";
+import { resetUserStore } from "@/mocks/fixtures/users";
 import { authHandlers } from "@/mocks/handlers/auth";
 import { server } from "@/mocks/server";
 import { HttpResponse, http } from "msw";
@@ -9,6 +10,7 @@ beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 beforeEach(async () => {
   server.resetHandlers(...authHandlers);
   resetAuthFixture();
+  resetUserStore();
   await fetch(new URL("/api/refresh", globalThis.location.origin), {
     method: "POST",
     credentials: "include",
@@ -23,6 +25,12 @@ describe("auth API", () => {
 
     expect(tokens.accessToken.split(".")).toHaveLength(3);
     expect(tokens.refreshToken.split(".")).toHaveLength(3);
+  });
+
+  it("authenticates a canonicalized seed email as its stored user", async () => {
+    const tokens = await signIn({ email: " USER@EXAMPLE.COM ", password: "Password1" });
+
+    expect(bearerUserId(`Bearer ${tokens.accessToken}`)).toBe("user-1");
   });
 
   it("rejects a sign-in request with an undocumented property", async () => {

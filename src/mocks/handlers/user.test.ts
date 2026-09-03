@@ -12,7 +12,7 @@ afterAll(() => server.close());
 
 describe("user handlers", () => {
   it("returns the OpenAPI profile for the current bearer", async () => {
-    const token = startAuthSession().accessToken;
+    const token = startAuthSession("user-1").accessToken;
     const response = await fetch(new URL("/api/user", globalThis.location.origin), {
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -49,16 +49,33 @@ function encode(value: unknown): string {
   return btoa(JSON.stringify(value)).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
 }
 
-function jwt(kind: "access" | "refresh"): string {
+function jwt(kind: "access" | "refresh", userId: string): string {
   return `${encode({ alg: "none", typ: "JWT" })}.${encode({
-    id: "user-1",
+    id: userId,
     exp: Math.floor(Date.now() / 1000) + 300,
     jti: `${kind}-${++state.sequence}`,
   })}.`;
 }
 
-function issue(): IssuedTokenPair {
-  const pair = { accessToken: jwt("access"), refreshToken: jwt("refresh") };
+function tokenUserId(token: string): string | null {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const base64 = payload.replaceAll("-", "+").replaceAll("_", "/");
+    const claims = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "="))) as {
+      id?: unknown;
+    };
+    return typeof claims.id === "string" ? claims.id : null;
+  } catch {
+    return null;
+  }
+}
+
+function issue(userId: string): IssuedTokenPair {
+  const pair = {
+    accessToken: jwt("access", userId),
+    refreshToken: jwt("refresh", userId),
+  };
   state.currentAccessToken = pair.accessToken;
   state.activeRefreshTokens.push(pair.refreshToken);
   persistState();
@@ -74,18 +91,34 @@ export function resetAuthFixture(): void {
   }
 }
 
-export function startAuthSession(): IssuedTokenPair {
+export function startAuthSession(userId: string): IssuedTokenPair {
   state.activeRefreshTokens = [];
-  return issue();
+  return issue(userId);
 }
 
 export function rotateRefreshToken(refreshToken: string): IssuedTokenPair | null {
   const index = state.activeRefreshTokens.indexOf(refreshToken);
   if (index === -1) return null;
+  const userId = tokenUserId(refreshToken);
+  if (!userId) return null;
   state.activeRefreshTokens.splice(index, 1);
-  return issue();
+  return issue(userId);
+}
+
+export function bearerUserId(header: string | null): string | null {
+  if (state.currentAccessToken === null || header !== `Bearer ${state.currentAccessToken}`) {
+    return null;
+  }
+  return tokenUserId(state.currentAccessToken);
 }
 
 export function acceptsBearer(header: string | null): boolean {
-  return state.currentAccessToken !== null && header === `Bearer ${state.currentAccessToken}`;
+  return bearerUserId(header) !== null;
+}
+
+export function revokeAuthSession(userId: string): void {
+  if (state.currentAccessToken === null || tokenUserId(state.currentAccessToken) !== userId) return;
+  state.currentAccessToken = null;
+  state.activeRefreshTokens = [];
+  persistState();
 }

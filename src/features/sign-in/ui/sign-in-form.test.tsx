@@ -139,7 +139,7 @@ describe("SignInForm", () => {
       http.post("/api/sign-in", async () => {
         requestCount += 1;
         await pending;
-        return HttpResponse.json(startAuthSession());
+        return HttpResponse.json(startAuthSession("user-1"));
       }),
     );
     render(<SignInForm onAuthenticated={onAuthenticated} />);

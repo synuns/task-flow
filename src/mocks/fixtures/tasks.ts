@@ -15,6 +15,7 @@ type DashboardResponse = {
 
 const storedTaskSchema = z.strictObject({
   id: z.string(),
+  ownerId: z.string(),
   title: z.string(),
   memo: z.string(),
   status: z.enum(["TODO", "DONE"]),
@@ -28,6 +29,7 @@ const fixtureStorageKey = "__kbhc_msw_task_fixture__";
 const seed: StoredTask[] = [
   {
     id: "task-1",
+    ownerId: "user-1",
     title: "첫 번째 할 일",
     memo: "삭제 검증 대상",
     status: "TODO",
@@ -35,6 +37,7 @@ const seed: StoredTask[] = [
   },
   {
     id: "task-2",
+    ownerId: "user-1",
     title: "두 번째 할 일",
     memo: "남아 있는 TODO",
     status: "TODO",
@@ -42,6 +45,7 @@ const seed: StoredTask[] = [
   },
   {
     id: "task-3",
+    ownerId: "user-1",
     title: "완료한 일",
     memo: "남아 있는 DONE",
     status: "DONE",
@@ -82,30 +86,42 @@ export function resetTaskStore(): void {
   persistTasks();
 }
 
-export function listTaskPage(page: number): TaskListResponse {
+export function listTaskPage(ownerId: string, page: number): TaskListResponse {
+  const ownedTasks = tasks.filter((task) => task.ownerId === ownerId);
   const start = (page - 1) * taskPageSize;
   return {
-    data: tasks.slice(start, start + taskPageSize).map(({ registerDatetime: _, ...task }) => task),
-    hasNext: start + taskPageSize < tasks.length,
+    data: ownedTasks
+      .slice(start, start + taskPageSize)
+      .map(({ ownerId: _, registerDatetime: __, ...task }) => task),
+    hasNext: start + taskPageSize < ownedTasks.length,
   };
 }
 
-export function findTask(id: string): StoredTask | null {
-  return tasks.find((task) => task.id === id) ?? null;
+export function findTask(ownerId: string, id: string): StoredTask | null {
+  return tasks.find((task) => task.ownerId === ownerId && task.id === id) ?? null;
 }
 
-export function removeTask(id: string): StoredTask | null {
-  const index = tasks.findIndex((task) => task.id === id);
+export function removeTask(ownerId: string, id: string): StoredTask | null {
+  const index = tasks.findIndex((task) => task.ownerId === ownerId && task.id === id);
   if (index < 0) return null;
   const removed = tasks.splice(index, 1)[0] ?? null;
   persistTasks();
   return removed;
 }
 
-export function getDashboardMetrics(): DashboardResponse {
+export function removeTasksByOwner(ownerId: string): number {
+  const previousCount = tasks.length;
+  tasks = tasks.filter((task) => task.ownerId !== ownerId);
+  const removedCount = previousCount - tasks.length;
+  if (removedCount > 0) persistTasks();
+  return removedCount;
+}
+
+export function getDashboardMetrics(ownerId: string): DashboardResponse {
+  const ownedTasks = tasks.filter((task) => task.ownerId === ownerId);
   return {
-    numOfTask: tasks.length,
-    numOfRestTask: tasks.filter((task) => task.status === "TODO").length,
-    numOfDoneTask: tasks.filter((task) => task.status === "DONE").length,
+    numOfTask: ownedTasks.length,
+    numOfRestTask: ownedTasks.filter((task) => task.status === "TODO").length,
+    numOfDoneTask: ownedTasks.filter((task) => task.status === "DONE").length,
   };
 }

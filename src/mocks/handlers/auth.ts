@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { rotateRefreshToken, startAuthSession } from "../fixtures/auth";
+import { authenticateUser } from "../fixtures/users";
 
 const refreshCookie = (token: string) =>
   `token=${token}; Path=/api/refresh; HttpOnly; SameSite=Strict`;
@@ -8,21 +9,23 @@ const expiredRefreshCookie = "token=; Path=/api/refresh; HttpOnly; Max-Age=0; Sa
 export const authHandlers = [
   http.post("/api/sign-in", async ({ request }) => {
     const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-    if (
+    const credentials =
       body === null ||
       Array.isArray(body) ||
       Object.keys(body).length !== 2 ||
       !Object.hasOwn(body, "email") ||
       !Object.hasOwn(body, "password") ||
-      body.email !== "user@example.com" ||
-      body.password !== "Password1"
-    ) {
+      typeof body.email !== "string" ||
+      typeof body.password !== "string"
+        ? null
+        : authenticateUser(body.email, body.password);
+    if (!credentials) {
       return HttpResponse.json(
         { errorMessage: "이메일 또는 비밀번호가 올바르지 않습니다." },
         { status: 400 },
       );
     }
-    const pair = startAuthSession();
+    const pair = startAuthSession(credentials.id);
     return HttpResponse.json(pair, {
       headers: { "Set-Cookie": refreshCookie(pair.refreshToken) },
     });

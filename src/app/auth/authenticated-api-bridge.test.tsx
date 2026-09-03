@@ -48,7 +48,7 @@ it("keeps one ApiClient instance while auth tokens rotate", async () => {
   const firstClient = observed.client;
   if (!observed.auth) throw new Error("auth controller is missing");
 
-  observed.auth.acceptSignIn(startAuthSession());
+  observed.auth.acceptSignIn(startAuthSession("user-1"));
 
   await waitFor(() => expect(screen.getByText("authenticated")).toBeInTheDocument());
   expect(observed.client).toBe(firstClient);
@@ -107,7 +107,7 @@ it("ends the session, clears task cache, and recovers the route after task 401 r
   if (!observed.auth) throw new Error("auth controller is missing");
   const activeController = observed.auth;
 
-  act(() => activeController.acceptSignIn(startAuthSession()));
+  act(() => activeController.acceptSignIn(startAuthSession("user-1")));
 
   await waitFor(() => expect(taskRequests).toBe(1));
   await waitFor(() => expect(observed.auth?.status.kind).toBe("anonymous"));

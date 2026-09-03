@@ -19,7 +19,7 @@ beforeEach(() => {
   server.resetHandlers(...taskHandlers);
   resetAuthFixture();
   resetTaskStore();
-  accessToken = startAuthSession().accessToken;
+  accessToken = startAuthSession("user-1").accessToken;
 });
 afterAll(() => server.close());
 
@@ -97,6 +97,21 @@ describe("task handlers", () => {
 
     expect((await apiRequest("/api/task?page=1")).body).toMatchObject({
       data: expect.arrayContaining([expect.objectContaining({ id: "task-1" })]),
+    });
+  });
+
+  it("hides another user's tasks across list, detail, delete, and dashboard", async () => {
+    const otherToken = startAuthSession("user-2").accessToken;
+
+    expect(await apiRequest("/api/task?page=1", "GET", otherToken)).toEqual({
+      status: 200,
+      body: { data: [], hasNext: false },
+    });
+    expect((await apiRequest("/api/task/task-1", "GET", otherToken)).status).toBe(404);
+    expect((await apiRequest("/api/task/task-1", "DELETE", otherToken)).status).toBe(404);
+    expect(await apiRequest("/api/dashboard", "GET", otherToken)).toEqual({
+      status: 200,
+      body: { numOfTask: 0, numOfRestTask: 0, numOfDoneTask: 0 },
     });
   });
 

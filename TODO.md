@@ -2735,7 +2735,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `src/generated/openapi.ts` 무변경 확인 PASS. 계약/requirement/Journey map과 승인
   spec 대조에서 누락·Task CRUD 선반영·미해결 finding 없음; browser 적용 없음.
 
-### [ ] USER-CRUD-STORE-01 사용자 저장소와 Task 소유권 구현
+### [x] USER-CRUD-STORE-01 사용자 저장소와 Task 소유권 구현
 
 - Requirements: `USER-CRUD-03`, `USER-CRUD-06`, `USER-CRUD-07`
 - Risk: HIGH — credential, auth identity와 영구 삭제 cascade 의미 구현
@@ -2746,9 +2746,17 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: user/auth/task fixture와 handler Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — fixture/store integration task
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; `USER-CRUD-CONTRACT-01`
-  검증 완료 후 store/auth/task 소유권 Journey lookup 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; store RED는 User fixture
+  module 부재, bearer user ID API 부재와 owner-aware Task signature 불일치로 focused
+  3 files에서 7 failed/1 passed. 최소 sessionStorage User store, canonical email과
+  trimmed name, one-field update, wrong-password guard, deletion cascade를 구현하고 JWT
+  `id`를 sign-in/refresh/bearer/revoke에 유지함. 기존 Task store에 내부 `ownerId`만
+  추가하고 API projection에서는 제외했으며 list/detail/delete/dashboard를 소유자로
+  격리함. Focused 6 files/31 tests PASS — duplicate signup, canonical sign-in,
+  wrong-password 무변경, seed User의 Task 3개 cascade와 cross-user list/detail/delete/
+  dashboard 격리 포함. `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 40
+  files/189 tests; `pnpm typecheck`, `git diff --check` PASS. Browser 적용 없음.
 
 ### [ ] USER-CRUD-TRANSPORT-01 User entity와 API boundary 구현
 
@@ -2761,8 +2769,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: user API/handler/architecture Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — transport/entity task
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; store와 인증 소유권 검증 후
+  User entity/API/handler boundary Journey lookup 착수.
 
 ### [ ] USER-CRUD-SIGNUP-01 회원가입 화면과 진입 UX 구현
 

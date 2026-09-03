@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { acceptsBearer } from "../fixtures/auth";
+import { bearerUserId } from "../fixtures/auth";
 import { findTask, getDashboardMetrics, listTaskPage, removeTask } from "../fixtures/tasks";
 
 const unauthorized = () =>
@@ -9,15 +9,17 @@ const missing = () =>
 
 export const taskHandlers = [
   http.get("/api/task", ({ request }) => {
-    if (!acceptsBearer(request.headers.get("Authorization"))) return unauthorized();
+    const userId = bearerUserId(request.headers.get("Authorization"));
+    if (!userId) return unauthorized();
     const pageValue = new URL(request.url).searchParams.get("page");
     const page = Number(pageValue);
     if (pageValue === null || !Number.isInteger(page) || page < 1) return HttpResponse.error();
-    return HttpResponse.json(listTaskPage(page));
+    return HttpResponse.json(listTaskPage(userId, page));
   }),
   http.get("/api/task/:id", ({ params, request }) => {
-    if (!acceptsBearer(request.headers.get("Authorization"))) return unauthorized();
-    const task = findTask(String(params.id));
+    const userId = bearerUserId(request.headers.get("Authorization"));
+    if (!userId) return unauthorized();
+    const task = findTask(userId, String(params.id));
     return task
       ? HttpResponse.json({
           title: task.title,
@@ -27,14 +29,14 @@ export const taskHandlers = [
       : missing();
   }),
   http.delete("/api/task/:id", ({ params, request }) => {
-    if (!acceptsBearer(request.headers.get("Authorization"))) return unauthorized();
-    return removeTask(String(params.id))
+    const userId = bearerUserId(request.headers.get("Authorization"));
+    if (!userId) return unauthorized();
+    return removeTask(userId, String(params.id))
       ? HttpResponse.json({ success: true as const })
       : missing();
   }),
-  http.get("/api/dashboard", ({ request }) =>
-    acceptsBearer(request.headers.get("Authorization"))
-      ? HttpResponse.json(getDashboardMetrics())
-      : unauthorized(),
-  ),
+  http.get("/api/dashboard", ({ request }) => {
+    const userId = bearerUserId(request.headers.get("Authorization"));
+    return userId ? HttpResponse.json(getDashboardMetrics(userId)) : unauthorized();
+  }),
 ];

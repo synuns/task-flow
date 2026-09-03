@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const fixtureStorageKey = "__kbhc_msw_task_fixture__";
 const storedTask = {
   id: "stored-task",
+  ownerId: "user-1",
   title: "저장된 할 일",
   memo: "저장 경계 검증",
   status: "TODO",
@@ -23,13 +24,13 @@ describe("task fixture persistence", () => {
   it("keeps a delete transaction across a page module reload", async () => {
     const firstModule = await import("./tasks");
     firstModule.resetTaskStore();
-    expect(firstModule.removeTask("task-1")?.id).toBe("task-1");
+    expect(firstModule.removeTask("user-1", "task-1")?.id).toBe("task-1");
 
     vi.resetModules();
     const reloadedModule = await import("./tasks");
 
-    expect(reloadedModule.findTask("task-1")).toBeNull();
-    expect(reloadedModule.getDashboardMetrics()).toEqual({
+    expect(reloadedModule.findTask("user-1", "task-1")).toBeNull();
+    expect(reloadedModule.getDashboardMetrics("user-1")).toEqual({
       numOfTask: 2,
       numOfRestTask: 1,
       numOfDoneTask: 1,
@@ -45,8 +46,8 @@ describe("task fixture persistence", () => {
 
     const fixture = await import("./tasks");
 
-    expect(fixture.findTask("stored-task")).toBeNull();
-    expect(fixture.listTaskPage(1).data[0]?.id).toBe("task-1");
+    expect(fixture.findTask("user-1", "stored-task")).toBeNull();
+    expect(fixture.listTaskPage("user-1", 1).data[0]?.id).toBe("task-1");
   });
 
   it("restores the seed for malformed JSON", async () => {
@@ -54,6 +55,19 @@ describe("task fixture persistence", () => {
 
     const fixture = await import("./tasks");
 
-    expect(fixture.listTaskPage(1).data[0]?.id).toBe("task-1");
+    expect(fixture.listTaskPage("user-1", 1).data[0]?.id).toBe("task-1");
+  });
+
+  it("never exposes tasks owned by another user", async () => {
+    const fixture = await import("./tasks");
+
+    expect(fixture.listTaskPage("user-2", 1)).toEqual({ data: [], hasNext: false });
+    expect(fixture.findTask("user-2", "task-1")).toBeNull();
+    expect(fixture.removeTask("user-2", "task-1")).toBeNull();
+    expect(fixture.getDashboardMetrics("user-2")).toEqual({
+      numOfTask: 0,
+      numOfRestTask: 0,
+      numOfDoneTask: 0,
+    });
   });
 });
