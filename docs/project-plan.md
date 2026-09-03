@@ -30,6 +30,10 @@
 `docs/quality/requirements.md`가 충돌하거나 해석이 둘 이상이면
 `REQUIREMENT` 실패로 기록하고 HIGH-risk 사람 결정을 요청한다.
 
+`docs/api/crud-openapi.yaml`은 2026-09-03 사람이 승인한 User CRUD 확장에만
+적용되는 API 계약이다. 이 확장과 겹치는 `/api/user` 응답은 확장 계약을 따르고,
+그 밖의 원본 API 동작은 `assignment-original/openapi.yaml`이 계속 우선한다.
+
 ## 제품 목표
 
 React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 단일 페이지
@@ -42,7 +46,11 @@ React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 
 - 가상화된 무한 목록에서 task를 탐색하고 상세로 이동한다.
 - 상세가 없으면 목록으로 복구한다.
 - route ID를 정확히 입력한 경우에만 task를 삭제하고 목록으로 돌아간다.
-- profile에서 사용자 name과 memo를 확인한다.
+- 로그인 화면에서 회원가입으로 이동하고 유효한 email, password, name으로
+  계정을 만든다.
+- profile에서 canonical email, name과 memo를 확인하고 name 또는 memo를 한
+  항목씩 수정한다.
+- 현재 비밀번호를 확인한 뒤 계정과 소유 task를 삭제한다.
 
 ## 성공 기준
 
@@ -50,8 +58,8 @@ React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 
 
 - `docs/quality/requirements.md`의 모든 requirement에 재현 가능한 자동 또는
   browser evidence가 기록된다.
-- 네 Golden Journey `auth-entry`, `work-overview`, `task-discovery`,
-  `task-resolution`이 각각 경량 adversarial review를 통과하고 사람이
+- 다섯 Golden Journey `auth-entry`, `work-overview`, `task-discovery`,
+  `task-resolution`, `user-crud`가 각각 경량 adversarial review를 통과하고 사람이
   checkpoint를 승인한다.
 - OpenAPI 계약에서 생성한 타입과 MSW 동작이 실제 client 요청·응답과 일치한다.
 - loading, empty, error, success 상태가 적용 가능한 화면에서 구분된다.
@@ -67,19 +75,20 @@ React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 
 
 ### 포함
 
-- `/`, `/sign-in`, `/task`, `/task/:id`, `/user` route
+- `/`, `/sign-in`, `/sign-up`, `/task`, `/task/:id`, `/user` route
 - 상태별 GNB/LNB action과 서로 다른 아이콘
 - sign-in validation, 요청, 오류 modal, 인증 상태
 - dashboard metrics
 - task 가상 목록, 무한 pagination, 상세, 404 복구, 확인 후 삭제
-- user profile
+- user 회원가입, profile 조회, name/memo 단일 필드 수정, 비밀번호 확인 탈퇴
 - OAS 3.1 기반 생성 타입과 제출 가능한 MSW API 대체 구현
 - 명명된 색상 token과 local Pretendard font
 - 자동 검증, browser evidence, Golden Journey checkpoint, AI 사용 공개
 
 ### 제외
 
-- 원본에 없는 회원가입, 로그아웃 UI, task 생성·수정, 검색, 정렬, filter
+- 이메일·비밀번호 변경, 관리자용 user CRUD, 로그아웃 UI, task 생성·수정,
+  검색, 정렬, filter
 - 별도 production backend와 database
 - 원본에 없는 role·permission 체계
 - offline mode, realtime synchronization, analytics, 국제화
@@ -98,6 +107,9 @@ React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 
 4. 유효한 입력을 제출한다.
 5. non-200 응답이면 API `errorMessage` modal을 확인하고 닫는다.
 6. 200 응답이면 승인된 방식으로 인증 상태를 만들고 보호 API 요청을 수행한다.
+7. 계정이 없으면 form 아래 link로 `/sign-up`에 이동한다.
+8. email, password, password confirmation, name을 검증해 가입하고 자동 로그인
+   없이 `/sign-in`으로 돌아온다.
 
 dashboard와 task action의 노출 여부와 보호 route 접근 정책은 원본만으로
 확정되지 않았다. navigation action은 항상 존재한다는 invariant를 지키되,
@@ -114,7 +126,10 @@ dashboard와 task action의 노출 여부와 보호 route 접근 정책은 원�
 7. 삭제 modal에서 잘못된 ID에는 submit이 비활성화되고 정확한 ID에서만
    활성화되는지 확인한다.
 8. 삭제 성공 후 `/task`로 돌아간다.
-9. profile에서 name과 memo를 확인한다.
+9. profile에서 canonical email, name과 memo를 확인한다.
+10. name 또는 memo 오른쪽 연필을 눌러 한 항목만 수정하고 체크로 완료하거나
+    X로 취소한다.
+11. 현재 비밀번호를 확인한 뒤 탈퇴하고 `/sign-in`으로 돌아간다.
 
 ## 화면·route 기획
 
@@ -122,9 +137,10 @@ dashboard와 task action의 노출 여부와 보호 route 접근 정책은 원�
 | --- | --- | --- | --- |
 | `/` | 업무 현황 확인 | loading, error, success | `DASH-01`, `NAV-01`, `NAV-03` |
 | `/sign-in` | 인증 시작 | invalid, submitting, API error, success | `NAV-02`, `AUTH-01`~`AUTH-07` |
+| `/sign-up` | 계정 생성 | invalid, submitting, API error, outcome unknown, success | `USER-CRUD-01`~`USER-CRUD-03`, `USER-CRUD-08` |
 | `/task` | task 탐색 | initial loading, empty, page loading, error, terminal page | `TASK-LIST-01`~`TASK-LIST-05` |
 | `/task/:id` | task 확인·삭제 | loading, 404, error, success, delete modal | `TASK-DETAIL-01`~`TASK-DETAIL-05` |
-| `/user` | profile 확인 | loading, error, success | `USER-01`, `NAV-03` |
+| `/user` | profile 확인·수정·탈퇴 | loading, error, success, field editing, delete modal | `USER-01`, `NAV-03`, `USER-CRUD-04`~`USER-CRUD-08` |
 
 공통 shell은 현재 route를 표시하고 dashboard/task action을 유지한다. 인증
 action은 sign-in과 profile 중 정확히 하나만 표시한다. 아이콘은 항목별로
@@ -136,7 +152,10 @@ action은 sign-in과 profile 중 정확히 하나만 표시한다. 아이콘은 
 | --- | --- | --- |
 | 로그인 | `POST /api/sign-in` | email/password JSON, 200 token 응답, non-200 `errorMessage` |
 | 갱신 | `POST /api/refresh` | refresh cookie credential, 200 token, 400/401 error |
-| profile | `GET /api/user` | bearer token, name/memo |
+| 회원가입 | `POST /api/user` | public email/password/name, 201 user, 400/409 error |
+| profile | `GET /api/user` | bearer token, canonical email/name/memo |
+| profile 수정 | `PATCH /api/user` | bearer token, name 또는 memo 한 field, 200 user |
+| 회원 탈퇴 | `DELETE /api/user` | bearer token, 현재 password, 200 success만 session 종료 |
 | dashboard | `GET /api/dashboard` | bearer token, 세 integer metric |
 | task 목록 | `GET /api/task?page=N` | 1부터 시작, data/hasNext |
 | task 상세 | `GET /api/task/{id}` | bearer token, 200 detail, 404 error |
@@ -348,7 +367,14 @@ evidence, review가 준비되고 사람 checkpoint를 요청한다.
 정확한 ID guard, failure recovery, 성공 redirect evidence, review가 준비되고
 사람 checkpoint를 요청한다.
 
-### 7. 통합·제출 QA
+### 7. user-crud Journey
+
+로그인 화면의 회원가입 link, 가입 검증과 201-only 전환, canonical profile,
+한 field 수정, 비밀번호 확인 탈퇴를 완성한다. Exit: User와 소유 Task 삭제를
+store integration으로 증명하고 success/failure core browser evidence와 review를
+준비해 사람 checkpoint를 요청한다.
+
+### 8. 통합·제출 QA
 
 journey 간 auth transition, stale cache, API error, mock/OAS 일관성, 반응형,
 접근성, AI disclosure를 교차 검토한다. Exit: full adversarial review와

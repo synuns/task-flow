@@ -19,8 +19,8 @@
     "test:watch": "vitest",
     "test:e2e:core": "env -u NO_COLOR playwright test --grep @core",
     "test:e2e:smoke": "env -u NO_COLOR playwright test e2e/scaffold.smoke.spec.ts",
-    "api:types": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts",
-    "api:types:check": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts --check",
+    "api:types": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts && openapi-typescript docs/api/crud-openapi.yaml -o src/generated/crud-openapi.ts",
+    "api:types:check": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts --check && openapi-typescript docs/api/crud-openapi.yaml -o src/generated/crud-openapi.ts --check",
     "ai:review": "./scripts/review-ai-record",
     "verify": "./scripts/verify"
   },

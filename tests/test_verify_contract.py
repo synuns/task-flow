@@ -491,6 +491,22 @@ class VerifyContractTests(unittest.TestCase):
                 self.assertIn(relative, verifier.REQUIRED_FILES)
                 self.assertTrue((ROOT / relative).is_file())
 
+    def test_repository_wires_approved_crud_contract(self):
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+
+        for relative in ("docs/api/crud-openapi.yaml", "src/generated/crud-openapi.ts"):
+            with self.subTest(relative=relative):
+                self.assertTrue((ROOT / relative).is_file())
+        for script in ("api:types", "api:types:check"):
+            with self.subTest(script=script):
+                command = package["scripts"][script]
+                self.assertIn("assignment-original/openapi.yaml", command)
+                self.assertIn("docs/api/crud-openapi.yaml", command)
+                self.assertIn("src/generated/crud-openapi.ts", command)
+
+        biome = json.loads((ROOT / "biome.json").read_text(encoding="utf-8"))
+        self.assertIn("!src/generated/crud-openapi.ts", biome["files"]["includes"])
+
     def test_protected_core_journeys_use_authenticated_fixture(self):
         for relative in (
             "e2e/work-overview.spec.ts",

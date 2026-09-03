@@ -7,6 +7,10 @@ Use `assignment-original/openapi.yaml` as the API authority and
 `REQUIREMENT` failure and request a human decision when the sources conflict in
 a way that changes accepted behavior.
 
+Use `docs/api/crud-openapi.yaml` only for the human-approved User CRUD extension.
+The original OpenAPI remains authoritative for every operation outside that
+extension and is never modified by extension work.
+
 ## Status and Evidence Rules
 
 Allowed statuses: `NOT_STARTED`, `IN_PROGRESS`, `AI_VERIFIED`,
@@ -49,13 +53,22 @@ are reserved for human owners.
 | TASK-DETAIL-04 | Delete guard | requirement: 상세 | Delete submit stays disabled until input exactly equals route ID. | LOW | unit/component | attempt/dialog Vitest | `docs/quality/evidence/task-resolution.md` | task-resolution | AI_VERIFIED |
 | TASK-DETAIL-05 | Delete success | requirement: 상세; OAS `DELETE /api/task/{id}` | Confirmed submit calls delete API and successful response redirects to `/task`. | MEDIUM | integration/browser | resolution/cache/page/transport Vitest | `docs/quality/evidence/task-resolution.md` | task-resolution | AI_VERIFIED |
 | USER-01 | Profile data | requirement: 회원정보; OAS `UserResponse` | Authenticated profile view shows name and memo from `GET /api/user`. | MEDIUM | integration/browser | user API/handler/widget Vitest | `docs/quality/evidence/work-overview.md` | work-overview | AI_VERIFIED |
+| USER-CRUD-01 | Sign-up entry | approved CRUD design | `/sign-up` is reachable only from a normal link below the sign-in form; navigation gains no sign-up action. | LOW | component/browser | router/sign-in Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-02 | Sign-up validation | CRUD OAS `CreateUserRequest`; approved CRUD design | Email is trimmed/lowercased, syntactically valid, and at most 254 characters; password is 8–24 ASCII alphanumeric characters; confirmation matches; trimmed name is 1–50 characters; associated errors prevent invalid submit. | MEDIUM | unit/component | sign-up schema/component Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-03 | Account creation | CRUD OAS `POST /api/user` | Only a 201 response completes sign-up and navigates to `/sign-in` without creating an authenticated session; request omits confirmation and memo. | HIGH | integration/browser | user API/sign-up Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-04 | Canonical profile | CRUD OAS `GET /api/user` | Protected `/user` displays the current user's canonical email, name, and memo; email is read-only. | MEDIUM | integration/browser | user API/profile Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-05 | Single-field profile update | CRUD OAS `PATCH /api/user`; approved CRUD design | Name and memo each use pencil to start, check to submit, and X to cancel; only one field is edited and sent at a time, and displayed/cache data changes only after a successful response. | MEDIUM | component/integration/browser | profile editor/API Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-06 | Password-confirmed account deletion | CRUD OAS `DELETE /api/user` | Current password is required; only a 200 success terminates the session and navigates to `/sign-in`; failure preserves account, tasks, profile, and session. | HIGH | integration/browser | delete-user/API Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-07 | Deletion cascade | approved CRUD destructive-data policy | Successful deletion permanently removes the User and every owned Task; store integration evidence, not a later sign-in failure, proves removal. | HIGH | store integration | user/task store Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-CRUD-08 | Mutation uncertainty and generic errors | approved CRUD error policy | A 400 without a field identifier is shown as a form or row alert, never inferred as a field error; POST network/invalid-response is outcome-unknown, is not retried automatically, and offers login verification or explicit resubmission. | HIGH | component/integration | sign-up/profile/delete Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
 
 ## Scenario Execution Rules
 
-`assignment-original/` is read-only. API steps use only operations, statuses,
-security schemes, and fields defined by `openapi.yaml`. UI-only steps use
-`requirement.md`. A schema-conforming fixture value is test data, not a new
-product field or behavior.
+`assignment-original/` is read-only. Baseline API steps use only operations,
+statuses, security schemes, and fields defined by its `openapi.yaml`. User CRUD
+steps use only the separately approved `docs/api/crud-openapi.yaml`. UI-only
+baseline steps use `requirement.md`; approved extension UI uses the CRUD design.
+A schema-conforming fixture value is test data, not a new product field or behavior.
 
 Each journey starts with a fresh browser context, query cache, and MSW fixture
 state. No journey depends on another journey having run. Each scenario records
@@ -72,7 +85,7 @@ behavior, and list/detail/dashboard cache consistency follow
 
 ## Master Journey
 
-The Master Journey is a map, not an E2E test. It connects the four independently
+The Master Journey is a map, not an E2E test. It connects the five independently
 executable journeys without making their state or execution order dependent.
 
 | Order | Journey | Entry state | Observable exit | Decision gate |
@@ -81,6 +94,7 @@ executable journeys without making their state or execution order dependent.
 | 2 | `work-overview` | Fresh approved authenticated fixture | Navigation, dashboard metrics, and profile data | `DEC-AUTH-01` for 401 transition and signed-out protected routes |
 | 3 | `task-discovery` | Fresh approved authenticated fixture with reset pages | First page, cards, bounded DOM, paging stop, and detail navigation | `DEC-AUTH-01` for 401 transition |
 | 4 | `task-resolution` | Fresh approved authenticated fixture with reset task data | Detail, 404 recovery, exact-ID guard, and approved delete result | `DEC-DELETE-01` before delete error/modal/cache semantics |
+| 5 | `user-crud` | Fresh signed-out context with reset User/Task stores | Sign-up, canonical profile, single-field updates, password-confirmed deletion | Approved CRUD contract and existing auth policy |
 
 ## Independent Journey Contract
 
@@ -193,10 +207,43 @@ The scenario uses the approved pending close lock, one-attempt duplicate guard,
 server-authoritative fixture mutation, and outcome-unknown reconciliation from
 `DEC-DELETE-01`.
 
+### user-crud
+
+Requirements: `USER-CRUD-01` through `USER-CRUD-08`.
+
+Independent initial state: fresh signed-out browser context, an available
+canonical email, reset User and Task stores, and a fresh query cache. Cases do
+not reuse an account or mutation result from another case.
+
+| Case/step | Requirement | User action | OpenAPI contract | Expected result | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| `USER-P1-1` | `USER-CRUD-01` | Follow the link below `/sign-in` | None | Route becomes `/sign-up`; navigation contains no sign-up action | component + browser |
+| `USER-P1-2` | `USER-CRUD-02` | Enter invalid, then valid sign-up values | None | Associated field errors allow only valid submit | unit + component |
+| `USER-P1-3` | `USER-CRUD-03` | Submit sign-up | `POST /api/user`, 201 `UserResponse` | Account has empty memo; route becomes `/sign-in`; no session is created | integration + browser |
+| `USER-P1-4` | `USER-CRUD-04` | Sign in with the new account and open profile | sign-in; bearer `GET /api/user` | Canonical email, name, and empty memo render | integration + browser |
+| `USER-P1-5` | `USER-CRUD-05` | Edit name using pencil, input, and check | one-field `PATCH /api/user` | Only the successful response changes name | component + integration |
+| `USER-P1-6` | `USER-CRUD-05` | Edit memo using pencil, input, and check | one-field `PATCH /api/user` | Only the successful response changes memo | component + integration |
+| `USER-P1-7` | `USER-CRUD-06` | Confirm deletion with the current password | `DELETE /api/user`, 200 `DeleteUserResponse` | Session ends, route becomes `/sign-in`, and protected UI is inaccessible | integration + browser |
+| `USER-P1-8` | `USER-CRUD-07` | Inspect the store after deletion | None | The User and every owned Task are absent | store integration |
+
+Core E2E combines `USER-P1-1` through `USER-P1-7` for the cross-browser boundary.
+It does not infer permanent deletion from a later sign-in failure; `USER-P1-8`
+owns that proof at store integration level.
+
+| Case | Requirement | Expected result | Evidence |
+| --- | --- | --- | --- |
+| `USER-E1` wrong deletion password | `USER-CRUD-06` | 400 form alert; dialog, profile, Tasks, and session remain unchanged | integration + core browser |
+| `USER-E2` invalid sign-up | `USER-CRUD-02` | Field errors; zero POST requests | unit + component |
+| `USER-E3` duplicate email | `USER-CRUD-03`, `USER-CRUD-08` | Only 409 maps to the email field; no account is added | integration |
+| `USER-E4` failed field PATCH | `USER-CRUD-05`, `USER-CRUD-08` | Edit/input and server value remain unchanged; generic 400 uses row alert | component + integration |
+| `USER-E5` create outcome unknown | `USER-CRUD-08` | No automatic POST; UI offers login verification or explicit resubmission | component + integration |
+| `USER-E6` terminal protected 401 | `USER-CRUD-06` | Existing auth policy clears session/cache | integration |
+
 ## Invariants
 
 - Dashboard and task navigation remain present across routes.
 - Authentication state exposes exactly one of sign-in and profile actions.
+- Sign-up has no navigation action and is entered from the sign-in form link.
 - UI colors flow through named tokens; Pretendard remains application font.
 - Input labels remain associated with controls.
 - Invalid sign-in input cannot submit; API errors surface `errorMessage`.
@@ -205,6 +252,9 @@ server-authoritative fixture mutation, and outcome-unknown reconciliation from
 - One task page has at most one in-flight request; `hasNext: false` stops paging.
 - Detail 404 always provides list recovery.
 - Delete cannot submit without exact ID and success always returns to task list.
+- User mutation UI and cache remain unchanged until a successful server response.
+- Fieldless 400 responses are form/row alerts; POST outcome-unknown never auto-retries.
+- Account-deletion E2E proves session/access only; store integration proves User and owned Task removal.
 - Loading, empty, error, and success states are distinguishable.
 - AI evidence never marks `HUMAN_APPROVED`.
 - Verification commands never modify repository files.

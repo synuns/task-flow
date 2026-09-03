@@ -2710,7 +2710,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   browser/failure/evidence/사람 gate coverage self-review PASS; `pnpm verify setup`
   PASS — hook 85, verifier 19; `git diff --check` PASS; browser 적용 없음.
 
-### [ ] USER-CRUD-CONTRACT-01 User CRUD 확장 계약 등록
+### [x] USER-CRUD-CONTRACT-01 User CRUD 확장 계약 등록
 
 - Requirements: `USER-CRUD-03`, `USER-CRUD-04`, `USER-CRUD-06`
 - Risk: HIGH — 승인된 원본 밖 API를 별도 authoritative contract로 추가
@@ -2722,9 +2722,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: OpenAPI contract Vitest, generated diff check,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — API·문서 contract task
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; loop 설계 검증 뒤 승인된
-  User CRUD extension OpenAPI와 quality map의 첫 RED 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; 승인된 User CRUD extension을
+  `docs/api/crud-openapi.yaml`로 분리하고 POST/GET/PATCH/DELETE, bearer, exact
+  request/response와 201/200/400/401/409를 generated type에 연결함. Verifier RED는
+  contract/generated file과 두 generation script가 없어 4 failures; source와 script
+  추가 뒤 focused verifier 1/1, OpenAPI Vitest 1 file/2 tests GREEN. 첫 quick은 새
+  generated file을 Biome이 재포맷해 type freshness를 깨뜨리는 `INTEGRATION` 실패;
+  기존 generated 제외 방식을 재사용해 `biome.json`에 한 항목만 추가하고 재생성함.
+  `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 39 files/183 tests;
+  `pnpm api:types:check`, `git diff --check`, 원본 OpenAPI와
+  `src/generated/openapi.ts` 무변경 확인 PASS. 계약/requirement/Journey map과 승인
+  spec 대조에서 누락·Task CRUD 선반영·미해결 finding 없음; browser 적용 없음.
 
 ### [ ] USER-CRUD-STORE-01 사용자 저장소와 Task 소유권 구현
 
@@ -2737,8 +2746,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: user/auth/task fixture와 handler Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — fixture/store integration task
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; `USER-CRUD-CONTRACT-01`
+  검증 완료 후 store/auth/task 소유권 Journey lookup 착수.
 
 ### [ ] USER-CRUD-TRANSPORT-01 User entity와 API boundary 구현
 

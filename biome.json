@@ -4,6 +4,7 @@
     "includes": [
       "**",
       "!src/generated/openapi.ts",
+      "!src/generated/crud-openapi.ts",
       "!public/mockServiceWorker.js",
       "!!dist",
       "!!coverage",
