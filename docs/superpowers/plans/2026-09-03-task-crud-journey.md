@@ -61,6 +61,14 @@ Expected: branch `feat/task-crud`, clean worktree, User CRUD plan의 owner-aware
 
 ## Required Interfaces
 
+| Method and path | Request | Success |
+| --- | --- | --- |
+| `POST /api/task` | `{ title, memo? }` | `201 CreatedTaskData`, status `TODO` |
+| `GET /api/task?page=N` | 없음 | `200 TaskPage` |
+| `GET /api/task/{id}` | 없음 | `200 TaskDetailData` |
+| `PATCH /api/task/{id}` | exact one-field `UpdateTaskInput` | `200 TaskDetailData` |
+| `DELETE /api/task/{id}` | 없음 | 기존 `200 { success: true }` |
+
 ```ts
 // entities/task/model/task.ts
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
