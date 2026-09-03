@@ -1,6 +1,6 @@
 import { type EditableTaskField, taskKeys } from "@/entities/task";
 import { DeleteTaskDialog, evictTaskSnapshots } from "@/features/delete-task";
-import { UpdateTaskField } from "@/features/update-task";
+import { TaskStatusControl, UpdateTaskField } from "@/features/update-task";
 import { type ApiError, getTaskDetail, useApiClient } from "@/shared/api";
 import {
   Alert,
@@ -87,6 +87,7 @@ export function TaskDetailPage() {
       />
       <Card>
         <CardContent className="grid gap-6">
+          <TaskStatusControl status={query.data.status} taskId={id} />
           <section>
             <h2 className="mb-2 font-medium text-muted-foreground text-sm">메모</h2>
             <UpdateTaskField

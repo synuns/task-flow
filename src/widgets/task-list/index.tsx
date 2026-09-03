@@ -129,7 +129,7 @@ export function TaskList() {
                   width: "100%",
                 }}
               >
-                <TaskCard id={task.id} memo={task.memo} title={task.title} />
+                <TaskCard id={task.id} memo={task.memo} status={task.status} title={task.title} />
               </li>
             );
           })}

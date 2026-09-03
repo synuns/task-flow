@@ -3177,7 +3177,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   첫 quick의 Biome 한 줄은 `TOOLING`으로 교정 후 `pnpm verify quick` PASS — hook 85,
   verifier 20, Vitest 47 files/246 tests; browser는 Journey verify task로 이관.
 
-### [ ] TASK-CRUD-STATUS-01 Task 3-state control과 dashboard 연동
+### [x] TASK-CRUD-STATUS-01 Task 3-state control과 dashboard 연동
 
 - Requirements: `TASK-CRUD-04`, `TASK-CRUD-06`
 - Risk: MEDIUM — detail/list/dashboard 교차 cache 일관성
@@ -3186,8 +3186,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: 이전 상태는 PATCH success 전 유지되고 success 뒤에만 상세·목록·dashboard가 갱신된다.
 - Automatic verification: status/detail/card/dashboard Vitest, `pnpm verify quick`
 - Browser verification: Journey verify task에서 `aria-pressed`, pending과 dashboard 값 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-EDIT-01`
+  commit `48e17db` 뒤 detail/list/dashboard query 소비자와 TaskCard caller를 조사함.
+  RED에서 status control/badge 부재 3건을 확인. semantic fieldset의 TODO/IN_PROGRESS/DONE
+  button에 `aria-pressed`를 제공하고 current/no-op 및 pending lock을 구현함. PATCH 성공
+  전에는 이전 상태와 cache를 유지하고 성공 response 뒤 detail을 교체하며 list/dashboard를
+  invalidate; 400 실패는 모두 보존함. TaskCard에는 비대화형 한글 status badge와 상태가
+  포함된 accessible link name을 추가함. focused 5 files/30 tests와 `pnpm verify quick` PASS —
+  hook 85, verifier 20, Vitest 47 files/248 tests; 첫 lint의 group role은
+  `UX_ACCESSIBILITY`로 분류해 native fieldset으로 교정, browser는 Journey verify로 이관.
 
 ### [ ] TASK-CRUD-DELETE-REGRESSION-01 CRUD 확장 후 기존 삭제 계약 보존
 

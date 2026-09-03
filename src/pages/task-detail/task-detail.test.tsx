@@ -219,6 +219,91 @@ describe("TaskDetailPage", () => {
     expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
   });
 
+  it("changes status and related caches only after PATCH succeeds", async () => {
+    const user = userEvent.setup();
+    const initial = {
+      title: "첫 번째 할 일",
+      memo: "삭제 검증 대상",
+      status: "TODO",
+      registerDatetime: "2026-08-30T09:00:00.000Z",
+    } as const;
+    const updated = { ...initial, status: "IN_PROGRESS" as const };
+    let release: () => void = () => undefined;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const requests: RequestInit[] = [];
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        requests.push(init);
+        const body: unknown = init.method === "PATCH" ? updated : initial;
+        if (init.method === "PATCH") await pending;
+        if (!isSuccess(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+    const { queryClient } = renderPage(client);
+    queryClient.setQueryData(["tasks"], { pages: [{ data: [{ id: "task-1" }] }] });
+    queryClient.setQueryData(["dashboard"], { numOfTask: 1, numOfRestTask: 1, numOfDoneTask: 0 });
+
+    const todo = await screen.findByRole("button", { name: "할 일" });
+    const inProgress = screen.getByRole("button", { name: "진행 중" });
+    expect(todo).toHaveAttribute("aria-pressed", "true");
+    await user.click(inProgress);
+
+    expect(todo).toHaveAttribute("aria-pressed", "true");
+    expect(inProgress).toHaveAttribute("aria-pressed", "false");
+    expect(inProgress).toBeDisabled();
+    expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
+    expect(requests.at(-1)).toMatchObject({
+      method: "PATCH",
+      body: JSON.stringify({ status: "IN_PROGRESS" }),
+    });
+    release();
+
+    await waitFor(() => expect(inProgress).toHaveAttribute("aria-pressed", "true"));
+    expect(queryClient.getQueryData(["task", "task-1"])).toEqual(updated);
+    expect(queryClient.getQueryState(["tasks"])?.isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(["dashboard"])?.isInvalidated).toBe(true);
+  });
+
+  it("keeps the prior status and dashboard after PATCH fails", async () => {
+    const user = userEvent.setup();
+    const initial = {
+      title: "첫 번째 할 일",
+      memo: "삭제 검증 대상",
+      status: "TODO",
+      registerDatetime: "2026-08-30T09:00:00.000Z",
+    } as const;
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        if (init.method === "PATCH") {
+          throw { kind: "http", status: 400, message: "상태를 수정하지 못했습니다." };
+        }
+        if (!isSuccess(initial)) throw new Error("invalid fixture");
+        return initial;
+      },
+    };
+    const { queryClient } = renderPage(client);
+    queryClient.setQueryData(["dashboard"], { numOfTask: 1, numOfRestTask: 1, numOfDoneTask: 0 });
+
+    await user.click(await screen.findByRole("button", { name: "완료" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("상태를 수정하지 못했습니다.");
+    expect(screen.getByRole("button", { name: "할 일" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "완료" })).toHaveAttribute("aria-pressed", "false");
+    expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
+    expect(queryClient.getQueryState(["dashboard"])?.isInvalidated).toBe(false);
+  });
+
   it("separates a missing task and offers a list recovery action", async () => {
     const client: ApiClient = {
       request: async () => {

@@ -7,7 +7,7 @@ describe("TaskCard", () => {
   it("shows title and memo and links the response ID to its detail route", () => {
     render(
       <MemoryRouter>
-        <TaskCard id="task/A" memo="삭제 검증 대상" title="첫 번째 할 일" />
+        <TaskCard id="task/A" memo="삭제 검증 대상" status="IN_PROGRESS" title="첫 번째 할 일" />
       </MemoryRouter>,
     );
 
@@ -21,6 +21,7 @@ describe("TaskCard", () => {
     expect(title).not.toHaveClass("truncate");
     expect(memo).toHaveClass("break-words");
     expect(memo).not.toHaveClass("truncate");
-    expect(screen.queryByText("TODO")).not.toBeInTheDocument();
+    expect(screen.getByText("진행 중")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "진행 중" })).not.toBeInTheDocument();
   });
 });
