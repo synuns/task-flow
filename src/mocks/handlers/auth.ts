@@ -1,5 +1,10 @@
 import { http, HttpResponse } from "msw";
-import { rotateRefreshToken, startAuthSession } from "../fixtures/auth";
+import {
+  bearerUserId,
+  revokeAuthSession,
+  rotateRefreshToken,
+  startAuthSession,
+} from "../fixtures/auth";
 import { authenticateUser } from "../fixtures/users";
 
 const refreshCookie = (token: string) =>
@@ -41,5 +46,15 @@ export const authHandlers = [
     return HttpResponse.json(pair, {
       headers: { "Set-Cookie": refreshCookie(pair.refreshToken) },
     });
+  }),
+  http.post("/api/sign-out", ({ request }) => {
+    const userId = bearerUserId(request.headers.get("Authorization"));
+    if (!userId || !revokeAuthSession(userId)) {
+      return HttpResponse.json({ errorMessage: "인증이 필요합니다." }, { status: 401 });
+    }
+    return HttpResponse.json(
+      { success: true as const },
+      { headers: { "Set-Cookie": expiredRefreshCookie } },
+    );
   }),
 ];

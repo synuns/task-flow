@@ -4,7 +4,8 @@ import { authHandlers } from "@/mocks/handlers/auth";
 import { server } from "@/mocks/server";
 import { HttpResponse, http } from "msw";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { refreshAccessToken, signIn } from "./auth";
+import type { ApiClient } from "./api-client-context";
+import { refreshAccessToken, signIn, signOut } from "./auth";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 beforeEach(async () => {
@@ -76,5 +77,32 @@ describe("auth API", () => {
       status: 401,
       message: "인증 정보를 갱신할 수 없습니다.",
     });
+  });
+
+  it("posts sign-out without a body and accepts only literal success", async () => {
+    const capture: { init?: RequestInit } = {};
+    const client: ApiClient = {
+      request: async (_input, init, guard) => {
+        capture.init = init;
+        const body: unknown = { success: true };
+        if (!guard(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+
+    await expect(signOut(client)).resolves.toEqual({ success: true });
+    expect(capture.init).toEqual({ method: "POST", credentials: "include" });
+  });
+
+  it("rejects a sign-out response with an undocumented property", async () => {
+    const client: ApiClient = {
+      request: async (_input, _init, guard) => {
+        const body: unknown = { success: true, userId: "user-1" };
+        if (!guard(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+
+    await expect(signOut(client)).rejects.toThrow("invalid fixture");
   });
 });

@@ -116,9 +116,12 @@ export function acceptsBearer(header: string | null): boolean {
   return bearerUserId(header) !== null;
 }
 
-export function revokeAuthSession(userId: string): void {
-  if (state.currentAccessToken === null || tokenUserId(state.currentAccessToken) !== userId) return;
+export function revokeAuthSession(userId: string): boolean {
+  if (state.currentAccessToken === null || tokenUserId(state.currentAccessToken) !== userId) {
+    return false;
+  }
   state.currentAccessToken = null;
   state.activeRefreshTokens = [];
   persistState();
+  return true;
 }

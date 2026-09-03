@@ -13,8 +13,10 @@ export {
 export {
   refreshAccessToken,
   signIn,
+  signOut,
   type AuthTokenPair,
   type SignInCredentials,
+  type SignOutResult,
 } from "./auth";
 export { type DashboardMetrics, getDashboard } from "./dashboard";
 export {

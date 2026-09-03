@@ -2975,7 +2975,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   PASS(hook 85, verifier 20, Vitest 43 files/219 tests). 원본 OpenAPI/generated와
   lockfile 무변경, `git diff --check` PASS.
 
-### [ ] USER-LOGOUT-SESSION-01 server/client 로그아웃 경계 구현
+### [x] USER-LOGOUT-SESSION-01 server/client 로그아웃 경계 구현
 
 - Requirements: `USER-LOGOUT-03`~`USER-LOGOUT-05`
 - Risk: HIGH — refresh session 폐기와 auth 경계
@@ -2985,8 +2985,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   상태를 보존한다.
 - Automatic verification: auth API/fixture/handler Vitest, quick
 - Browser verification: 적용 없음 — transport/store task
-- Status: NOT_STARTED
-- Evidence: 없음 — 선행 계약 task 대기.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; focused RED에서 `signOut is
+  not a function`과 MSW `/api/sign-out` 미등록 4건 실패를 확인. body 없는 bearer
+  POST client, exact success guard, bearer session revoke와 refresh cookie 만료 handler를
+  기존 auth fixture에 최소 추가. focused GREEN 4 files/20 tests PASS,
+  `pnpm verify quick` PASS(hook 85, verifier 20, Vitest 44 files/223 tests).
 
 ### [ ] USER-LOGOUT-UI-01 회원정보 로그아웃 확인 modal 구현
 
