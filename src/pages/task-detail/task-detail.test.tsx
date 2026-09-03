@@ -1,6 +1,6 @@
 import { ApiClientProvider, type ApiClient } from "@/shared/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { PropsWithChildren } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -102,6 +102,121 @@ describe("TaskDetailPage", () => {
       "[overflow-wrap:anywhere]",
     );
     expect(screen.getByText(memo)).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+  });
+
+  it("edits one task field at a time and cancels back to the server value", async () => {
+    const user = userEvent.setup();
+    const detail = {
+      title: "첫 번째 할 일",
+      memo: "삭제 검증 대상",
+      status: "TODO",
+      registerDatetime: "2026-08-30T09:00:00.000Z",
+    } as const;
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        _init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        if (!isSuccess(detail)) throw new Error("invalid fixture");
+        return detail;
+      },
+    };
+    renderPage(client);
+
+    const editTitle = await screen.findByRole("button", { name: "제목 수정" });
+    await user.click(editTitle);
+    const input = screen.getByRole("textbox", { name: "제목" });
+    expect(input).toHaveFocus();
+    expect(screen.getByRole("button", { name: "메모 수정" })).toBeDisabled();
+    await user.clear(input);
+    await user.type(input, "임시 제목");
+    await user.click(screen.getByRole("button", { name: "제목 수정 취소" }));
+
+    expect(screen.getByRole("heading", { name: detail.title })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "제목 수정" })).toHaveFocus();
+    expect(screen.queryByRole("button", { name: "등록 일시 수정" })).not.toBeInTheDocument();
+  });
+
+  it("keeps caches unchanged until one-field PATCH succeeds", async () => {
+    const user = userEvent.setup();
+    const initial = {
+      title: "첫 번째 할 일",
+      memo: "삭제 검증 대상",
+      status: "TODO",
+      registerDatetime: "2026-08-30T09:00:00.000Z",
+    } as const;
+    const updated = { ...initial, title: "수정한 할 일" };
+    let release: () => void = () => undefined;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const requests: RequestInit[] = [];
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        requests.push(init);
+        const body: unknown = init.method === "PATCH" ? updated : initial;
+        if (init.method === "PATCH") await pending;
+        if (!isSuccess(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+    const { queryClient } = renderPage(client);
+    queryClient.setQueryData(["tasks"], { pages: [{ data: [{ id: "task-1" }] }] });
+
+    await user.click(await screen.findByRole("button", { name: "제목 수정" }));
+    await user.clear(screen.getByRole("textbox", { name: "제목" }));
+    await user.type(screen.getByRole("textbox", { name: "제목" }), "  수정한 할 일  ");
+    await user.click(screen.getByRole("button", { name: "제목 수정 완료" }));
+
+    expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
+    expect(screen.getByRole("button", { name: "제목 수정 완료" })).toBeDisabled();
+    expect(requests.at(-1)).toMatchObject({
+      method: "PATCH",
+      body: JSON.stringify({ title: "수정한 할 일" }),
+    });
+    release();
+
+    expect(await screen.findByRole("heading", { name: updated.title })).toBeInTheDocument();
+    expect(queryClient.getQueryData(["task", "task-1"])).toEqual(updated);
+    await waitFor(() => expect(queryClient.getQueryState(["tasks"])?.isInvalidated).toBe(true));
+  });
+
+  it("preserves the draft and server value after a fieldless PATCH error", async () => {
+    const user = userEvent.setup();
+    const initial = {
+      title: "첫 번째 할 일",
+      memo: "삭제 검증 대상",
+      status: "TODO",
+      registerDatetime: "2026-08-30T09:00:00.000Z",
+    } as const;
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ) => {
+        if (init.method === "PATCH") {
+          throw { kind: "http", status: 400, message: "수정 값을 확인해주세요." };
+        }
+        if (!isSuccess(initial)) throw new Error("invalid fixture");
+        return initial;
+      },
+    };
+    const { queryClient } = renderPage(client);
+
+    await user.click(await screen.findByRole("button", { name: "메모 수정" }));
+    await user.clear(screen.getByRole("textbox", { name: "메모" }));
+    await user.type(screen.getByRole("textbox", { name: "메모" }), "임시 메모");
+    await user.click(screen.getByRole("button", { name: "메모 수정 완료" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("수정 값을 확인해주세요.");
+    expect(screen.getByRole("textbox", { name: "메모" })).toHaveValue("임시 메모");
+    expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
   });
 
   it("separates a missing task and offers a list recovery action", async () => {

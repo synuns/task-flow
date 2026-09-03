@@ -3158,7 +3158,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   3 files/20 tests와 `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 47 files/243 tests;
   browser는 Journey verify task로 이관.
 
-### [ ] TASK-CRUD-EDIT-01 Task 상세 title·memo 단일 필드 수정
+### [x] TASK-CRUD-EDIT-01 Task 상세 title·memo 단일 필드 수정
 
 - Requirements: `TASK-CRUD-04`, `TASK-CRUD-05`
 - Risk: MEDIUM — server-authoritative 상세/list cache 갱신
@@ -3167,8 +3167,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: 한 번에 한 field만 편집하며 실패는 draft와 server 값을 보존하고 success 뒤에만 반영한다.
 - Automatic verification: update-task/detail component Vitest, `pnpm verify quick`
 - Browser verification: Journey verify task에서 focus, cancel, success/failure 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-CREATE-01`
+  commit `cc5e734` 뒤 기존 UpdateUserField 상호작용과 Task detail/cache caller를 조사함.
+  RED detail 3건에서 edit control 부재를 확인하고 동일 Pencil/Check/X, focus return,
+  한 active field 상태를 Task feature로 구현함. PATCH는 trim된 title 또는 memo 한 field만
+  전송하며 success response 뒤에만 detail cache를 바꾸고 목록을 invalidate함. 400 실패는
+  server cache와 draft를 보존해 row alert로 표시함. focused 1 file/9 tests와 typecheck PASS;
+  첫 quick의 Biome 한 줄은 `TOOLING`으로 교정 후 `pnpm verify quick` PASS — hook 85,
+  verifier 20, Vitest 47 files/246 tests; browser는 Journey verify task로 이관.
 
 ### [ ] TASK-CRUD-STATUS-01 Task 3-state control과 dashboard 연동
 

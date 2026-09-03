@@ -1,5 +1,6 @@
-import { taskKeys } from "@/entities/task";
+import { type EditableTaskField, taskKeys } from "@/entities/task";
 import { DeleteTaskDialog, evictTaskSnapshots } from "@/features/delete-task";
+import { UpdateTaskField } from "@/features/update-task";
 import { type ApiError, getTaskDetail, useApiClient } from "@/shared/api";
 import {
   Alert,
@@ -12,6 +13,7 @@ import {
 } from "@/shared/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 function asApiError(value: unknown): ApiError | null {
@@ -23,6 +25,7 @@ export function TaskDetailPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { id = "" } = useParams();
+  const [editingField, setEditingField] = useState<EditableTaskField | null>(null);
   const query = useQuery({
     queryKey: taskKeys.detail(id),
     queryFn: ({ signal }) => getTaskDetail(client, id, signal),
@@ -72,16 +75,30 @@ export function TaskDetailPage() {
           <ArrowLeft aria-hidden="true" />할 일 목록
         </Link>
       </Button>
-      <h1 className="mb-6 min-w-0 font-semibold text-3xl tracking-tight [overflow-wrap:anywhere]">
-        {query.data.title}
-      </h1>
+      <UpdateTaskField
+        disabled={editingField !== null && editingField !== "title"}
+        editing={editingField === "title"}
+        field="title"
+        label="제목"
+        onFinish={() => setEditingField(null)}
+        onStart={() => setEditingField("title")}
+        taskId={id}
+        value={query.data.title}
+      />
       <Card>
         <CardContent className="grid gap-6">
           <section>
             <h2 className="mb-2 font-medium text-muted-foreground text-sm">메모</h2>
-            <p className="min-w-0 whitespace-pre-wrap leading-7 [overflow-wrap:anywhere]">
-              {query.data.memo}
-            </p>
+            <UpdateTaskField
+              disabled={editingField !== null && editingField !== "memo"}
+              editing={editingField === "memo"}
+              field="memo"
+              label="메모"
+              onFinish={() => setEditingField(null)}
+              onStart={() => setEditingField("memo")}
+              taskId={id}
+              value={query.data.memo}
+            />
           </section>
           <dl className="border-t pt-5">
             <div className="grid gap-1 sm:grid-cols-[8rem_1fr] sm:items-center sm:gap-4">
