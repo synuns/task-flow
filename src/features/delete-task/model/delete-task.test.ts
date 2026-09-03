@@ -7,6 +7,7 @@ type Outcome = { body: unknown } | { error: ApiError };
 const detail = {
   title: "첫 번째 할 일",
   memo: "삭제 검증 대상",
+  status: "TODO",
   registerDatetime: "2026-08-30T09:00:00.000Z",
 };
 

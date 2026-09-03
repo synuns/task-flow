@@ -49,6 +49,7 @@ describe("TaskDetailPage", () => {
         const body: unknown = {
           title: "첫 번째 할 일",
           memo: "삭제 검증 대상",
+          status: "TODO",
           registerDatetime: "2026-08-30T09:00:00.000Z",
         };
         if (!isSuccess(body)) throw new Error("invalid fixture");
@@ -86,6 +87,7 @@ describe("TaskDetailPage", () => {
         const body: unknown = {
           title,
           memo,
+          status: "TODO",
           registerDatetime: "2026-08-30T09:00:00.000Z",
         };
         if (!isSuccess(body)) throw new Error("invalid fixture");
@@ -135,6 +137,7 @@ describe("TaskDetailPage", () => {
             : {
                 title: "첫 번째 할 일",
                 memo: "삭제 검증 대상",
+                status: "TODO",
                 registerDatetime: "2026-08-30T09:00:00.000Z",
               };
         if (!isSuccess(body)) throw new Error("invalid fixture");
@@ -171,6 +174,7 @@ describe("TaskDetailPage", () => {
         const body: unknown = {
           title: "첫 번째 할 일",
           memo: "삭제 검증 대상",
+          status: "TODO",
           registerDatetime: "2026-08-30T09:00:00.000Z",
         };
         if (!isSuccess(body)) throw new Error("invalid fixture");
@@ -211,6 +215,7 @@ describe("TaskDetailPage", () => {
         const body: unknown = {
           title: "첫 번째 할 일",
           memo: "삭제 검증 대상",
+          status: "TODO",
           registerDatetime: "2026-08-30T09:00:00.000Z",
         };
         if (!isSuccess(body)) throw new Error("invalid fixture");

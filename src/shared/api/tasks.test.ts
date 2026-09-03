@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { ApiClient } from "./api-client-context";
-import { deleteTask, getTaskDetail, getTasks } from "./tasks";
+import { createTask, deleteTask, getTaskDetail, getTasks, updateTask } from "./tasks";
 
-function clientFor(body: unknown, capture: { url?: string; method?: string }): ApiClient {
+type Capture = { url?: string; init?: RequestInit };
+
+function clientFor(body: unknown, capture: Capture): ApiClient {
   return {
     request: async <T>(
       input: RequestInfo | URL,
@@ -10,7 +12,7 @@ function clientFor(body: unknown, capture: { url?: string; method?: string }): A
       isSuccess: (value: unknown) => value is T,
     ) => {
       capture.url = String(input);
-      capture.method = init.method;
+      capture.init = init;
       if (!isSuccess(body)) {
         throw { kind: "invalid-response", status: 200, message: "invalid" };
       }
@@ -25,13 +27,14 @@ describe("tasks API", () => {
     const body = {
       title: "첫 번째 할 일",
       memo: "삭제 검증 대상",
+      status: "IN_PROGRESS",
       registerDatetime: "2026-08-30T09:00:00.000Z",
     };
 
     await expect(getTaskDetail(clientFor(body, capture), "task/A")).resolves.toEqual(body);
     expect(capture).toEqual({
       url: `${globalThis.location.origin}/api/task/task%2FA`,
-      method: "GET",
+      init: { method: "GET", signal: undefined },
     });
   });
 
@@ -40,7 +43,10 @@ describe("tasks API", () => {
 
     await expect(
       getTaskDetail(
-        clientFor({ title: "할 일", memo: "메모", registerDatetime: "not-a-date" }, capture),
+        clientFor(
+          { title: "할 일", memo: "메모", status: "TODO", registerDatetime: "not-a-date" },
+          capture,
+        ),
         "task-1",
       ),
     ).rejects.toMatchObject({ kind: "invalid-response" });
@@ -49,14 +55,21 @@ describe("tasks API", () => {
   it("requests the exact page and accepts the OpenAPI task-list shape", async () => {
     const capture: { url?: string; method?: string } = {};
     const body = {
-      data: [{ id: "task-1", title: "첫 번째 할 일", memo: "삭제 검증 대상", status: "TODO" }],
+      data: [
+        {
+          id: "task-1",
+          title: "첫 번째 할 일",
+          memo: "삭제 검증 대상",
+          status: "IN_PROGRESS",
+        },
+      ],
       hasNext: true,
     };
 
     await expect(getTasks(clientFor(body, capture), 1)).resolves.toEqual(body);
     expect(capture).toEqual({
       url: `${globalThis.location.origin}/api/task?page=1`,
-      method: "GET",
+      init: { method: "GET", signal: undefined },
     });
   });
 
@@ -113,6 +126,7 @@ describe("tasks API", () => {
           {
             title: "할 일",
             memo: "메모",
+            status: "TODO",
             registerDatetime: "2026-08-30T09:00:00.000Z",
             id: "task-1",
           },
@@ -129,5 +143,61 @@ describe("tasks API", () => {
     await expect(
       deleteTask(clientFor({ success: true, deletedId: "task-1" }, capture), "task-1"),
     ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
+  it("posts creation fields and patches exactly one task field", async () => {
+    const created = {
+      id: "task-4",
+      title: "새 할 일",
+      memo: "",
+      status: "TODO",
+      registerDatetime: "2026-09-03T10:00:00.000Z",
+    } as const;
+    const updated = {
+      title: created.title,
+      memo: created.memo,
+      status: "IN_PROGRESS",
+      registerDatetime: created.registerDatetime,
+    } as const;
+    const createCapture: Capture = {};
+    const updateCapture: Capture = {};
+
+    await expect(
+      createTask(clientFor(created, createCapture), { title: "새 할 일" }),
+    ).resolves.toEqual(created);
+    await expect(
+      updateTask(clientFor(updated, updateCapture), "task/A", { status: "IN_PROGRESS" }),
+    ).resolves.toEqual(updated);
+    expect(createCapture).toMatchObject({
+      url: `${globalThis.location.origin}/api/task`,
+      init: { method: "POST", body: JSON.stringify({ title: "새 할 일" }) },
+    });
+    expect(updateCapture).toMatchObject({
+      url: `${globalThis.location.origin}/api/task/task%2FA`,
+      init: { method: "PATCH", body: JSON.stringify({ status: "IN_PROGRESS" }) },
+    });
+  });
+
+  it.each([
+    [
+      "create",
+      (client: ApiClient) => createTask(client, { title: "새 할 일" }),
+      { title: "새 할 일", memo: "", status: "TODO", registerDatetime: "2026-09-03T10:00:00.000Z" },
+    ],
+    [
+      "update",
+      (client: ApiClient) => updateTask(client, "task-1", { memo: "수정" }),
+      {
+        title: "할 일",
+        memo: "수정",
+        status: "DONE",
+        registerDatetime: "2026-09-03T10:00:00.000Z",
+        id: "task-1",
+      },
+    ],
+  ])("rejects an invalid %s response", async (_case, request, body) => {
+    await expect(request(clientFor(body, {}))).rejects.toMatchObject({
+      kind: "invalid-response",
+    });
   });
 });

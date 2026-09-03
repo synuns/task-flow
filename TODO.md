@@ -3119,7 +3119,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `TOOLING`으로 분류해 제시된 줄바꿈만 교정했고 재실행 `pnpm verify quick` PASS —
   hook 85, verifier 20, Vitest 45 files/232 tests; browser는 store/handler task라 적용 없음.
 
-### [ ] TASK-CRUD-TRANSPORT-01 Task entity와 API 경계 확장
+### [x] TASK-CRUD-TRANSPORT-01 Task entity와 API 경계 확장
 
 - Requirements: `TASK-CRUD-02`, `TASK-CRUD-04`~`TASK-CRUD-06`
 - Risk: MEDIUM — generated DTO와 runtime guard 연결
@@ -3128,8 +3128,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: create는 title/memo만, update는 title/memo/status 중 한 field만 보내고 exact response만 수용한다.
 - Automatic verification: task API/entity Vitest, architecture contract, `pnpm verify quick`
 - Browser verification: 적용 없음 — API boundary task
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-STORE-01`
+  commit `c2fda38` 뒤 기존 task API/entity public boundary와 모든 caller를 조사함.
+  RED `pnpm vitest run src/shared/api/tasks.test.ts`에서 `IN_PROGRESS` detail/list
+  응답 거부 2건과 create/update 함수 부재 3건을 확인. CRUD generated DTO를 public
+  type으로 연결하고 exact runtime guards, POST/PATCH transport, 최소 Task domain type을
+  추가함. 첫 quick의 기존 detail fixture status 누락 8건은 `INTEGRATION`으로 분류해
+  계약 fixture만 교정. focused 5 files/41 tests와 `pnpm verify quick` PASS — hook 85,
+  verifier 20, Vitest 45 files/235 tests; browser는 API boundary task라 적용 없음.
 
 ### [ ] TASK-CRUD-CREATE-01 Task 생성 modal과 목록 연동
 

@@ -30,11 +30,17 @@ export {
   type UserProfileData,
 } from "./user";
 export {
+  createTask,
+  type CreateTaskInput,
+  type CreatedTaskData,
   deleteTask,
   getTaskDetail,
   getTasks,
+  updateTask,
   type DeleteTaskResult,
-  type TaskDetail,
+  type TaskDetailData,
   type TaskListItem,
   type TaskPage,
+  type TaskStatusData,
+  type UpdateTaskInput,
 } from "./tasks";
