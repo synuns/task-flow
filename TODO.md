@@ -2622,3 +2622,28 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   모두 보존; Rerun: `pnpm verify full` PASS — hook 85, verifier 19, Vitest 39/182,
   build, Chromium core 5/5, verifier regression 19/19; `git diff --check` PASS;
   Verdict: PASS.
+
+## 8. 사용 가능한 CRUD 확장 기획
+
+### [ ] CRUD-JOURNEY-DESIGN-01 User·Task CRUD Journey 확장 설계
+
+- Requirements: proposed `USER-CRUD-01`~`USER-CRUD-08`,
+  `TASK-CRUD-01`~`TASK-CRUD-08`
+- Risk: HIGH — 원본 범위 밖 API·화면·데이터 의미 확장
+- Depends on: `QA-04`
+- Deliverable:
+  `docs/superpowers/specs/2026-09-03-user-task-crud-journeys-design.md`
+- Acceptance: User와 Task CRUD의 API, entity model, UI/UX, 비낙관 mutation,
+  outcome-unknown, 독립 Journey·핵심 실패·검증·사람 gate가 모순 없이 확정되고
+  사용자가 작성된 명세를 검토한다.
+- Automatic verification: placeholder·contradiction·ambiguity·scope self-review,
+  `./scripts/verify setup`, `git diff --check`
+- Browser verification: 설계 task에는 적용 없음 — Visual Companion 시안 검토 완료;
+  후속 구현 plan이 두 viewport와 named browser evidence를 소유
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; branch
+  `docs/crud-journey-design`, worktree `.worktrees/crud-journey-design`; 사용자가
+  self-account CRUD, email/password 수정 제외, Task `IN_PROGRESS`, 가입 후 sign-in,
+  account-delete cascade, API, hybrid 화면, field-edit icon, detail status, 비낙관
+  mutation과 POST outcome-unknown 정책을 대화에서 순차 승인함. 작성된 spec의 사람
+  검토와 후속 구현 계획 전환 대기.
