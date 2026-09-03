@@ -1607,7 +1607,7 @@ Requirement/Journey: `REM-AUTH-ID-01`, `REM-RESPONSIVE-01`,
 `NAV-03`, `SYS-04`, `TASK-LIST-05`, `TASK-DETAIL-01`, `TASK-DETAIL-03`,
 `TASK-DETAIL-04`.
 
-Exact source target: `37ecd3c`. Browser session: fresh named agent-browser session
+Exact source target: `c9832d8`. Browser session: fresh named agent-browser session
 `review-remediation`, Chromium 390x844, closed after inspection. Production preview ran
 on `127.0.0.1:4173`; it was stopped and the listening port was confirmed closed.
 
@@ -1646,7 +1646,7 @@ human checkpoint and canonical full gate remain; no final acceptance is claimed 
 
 ## Review Remediation Plan-completion Adversarial Review — 2026-09-03
 
-Review target: `47e3d85`, full branch diff from `be409b0`, approved design
+Review target: `6c99f5a`, full branch diff from `be409b0`, approved design
 `docs/superpowers/specs/2026-09-03-review-remediation-design.md`, and implementation plan
 `docs/superpowers/plans/2026-09-03-review-remediation.md`.
 
@@ -1687,7 +1687,7 @@ and the canonical `./scripts/verify full` remain; `HUMAN_APPROVED` is not claime
 
 ## Review Remediation Final Gate — 2026-09-03
 
-Exact target: `cc66152`. After reviewing the browser and adversarial-review results, the
+Exact target: `1fe789b`. After reviewing the browser and adversarial-review results, the
 user explicitly approved proceeding with the canonical full gate.
 
 `./scripts/verify full` completed with exit code 0:

@@ -2578,19 +2578,19 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Status: AI_VERIFIED
 - Evidence: 2026-09-03 Codex `/root` task block owner; 앞선 다섯 remediation task의
   focused test와 quick gate 완료 후 통합·browser·adversarial review 착수; exact source
-  target `37ecd3c`; mapped auth/task-resolution Chromium 3/3 PASS; production build PASS;
+  target `c9832d8`; mapped auth/task-resolution Chromium 3/3 PASS; production build PASS;
   named agent-browser encoded auth return과 390x844 long-string detail/dialog 측정 PASS,
   예상 anonymous refresh 401 외 console error와 page error 없음; session과 preview 종료,
   4173 port closed; 상세
   `docs/quality/evidence/final-qa.md#review-remediation-integrated-browser-evidence--2026-09-03`;
-  plan-completion review target `47e3d85`, 동일 세션 분리 read-only pass `/root`가
+  plan-completion review target `6c99f5a`, 동일 세션 분리 read-only pass `/root`가
   OpenAPI/auth/route/UI/mock/bootstrap/architecture/diff 경계를 재검토하고 영향 Vitest
   11 files/73 tests, authoritative/dependency/generated diff zero, diff/status clean PASS;
   coordination 정책상 independent subagent를 사용하지 못한 한계를 기록하고 사람
   checkpoint 대기; findings 없음, 상세
   `docs/quality/evidence/final-qa.md#review-remediation-plan-completion-adversarial-review--2026-09-03`;
   사용자가 review 결과를 확인하고 canonical full 진행을 명시 승인; exact full target
-  `cc66152`; `./scripts/verify full` PASS — hook 85, verifier contract 19,
+  `1fe789b`; `./scripts/verify full` PASS — hook 85, verifier contract 19,
   format/lint/OpenAPI/typecheck, Vitest 39 files/182 tests, build, fresh Chromium core 5/5,
   verifier regression 19/19; 기존 non-failing Vite chunk-size advisory 외 unresolved finding
   없음. 이 상태는 AI 검증 완료이며 새로운 `HUMAN_APPROVED` 또는 최종 acceptance를
