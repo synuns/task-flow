@@ -2830,7 +2830,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `/tmp/user-crud-profile-mobile.png`, `/tmp/user-crud-profile-desktop.png`,
   `/tmp/user-crud-profile-error-desktop.png`; session close 완료.
 
-### [ ] USER-CRUD-DELETE-01 비밀번호 확인 회원 탈퇴 구현
+### [x] USER-CRUD-DELETE-01 비밀번호 확인 회원 탈퇴 구현
 
 - Requirements: `USER-CRUD-06`~`USER-CRUD-08`
 - Risk: HIGH — 계정·Task 영구 삭제와 session/cache 종료
@@ -2841,9 +2841,17 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: delete-user/profile/store/handler Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 두 viewport dialog focus, close lock, 실패와 success 전환
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; `USER-CRUD-PROFILE-01`
-  AI 검증 완료 후 비밀번호 확인 탈퇴 Journey lookup 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root`; delete dialog/auth/profile/store/handler/router focused
+  Vitest 6 files/28 tests PASS, `pnpm verify quick` 85 hook + 20 verifier + 43 files/219
+  tests PASS, `git diff --check` PASS. 기존 auth-provider matching snapshot test로 protected
+  cache root 제거를 재검증했다. agent-browser `user-crud-delete`에서 `390x844`,
+  `1280x720` password autofocus, disabled submit, cancel focus restore, wrong password 400 후
+  dialog/profile/session과 입력값 유지, 지연 DELETE 중 action/Escape lock, 200 뒤 `/sign-in`
+  replace 및 `/user` 접근 불가, 가로 overflow 없음 확인. screenshots:
+  `/tmp/user-crud-delete-mobile.png`, `/tmp/user-crud-delete-error-mobile.png`,
+  `/tmp/user-crud-delete-desktop.png`; session close 완료. User/소유 Task 영구 삭제는 store
+  integration test가 증명하며 브라우저 evidence는 접근 불가만 주장한다.
 
 ### [ ] USER-CRUD-JOURNEY-VERIFY-01 User CRUD Journey 통합 검증
 
@@ -2857,8 +2865,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify full`, `git diff --check`
 - Browser verification: named agent-browser session, `390x844`, `1280x720`,
   console/page/network와 screenshot/trace
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; User CRUD 기능 단위 구현 완료 후
+  success/wrong-password 핵심 E2E와 Journey evidence 통합 착수.
 
 ### [ ] USER-CRUD-JOURNEY-REVIEW-01 User CRUD 계획 완료 적대적 검토
 

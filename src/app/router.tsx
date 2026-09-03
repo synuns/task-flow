@@ -1,13 +1,14 @@
-import { createBrowserRouter, type RouteObject } from "react-router-dom";
+import { createBrowserRouter, type RouteObject, useNavigate } from "react-router-dom";
 import { DashboardPage } from "@/pages/dashboard";
 import { SignInPage } from "@/pages/sign-in";
 import { SignUpPage } from "@/pages/sign-up";
 import { TaskDetailPage } from "@/pages/task-detail";
 import { TaskListPage } from "@/pages/task-list";
 import { UserPage } from "@/pages/user";
+import { deleteUser, useApiClient } from "@/shared/api";
 import { AppShell } from "@/widgets/app-shell";
-import { AuthRouteBoundary } from "./auth/auth-route-boundary";
 import { useAuth } from "./auth/auth-provider";
+import { AuthRouteBoundary } from "./auth/auth-route-boundary";
 import { RouteErrorBoundary } from "./route-error-boundary";
 
 function AuthShellRoute() {
@@ -28,6 +29,21 @@ function SignInRoute() {
   return <SignInPage onAuthenticated={auth.acceptSignIn} />;
 }
 
+function UserRoute() {
+  const auth = useAuth();
+  const client = useApiClient();
+  const navigate = useNavigate();
+
+  async function deleteAccount(password: string) {
+    const snapshot = auth.getSnapshot();
+    await deleteUser(client, password);
+    auth.terminate(snapshot);
+    navigate("/sign-in", { replace: true });
+  }
+
+  return <UserPage onDelete={deleteAccount} />;
+}
+
 export const appRoutes: RouteObject[] = [
   {
     path: "/",
@@ -42,7 +58,7 @@ export const appRoutes: RouteObject[] = [
           { path: "sign-up", element: <SignUpPage /> },
           { path: "task", element: <TaskListPage /> },
           { path: "task/:id", element: <TaskDetailPage /> },
-          { path: "user", element: <UserPage /> },
+          { path: "user", element: <UserRoute /> },
         ],
       },
     ],
