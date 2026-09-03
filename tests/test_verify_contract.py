@@ -113,7 +113,11 @@ class VerifyContractTests(unittest.TestCase):
 
     def test_todo_rejects_completed_review_without_review_record(self):
         verifier = load_verify_module()
-        for task_id in ("AUTH-JOURNEY-REVIEW-01", "USER-CRUD-JOURNEY-REVIEW-01"):
+        for task_id in (
+            "AUTH-JOURNEY-REVIEW-01",
+            "USER-CRUD-JOURNEY-REVIEW-01",
+            "USER-LOGOUT-JOURNEY-REVIEW-01",
+        ):
             with self.subTest(task_id=task_id), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 (root / "TODO.md").write_text(
@@ -141,7 +145,11 @@ class VerifyContractTests(unittest.TestCase):
 
     def test_todo_accepts_completed_review_record(self):
         verifier = load_verify_module()
-        for task_id in ("AUTH-JOURNEY-REVIEW-01", "USER-CRUD-JOURNEY-REVIEW-01"):
+        for task_id in (
+            "AUTH-JOURNEY-REVIEW-01",
+            "USER-CRUD-JOURNEY-REVIEW-01",
+            "USER-LOGOUT-JOURNEY-REVIEW-01",
+        ):
             with self.subTest(task_id=task_id), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 (root / "TODO.md").write_text(
@@ -386,7 +394,18 @@ class VerifyContractTests(unittest.TestCase):
                 {"USER-CRUD-JOURNEY-VERIFY-01"},
                 "NOT_STARTED",
             ),
-            "JOURNEY-USER-CRUD-01": ({"USER-CRUD-JOURNEY-REVIEW-01"}, "BLOCKED"),
+            "USER-LOGOUT-CONTRACT-01": ({"USER-LOGOUT-PLAN-01"}, "IN_PROGRESS"),
+            "USER-LOGOUT-SESSION-01": ({"USER-LOGOUT-CONTRACT-01"}, "NOT_STARTED"),
+            "USER-LOGOUT-UI-01": ({"USER-LOGOUT-SESSION-01"}, "NOT_STARTED"),
+            "USER-LOGOUT-JOURNEY-VERIFY-01": (
+                {"USER-LOGOUT-UI-01"},
+                "NOT_STARTED",
+            ),
+            "USER-LOGOUT-JOURNEY-REVIEW-01": (
+                {"USER-LOGOUT-JOURNEY-VERIFY-01"},
+                "NOT_STARTED",
+            ),
+            "JOURNEY-USER-CRUD-01": ({"USER-LOGOUT-JOURNEY-REVIEW-01"}, "BLOCKED"),
         }
 
         human_owned = {
@@ -494,6 +513,8 @@ class VerifyContractTests(unittest.TestCase):
 
     def test_repository_wires_approved_crud_contract(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        crud_contract = (ROOT / "docs/api/crud-openapi.yaml").read_text(encoding="utf-8")
+        requirements = (ROOT / "docs/quality/requirements.md").read_text(encoding="utf-8")
 
         for relative in ("docs/api/crud-openapi.yaml", "src/generated/crud-openapi.ts"):
             with self.subTest(relative=relative):
@@ -507,6 +528,16 @@ class VerifyContractTests(unittest.TestCase):
 
         biome = json.loads((ROOT / "biome.json").read_text(encoding="utf-8"))
         self.assertIn("!src/generated/crud-openapi.ts", biome["files"]["includes"])
+        self.assertIn("/api/sign-out:", crud_contract)
+        self.assertIn("operationId: signOut", crud_contract)
+        for requirement_id in (
+            "USER-LOGOUT-01",
+            "USER-LOGOUT-02",
+            "USER-LOGOUT-03",
+            "USER-LOGOUT-04",
+            "USER-LOGOUT-05",
+        ):
+            self.assertIn(requirement_id, requirements)
 
     def test_protected_core_journeys_use_authenticated_fixture(self):
         for relative in (

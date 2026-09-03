@@ -34,6 +34,7 @@
 ### Task 1: `USER-LOGOUT-CONTRACT-01` 확장 계약과 추적성을 등록한다
 
 **Files:**
+- Modify: `scripts/verify`
 - Modify: `tests/test_verify_contract.py`
 - Modify: `docs/api/crud-openapi.yaml`
 - Regenerate: `src/generated/crud-openapi.ts`
@@ -73,8 +74,8 @@ for requirement_id in ("USER-LOGOUT-01", "USER-LOGOUT-02", "USER-LOGOUT-03", "US
 "JOURNEY-USER-CRUD-01": ({"USER-LOGOUT-JOURNEY-REVIEW-01"}, "BLOCKED"),  # replace existing entry
 ```
 
-completed-review verifier가 검사하는 tuple에도 `USER-LOGOUT-JOURNEY-REVIEW-01`을
-추가한다.
+completed-review verifier와 그 음성/양성 test tuple에도
+`USER-LOGOUT-JOURNEY-REVIEW-01`을 추가한다.
 
 - [ ] **Step 2: verifier RED를 확인한다**
 
@@ -148,7 +149,7 @@ Expected: verifier 2/2, OpenAPI test와 quick PASS.
 `TODO.md`에서 `USER-LOGOUT-CONTRACT-01`을 `AI_VERIFIED`로 닫고 실행 결과를 기록한다.
 
 ```bash
-git add tests/test_verify_contract.py docs/api/crud-openapi.yaml src/generated/crud-openapi.ts src/shared/api/openapi-contract.test.ts docs/quality/requirements.md docs/quality/verification.md docs/superpowers/specs/2026-09-03-user-crud-loop-engineering-design.md TODO.md
+git add scripts/verify tests/test_verify_contract.py docs/api/crud-openapi.yaml src/generated/crud-openapi.ts src/shared/api/openapi-contract.test.ts docs/quality/requirements.md docs/quality/verification.md docs/superpowers/specs/2026-09-03-user-crud-loop-engineering-design.md docs/superpowers/plans/2026-09-03-user-logout.md TODO.md
 git diff --cached --check
 git commit -m "feat(auth): 로그아웃 확장 계약 추가"
 ```

@@ -2902,7 +2902,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 
 - Requirements: `USER-CRUD-01`~`USER-CRUD-08`, `user-crud`
 - Risk: HIGH — User CRUD Golden Journey acceptance는 사람 소유
-- Depends on: `USER-CRUD-JOURNEY-REVIEW-01`
+- Depends on: `USER-LOGOUT-JOURNEY-REVIEW-01`
 - Deliverable: automatic/browser/review evidence에 대한 사람 결정
 - Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
 - Automatic verification: 적용 없음 — 사람 결정 gate
@@ -2957,7 +2957,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   확인에서 미해결 gap 없음; `pnpm verify setup` PASS — hook 85, verifier 20;
   원본 OpenAPI/generated와 lockfile 무변경, `git diff --check` PASS.
 
-### [ ] USER-LOGOUT-CONTRACT-01 로그아웃 확장 계약과 추적성 등록
+### [x] USER-LOGOUT-CONTRACT-01 로그아웃 확장 계약과 추적성 등록
 
 - Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`
 - Risk: HIGH — 원본 밖 인증 endpoint 계약 반영
@@ -2966,8 +2966,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: bearer, body 없음, 200 literal success와 401 error가 모든 계약면에 일치한다.
 - Automatic verification: verifier RED/GREEN, generated contract Vitest, quick
 - Browser verification: 적용 없음 — contract task
-- Status: NOT_STARTED
-- Evidence: 없음 — 선행 계획 검토 뒤 시작.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; contract/backlog RED에서
+  `/api/sign-out` 부재를 확인했고 backlog 검사는 PASS. OpenAPI/generated type과
+  requirement/verification map을 추가한 뒤 focused verifier 4/4 및 contract Vitest 2/2
+  PASS. 첫 quick은 새 review task ID가 `scripts/verify` 대상에 없어 실패했으며
+  TOOLING/CONTROL-PLANE으로 분류해 공통 review set을 수정. 재실행 `pnpm verify quick`
+  PASS(hook 85, verifier 20, Vitest 43 files/219 tests). 원본 OpenAPI/generated와
+  lockfile 무변경, `git diff --check` PASS.
 
 ### [ ] USER-LOGOUT-SESSION-01 server/client 로그아웃 경계 구현
 

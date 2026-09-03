@@ -71,7 +71,7 @@ Search a requirement ID, route, API path, or symbol in
 | `work-overview` | `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`; `/`, `/user` | `src/widgets/app-shell`, `src/pages/dashboard`, `src/pages/user`, `src/widgets/dashboard-summary`, `src/widgets/user-profile` | `e2e/work-overview.spec.ts` |
 | `task-discovery` | `TASK-LIST-01..05`; `/task`, `GET /api/task` | `src/pages/task-list`, `src/widgets/task-list`, `src/entities/task`, `src/shared/api/tasks.ts` | `e2e/task-discovery.spec.ts` |
 | `task-resolution` | `TASK-DETAIL-01..05`; `/task/:id`, `GET/DELETE /api/task/:id` | `src/pages/task-detail`, `src/features/delete-task`, `src/shared/api/tasks.ts` | `e2e/task-resolution.spec.ts` |
-| `user-crud` | `USER-CRUD-01..08`; `/sign-in`, `/sign-up`, `/user`, `POST/GET/PATCH/DELETE /api/user` | `src/entities/user`, `src/features/sign-up`, `src/features/edit-user-field`, `src/features/delete-user`, `src/shared/api/user.ts` | `e2e/user-crud.spec.ts` |
+| `user-crud` | `USER-CRUD-01..08`, `USER-LOGOUT-01..05`; `/sign-in`, `/sign-up`, `/user`, `POST/GET/PATCH/DELETE /api/user`, `POST /api/sign-out` | `src/entities/user`, `src/features/sign-up`, `src/features/edit-user-field`, `src/features/delete-user`, `src/features/sign-out`, `src/shared/api/user.ts`, `src/shared/api/auth.ts` | `e2e/user-crud.spec.ts` |
 
 The table is a lookup aid, not a replacement for requirement IDs or focused
 unit, component, and integration tests.

@@ -61,6 +61,11 @@ are reserved for human owners.
 | USER-CRUD-06 | Password-confirmed account deletion | CRUD OAS `DELETE /api/user` | Current password is required; only a 200 success terminates the session and navigates to `/sign-in`; failure preserves account, tasks, profile, and session. | HIGH | integration/browser | delete-user/API Vitest | `docs/quality/evidence/user-crud.md` | user-crud | AI_VERIFIED |
 | USER-CRUD-07 | Deletion cascade | approved CRUD destructive-data policy | Successful deletion permanently removes the User and every owned Task; store integration evidence, not a later sign-in failure, proves removal. | HIGH | store integration | user/task store Vitest | `docs/quality/evidence/user-crud.md` | user-crud | AI_VERIFIED |
 | USER-CRUD-08 | Mutation uncertainty and generic errors | approved CRUD error policy | A 400 without a field identifier is shown as a form or row alert, never inferred as a field error; POST network/invalid-response is outcome-unknown, is not retried automatically, and offers login verification or explicit resubmission. | HIGH | component/integration | sign-up/profile/delete Vitest | `docs/quality/evidence/user-crud.md` | user-crud | AI_VERIFIED |
+| USER-LOGOUT-01 | Profile sign-out action | approved logout design | Authenticated `/user` shows an outline LogOut action in its heading area without adding a navigation action. | LOW | component/browser | sign-out/profile Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-LOGOUT-02 | Sign-out confirmation | approved logout design | The action opens an alert dialog focused on cancel; cancel sends no request, closes the dialog, and restores trigger focus. | MEDIUM | component/browser | sign-out dialog Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-LOGOUT-03 | Bounded sign-out request | CRUD OAS `POST /api/sign-out` | Confirm sends one bodyless bearer POST; pending disables both actions and blocks Escape/outside close. | HIGH | component/integration | auth API/handler/dialog Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-LOGOUT-04 | Server and client session termination | CRUD OAS `POST /api/sign-out`; approved auth policy | Only an exact 200 `{ success: true }` revokes the server session, expires the refresh cookie, terminates the matching client generation, removes protected Query data, and replaces the route with `/sign-in`; reload and protected direct entry remain signed out. | HIGH | integration/browser | auth handler/provider/router Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
+| USER-LOGOUT-05 | Sign-out failure preservation | approved logout design and auth policy | Network, invalid-response, and non-terminal HTTP failures are not retried automatically; the dialog reports an alert while page, session, and cache remain unchanged. Terminal 401 follows the existing auth policy. | HIGH | component/integration | auth API/dialog/router Vitest | `docs/quality/evidence/user-crud.md` | user-crud | NOT_STARTED |
 
 ## Scenario Execution Rules
 
@@ -209,7 +214,8 @@ server-authoritative fixture mutation, and outcome-unknown reconciliation from
 
 ### user-crud
 
-Requirements: `USER-CRUD-01` through `USER-CRUD-08`.
+Requirements: `USER-CRUD-01` through `USER-CRUD-08` and `USER-LOGOUT-01` through
+`USER-LOGOUT-05`.
 
 Independent initial state: fresh signed-out browser context, an available
 canonical email, reset User and Task stores, and a fresh query cache. Cases do
@@ -223,10 +229,12 @@ not reuse an account or mutation result from another case.
 | `USER-P1-4` | `USER-CRUD-04` | Sign in with the new account and open profile | sign-in; bearer `GET /api/user` | Canonical email, name, and empty memo render | integration + browser |
 | `USER-P1-5` | `USER-CRUD-05` | Edit name using pencil, input, and check | one-field `PATCH /api/user` | Only the successful response changes name | component + integration |
 | `USER-P1-6` | `USER-CRUD-05` | Edit memo using pencil, input, and check | one-field `PATCH /api/user` | Only the successful response changes memo | component + integration |
+| `USER-P1-7A` | `USER-LOGOUT-01`~`USER-LOGOUT-04` | Confirm sign-out from the profile, reload, and enter `/user` directly | bodyless bearer `POST /api/sign-out`, 200 `SignOutResponse` | Dialog focus/confirmation works; server and client sessions end; reload and protected entry remain `/sign-in` | component + integration + browser |
 | `USER-P1-7` | `USER-CRUD-06` | Confirm deletion with the current password | `DELETE /api/user`, 200 `DeleteUserResponse` | Session ends, route becomes `/sign-in`, and protected UI is inaccessible | integration + browser |
 | `USER-P1-8` | `USER-CRUD-07` | Inspect the store after deletion | None | The User and every owned Task are absent | store integration |
 
-Core E2E combines `USER-P1-1` through `USER-P1-7` for the cross-browser boundary.
+Core E2E combines `USER-P1-1` through `USER-P1-7`, including `USER-P1-7A`, for the
+cross-browser boundary.
 It does not infer permanent deletion from a later sign-in failure; `USER-P1-8`
 owns that proof at store integration level.
 
@@ -238,6 +246,7 @@ owns that proof at store integration level.
 | `USER-E4` failed field PATCH | `USER-CRUD-05`, `USER-CRUD-08` | Edit/input and server value remain unchanged; generic 400 uses row alert | component + integration |
 | `USER-E5` create outcome unknown | `USER-CRUD-08` | No automatic POST; UI offers login verification or explicit resubmission | component + integration |
 | `USER-E6` terminal protected 401 | `USER-CRUD-06` | Existing auth policy clears session/cache | integration |
+| `USER-E7` non-terminal sign-out failure | `USER-LOGOUT-05` | Modal alert remains with the same page, session, and protected cache; no automatic retry | component + integration + browser |
 
 ## Invariants
 
@@ -248,6 +257,7 @@ owns that proof at store integration level.
 - Input labels remain associated with controls.
 - Invalid sign-in input cannot submit; API errors surface `errorMessage`.
 - Protected requests use approved authentication state.
+- Sign-out changes neither client session nor protected cache before exact 200 success.
 - Virtualized task DOM remains bounded as fetched data grows.
 - One task page has at most one in-flight request; `hasNext: false` stops paging.
 - Detail 404 always provides list recovery.

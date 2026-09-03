@@ -50,7 +50,12 @@ focused regression
 | 6 | `USER-CRUD-DELETE-01` | password 확인 탈퇴와 session/cache 종료 |
 | 7 | `USER-CRUD-JOURNEY-VERIFY-01` | core E2E, 두 viewport browser evidence, full PASS |
 | 8 | `USER-CRUD-JOURNEY-REVIEW-01` | exact target review와 unresolved HIGH/MEDIUM 없음 |
-| gate | `JOURNEY-USER-CRUD-01` | 사람 검토 대기; AI가 승인 상태를 기록하지 않음 |
+| 9 | `USER-LOGOUT-CONTRACT-01` | body 없는 bearer sign-out extension과 requirement map |
+| 10 | `USER-LOGOUT-SESSION-01` | server session revoke, cookie 만료와 client transport |
+| 11 | `USER-LOGOUT-UI-01` | `/user` 확인 modal과 성공 후 auth/navigation 조합 |
+| 12 | `USER-LOGOUT-JOURNEY-VERIFY-01` | 기존 core E2E, 두 viewport browser와 full 재검증 |
+| 13 | `USER-LOGOUT-JOURNEY-REVIEW-01` | 로그아웃 포함 exact target 재검토 |
+| gate | `JOURNEY-USER-CRUD-01` | 새 review 뒤 사람 검토 대기; AI가 승인 상태를 기록하지 않음 |
 
 한 시점에는 dependency가 해소된 task 하나만 `IN_PROGRESS`다. Evidence에 기록된
 session이 해당 block owner이며 다른 session은 그 block을 수정하지 않는다.
@@ -77,6 +82,8 @@ session이 해당 block owner이며 다른 session은 그 block을 수정하지 
 - field identifier가 없는 400은 특정 field로 추정하지 않고 form/row alert로 보낸다.
 - `POST /api/user` network/invalid response는 결과 미확정이며 자동 재시도하지 않는다.
 - `DELETE /api/user` 200만 auth/cache 정리와 `/sign-in` 이동을 만든다.
+- `POST /api/sign-out` exact 200 전에는 auth/cache를 바꾸지 않고 non-terminal 실패를
+  modal 안에 보존한다.
 
 ## 검증 배치
 

@@ -302,6 +302,7 @@ def verify_todo_consistency(root=ROOT):
         "TASK-LIST-JOURNEY-REVIEW-01",
         "TASK-DETAIL-JOURNEY-REVIEW-01",
         "USER-CRUD-JOURNEY-REVIEW-01",
+        "USER-LOGOUT-JOURNEY-REVIEW-01",
         "QA-02",
     }
     review_fields = (

@@ -22,6 +22,8 @@ describe("generated OpenAPI contract", () => {
       crudPaths["/api/user"]["post"]["responses"][201]["content"]["application/json"];
     type UserResponse = crudComponents["schemas"]["UserResponse"];
     type UpdateUserRequest = crudComponents["schemas"]["UpdateUserRequest"];
+    type SignOut200 =
+      crudPaths["/api/sign-out"]["post"]["responses"][200]["content"]["application/json"];
 
     const path: keyof crudPaths = "/api/user";
     const response: CreateUser201 = {
@@ -37,6 +39,7 @@ describe("generated OpenAPI contract", () => {
       memo: string;
     }>();
     expectTypeOf<UpdateUserRequest>().toEqualTypeOf<{ name: string } | { memo: string }>();
+    expectTypeOf<SignOut200>().toEqualTypeOf<{ success: true }>();
     expect(path).toBe("/api/user");
     expect(response.email).toBe("user@example.com");
   });
