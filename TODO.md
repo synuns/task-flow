@@ -2625,7 +2625,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 
 ## 8. 사용 가능한 CRUD 확장 기획
 
-### [ ] CRUD-JOURNEY-DESIGN-01 User·Task CRUD Journey 확장 설계
+### [x] CRUD-JOURNEY-DESIGN-01 User·Task CRUD Journey 확장 설계
 
 - Requirements: proposed `USER-CRUD-01`~`USER-CRUD-08`,
   `TASK-CRUD-01`~`TASK-CRUD-08`
@@ -2640,10 +2640,32 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `./scripts/verify setup`, `git diff --check`
 - Browser verification: 설계 task에는 적용 없음 — Visual Companion 시안 검토 완료;
   후속 구현 plan이 두 viewport와 named browser evidence를 소유
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-03 Codex `/root` task block owner; branch
   `docs/crud-journey-design`, worktree `.worktrees/crud-journey-design`; 사용자가
   self-account CRUD, email/password 수정 제외, Task `IN_PROGRESS`, 가입 후 sign-in,
   account-delete cascade, API, hybrid 화면, field-edit icon, detail status, 비낙관
-  mutation과 POST outcome-unknown 정책을 대화에서 순차 승인함. 작성된 spec의 사람
-  검토와 후속 구현 계획 전환 대기.
+  mutation과 POST outcome-unknown 정책을 대화에서 순차 승인함; 작성된 spec을
+  placeholder·계약 충돌·모호성·scope 관점으로 재검토하고 `./scripts/verify setup`
+  PASS — hook 85, verifier 19, `git diff --check` PASS; design commits `7c03f03`,
+  `92443cc`; 사용자가 2026-09-03 작성된 명세와 보완된 실패·재시도 정책을 명시 승인;
+  이는 구현 시작 checkpoint이며 AI가 `HUMAN_APPROVED`를 기록하지 않음.
+
+### [ ] CRUD-IMPLEMENTATION-PLANS-01 User·Task CRUD 독립 구현 계획 작성
+
+- Requirements: `USER-CRUD-01`~`USER-CRUD-08`,
+  `TASK-CRUD-01`~`TASK-CRUD-08`
+- Risk: LOW — 승인된 설계를 실행 단위와 검증 gate로 구체화하는 문서 변경
+- Depends on: `CRUD-JOURNEY-DESIGN-01`
+- Deliverable:
+  `docs/superpowers/plans/2026-09-03-user-crud-journey.md`,
+  `docs/superpowers/plans/2026-09-03-task-crud-journey.md`
+- Acceptance: 두 계획이 각자 exact file·interface·RED/GREEN·commit·browser evidence와
+  사람 checkpoint를 포함하고, User plan 완료 뒤 Task plan을 독립 실행할 수 있다.
+- Automatic verification: plan placeholder·경로·명령·type consistency self-review,
+  `./scripts/verify setup`, `git diff --check`
+- Browser verification: 계획 문서 task에는 적용 없음 — 각 구현 계획의 Journey task가
+  `390x844`, `1280x720` named browser evidence를 소유
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; branch
+  `docs/crud-journey-design`; 승인된 CRUD spec에서 User와 Task 실행 경계를 분리하여 작성 중.
