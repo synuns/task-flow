@@ -74,6 +74,34 @@ describe("TaskDetailPage", () => {
     expect(requestSignals[0]).toBeInstanceOf(AbortSignal);
   });
 
+  it("keeps long contract strings inside the detail layout", async () => {
+    const title = "A".repeat(500);
+    const memo = "B".repeat(500);
+    const client: ApiClient = {
+      request: async <T,>(
+        _input: RequestInfo | URL,
+        _init: RequestInit,
+        isSuccess: (value: unknown) => value is T,
+      ): Promise<T> => {
+        const body: unknown = {
+          title,
+          memo,
+          registerDatetime: "2026-08-30T09:00:00.000Z",
+        };
+        if (!isSuccess(body)) throw new Error("invalid fixture");
+        return body;
+      },
+    };
+
+    renderPage(client);
+
+    expect(await screen.findByRole("heading", { name: title })).toHaveClass(
+      "min-w-0",
+      "[overflow-wrap:anywhere]",
+    );
+    expect(screen.getByText(memo)).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+  });
+
   it("separates a missing task and offers a list recovery action", async () => {
     const client: ApiClient = {
       request: async () => {

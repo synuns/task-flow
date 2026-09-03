@@ -2487,7 +2487,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   direct entry, sign-in 후 `/task/task%2FA` 복귀와 reload 상세 표시 확인;
   `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/173 tests
 
-### [ ] REM-RESPONSIVE-01 긴 task 문자열 반응형 표시
+### [x] REM-RESPONSIVE-01 긴 task 문자열 반응형 표시
 
 - Requirements: `TASK-DETAIL-01`, `TASK-DETAIL-03`, `TASK-DETAIL-04`
 - Risk: MEDIUM — OpenAPI상 길이 제한 없는 문자열의 모바일 표시
@@ -2497,8 +2497,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   없고 원본 값과 exact delete guard가 보존된다.
 - Automatic verification: task detail/delete dialog Vitest, `./scripts/verify quick`
 - Browser verification: 390x844 detail와 delete dialog bounding rect
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-AUTH-ID-01` 완료 후 착수
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-AUTH-ID-01` 완료 후 착수;
+  RED detail/dialog 2 files 2 FAIL로 500자 공백 없는 title과 ID의 overflow class 누락
+  재현; title, memo와 dialog ID에 `min-w-0` 및 `overflow-wrap:anywhere`만 추가한 뒤
+  GREEN 2 files/12 tests; 첫 quick은 dialog test 한 줄 Biome format 차이로
+  `TOOLING` FAIL, `pnpm run format`이 해당 1 file만 수정한 diff를 검토하고 재실행;
+  corrected `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/175 tests;
+  실제 mobile bounding rect는 `REM-FINAL-01` browser evidence에서 확인
 
 ### [ ] REM-MOCK-CONTRACT-01 저장된 mock task 계약 검증
 
@@ -2510,8 +2516,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   않고 기본 fixture로 복구되며 유효 저장 값과 삭제 persistence는 유지된다.
 - Automatic verification: fixture/handler/task API Vitest, `./scripts/verify quick`
 - Browser verification: 적용 없음 — 저장 경계 integration test가 위험을 직접 증명
-- Status: NOT_STARTED
-- Evidence: 구현 전
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-RESPONSIVE-01` 완료 후 착수
 
 ### [ ] REM-BOOTSTRAP-01 mock 시작 실패 복구
 

@@ -72,12 +72,16 @@ export function TaskDetailPage() {
           <ArrowLeft aria-hidden="true" />할 일 목록
         </Link>
       </Button>
-      <h1 className="mb-6 font-semibold text-3xl tracking-tight">{query.data.title}</h1>
+      <h1 className="mb-6 min-w-0 font-semibold text-3xl tracking-tight [overflow-wrap:anywhere]">
+        {query.data.title}
+      </h1>
       <Card>
         <CardContent className="grid gap-6">
           <section>
             <h2 className="mb-2 font-medium text-muted-foreground text-sm">메모</h2>
-            <p className="whitespace-pre-wrap leading-7">{query.data.memo}</p>
+            <p className="min-w-0 whitespace-pre-wrap leading-7 [overflow-wrap:anywhere]">
+              {query.data.memo}
+            </p>
           </section>
           <dl className="border-t pt-5">
             <div className="grid gap-1 sm:grid-cols-[8rem_1fr] sm:items-center sm:gap-4">

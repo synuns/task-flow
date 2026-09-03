@@ -21,11 +21,11 @@ const client: ApiClient = {
   },
 };
 
-function renderDialog(onSuccess = vi.fn(), onAbsent = vi.fn()) {
+function renderDialog(taskId = "task-1", onSuccess = vi.fn(), onAbsent = vi.fn()) {
   render(
     <MemoryRouter>
       <ApiClientProvider client={client}>
-        <DeleteTaskDialog taskId="task-1" onSuccess={onSuccess} onAbsent={onAbsent} />
+        <DeleteTaskDialog taskId={taskId} onSuccess={onSuccess} onAbsent={onAbsent} />
       </ApiClientProvider>
     </MemoryRouter>,
   );
@@ -39,6 +39,15 @@ afterEach(() => {
 });
 
 describe("DeleteTaskDialog", () => {
+  it("keeps a long task ID inside the confirmation dialog", async () => {
+    const taskId = "I".repeat(500);
+    renderDialog(taskId);
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "할 일 삭제" }));
+
+    expect(screen.getByText(taskId)).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+  });
+
   it("requires byte-exact input before a delete attempt", async () => {
     renderDialog();
 

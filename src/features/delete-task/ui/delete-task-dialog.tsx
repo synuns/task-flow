@@ -136,7 +136,9 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
             삭제하려면 아래 할 일 ID를 정확히 입력해주세요.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <code className="rounded-md bg-muted px-3 py-2 font-mono text-sm">{taskId}</code>
+        <code className="min-w-0 rounded-md bg-muted px-3 py-2 font-mono text-sm [overflow-wrap:anywhere]">
+          {taskId}
+        </code>
         <form className="contents" onSubmit={(event) => void submit(event)}>
           <div className="grid gap-2">
             <Label htmlFor="delete-task-id">할 일 ID</Label>
