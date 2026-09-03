@@ -60,6 +60,13 @@ Expected: branch `feat/user-crud`, clean worktree, 이 plan과 승인된 spec이
 
 ## Required Interfaces
 
+| Method and path | Request | Success |
+| --- | --- | --- |
+| `POST /api/user` | `CreateUserInput` | `201 UserProfileData` |
+| `GET /api/user` | 없음 | `200 UserProfileData` |
+| `PATCH /api/user` | exact one-field `UpdateUserInput` | `200 UserProfileData` |
+| `DELETE /api/user` | `{ password }` | `200 { success: true }` |
+
 ```ts
 // entities/user/model/user.ts
 export type User = { email: string; name: string; memo: string };
