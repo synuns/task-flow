@@ -2461,4 +2461,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   target `67c7dc2`; reviewer `/root` explicit inline second-pass; 공통 active branch,
   selected background/semantics/focus, test·dependency 최소성, evidence/TODO와 diff를
   재검토해 findings 없음. `git diff --check`와 setup hook 85·verifier 19 PASS;
-  Verdict: PASS. `HUMAN_APPROVED`나 final acceptance는 새로 기록하지 않음.
+  Verdict: PASS. Completion gate의 제품 검증은 통과했으나 설계 문서 EOF 빈 줄로
+  range diff check가 실패해 `TOOLING`으로 분류하고 `01bfa05`에서 한 줄 제거. 동일
+  gate rerun은 focused 9/9, quick 38/169, mapped Chromium 1/1, range diff와 clean
+  status 모두 PASS. `HUMAN_APPROVED`나 final acceptance는 새로 기록하지 않음.

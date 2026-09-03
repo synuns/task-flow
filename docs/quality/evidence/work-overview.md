@@ -47,6 +47,15 @@ Rerun: `rg` source/style scan, exact base-to-implementation diff review,
 quick, mapped Chromium과 named agent-browser 결과를 재대조했다.
 Verdict: PASS.
 
+Final verification failure/correction/rerun: 첫 두 completion gate는 focused 9/9,
+quick 38 files/169 tests와 mapped Chromium 1/1까지 PASS한 뒤, commit된 설계 문서의
+EOF 빈 줄을 range `git diff --check`가 보고해 exit 2였다. Class: `TOOLING` — 제품
+동작이나 test failure가 아니라 문서 whitespace와 첫 correction의 commit 순서 문제였다.
+Correction commit `01bfa050f15499ad14f3bd9ad1ed2b3a1fb665d8`에서 빈 줄 한 줄을 제거했다.
+동일 completion gate를 다시 실행해 focused 2 files/9 tests, quick hook 85·verifier
+19·Vitest 38/169, mapped Chromium 1/1, base-to-HEAD diff check와 clean status가 모두
+PASS했다.
+
 ## WORK-JOURNEY-VERIFY-01
 
 Requirement/Journey/case trace: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`; `work-overview`; `WORK-P1-1` AppShell/router plus navigation browser record, `WORK-P1-2` dashboard widget/API plus `/`, `WORK-P1-3` profile widget/API plus `/user`, `WORK-P1-4` AppShell/theme plus both viewports, `WORK-E1` terminal-401 request/provider/cache and anonymous route-boundary contracts.
