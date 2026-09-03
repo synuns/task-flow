@@ -2506,7 +2506,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   corrected `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/175 tests;
   실제 mobile bounding rect는 `REM-FINAL-01` browser evidence에서 확인
 
-### [ ] REM-MOCK-CONTRACT-01 저장된 mock task 계약 검증
+### [x] REM-MOCK-CONTRACT-01 저장된 mock task 계약 검증
 
 - Requirements: `SYS-04`, `TASK-LIST-01`, `TASK-DETAIL-01`
 - Risk: MEDIUM — 제출 API 대체 구현의 OAS 응답 정합성
@@ -2516,8 +2516,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   않고 기본 fixture로 복구되며 유효 저장 값과 삭제 persistence는 유지된다.
 - Automatic verification: fixture/handler/task API Vitest, `./scripts/verify quick`
 - Browser verification: 적용 없음 — 저장 경계 integration test가 위험을 직접 증명
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-RESPONSIVE-01` 완료 후 착수
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-RESPONSIVE-01` 완료 후 착수;
+  RED fixture 1 file/5 중 extra key와 invalid date-time 2 FAIL, 기존 invalid status와
+  malformed JSON fallback은 PASS; installed Zod `strictObject`와
+  `z.iso.datetime({ offset: true })` 한 경계로 교정; GREEN fixture/handler/API 3 files
+  25 tests; `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/179 tests
 
 ### [ ] REM-BOOTSTRAP-01 mock 시작 실패 복구
 
@@ -2529,8 +2533,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   다시 시도 button을 표시하며 click은 reload를 한 번 요청한다.
 - Automatic verification: bootstrap/architecture Vitest, `./scripts/verify quick`
 - Browser verification: production preview 정상 bootstrap과 console/page error
-- Status: NOT_STARTED
-- Evidence: 구현 전
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-MOCK-CONTRACT-01` 완료 후 착수
 
 ### [ ] REM-VERIFY-01 read-only 구조 검사와 국소 dead code 정리
 

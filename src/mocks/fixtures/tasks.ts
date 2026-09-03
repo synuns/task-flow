@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 type TaskItem = {
   id: string;
   title: string;
@@ -11,7 +13,15 @@ type DashboardResponse = {
   numOfDoneTask: number;
 };
 
-export type StoredTask = TaskItem & { registerDatetime: string };
+const storedTaskSchema = z.strictObject({
+  id: z.string(),
+  title: z.string(),
+  memo: z.string(),
+  status: z.enum(["TODO", "DONE"]),
+  registerDatetime: z.iso.datetime({ offset: true }),
+});
+
+export type StoredTask = z.infer<typeof storedTaskSchema>;
 
 const fixtureStorageKey = "__kbhc_msw_task_fixture__";
 
@@ -40,15 +50,7 @@ const seed: StoredTask[] = [
 ];
 
 function isStoredTask(value: unknown): value is StoredTask {
-  if (!value || typeof value !== "object") return false;
-  const task = value as Record<string, unknown>;
-  return (
-    typeof task.id === "string" &&
-    typeof task.title === "string" &&
-    typeof task.memo === "string" &&
-    (task.status === "TODO" || task.status === "DONE") &&
-    typeof task.registerDatetime === "string"
-  );
+  return storedTaskSchema.safeParse(value).success;
 }
 
 function loadTasks(): StoredTask[] {
