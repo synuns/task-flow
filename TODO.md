@@ -2651,7 +2651,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `92443cc`; 사용자가 2026-09-03 작성된 명세와 보완된 실패·재시도 정책을 명시 승인;
   이는 구현 시작 checkpoint이며 AI가 `HUMAN_APPROVED`를 기록하지 않음.
 
-### [ ] CRUD-IMPLEMENTATION-PLANS-01 User·Task CRUD 독립 구현 계획 작성
+### [x] CRUD-IMPLEMENTATION-PLANS-01 User·Task CRUD 독립 구현 계획 작성
 
 - Requirements: `USER-CRUD-01`~`USER-CRUD-08`,
   `TASK-CRUD-01`~`TASK-CRUD-08`
@@ -2666,6 +2666,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `./scripts/verify setup`, `git diff --check`
 - Browser verification: 계획 문서 task에는 적용 없음 — 각 구현 계획의 Journey task가
   `390x844`, `1280x720` named browser evidence를 소유
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-03 Codex `/root` task block owner; branch
-  `docs/crud-journey-design`; 승인된 CRUD spec에서 User와 Task 실행 경계를 분리하여 작성 중.
+  `docs/crud-journey-design`; 승인된 CRUD spec을 User 8 tasks/37 steps와 Task
+  9 tasks/38 steps의 독립 계획으로 분리하고 exact path/API/interface, RED/GREEN,
+  Conventional Commit, browser/full/review/checkpoint를 명시함; Review target:
+  `2ad25872ff3a175700dec95983fa4195b5f18797`; Reviewer: `/root` explicit
+  second-pass; Checks: `USER-CRUD-01`~`08`, `TASK-CRUD-01`~`08` 개별 task 추적,
+  OpenAPI extension과 원본 불변, entity/transport import 방향, 사용자별 store/auth,
+  field edit/status UI, 비낙관 mutation, field 없는 400, POST outcome-unknown,
+  delete/cascade evidence, E2E/verifier/worktree/사람 gate; Findings: verifier 고정
+  backlog·review/core source 변경 누락, User 단계에서 여섯 Journey를 조기 선언한 표현,
+  requirement별 task 추적표 누락, 낙관 업데이트를 쓰지 않는데 남은 rollback 용어,
+  API method/path의 literal matrix 누락; Corrections: `c981746`, `721be82`,
+  `a52d778`, `2ad2587`에서 verifier RED/GREEN steps, 단계별 5→6 Journey 전환,
+  requirement coverage, server-authoritative 용어와 User/Task API matrix를 보완;
+  Rerun: contract token/requirement/markdown fence/no-rollback self-check PASS,
+  `git diff --exit-code -- assignment-original pnpm-lock.yaml` PASS,
+  `git diff --check` PASS, `pnpm verify setup` PASS — hook 85, verifier 19;
+  Verdict: PASS, browser 적용 없음 — 계획 문서만 변경.
