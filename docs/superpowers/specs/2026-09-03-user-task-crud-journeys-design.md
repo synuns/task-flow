@@ -53,6 +53,27 @@ guard, MSW와 UI가 동일 계약을 소비하도록 연결해야 한다. 기존
 - optimistic mutation과 자동 POST 재시도
 - production backend와 database
 
+## 제안 Requirement
+
+| ID | Acceptance |
+| --- | --- |
+| `USER-CRUD-01` | 로그인 화면의 link로만 `/sign-up`에 접근하고 navigation 항목을 추가하지 않는다. |
+| `USER-CRUD-02` | 가입 form의 email/password/confirmation/name 검증과 연결된 오류가 유효한 제출만 허용한다. |
+| `USER-CRUD-03` | `POST /api/user`의 201만 가입 success이며 자동 로그인 없이 `/sign-in`으로 이동한다. |
+| `USER-CRUD-04` | 보호된 `/user`가 현재 사용자의 canonical email, name과 memo를 표시한다. |
+| `USER-CRUD-05` | name과 memo는 연필→체크/X 방식으로 한 field씩만 수정하고 success 뒤 반영한다. |
+| `USER-CRUD-06` | 현재 비밀번호가 맞을 때만 탈퇴할 수 있고 200 success만 session 종료를 만든다. |
+| `USER-CRUD-07` | 탈퇴 success가 User와 모든 소유 Task를 영구 제거하며 store integration으로 증명된다. |
+| `USER-CRUD-08` | field 없는 400과 POST outcome-unknown을 추정·자동재시도 없이 복구 가능한 상태로 표시한다. |
+| `TASK-CRUD-01` | 목록의 일관된 `새 할 일` button이 accessible create modal을 연다. |
+| `TASK-CRUD-02` | valid title/memo의 `POST /api/task` 201만 `TODO` Task 생성 success다. |
+| `TASK-CRUD-03` | 생성 뒤 갱신된 목록에서 새 ID의 존재를 확인하되 순서를 가정하지 않는다. |
+| `TASK-CRUD-04` | 상세가 title, memo, status와 registerDatetime을 표시한다. |
+| `TASK-CRUD-05` | title과 memo는 profile과 같은 방식으로 한 field씩만 수정한다. |
+| `TASK-CRUD-06` | detail의 세 상태 button이 success 뒤에만 status와 dashboard를 갱신한다. |
+| `TASK-CRUD-07` | 기존 exact-ID guard와 200-only redirect로 Task를 삭제한다. |
+| `TASK-CRUD-08` | 사용자별 Task 격리, cross-user 404와 list/detail/dashboard 일관성을 유지한다. |
+
 ## 설계 대안과 선택
 
 CRUD form 배치는 전용 route, 기존 화면 inline, modal 중심의 세 안을 비교했다.
@@ -437,7 +458,8 @@ Core success E2E는 `TASK-P1-1`~`TASK-P1-8`의 cross-route CRUD 경계를 한 ca
 
 ## 구현·review 순서
 
-두 Journey는 한 구현 batch로 섞지 않는다.
+두 Journey는 한 구현 batch나 한 구현 계획으로 섞지 않는다. 이 공통 설계에서
+`user-crud`와 `task-crud` 구현 계획을 각각 작성한다.
 
 1. 확장 OpenAPI와 requirement ID를 project-plan, quality requirements와 TODO에 연결
 2. `entities/user`와 `entities/task` domain model·Query key 경계 확정
