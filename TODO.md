@@ -2912,7 +2912,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Verdict PASS와 focused/quick/E2E/browser/full 근거를
   `docs/quality/evidence/user-crud.md`에 연결하고 사람 checkpoint를 요청할 준비가 됨.
   수동 검토 중 로그아웃 요구사항이 추가되어 새 구현·검증·review 전까지 사람 결정 근거
-  없음; AI가 `HUMAN_APPROVED` 상태를 기록하지 않음.
+  없음. 로그아웃 포함 exact target `d4966571b8b3b2fdb31ba05dcedb2fcfb1f63c0b`에
+  대한 fresh review Verdict PASS와 focused/quick/E2E/browser/full 근거가 추가됐으며,
+  AI가 `HUMAN_APPROVED` 상태를 기록하지 않음.
 
 ## 10. User 로그아웃 확장
 
@@ -3035,7 +3037,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   files/226 tests, build, core Chromium 7/7 without retry, regression 19/19), 원본
   OpenAPI/generated와 lockfile 무변경, `git diff --check` PASS.
 
-### [ ] USER-LOGOUT-JOURNEY-REVIEW-01 로그아웃 포함 User CRUD 적대적 검토
+### [x] USER-LOGOUT-JOURNEY-REVIEW-01 로그아웃 포함 User CRUD 적대적 검토
 
 - Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`, `user-crud`
 - Risk: HIGH — 사람 checkpoint 전 새 exact target 검토
@@ -3044,5 +3046,23 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: contract/auth/session/UI/error/E2E/browser/회귀에 unresolved HIGH/MEDIUM이 없다.
 - Automatic verification: corrected target의 focused/quick/E2E/full/setup/diff
 - Browser verification: Journey evidence 재검토; UI correction 시 재실행
-- Status: NOT_STARTED
-- Evidence: 없음 — 선행 Journey 검증 대기.
+- Status: AI_VERIFIED
+- Evidence:
+  Review target: merge-base `9ea74883b989c3e08d661b09b9548ba80a4852f3`, logout
+  range `46e32d02ea68f06a1ff405d230062a17b66ffce1..d4966571b8b3b2fdb31ba05dcedb2fcfb1f63c0b`,
+  `docs/superpowers/plans/2026-09-03-user-logout.md`, `USER-LOGOUT-01`~`05`.
+  Reviewer: Codex `/root`, 구현 author와 동일하되 구현 종료 뒤 fresh second-pass adversarial
+  role로 재검토; 현재 runtime의 subagent 금지 정책에 따라 별도 reviewer는 사용하지 않음.
+  Checks: 원본 OpenAPI/generated/lockfile 무변경, extension contract/generated guard,
+  bearer/no-body/cookie path, exact session revoke, 200 전 auth/cache 불변, terminal 401 기존
+  bounded 정책, non-terminal 실패, focus/pending/외부 닫기, responsive screenshots,
+  core case 무증가, 탈퇴 회귀, TODO dependency/diff를 검사.
+  Findings: unresolved HIGH, MEDIUM, LOW finding 없음.
+  Corrections: review task에서 product/test/doc correction 없음.
+  Rerun: focused Vitest 5 files/27 tests PASS; `pnpm verify quick` PASS(hook 85,
+  verifier 20, Vitest 45 files/226 tests); mapped Chromium 2/2 PASS without retry;
+  `pnpm verify full` PASS(build, core 7/7 without retry, regression 19/19, read-only check);
+  `git diff --check`와 원본/lockfile diff PASS. 기존 named browser 두 viewport evidence를
+  재검토했으며 UI correction이 없어 browser rerun은 적용 없음.
+  Verdict: PASS. Golden Journey 최종 수용은 아래 사람 checkpoint 소유이며 AI 승인을
+  주장하지 않음.

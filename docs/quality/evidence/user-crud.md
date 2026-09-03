@@ -145,3 +145,28 @@ but the preceding protected direct-entry check correctly preserved `returnTo=/us
 2/2 without retry. UI quick failures were `IMPLEMENTATION` (formatter layout) and `INTEGRATION`
 (an AlertDialog prop omitted by the installed Radix contract); formatting was corrected and the
 native AlertDialog outside-dismiss prevention was reused. Final quick and full gates passed.
+
+## USER-LOGOUT-JOURNEY-REVIEW-01
+
+- Review target: merge-base `9ea74883b989c3e08d661b09b9548ba80a4852f3`; logout range
+  `46e32d02ea68f06a1ff405d230062a17b66ffce1..d4966571b8b3b2fdb31ba05dcedb2fcfb1f63c0b`;
+  `docs/superpowers/plans/2026-09-03-user-logout.md`; `USER-LOGOUT-01`~`05`.
+- Reviewer: Codex `/root`, the same implementation author acting as a fresh second-pass
+  adversarial reviewer after implementation and Journey verification. A separate reviewer was
+  not dispatched because the active runtime policy prohibited subagent spawning.
+- Checks: unchanged original OpenAPI/generated/lockfile; extension OpenAPI and exact runtime
+  guard; bodyless bearer request; refresh-cookie path and expiry; exact current-session revoke;
+  no auth/cache mutation before 200; existing bounded terminal-401 policy; non-terminal failure
+  preservation and no automatic retry; modal focus/pending/outside-close semantics; responsive
+  screenshots and overflow; unchanged core case count; account-deletion regression; dependency,
+  FSD, generated and diff hygiene.
+- Findings: no unresolved HIGH, MEDIUM, or LOW findings.
+- Corrections: no product, test, or documentation correction was required by this review task.
+- Rerun: focused Vitest 5 files/27 tests PASS; `pnpm verify quick` PASS with hook 85,
+  verifier 20 and Vitest 45 files/226 tests; mapped User CRUD Chromium 2/2 PASS without retry;
+  `pnpm verify full` PASS with production build, core Chromium 7/7 without retry, verifier
+  regression 19/19 and read-only fingerprint check. `git diff --check` and original/lockfile
+  comparisons passed. The named browser evidence for `390x844` and `1280x720` was re-reviewed;
+  no UI correction required a browser rerun.
+- Verdict: PASS for AI plan-completion review. Golden Journey acceptance remains human-owned;
+  no `HUMAN_APPROVED` status is claimed.
