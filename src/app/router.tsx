@@ -5,7 +5,7 @@ import { SignUpPage } from "@/pages/sign-up";
 import { TaskDetailPage } from "@/pages/task-detail";
 import { TaskListPage } from "@/pages/task-list";
 import { UserPage } from "@/pages/user";
-import { deleteUser, useApiClient } from "@/shared/api";
+import { deleteUser, signOut, useApiClient } from "@/shared/api";
 import { AppShell } from "@/widgets/app-shell";
 import { useAuth } from "./auth/auth-provider";
 import { AuthRouteBoundary } from "./auth/auth-route-boundary";
@@ -41,7 +41,14 @@ function UserRoute() {
     navigate("/sign-in", { replace: true });
   }
 
-  return <UserPage onDelete={deleteAccount} />;
+  async function signOutCurrentSession() {
+    const snapshot = auth.getSnapshot();
+    await signOut(client);
+    auth.terminate(snapshot);
+    navigate("/sign-in", { replace: true });
+  }
+
+  return <UserPage onDelete={deleteAccount} onSignOut={signOutCurrentSession} />;
 }
 
 export const appRoutes: RouteObject[] = [

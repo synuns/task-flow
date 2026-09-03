@@ -2992,7 +2992,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   기존 auth fixture에 최소 추가. focused GREEN 4 files/20 tests PASS,
   `pnpm verify quick` PASS(hook 85, verifier 20, Vitest 44 files/223 tests).
 
-### [ ] USER-LOGOUT-UI-01 회원정보 로그아웃 확인 modal 구현
+### [x] USER-LOGOUT-UI-01 회원정보 로그아웃 확인 modal 구현
 
 - Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`
 - Risk: MEDIUM — auth mutation과 focus modal UI
@@ -3002,8 +3002,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   승인 설계와 일치한다.
 - Automatic verification: component/router/auth-provider Vitest, quick
 - Browser verification: Journey verify task에서 두 viewport 통합 확인
-- Status: NOT_STARTED
-- Evidence: 없음 — 선행 session task 대기.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; component RED에서 module 미존재를
+  확인. 기존 shared AlertDialog/Button을 재사용해 cancel initial/return focus, pending
+  중 action/Escape lock, 실패 alert 보존을 구현하고 `/user` header 및 captured auth
+  snapshot 종료를 조합. focused GREEN 3 files/17 tests PASS. 첫 quick의 format 오류는
+  IMPLEMENTATION, 두 번째의 AlertDialog 미지원 prop type 오류는 INTEGRATION으로 분류;
+  formatter 요구를 반영하고 AlertDialog가 외부 click dismiss를 기본 차단하는 계약을
+  재사용해 교정. 최종 `pnpm verify quick` PASS(hook 85, verifier 20, Vitest 45
+  files/226 tests), `git diff --check` PASS.
 
 ### [ ] USER-LOGOUT-JOURNEY-VERIFY-01 로그아웃 포함 User CRUD 통합 검증
 

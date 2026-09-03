@@ -1,6 +1,7 @@
 import { ApiClientProvider, type ApiClient } from "@/shared/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AuthController, AuthStatus } from "./auth/auth-provider";
@@ -36,15 +37,17 @@ const apiClient: ApiClient = {
     const body: unknown =
       pathname === "/api/dashboard"
         ? { numOfTask: 3, numOfRestTask: 2, numOfDoneTask: 1 }
-        : pathname === "/api/user"
-          ? { email: "user@example.com", name: "김담당", memo: "오늘도 차근차근" }
-          : pathname === "/api/task/task-1"
-            ? {
-                title: "첫 번째 할 일",
-                memo: "삭제 검증 대상",
-                registerDatetime: "2026-08-30T09:00:00.000Z",
-              }
-            : {};
+        : pathname === "/api/sign-out"
+          ? { success: true }
+          : pathname === "/api/user"
+            ? { email: "user@example.com", name: "김담당", memo: "오늘도 차근차근" }
+            : pathname === "/api/task/task-1"
+              ? {
+                  title: "첫 번째 할 일",
+                  memo: "삭제 검증 대상",
+                  registerDatetime: "2026-08-30T09:00:00.000Z",
+                }
+              : {};
     if (!isSuccess(body)) throw new Error("router test API fixture is missing");
     return body;
   },
@@ -128,6 +131,37 @@ describe("app router", () => {
     expect(screen.getByRole("link", { name: "로그인" })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("인증 상태를 확인하고 있습니다.");
     expect(screen.queryByRole("heading", { name: "할 일" })).not.toBeInTheDocument();
+  });
+
+  it("terminates the captured session only after sign-out succeeds", async () => {
+    const user = userEvent.setup();
+    const active = controller({
+      kind: "authenticated",
+      generation: 1,
+      accessToken: "token",
+      userId: "user-1",
+    });
+    active.getSnapshot = vi.fn(() => ({ generation: 1, accessToken: "token" }));
+    active.terminate = vi.fn(() => {
+      active.status = { kind: "anonymous" };
+    });
+    auth.controller = active;
+    const router = createMemoryRouter(appRoutes, { initialEntries: ["/user"] });
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ApiClientProvider client={apiClient}>
+          <RouterProvider router={router} />
+        </ApiClientProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "로그아웃" }));
+    const dialog = screen.getByRole("alertdialog", { name: "로그아웃하시겠어요?" });
+    await user.click(within(dialog).getByRole("button", { name: "로그아웃" }));
+
+    expect(await screen.findByRole("heading", { name: "로그인" })).toBeInTheDocument();
+    expect(active.terminate).toHaveBeenCalledWith({ generation: 1, accessToken: "token" });
   });
 
   it("renders the route error boundary for render failures", async () => {
