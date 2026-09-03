@@ -50,3 +50,35 @@ Failure classification/correction: the first quick run required only Biome forma
 E2E source (`TOOLING`). The first mapped E2E used partial-name `할 일`, which also matched
 `할 일 삭제`; class `TEST`. Status locators were changed to exact accessible-name matches and the
 rerun passed 2/2 without retry. No product correction was required.
+
+## TASK-CRUD-JOURNEY-REVIEW-01
+
+Review target: base `2421483ec98c9a698fbd1e3714bda626f6cd4d58`, implementation target
+`c53903a7004b75009e31a61c2c8a6e77214bf45e`, Task CRUD plan and
+`TASK-CRUD-01`~`TASK-CRUD-08`.
+
+Reviewer: on 2026-09-03 Codex `/root` performed a fresh read-only second pass after implementation.
+The active runtime policy prohibited a separate subagent, so this does not claim reviewer
+independence; the person checkpoint remains the external review boundary.
+
+Checks: reviewed the authoritative and extension OpenAPI boundaries, generated guards, owner
+isolation, server-owned ID/date/default status, exact one-field PATCH, POST outcome-unknown policy,
+non-optimistic mutations and invalidations, field edit/status/delete behavior, responsive and
+accessibility evidence, mapped E2E, TODO dependencies, and the exact branch diff. Confirmed
+`assignment-original/`, `src/generated/openapi.ts`, and `pnpm-lock.yaml` are unchanged.
+
+Findings: no unresolved HIGH, MEDIUM, or LOW finding. The existing Vite chunk-size advisory is a
+non-failing build warning, not an open Task CRUD finding.
+
+Corrections: none in the review task. The earlier mapped-E2E partial-name ambiguity was already
+classified as `TEST`, corrected, and verified before this review target.
+
+Rerun: contract Vitest 3 files/17 tests and focused Vitest 5 files/52 tests PASS;
+`pnpm verify quick` PASS with hook 85, verifier 20, and Vitest 47 files/248 tests; mapped Chromium
+2/2 PASS without retry; `pnpm verify full` PASS with production build, core Chromium 9/9 without
+retry, verifier regression 19/19, and read-only comparison. `git diff --check` and the authoritative
+OpenAPI/generated/lockfile diff checks PASS. The named two-viewport browser evidence was reviewed;
+no UI correction required a browser rerun.
+
+Verdict: **PASS**. No unresolved finding remains on the reviewed target. This does not mark
+`JOURNEY-TASK-CRUD-01` as `HUMAN_APPROVED`; final Golden Journey acceptance belongs to a person.

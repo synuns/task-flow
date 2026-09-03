@@ -3233,7 +3233,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   1280x720 create/edit/status/dashboard/failure/exact-delete, focus/aria/overflow/errors를 확인하고
   정상 close함. 상세 evidence: `docs/quality/evidence/task-crud.md`.
 
-### [ ] TASK-CRUD-JOURNEY-REVIEW-01 Task CRUD 계획 완료 적대적 검토
+### [x] TASK-CRUD-JOURNEY-REVIEW-01 Task CRUD 계획 완료 적대적 검토
 
 - Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`, `task-crud`
 - Risk: HIGH — 사람 checkpoint 전 exact target 독립 검토
@@ -3242,8 +3242,27 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: contract/ownership/mutation/cache/UI/E2E/browser/회귀에 unresolved HIGH/MEDIUM finding이 없다.
 - Automatic verification: corrected target의 focused/quick/E2E/full/setup/diff
 - Browser verification: Journey evidence 재검토; UI correction 시 재실행
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence:
+  Review target: base `2421483ec98c9a698fbd1e3714bda626f6cd4d58`, implementation
+  target `c53903a7004b75009e31a61c2c8a6e77214bf45e`, Task CRUD plan과
+  `TASK-CRUD-01`~`TASK-CRUD-08`.
+  Reviewer: 2026-09-03 Codex `/root`, 구현 종료 뒤 fresh second-pass adversarial role로
+  재검토; 현재 runtime의 subagent 금지 정책에 따라 별도 reviewer는 사용하지 않음.
+  Checks: authoritative OpenAPI/generated/lockfile 무변경, extension contract/generated guard,
+  owner 격리, server ID/date/default status, exact one-field PATCH, POST outcome-unknown,
+  비낙관 mutation/cache, field edit/status/delete 경계, responsive/accessibility, mapped
+  E2E/browser evidence, TODO dependency와 exact diff를 검사.
+  Findings: unresolved HIGH, MEDIUM, LOW finding 없음.
+  Corrections: review task에서 product/test/doc correction 없음.
+  Rerun: contract Vitest 3 files/17 tests와 focused Vitest 5 files/52 tests PASS;
+  `pnpm verify quick` PASS(hook 85, verifier 20, Vitest 47 files/248 tests); mapped Chromium
+  2/2 PASS without retry; `pnpm verify full` PASS(build, core Chromium 9/9 without retry,
+  regression 19/19, read-only check); `git diff --check`와 authoritative/lockfile diff PASS.
+  기존 named browser 두 viewport evidence를 재검토했으며 UI correction이 없어 browser
+  rerun은 적용 없음.
+  Verdict: PASS. Golden Journey 최종 수용은 아래 사람 checkpoint 소유이며 AI 승인을
+  주장하지 않음. 상세 기록은 `docs/quality/evidence/task-crud.md`.
 
 ### [ ] JOURNEY-TASK-CRUD-01 Task CRUD 사람 checkpoint
 
@@ -3255,4 +3274,6 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: 적용 없음 — 사람 결정 gate
 - Browser verification: `docs/quality/evidence/task-crud.md`의 named evidence 검토
 - Status: BLOCKED
-- Evidence: Task CRUD 구현·검증·review 완료 후 사람 checkpoint 요청 예정.
+- Evidence: Task CRUD 구현·검증과 `TASK-CRUD-JOURNEY-REVIEW-01` PASS 완료. 사람이 exact
+  target `c53903a7004b75009e31a61c2c8a6e77214bf45e` 및
+  `docs/quality/evidence/task-crud.md`를 검토해 승인 또는 correction을 명시해야 함.
