@@ -154,7 +154,7 @@ action은 sign-in과 profile 중 정확히 하나만 표시한다. 아이콘은 
 | --- | --- | --- |
 | 로그인 | `POST /api/sign-in` | email/password JSON, 200 token 응답, non-200 `errorMessage` |
 | 갱신 | `POST /api/refresh` | refresh cookie credential, 200 token, 400/401 error |
-| 로그아웃 | `POST /api/sign-out` | bearer/refresh cookie, body 없음, 200 success 뒤 session 정리 |
+| 로그아웃 | `POST /api/sign-out` | bearer, body 없음, 200 success 뒤 server/client session 정리와 refresh cookie 만료 |
 | 회원가입 | `POST /api/user` | public email/password/name, 201 user, 400/409 error |
 | profile | `GET /api/user` | bearer token, canonical email/name/memo |
 | profile 수정 | `PATCH /api/user` | bearer token, name 또는 memo 한 field, 200 user |

@@ -36,7 +36,7 @@ memory 저장, refresh cookie, session generation, 보호 Query 정리 정책은
 | --- | --- |
 | `USER-LOGOUT-01` | 인증된 `/user` 제목 영역에 outline 스타일의 `LogOut` 아이콘과 `로그아웃` 버튼이 있고 navigation에는 추가하지 않는다. |
 | `USER-LOGOUT-02` | trigger는 `로그아웃하시겠어요?` alert dialog를 열며, `취소`에 최초 focus를 두고 취소 뒤 trigger로 focus를 돌린다. |
-| `USER-LOGOUT-03` | 확인은 body 없는 bearer/cookie `POST /api/sign-out`을 정확히 한 번 보내고 pending 동안 확인·취소·Escape·외부 닫기를 잠근다. |
+| `USER-LOGOUT-03` | 확인은 body 없는 bearer `POST /api/sign-out`을 정확히 한 번 보내고 pending 동안 확인·취소·Escape·외부 닫기를 잠근다. |
 | `USER-LOGOUT-04` | runtime 검증을 통과한 200 `{ success: true }` 뒤에만 현재 client session과 보호 Query를 정리하고 `/sign-in`으로 replace 이동한다. 폐기된 refresh cookie로 reload해도 인증이 복원되지 않는다. |
 | `USER-LOGOUT-05` | network, invalid-response와 non-terminal HTTP 실패는 자동 재시도하지 않고 modal alert로 표시하며 page, session과 cache를 유지한다. terminal 401은 기존 auth 정책을 따른다. |
 
@@ -64,7 +64,6 @@ memory 저장, refresh cookie, session generation, 보호 Query 정리 정책은
 ```text
 POST /api/sign-out
 Authorization: Bearer <accessToken>
-Cookie: token=<refreshToken>
 Request body: 없음
 
 200 { "success": true }
@@ -75,14 +74,16 @@ Request body: 없음
 `Max-Age=0`으로 만료한다. MSW session store도 해당 사용자의 현재 access/refresh
 session을 폐기한다. 응답은 exact key와 literal `true`를 runtime에서 확인한다.
 
-Client는 기존 authenticated request를 재사용하되 cookie 전송을 위해
-`credentials: "include"`를 지정한다. body와 `Content-Type`은 보내지 않는다. 원본
-OpenAPI와 기존 sign-in/refresh contract는 수정하지 않는다.
+refresh cookie의 `Path=/api/refresh` 때문에 브라우저는 이 cookie를 `/api/sign-out`
+요청에 보내지 않는다. 서버는 bearer가 가리키는 session과 연결된 refresh token을
+폐기한다. Client는 만료 `Set-Cookie` 반영을 명시하기 위해 `credentials: "include"`를
+사용하고 body와 `Content-Type`은 보내지 않는다. 원본 OpenAPI와 기존 sign-in/refresh
+contract는 수정하지 않는다.
 
 ## 데이터 흐름과 상태
 
 1. dialog 확인 시 현재 auth snapshot을 캡처한다.
-2. protected client가 bearer와 cookie로 sign-out request를 보낸다.
+2. protected client가 bearer로 sign-out request를 보낸다.
 3. success response를 runtime 검증한다.
 4. 같은 generation인 session만 종료하고 보호 Query root를 제거한다.
 5. `/sign-in`으로 replace 이동한다.

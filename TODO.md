@@ -2936,3 +2936,86 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   placeholder·내부 모순·범위·모호성을 self-review했고 미해결 항목 없음;
   `pnpm verify setup` PASS — hook 85, verifier 20; 원본 OpenAPI/generated와 lockfile
   무변경, `git diff --check` PASS.
+
+### [x] USER-LOGOUT-PLAN-01 로그아웃 구현 계획 작성
+
+- Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`
+- Risk: LOW — 승인된 설계를 testable task와 gate로 구체화
+- Depends on: `USER-LOGOUT-DESIGN-01`
+- Deliverable: `docs/superpowers/plans/2026-09-03-user-logout.md`, granular backlog
+- Acceptance: contract, session transport, modal UI, 기존 core E2E, browser, full, 새 review와
+  사람 checkpoint가 exact file/interface/RED/GREEN/commit 순서로 연결된다.
+- Automatic verification: plan spec coverage, placeholder와 type consistency self-review,
+  `pnpm verify setup`, `git diff --check`
+- Browser verification: 계획 task에는 적용 없음 — Journey verify task가 소유
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; 승인된 A 방식과 확인 modal 명세를
+  5개 실행 task로 분리하고 exact contract/signature/test/command/commit을 명시함. 계획
+  대조 중 refresh cookie `Path=/api/refresh`는 `/api/sign-out`에 전송되지 않는 모순을
+  발견해 bearer가 server session을 식별하고 응답이 cookie를 만료하도록 명세와 상위
+  기획을 교정함. spec coverage, placeholder와 type consistency self-review 및 setup/diff
+  확인에서 미해결 gap 없음; `pnpm verify setup` PASS — hook 85, verifier 20;
+  원본 OpenAPI/generated와 lockfile 무변경, `git diff --check` PASS.
+
+### [ ] USER-LOGOUT-CONTRACT-01 로그아웃 확장 계약과 추적성 등록
+
+- Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`
+- Risk: HIGH — 원본 밖 인증 endpoint 계약 반영
+- Depends on: `USER-LOGOUT-PLAN-01`
+- Deliverable: CRUD extension OpenAPI/generated type, requirement/verification/verifier map
+- Acceptance: bearer, body 없음, 200 literal success와 401 error가 모든 계약면에 일치한다.
+- Automatic verification: verifier RED/GREEN, generated contract Vitest, quick
+- Browser verification: 적용 없음 — contract task
+- Status: NOT_STARTED
+- Evidence: 없음 — 선행 계획 검토 뒤 시작.
+
+### [ ] USER-LOGOUT-SESSION-01 server/client 로그아웃 경계 구현
+
+- Requirements: `USER-LOGOUT-03`~`USER-LOGOUT-05`
+- Risk: HIGH — refresh session 폐기와 auth 경계
+- Depends on: `USER-LOGOUT-CONTRACT-01`
+- Deliverable: signOut API, auth fixture revoke, MSW sign-out handler
+- Acceptance: body 없는 bearer POST 200만 session을 폐기하고 cookie를 만료하며 실패는
+  상태를 보존한다.
+- Automatic verification: auth API/fixture/handler Vitest, quick
+- Browser verification: 적용 없음 — transport/store task
+- Status: NOT_STARTED
+- Evidence: 없음 — 선행 계약 task 대기.
+
+### [ ] USER-LOGOUT-UI-01 회원정보 로그아웃 확인 modal 구현
+
+- Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`
+- Risk: MEDIUM — auth mutation과 focus modal UI
+- Depends on: `USER-LOGOUT-SESSION-01`
+- Deliverable: sign-out feature, `/user` action, router auth/navigation composition
+- Acceptance: responsive action, cancel focus, pending close lock, 실패 보존과 200 뒤 종료가
+  승인 설계와 일치한다.
+- Automatic verification: component/router/auth-provider Vitest, quick
+- Browser verification: Journey verify task에서 두 viewport 통합 확인
+- Status: NOT_STARTED
+- Evidence: 없음 — 선행 session task 대기.
+
+### [ ] USER-LOGOUT-JOURNEY-VERIFY-01 로그아웃 포함 User CRUD 통합 검증
+
+- Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`, `user-crud`
+- Risk: HIGH — server/client session과 browser reload 경계
+- Depends on: `USER-LOGOUT-UI-01`
+- Deliverable: 기존 User CRUD core E2E 확장, named browser와 evidence
+- Acceptance: 로그아웃 뒤 reload/direct protected route가 닫히고 실패 전에는 session이
+  유지되며 기존 탈퇴 success/failure가 회귀하지 않는다.
+- Automatic verification: focused, quick, mapped E2E, full
+- Browser verification: `390x844`, `1280x720`, modal/failure/success/reload/diagnostics
+- Status: NOT_STARTED
+- Evidence: 없음 — 선행 UI task 대기.
+
+### [ ] USER-LOGOUT-JOURNEY-REVIEW-01 로그아웃 포함 User CRUD 적대적 검토
+
+- Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`, `user-crud`
+- Risk: HIGH — 사람 checkpoint 전 새 exact target 검토
+- Depends on: `USER-LOGOUT-JOURNEY-VERIFY-01`
+- Deliverable: seven-field review record와 사람 checkpoint 연결
+- Acceptance: contract/auth/session/UI/error/E2E/browser/회귀에 unresolved HIGH/MEDIUM이 없다.
+- Automatic verification: corrected target의 focused/quick/E2E/full/setup/diff
+- Browser verification: Journey evidence 재검토; UI correction 시 재실행
+- Status: NOT_STARTED
+- Evidence: 없음 — 선행 Journey 검증 대기.
