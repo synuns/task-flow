@@ -1643,3 +1643,44 @@ Automatic verification:
 
 Verdict: integration and browser checks PASS. Final plan-completion adversarial review,
 human checkpoint and canonical full gate remain; no final acceptance is claimed here.
+
+## Review Remediation Plan-completion Adversarial Review — 2026-09-03
+
+Review target: `47e3d85`, full branch diff from `be409b0`, approved design
+`docs/superpowers/specs/2026-09-03-review-remediation-design.md`, and implementation plan
+`docs/superpowers/plans/2026-09-03-review-remediation.md`.
+
+Reviewer/context: `/root` performed a separate read-only pass after completing the
+implementation and browser evidence. The active coordination policy prohibited creating
+an independent subagent, so this review does not claim reviewer independence; the required
+person checkpoint remains the external review boundary.
+
+Checks:
+
+- Compared every changed product/test file with the authoritative OpenAPI, `AUTH-07`,
+  `NAV-03`, `SYS-04` and task detail/delete requirements.
+- Confirmed encoded slash is accepted only inside one raw task segment; raw `/task/a/b`,
+  external origins and malformed percent encoding still fall back safely.
+- Confirmed route, API and MSW preserve `task/A` without double-decoding or changing the
+  task value.
+- Confirmed long-string CSS changes only wrapping and does not truncate values or weaken
+  exact delete confirmation.
+- Confirmed stored mock tasks require exact keys, status enum and the same Zod RFC 3339
+  boundary used by the task API client.
+- Confirmed bootstrap does not render the application before worker success and renders a
+  retry boundary on rejection.
+- Confirmed architecture fixtures are created and removed only under `tmpdir()`, while
+  the real project `biome.json` still produces allowed status 0 and blocked status 1.
+- Confirmed `assignment-original/`, `package.json`, `pnpm-lock.yaml` and generated OpenAPI
+  output are unchanged; no dangerous HTML/eval or access-token persistence was introduced.
+
+Findings: no HIGH, MEDIUM, or LOW finding. The existing Vite chunk-size advisory remains
+an explicitly excluded, non-failing performance item. The two intermediate format failures
+were corrected and rerun as recorded in `TODO.md`.
+
+Rerun: impacted Vitest 11 files/73 tests PASS; assignment/dependency/generated diff zero;
+`git diff --check main...HEAD` and clean worktree PASS. The earlier quick 39 files/182 tests,
+mapped Chromium 3/3 and measured 390x844 browser evidence remain on the reviewed target.
+
+Verdict: automated adversarial review PASS with no unresolved finding. Human checkpoint
+and the canonical `./scripts/verify full` remain; `HUMAN_APPROVED` is not claimed.

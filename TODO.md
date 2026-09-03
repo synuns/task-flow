@@ -2582,4 +2582,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   named agent-browser encoded auth return과 390x844 long-string detail/dialog 측정 PASS,
   예상 anonymous refresh 401 외 console error와 page error 없음; session과 preview 종료,
   4173 port closed; 상세
-  `docs/quality/evidence/final-qa.md#review-remediation-integrated-browser-evidence--2026-09-03`
+  `docs/quality/evidence/final-qa.md#review-remediation-integrated-browser-evidence--2026-09-03`;
+  plan-completion review target `47e3d85`, 동일 세션 분리 read-only pass `/root`가
+  OpenAPI/auth/route/UI/mock/bootstrap/architecture/diff 경계를 재검토하고 영향 Vitest
+  11 files/73 tests, authoritative/dependency/generated diff zero, diff/status clean PASS;
+  coordination 정책상 independent subagent를 사용하지 못한 한계를 기록하고 사람
+  checkpoint 대기; findings 없음, 상세
+  `docs/quality/evidence/final-qa.md#review-remediation-plan-completion-adversarial-review--2026-09-03`
