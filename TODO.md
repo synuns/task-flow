@@ -3012,7 +3012,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   재사용해 교정. 최종 `pnpm verify quick` PASS(hook 85, verifier 20, Vitest 45
   files/226 tests), `git diff --check` PASS.
 
-### [ ] USER-LOGOUT-JOURNEY-VERIFY-01 로그아웃 포함 User CRUD 통합 검증
+### [x] USER-LOGOUT-JOURNEY-VERIFY-01 로그아웃 포함 User CRUD 통합 검증
 
 - Requirements: `USER-LOGOUT-01`~`USER-LOGOUT-05`, `user-crud`
 - Risk: HIGH — server/client session과 browser reload 경계
@@ -3022,8 +3022,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   유지되며 기존 탈퇴 success/failure가 회귀하지 않는다.
 - Automatic verification: focused, quick, mapped E2E, full
 - Browser verification: `390x844`, `1280x720`, modal/failure/success/reload/diagnostics
-- Status: NOT_STARTED
-- Evidence: 없음 — 선행 UI task 대기.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; 기존 success core case 안에
+  cancel focus/restore, bodyless bearer POST, 성공 뒤 reload와 direct `/user` 차단,
+  재로그인 후 기존 탈퇴를 추가해 case 수를 유지. 첫 mapped E2E는 direct entry가 만든
+  `returnTo=/user`를 `/`로 잘못 기대한 TEST 실패였고 기존 redirect 계약에 맞춰 교정;
+  fresh rerun Chromium 2/2 PASS without retry. agent-browser named session
+  `user-logout-journey-verify-01`에서 390x844/1280x720 모두 overflow 없음, pending
+  `aria-busy=true`, 양 action disabled, Escape 무시, controlled 500 alert/session/Task
+  보존, 성공 200 뒤 reload/direct entry 차단, page error 없음과 screenshots 확인.
+  최종 focused/mapped E2E 및 `pnpm verify full` PASS(hook 85, verifier 20, Vitest 45
+  files/226 tests, build, core Chromium 7/7 without retry, regression 19/19), 원본
+  OpenAPI/generated와 lockfile 무변경, `git diff --check` PASS.
 
 ### [ ] USER-LOGOUT-JOURNEY-REVIEW-01 로그아웃 포함 User CRUD 적대적 검토
 

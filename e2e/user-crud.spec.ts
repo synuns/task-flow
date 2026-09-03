@@ -7,12 +7,20 @@ test.describe("@user-crud", () => {
     const createBodies: unknown[] = [];
     const updateBodies: unknown[] = [];
     const deleteBodies: unknown[] = [];
+    const signOutRequests: { method: string; body: string | null; bearer: boolean }[] = [];
     page.on("console", (message) => {
       if (message.type() === "error") consoleErrors.push(message.text());
     });
     page.on("pageerror", (error) => pageErrors.push(error.message));
     page.on("request", (request) => {
       const path = new URL(request.url()).pathname;
+      if (path === "/api/sign-out") {
+        signOutRequests.push({
+          method: request.method(),
+          body: request.postData(),
+          bearer: /^Bearer \S+$/.test(request.headers().authorization ?? ""),
+        });
+      }
       if (path !== "/api/user") return;
       if (request.method() === "POST") createBodies.push(request.postDataJSON());
       if (request.method() === "PATCH") updateBodies.push(request.postDataJSON());
@@ -60,6 +68,27 @@ test.describe("@user-crud", () => {
     await page.getByRole("button", { name: "이름 수정 완료" }).click();
     await expect(page.getByText("수정사용자")).toBeVisible();
     expect(updateBodies).toEqual([{ name: "수정사용자" }]);
+
+    await page.getByRole("button", { name: "로그아웃" }).click();
+    const signOutDialog = page.getByRole("alertdialog", { name: "로그아웃하시겠어요?" });
+    await expect(signOutDialog.getByRole("button", { name: "취소" })).toBeFocused();
+    await signOutDialog.getByRole("button", { name: "취소" }).click();
+    await expect(page.getByRole("button", { name: "로그아웃" })).toBeFocused();
+    await page.getByRole("button", { name: "로그아웃" }).click();
+    await signOutDialog.getByRole("button", { name: "로그아웃" }).click();
+
+    await expect(page).toHaveURL(/\/sign-in$/);
+    expect(signOutRequests).toEqual([{ method: "POST", body: null, bearer: true }]);
+    await page.reload();
+    await expect(page).toHaveURL(/\/sign-in$/);
+    await page.goto("/user");
+    await expect(page).toHaveURL(/\/sign-in$/);
+
+    await page.getByRole("textbox", { name: "이메일" }).fill("journey@example.com");
+    await page.getByLabel("비밀번호", { exact: true }).fill("Password1");
+    await page.getByRole("button", { name: "로그인" }).click();
+    await expect(page).toHaveURL(/\/user$/);
+    await expect(page.getByText("수정사용자")).toBeVisible();
 
     await page.getByRole("button", { name: "회원 탈퇴" }).click();
     const password = page.getByLabel("현재 비밀번호");

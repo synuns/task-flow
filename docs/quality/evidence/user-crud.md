@@ -92,3 +92,56 @@ seed user identity and the custom Task carries `ownerId: user-1`. Focused auth-e
   re-reviewed; no UI correction triggered a browser rerun. `git diff --check` PASS.
 - Verdict: PASS for AI plan-completion review. Golden Journey acceptance remains the following
   human checkpoint; no human decision is claimed here.
+
+## USER-LOGOUT-JOURNEY-VERIFY-01
+
+Requirement/Journey: `USER-LOGOUT-01`~`USER-LOGOUT-05`; `user-crud`; `USER-P1-7A`,
+`USER-E7`. Target is branch `feat/user-crud`, logout implementation commits `20b4a9a`,
+`2390474`, `62ae681`, plus this Journey verification diff. Session owner: Codex `/root`.
+
+Automatic verification:
+
+- Focused component/router/auth GREEN: 3 files/17 tests PASS; server/client boundary GREEN:
+  4 files/20 tests PASS.
+- Quick: `pnpm verify quick` — PASS, hook 85, verifier 20, Vitest 45 files/226 tests.
+- Mapped E2E: `pnpm exec playwright test e2e/user-crud.spec.ts` — Chromium 2/2 PASS
+  without retry. Existing core case count stayed at two. The success case observed exactly one
+  `POST /api/sign-out`, a valid bearer header, and `body: null`; cancel sent no request. After
+  success both reload and direct `/user` entry stayed at `/sign-in`; reauthentication followed
+  the preserved safe `returnTo=/user`, then the prior account-deletion flow completed.
+- Full: `pnpm verify full` — PASS, hook 85, verifier 20, Vitest 45 files/226 tests,
+  production build, core Chromium 7/7 without retry, verifier regression 19/19 and read-only
+  fingerprint check.
+
+Named browser evidence:
+
+- Agent-browser session: `user-logout-journey-verify-01`; route
+  `http://127.0.0.1:5173/user`; viewports `390x844` and `1280x720`.
+- Precondition/actions: seed user sign-in; profile open; confirm-modal cancel and reopen; a
+  one-shot controlled 500 response held the request pending, then released it; Task navigation
+  proved the same authenticated state remained; a later unmodified request completed logout;
+  reload and direct `/user` were checked.
+- Expected/actual: the responsive outline action was in the heading area. Cancel had initial
+  focus and trigger regained focus. Pending exposed `aria-busy=true`, disabled cancel/confirm,
+  showed `로그아웃 중`, and ignored Escape. The controlled failure kept the modal at `/user`
+  with its alert and preserved all three seeded Tasks. Success returned `/sign-in`; reload and
+  direct protected entry remained signed out. Both viewports reported no horizontal overflow.
+- Console/network: page errors were empty. Console showed expected anonymous refresh 401s and
+  MSW `POST /api/sign-out` 200 with an empty body. The one-shot controlled 500 intentionally
+  bypassed MSW. Agent-browser's request monitor again captured no service-worker-owned API
+  traffic; exact method/body/bearer assertions are independently covered by mapped E2E, API,
+  and handler tests.
+- Screenshots: `/tmp/user-logout-journey-mobile-profile.png`,
+  `/tmp/user-logout-journey-mobile-dialog.png`,
+  `/tmp/user-logout-journey-mobile-failure.png`,
+  `/tmp/user-logout-journey-mobile-signed-out.png`,
+  `/tmp/user-logout-journey-desktop-profile.png`,
+  `/tmp/user-logout-journey-desktop-dialog.png`. Visual review found no clipping, overlap, or
+  modal overflow. Browser and Vite server were closed.
+
+Failure classification/correction/rerun: the first mapped E2E expected `/` after re-sign-in,
+but the preceding protected direct-entry check correctly preserved `returnTo=/user`. Class:
+`TEST`; the assertion and redundant profile navigation were corrected. Fresh mapped E2E passed
+2/2 without retry. UI quick failures were `IMPLEMENTATION` (formatter layout) and `INTEGRATION`
+(an AlertDialog prop omitted by the installed Radix contract); formatting was corrected and the
+native AlertDialog outside-dismiss prevention was reused. Final quick and full gates passed.
