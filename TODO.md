@@ -3138,7 +3138,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   계약 fixture만 교정. focused 5 files/41 tests와 `pnpm verify quick` PASS — hook 85,
   verifier 20, Vitest 45 files/235 tests; browser는 API boundary task라 적용 없음.
 
-### [ ] TASK-CRUD-CREATE-01 Task 생성 modal과 목록 연동
+### [x] TASK-CRUD-CREATE-01 Task 생성 modal과 목록 연동
 
 - Requirements: `TASK-CRUD-01`~`TASK-CRUD-03`
 - Risk: MEDIUM — POST 결과 미확정과 가상 목록 재조회
@@ -3147,8 +3147,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: 201 뒤 목록 어딘가의 새 ID를 확인하고, outcome-unknown은 목록 재조회 전 자동·수동 POST를 막는다.
 - Automatic verification: create schema/component/list Vitest, `pnpm verify quick`
 - Browser verification: Journey verify task에서 mobile/desktop modal과 목록 동작 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-TRANSPORT-01`
+  commit `f583a45` 뒤 기존 Dialog, TaskList infinite query, dashboard/task query key 재사용
+  경계를 조사함. RED에서 schema module 부재와 목록 header action 부재 4건을 확인.
+  기존 Dialog/Input/Button과 query keys로 title/memo 전용 modal을 추가하고 201 뒤 목록을
+  page 1부터 reset/refetch해 server ID 존재를 확인하도록 구현함. network/invalid response는
+  POST를 1회로 멈추고 active 목록 GET 완료 전 submit을 잠근 뒤 명시적 retry만 허용함.
+  field validation, 400 form alert, focus return, responsive full-width action을 검증함. focused
+  3 files/20 tests와 `pnpm verify quick` PASS — hook 85, verifier 20, Vitest 47 files/243 tests;
+  browser는 Journey verify task로 이관.
 
 ### [ ] TASK-CRUD-EDIT-01 Task 상세 title·memo 단일 필드 수정
 
