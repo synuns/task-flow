@@ -70,6 +70,10 @@ artifact atomic rename, public index 갱신 순서로 실행되며 재실행해�
 - [검토 완료 세션 `01a05c2e-ff40-76d1-9487-2fb88087e317.s0001`](./artifacts/codex-session-01a05c2e-ff40-76d1-9487-2fb88087e317.s0001.md)
 - [검토 완료 세션 `01a05c41-55fe-7e62-913b-287359671160.s0001`](./artifacts/codex-session-01a05c41-55fe-7e62-913b-287359671160.s0001.md)
 - [검토 완료 세션 `01a05d12-7ce7-7240-b44a-f525ce4fe48c.s0001`](./artifacts/codex-session-01a05d12-7ce7-7240-b44a-f525ce4fe48c.s0001.md)
+- [검토 완료 세션 `01a05d86-f1bc-7293-aab2-857e54d4f227.s0001`](./artifacts/codex-session-01a05d86-f1bc-7293-aab2-857e54d4f227.s0001.md)
+- [검토 완료 세션 `01a05fe4-56c0-7913-8227-4be99311ca8d.s0001`](./artifacts/codex-session-01a05fe4-56c0-7913-8227-4be99311ca8d.s0001.md)
+- [검토 완료 세션 `01a06566-63aa-7bd0-957a-90a80719de16.s0001`](./artifacts/codex-session-01a06566-63aa-7bd0-957a-90a80719de16.s0001.md)
+- [검토 완료 세션 `01a06569-91c4-7db2-98de-06e3911ec38c.s0001`](./artifacts/codex-session-01a06569-91c4-7db2-98de-06e3911ec38c.s0001.md)
 <!-- reviewed-records:end -->
 
 - [전체 프롬프트와 작업 기록](./artifacts/index.md)
