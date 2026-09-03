@@ -80,12 +80,12 @@ describe("AuthRouteBoundary", () => {
   it("preserves an internal return path when anonymous enters a protected route", async () => {
     auth.controller = controller({ kind: "anonymous" });
     const router = createMemoryRouter(routes, {
-      initialEntries: ["/task/task-1?tab=memo#content"],
+      initialEntries: ["/task/task%2FA?tab=memo#content"],
     });
     render(<RouterProvider router={router} />);
 
     expect(await screen.findByTestId("location")).toHaveTextContent("/sign-in");
-    expect(screen.getByTestId("return-to")).toHaveTextContent("/task/task-1?tab=memo#content");
+    expect(screen.getByTestId("return-to")).toHaveTextContent("/task/task%2FA?tab=memo#content");
   });
 
   it.each([
@@ -93,6 +93,7 @@ describe("AuthRouteBoundary", () => {
     ["/sign-in", "/"],
     ["/unknown", "/"],
     ["/task/task-1?from=login", "/task/task-1?from=login"],
+    ["/task/task%2FA?from=login", "/task/task%2FA?from=login"],
   ])("validates an authenticated sign-in return target %s", async (returnTo, expected) => {
     auth.controller = controller({
       kind: "authenticated",

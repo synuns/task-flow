@@ -1,17 +1,19 @@
-import { matchPath } from "react-router-dom";
-
 const exactRoutes = ["/", "/task", "/user"] as const;
 
-export function isProtectedPath(pathname: string): boolean {
-  if (exactRoutes.includes(pathname as (typeof exactRoutes)[number])) return true;
-  const match = matchPath({ path: "/task/:id", end: true }, pathname);
-  if (!match?.params.id) return false;
+function isEncodedTaskPath(pathname: string): boolean {
+  if (!pathname.startsWith("/task/")) return false;
+  const segment = pathname.slice("/task/".length);
+  if (!segment || segment.includes("/")) return false;
   try {
-    const id = decodeURIComponent(match.params.id);
-    return id.length > 0 && !id.includes("/");
+    return decodeURIComponent(segment).length > 0;
   } catch {
     return false;
   }
+}
+
+export function isProtectedPath(pathname: string): boolean {
+  if (exactRoutes.includes(pathname as (typeof exactRoutes)[number])) return true;
+  return isEncodedTaskPath(pathname);
 }
 
 export function safeReturnTo(candidate: unknown, origin: string): string {

@@ -8,8 +8,10 @@ describe("safeReturnTo", () => {
     "/",
     "/task",
     "/task/task-1",
+    "/task/task%2FA",
     "/user",
     "/task?page=2#next",
+    "/task/task%2FA?tab=memo#content",
     "https://assignment.test/task/task-1?from=direct",
   ])("keeps an allowed same-origin route: %s", (path) => {
     const expected = path.startsWith(origin) ? path.slice(origin.length) : path;
@@ -21,7 +23,8 @@ describe("safeReturnTo", () => {
     "//evil.test/task",
     "/sign-in",
     "/unknown",
-    "/task/a%2Fb",
+    "/task/a/b",
+    "/task/%",
     "not a URL%",
   ])("falls back to root: %s", (path) => expect(safeReturnTo(path, origin)).toBe("/"));
 });

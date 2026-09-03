@@ -2465,7 +2465,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   range diff check가 실패해 `TOOLING`으로 분류하고 `01bfa05`에서 한 줄 제거. 동일
   gate rerun은 focused 9/9, quick 38/169, mapped Chromium 1/1, range diff와 clean
   status 모두 PASS. `HUMAN_APPROVED`나 final acceptance는 새로 기록하지 않음.
-### [ ] REM-AUTH-ID-01 인코딩된 task ID 인증 경로 교정
+
+### [x] REM-AUTH-ID-01 인코딩된 task ID 인증 경로 교정
 
 - Requirements: `AUTH-07`, `NAV-03`, `TASK-LIST-05`, `TASK-DETAIL-01`
 - Risk: HIGH — 보호 route와 로그인 복귀 경로의 task ID 허용 범위
@@ -2476,10 +2477,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: return-to/auth boundary/router Vitest, auth-entry Playwright,
   `./scripts/verify quick`
 - Browser verification: anonymous encoded route, 로그인 복귀, reload와 상세 표시
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-03 Codex `/root` task block owner; 사용자가 encoded slash ID 지원과
   `docs/superpowers/specs/2026-09-03-review-remediation-design.md`를 명시 승인;
-  isolated worktree `fix/review-remediation`; baseline `./scripts/verify quick` PASS
+  isolated worktree `fix/review-remediation`; baseline `./scripts/verify quick` PASS;
+  RED return-to/auth boundary 2 files 4 FAIL은 `/task/task%2FA`가 root fallback 또는
+  비보호 route로 남는 기존 결함을 재현; raw single-segment 판정 후 GREEN 관련 3 files
+  30 PASS; 저장 fixture `task/A`를 사용한 auth-entry Chromium 2/2 PASS로 anonymous
+  direct entry, sign-in 후 `/task/task%2FA` 복귀와 reload 상세 표시 확인;
+  `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/173 tests
 
 ### [ ] REM-RESPONSIVE-01 긴 task 문자열 반응형 표시
 
@@ -2491,8 +2497,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   없고 원본 값과 exact delete guard가 보존된다.
 - Automatic verification: task detail/delete dialog Vitest, `./scripts/verify quick`
 - Browser verification: 390x844 detail와 delete dialog bounding rect
-- Status: NOT_STARTED
-- Evidence: 구현 전
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; `REM-AUTH-ID-01` 완료 후 착수
 
 ### [ ] REM-MOCK-CONTRACT-01 저장된 mock task 계약 검증
 

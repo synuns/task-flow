@@ -14,10 +14,24 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
     if (request.url().endsWith("/api/refresh")) refreshRequests.push(request.method());
   });
 
-  await page.goto("/task/task-1");
+  await page.addInitScript(() => {
+    sessionStorage.setItem(
+      "__kbhc_msw_task_fixture__",
+      JSON.stringify([
+        {
+          id: "task/A",
+          title: "인코딩된 ID 할 일",
+          memo: "로그인 복귀 검증",
+          status: "TODO",
+          registerDatetime: "2026-08-30T09:00:00.000Z",
+        },
+      ]),
+    );
+  });
+  await page.goto("/task/task%2FA");
   await expect(page).toHaveURL(/\/sign-in$/);
   await expect(page.getByRole("heading", { name: "로그인" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "첫 번째 할 일" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "인코딩된 ID 할 일" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "로그인" })).toBeVisible();
   await expect(page.getByRole("link", { name: "회원정보" })).toHaveCount(0);
 
@@ -25,13 +39,13 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
   await page.getByLabel("비밀번호").fill("Password1");
   await page.getByRole("button", { name: "로그인" }).click();
 
-  await expect(page).toHaveURL(/\/task\/task-1$/);
-  await expect(page.getByRole("heading", { name: "첫 번째 할 일" })).toBeVisible();
+  await expect(page).toHaveURL(/\/task\/task%2FA$/);
+  await expect(page.getByRole("heading", { name: "인코딩된 ID 할 일" })).toBeVisible();
   await expect(page.getByRole("link", { name: "회원정보" })).toBeVisible();
   await expect(page.getByRole("link", { name: "로그인" })).toHaveCount(0);
   await page.reload();
-  await expect(page).toHaveURL(/\/task\/task-1$/);
-  await expect(page.getByRole("heading", { name: "첫 번째 할 일" })).toBeVisible();
+  await expect(page).toHaveURL(/\/task\/task%2FA$/);
+  await expect(page.getByRole("heading", { name: "인코딩된 ID 할 일" })).toBeVisible();
   expect(refreshRequests).toHaveLength(2);
   await page.getByRole("link", { name: "회원정보" }).click();
   await expect(page).toHaveURL(/\/user$/);
