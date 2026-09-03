@@ -74,10 +74,9 @@ production 전용 API는 추가하지 않는다.
 
 ### 5. Read-only 검증과 상태 문서 정합성
 
-architecture contract test의 fixture는 repository `src`가 아니라 OS 임시
-directory에서 생성하고 항상 정리한다. 검사 대상 경로를 명시적으로 넘겨 현재
-허용·차단 import 판정은 유지한다. 검증 전후 tracked/untracked fingerprint가
-동일해야 한다.
+architecture contract test는 repository `src`에 fixture를 쓰지 않고 Biome의
+`--stdin-file-path` 입력으로 허용·차단 import 판정을 유지한다. 검증 전후
+tracked/untracked fingerprint가 동일해야 한다.
 
 `TODO.md`에는 이 후속 작업의 소유 task block을 추가하고 Stage 7 상태를 실제
 작업 상태와 맞춘다. 구현과 검증 evidence는 같은 block에 누적하고 사람만
