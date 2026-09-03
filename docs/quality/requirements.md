@@ -7,9 +7,9 @@ Use `assignment-original/openapi.yaml` as the API authority and
 `REQUIREMENT` failure and request a human decision when the sources conflict in
 a way that changes accepted behavior.
 
-Use `docs/api/crud-openapi.yaml` only for the human-approved User CRUD extension.
-The original OpenAPI remains authoritative for every operation outside that
-extension and is never modified by extension work.
+Use `docs/api/crud-openapi.yaml` only for the human-approved User and Task CRUD
+extension. The original OpenAPI remains authoritative for every operation
+outside that extension and is never modified by extension work.
 
 ## Status and Evidence Rules
 
@@ -66,12 +66,20 @@ are reserved for human owners.
 | USER-LOGOUT-03 | Bounded sign-out request | CRUD OAS `POST /api/sign-out` | Confirm sends one bodyless bearer POST; pending disables both actions and blocks Escape/outside close. | HIGH | component/integration | auth API/handler/dialog Vitest | `docs/quality/evidence/user-crud.md` | user-crud | AI_VERIFIED |
 | USER-LOGOUT-04 | Server and client session termination | CRUD OAS `POST /api/sign-out`; approved auth policy | Only an exact 200 `{ success: true }` revokes the server session, expires the refresh cookie, terminates the matching client generation, removes protected Query data, and replaces the route with `/sign-in`; reload and protected direct entry remain signed out. | HIGH | integration/browser | auth handler/provider/router Vitest | `docs/quality/evidence/user-crud.md` | user-crud | AI_VERIFIED |
 | USER-LOGOUT-05 | Sign-out failure preservation | approved logout design and auth policy | Network, invalid-response, and non-terminal HTTP failures are not retried automatically; the dialog reports an alert while page, session, and cache remain unchanged. Terminal 401 follows the existing auth policy. | HIGH | component/integration | auth API/dialog/router Vitest | `docs/quality/evidence/user-crud.md` | user-crud | AI_VERIFIED |
+| TASK-CRUD-01 | Task creation entry | approved CRUD design | A consistent `새 할 일` button in the task-list header opens an accessible create modal. | MEDIUM | component/browser | create-task/list Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-02 | Task creation | CRUD OAS `POST /api/task` | Valid title and optional memo send no status; only a 201 response creates a server-owned ID/date Task with status `TODO`. | HIGH | integration/browser | task API/store/create Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-03 | Creation reconciliation | approved CRUD design | After success the list is refetched from page 1 and contains the response ID without assuming item order; outcome-unknown is not automatically retried. | HIGH | component/integration/browser | create-task/list Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-04 | Complete task detail | CRUD OAS `TaskDetailResponse` | Detail displays title, memo, status, and `registerDatetime`; ID/date remain server-owned and read-only. | MEDIUM | integration/browser | task API/detail Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-05 | Single-field task update | CRUD OAS `PATCH /api/task/{id}`; approved CRUD design | Title and memo use pencil, check, and X controls; exactly one field is sent and displayed/cache data changes only after success. | MEDIUM | component/integration/browser | update-task/detail Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-06 | Three-state update | CRUD OAS `TaskStatus`; approved CRUD design | Detail exposes `TODO`, `IN_PROGRESS`, and `DONE` controls; status, list, and dashboard change only after successful PATCH. | HIGH | component/integration/browser | update-task/dashboard Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-07 | Existing deletion contract | original OAS `DELETE /api/task/{id}`; approved delete policy | CRUD expansion preserves exact-ID confirmation, bounded auth replay, and 200-only redirect. | HIGH | integration/browser | delete-task/detail Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
+| TASK-CRUD-08 | Ownership and cross-view consistency | approved CRUD design | Each user sees only owned Tasks; cross-user detail/PATCH/DELETE return 404 and create/update/delete keep list, detail, and dashboard consistent. | HIGH | store/integration/browser | task store/handler Vitest | `docs/quality/evidence/task-crud.md` | task-crud | NOT_STARTED |
 
 ## Scenario Execution Rules
 
 `assignment-original/` is read-only. Baseline API steps use only operations,
-statuses, security schemes, and fields defined by its `openapi.yaml`. User CRUD
-steps use only the separately approved `docs/api/crud-openapi.yaml`. UI-only
+statuses, security schemes, and fields defined by its `openapi.yaml`. User and
+Task CRUD steps use only the separately approved `docs/api/crud-openapi.yaml`. UI-only
 baseline steps use `requirement.md`; approved extension UI uses the CRUD design.
 A schema-conforming fixture value is test data, not a new product field or behavior.
 
@@ -90,7 +98,7 @@ behavior, and list/detail/dashboard cache consistency follow
 
 ## Master Journey
 
-The Master Journey is a map, not an E2E test. It connects the five independently
+The Master Journey is a map, not an E2E test. It connects the six independently
 executable journeys without making their state or execution order dependent.
 
 | Order | Journey | Entry state | Observable exit | Decision gate |
@@ -100,6 +108,7 @@ executable journeys without making their state or execution order dependent.
 | 3 | `task-discovery` | Fresh approved authenticated fixture with reset pages | First page, cards, bounded DOM, paging stop, and detail navigation | `DEC-AUTH-01` for 401 transition |
 | 4 | `task-resolution` | Fresh approved authenticated fixture with reset task data | Detail, 404 recovery, exact-ID guard, and approved delete result | `DEC-DELETE-01` before delete error/modal/cache semantics |
 | 5 | `user-crud` | Fresh signed-out context with reset User/Task stores | Sign-up, canonical profile, single-field updates, password-confirmed deletion | Approved CRUD contract and existing auth policy |
+| 6 | `task-crud` | Fresh authenticated context with reset owner-aware Task store | Create, detail edits, three-state update, existing deletion | Approved CRUD contract, auth policy, and delete policy |
 
 ## Independent Journey Contract
 
@@ -248,6 +257,31 @@ owns that proof at store integration level.
 | `USER-E6` terminal protected 401 | `USER-CRUD-06` | Existing auth policy clears session/cache | integration |
 | `USER-E7` non-terminal sign-out failure | `USER-LOGOUT-05` | Modal alert remains with the same page, session, and protected cache; no automatic retry | component + integration + browser |
 
+### task-crud
+
+Requirements: `TASK-CRUD-01` through `TASK-CRUD-08`.
+
+Independent initial state: fresh approved authenticated fixture, reset owner-aware
+Task store and query cache. Success and failure cases do not share mutations.
+
+| Case/step | Requirement | User action | OpenAPI contract | Expected result | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| `TASK-CRUD-P1-1` | `TASK-CRUD-01` | Open `/task` and select `새 할 일` | None | Accessible modal opens with title focus | component + browser |
+| `TASK-CRUD-P1-2` | `TASK-CRUD-02`, `TASK-CRUD-03` | Submit valid title and memo | bearer `POST /api/task`, 201 `CreatedTaskResponse` | Server creates a `TODO` Task; refetched list contains its ID without an order assumption | integration + browser |
+| `TASK-CRUD-P1-3` | `TASK-CRUD-04` | Open the created detail | bearer `GET /api/task/{id}`, 200 `TaskDetailResponse` | Title, memo, status, and registerDatetime match the response | integration + browser |
+| `TASK-CRUD-P1-4` | `TASK-CRUD-05` | Edit title or memo with pencil/check | one-field `PATCH /api/task/{id}` | Only the successful response changes detail and list data | component + integration |
+| `TASK-CRUD-P1-5` | `TASK-CRUD-06` | Select `IN_PROGRESS`, then `DONE` | one-field status `PATCH /api/task/{id}` | Active status and dashboard metrics change only after each success | integration + browser |
+| `TASK-CRUD-P1-6` | `TASK-CRUD-07` | Confirm deletion with the exact route ID | bearer `DELETE /api/task/{id}`, 200 | Existing bounded attempt redirects to `/task` only on success | integration + browser |
+| `TASK-CRUD-P1-7` | `TASK-CRUD-08` | Inspect list/detail/dashboard as owner and another user | list/detail/dashboard contracts | Owner views stay consistent; other user cannot discover or mutate the Task | store + integration |
+
+| Case | Requirement | Expected result | Evidence |
+| --- | --- | --- | --- |
+| `TASK-CRUD-E1` invalid create | `TASK-CRUD-01`, `TASK-CRUD-02` | Associated title error and zero POST requests | unit + component |
+| `TASK-CRUD-E2` create outcome unknown | `TASK-CRUD-03` | One POST maximum, list reconciliation before explicit retry, no content-based inference | component + integration |
+| `TASK-CRUD-E3` failed field PATCH | `TASK-CRUD-05` | Draft remains editable while rendered/cache server value stays unchanged | component + integration |
+| `TASK-CRUD-E4` failed status PATCH | `TASK-CRUD-06` | Previous active status and dashboard metrics remain unchanged | component + integration + core browser |
+| `TASK-CRUD-E5` cross-user access | `TASK-CRUD-08` | Hidden from list; detail/PATCH/DELETE each return 404 | store + integration |
+
 ## Invariants
 
 - Dashboard and task navigation remain present across routes.
@@ -263,6 +297,9 @@ owns that proof at store integration level.
 - Detail 404 always provides list recovery.
 - Delete cannot submit without exact ID and success always returns to task list.
 - User mutation UI and cache remain unchanged until a successful server response.
+- Task create accepts no status; the server assigns `TODO`, ID, and registerDatetime.
+- Task title, memo, status, list, and dashboard remain unchanged until successful mutation responses.
+- Other users cannot discover or mutate a Task; missing and cross-user detail/mutations both return 404.
 - Fieldless 400 responses are form/row alerts; POST outcome-unknown never auto-retries.
 - Account-deletion E2E proves session/access only; store integration proves User and owned Task removal.
 - Loading, empty, error, and success states are distinguishable.

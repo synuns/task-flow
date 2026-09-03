@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Frontend Assignment CRUD Extension API
   version: 1.0.0
-  description: User CRUD extension approved on 2026-09-03
+  description: User and Task CRUD extension approved on 2026-09-03
 servers:
   - url: /
 paths:
@@ -132,6 +132,153 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/task:
+    post:
+      summary: Create task
+      operationId: createTask
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedTaskResponse'
+        '400':
+          description: Invalid task input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: Get task list
+      operationId: getTasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Task page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/task/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get task detail
+      operationId: getTaskDetail
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Task detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDetailResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Update one task field
+      operationId: updateTask
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDetailResponse'
+        '400':
+          description: Invalid task update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete task
+      operationId: deleteTask
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Task deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTaskResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   securitySchemes:
     bearerAuth:
@@ -217,6 +364,139 @@ components:
           enum:
             - true
     SignOutResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+    TaskStatus:
+      type: string
+      enum:
+        - TODO
+        - IN_PROGRESS
+        - DONE
+    CreateTaskRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        memo:
+          type: string
+          maxLength: 500
+    UpdateTaskRequest:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required:
+            - title
+          properties:
+            title:
+              type: string
+              minLength: 1
+              maxLength: 100
+        - type: object
+          additionalProperties: false
+          required:
+            - memo
+          properties:
+            memo:
+              type: string
+              maxLength: 500
+        - type: object
+          additionalProperties: false
+          required:
+            - status
+          properties:
+            status:
+              $ref: '#/components/schemas/TaskStatus'
+    TaskItem:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - memo
+        - status
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        memo:
+          type: string
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+    TaskListResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - data
+        - hasNext
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskItem'
+        hasNext:
+          type: boolean
+    TaskDetailResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - title
+        - memo
+        - status
+        - registerDatetime
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        memo:
+          type: string
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        registerDatetime:
+          type: string
+          format: date-time
+    CreatedTaskResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - title
+        - memo
+        - status
+        - registerDatetime
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        memo:
+          type: string
+          maxLength: 500
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        registerDatetime:
+          type: string
+          format: date-time
+    DeleteTaskResponse:
       type: object
       additionalProperties: false
       required:

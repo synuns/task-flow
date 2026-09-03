@@ -53,7 +53,9 @@
 | 4. work-overview   | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
-| 7. 통합·제출 QA    | 네 checkpoint와 full QA 후 사람 최종 acceptance | IN_PROGRESS                    |
+| 7. user-crud       | 구현·통합 검증·review 후 사람 checkpoint        | HUMAN_APPROVED                 |
+| 8. task-crud       | 구현·통합 검증·review 후 사람 checkpoint        | IN_PROGRESS                    |
+| 9. 통합·제출 QA    | 여섯 checkpoint와 full QA 후 사람 최종 acceptance | IN_PROGRESS                  |
 
 ## 0. 기획·결정 준비
 
@@ -3068,3 +3070,137 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   재검토했으며 UI correction이 없어 browser rerun은 적용 없음.
   Verdict: PASS. Golden Journey 최종 수용은 아래 사람 checkpoint 소유이며 AI 승인을
   주장하지 않음.
+
+## 11. Task CRUD Journey 구현
+
+### [x] TASK-CRUD-CONTRACT-01 Task 확장 계약과 작업 통제면 등록
+
+- Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`
+- Risk: HIGH — 승인된 원본 밖 Task API 계약 반영
+- Depends on: `JOURNEY-USER-CRUD-01`
+- Deliverable: CRUD extension OpenAPI/generated type, requirement/verification map과 Task CRUD backlog
+- Acceptance: 생성·조회·단일 필드 수정·삭제 계약, 세 상태와 Journey dependency가 승인 설계와 일치한다.
+- Automatic verification: verifier RED/GREEN, generated contract Vitest, `pnpm verify quick`
+- Browser verification: 적용 없음 — contract task
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `.worktrees/task-crud`,
+  `feat/task-crud`에서 최신 `main` target `2421483`으로 시작. baseline
+  `pnpm verify setup` PASS — hook 85, verifier 20. Control-plane RED에서
+  `TASK-CRUD-CONTRACT-01` block 부재와 review evidence 대상 미등록 2건을 확인했고,
+  quality-map RED에서 `TASK-CRUD-01` 부재를 확인함. Generated type RED는 계획의
+  Vitest-only 명령이 type assertion을 제거해 처음부터 통과한 `TEST` 문제를 발견해
+  `pnpm typecheck`로 바로잡았고 TaskStatus/path 부재 TypeScript 오류 4건을 확인함.
+  CRUD extension OAS에 POST/GET/PATCH/DELETE Task 계약과 exact schema를 추가하고
+  generated type을 재생성함. 첫 GREEN에서 schema `default`와 `allOf`가 optional
+  request/exact response type을 바꾼 `IMPLEMENTATION` 실패를 직접 object schema로
+  교정. focused verifier 4/4, contract Vitest 3/3, typecheck, 원본 OpenAPI/generated
+  무변경 검사를 통과했고 `pnpm verify quick` PASS — hook 85, verifier 20, Vitest
+  45 files/227 tests; browser는 contract task라 적용 없음.
+
+### [ ] TASK-CRUD-STORE-01 소유자별 Task 생성·수정 저장소 구현
+
+- Requirements: `TASK-CRUD-02`, `TASK-CRUD-06`, `TASK-CRUD-08`
+- Risk: HIGH — 사용자별 데이터 격리와 dashboard 계산 의미 구현
+- Depends on: `TASK-CRUD-CONTRACT-01`
+- Deliverable: owner-aware Task create/update/status store와 MSW handlers
+- Acceptance: server-owned ID/date/default TODO, one-field update, cross-user 404와 rest/done 수치가 일치한다.
+- Automatic verification: task fixture/handler Vitest, `pnpm verify quick`
+- Browser verification: 적용 없음 — store/transport integration task
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-TRANSPORT-01 Task entity와 API 경계 확장
+
+- Requirements: `TASK-CRUD-02`, `TASK-CRUD-04`~`TASK-CRUD-06`
+- Risk: MEDIUM — generated DTO와 runtime guard 연결
+- Depends on: `TASK-CRUD-STORE-01`
+- Deliverable: Task domain model, create/update transport와 exact response guards
+- Acceptance: create는 title/memo만, update는 title/memo/status 중 한 field만 보내고 exact response만 수용한다.
+- Automatic verification: task API/entity Vitest, architecture contract, `pnpm verify quick`
+- Browser verification: 적용 없음 — API boundary task
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-CREATE-01 Task 생성 modal과 목록 연동
+
+- Requirements: `TASK-CRUD-01`~`TASK-CRUD-03`
+- Risk: MEDIUM — POST 결과 미확정과 가상 목록 재조회
+- Depends on: `TASK-CRUD-TRANSPORT-01`
+- Deliverable: 목록 header action, accessible create modal과 cache reconciliation
+- Acceptance: 201 뒤 목록 어딘가의 새 ID를 확인하고, outcome-unknown은 목록 재조회 전 자동·수동 POST를 막는다.
+- Automatic verification: create schema/component/list Vitest, `pnpm verify quick`
+- Browser verification: Journey verify task에서 mobile/desktop modal과 목록 동작 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-EDIT-01 Task 상세 title·memo 단일 필드 수정
+
+- Requirements: `TASK-CRUD-04`, `TASK-CRUD-05`
+- Risk: MEDIUM — server-authoritative 상세/list cache 갱신
+- Depends on: `TASK-CRUD-CREATE-01`
+- Deliverable: 상세 field edit controls와 update mutation
+- Acceptance: 한 번에 한 field만 편집하며 실패는 draft와 server 값을 보존하고 success 뒤에만 반영한다.
+- Automatic verification: update-task/detail component Vitest, `pnpm verify quick`
+- Browser verification: Journey verify task에서 focus, cancel, success/failure 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-STATUS-01 Task 3-state control과 dashboard 연동
+
+- Requirements: `TASK-CRUD-04`, `TASK-CRUD-06`
+- Risk: MEDIUM — detail/list/dashboard 교차 cache 일관성
+- Depends on: `TASK-CRUD-EDIT-01`
+- Deliverable: TODO/IN_PROGRESS/DONE 상세 control과 목록 read-only badge
+- Acceptance: 이전 상태는 PATCH success 전 유지되고 success 뒤에만 상세·목록·dashboard가 갱신된다.
+- Automatic verification: status/detail/card/dashboard Vitest, `pnpm verify quick`
+- Browser verification: Journey verify task에서 `aria-pressed`, pending과 dashboard 값 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-DELETE-REGRESSION-01 CRUD 확장 후 기존 삭제 계약 보존
+
+- Requirements: `TASK-CRUD-07`, `TASK-CRUD-08`, `TASK-DETAIL-03`~`TASK-DETAIL-05`
+- Risk: HIGH — 승인된 destructive-data semantics 회귀 방지
+- Depends on: `TASK-CRUD-STATUS-01`
+- Deliverable: exact-ID, owner scope, bounded replay와 200-only redirect 회귀 근거
+- Acceptance: 기존 삭제 feature를 재사용하고 proven gap이 없으면 production code를 추가하지 않는다.
+- Automatic verification: delete-task/detail/handler focused Vitest, `pnpm verify quick`
+- Browser verification: Journey verify task에서 기존 삭제 modal과 redirect 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-JOURNEY-VERIFY-01 Task CRUD Journey 통합 검증
+
+- Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`, `task-crud`
+- Risk: HIGH — create/edit/status/delete와 소유권 경계 통합
+- Depends on: `TASK-CRUD-DELETE-REGRESSION-01`
+- Deliverable: `e2e/task-crud.spec.ts`, `docs/quality/evidence/task-crud.md`
+- Acceptance: success와 failed-status critical case가 독립 fixture에서 통과하고 생성 위치를 가정하지 않는다.
+- Automatic verification: focused suite, quick, mapped E2E, `pnpm verify full`
+- Browser verification: agent-browser `390x844`, `1280x720`, create/edit/status/delete/failure와 diagnostics
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-CRUD-JOURNEY-REVIEW-01 Task CRUD 계획 완료 적대적 검토
+
+- Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`, `task-crud`
+- Risk: HIGH — 사람 checkpoint 전 exact target 독립 검토
+- Depends on: `TASK-CRUD-JOURNEY-VERIFY-01`
+- Deliverable: Task CRUD evidence의 seven-field review record
+- Acceptance: contract/ownership/mutation/cache/UI/E2E/browser/회귀에 unresolved HIGH/MEDIUM finding이 없다.
+- Automatic verification: corrected target의 focused/quick/E2E/full/setup/diff
+- Browser verification: Journey evidence 재검토; UI correction 시 재실행
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] JOURNEY-TASK-CRUD-01 Task CRUD 사람 checkpoint
+
+- Requirements: `TASK-CRUD-01`~`TASK-CRUD-08`, `task-crud`
+- Risk: HIGH — Task CRUD Golden Journey acceptance는 사람 소유
+- Depends on: `TASK-CRUD-JOURNEY-REVIEW-01`
+- Deliverable: automatic/browser/review evidence에 대한 사람 결정
+- Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
+- Automatic verification: 적용 없음 — 사람 결정 gate
+- Browser verification: `docs/quality/evidence/task-crud.md`의 named evidence 검토
+- Status: BLOCKED
+- Evidence: Task CRUD 구현·검증·review 완료 후 사람 checkpoint 요청 예정.

@@ -43,4 +43,27 @@ describe("generated OpenAPI contract", () => {
     expect(path).toBe("/api/user");
     expect(response.email).toBe("user@example.com");
   });
+
+  it("exposes the approved Task CRUD extension separately", () => {
+    type TaskStatus = crudComponents["schemas"]["TaskStatus"];
+    type CreateTaskRequest =
+      crudPaths["/api/task"]["post"]["requestBody"]["content"]["application/json"];
+    type UpdateTaskRequest =
+      crudPaths["/api/task/{id}"]["patch"]["requestBody"]["content"]["application/json"];
+    type CreatedTaskResponse =
+      crudPaths["/api/task"]["post"]["responses"][201]["content"]["application/json"];
+
+    expectTypeOf<TaskStatus>().toEqualTypeOf<"TODO" | "IN_PROGRESS" | "DONE">();
+    expectTypeOf<CreateTaskRequest>().toEqualTypeOf<{ title: string; memo?: string }>();
+    expectTypeOf<UpdateTaskRequest>().toEqualTypeOf<
+      { title: string } | { memo: string } | { status: TaskStatus }
+    >();
+    expectTypeOf<CreatedTaskResponse>().toEqualTypeOf<{
+      id: string;
+      title: string;
+      memo: string;
+      status: TaskStatus;
+      registerDatetime: string;
+    }>();
+  });
 });

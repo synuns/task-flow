@@ -72,6 +72,7 @@ Search a requirement ID, route, API path, or symbol in
 | `task-discovery` | `TASK-LIST-01..05`; `/task`, `GET /api/task` | `src/pages/task-list`, `src/widgets/task-list`, `src/entities/task`, `src/shared/api/tasks.ts` | `e2e/task-discovery.spec.ts` |
 | `task-resolution` | `TASK-DETAIL-01..05`; `/task/:id`, `GET/DELETE /api/task/:id` | `src/pages/task-detail`, `src/features/delete-task`, `src/shared/api/tasks.ts` | `e2e/task-resolution.spec.ts` |
 | `user-crud` | `USER-CRUD-01..08`, `USER-LOGOUT-01..05`; `/sign-in`, `/sign-up`, `/user`, `POST/GET/PATCH/DELETE /api/user`, `POST /api/sign-out` | `src/entities/user`, `src/features/sign-up`, `src/features/edit-user-field`, `src/features/delete-user`, `src/features/sign-out`, `src/shared/api/user.ts`, `src/shared/api/auth.ts` | `e2e/user-crud.spec.ts` |
+| `task-crud` | `TASK-CRUD-01..08`; `/task`, `/task/:id`, `POST/GET/PATCH/DELETE /api/task` | `src/entities/task`, `src/features/create-task`, `src/features/update-task`, `src/features/delete-task`, `src/shared/api/tasks.ts`, `src/mocks/fixtures/tasks.ts` | `e2e/task-crud.spec.ts` |
 
 The table is a lookup aid, not a replacement for requirement IDs or focused
 unit, component, and integration tests.
@@ -94,16 +95,16 @@ result fail the gate.
 ## Core E2E Journeys
 
 Organize by `auth-entry`, `work-overview`, `task-discovery`, `task-resolution`,
-and `user-crud`, not by page.
+`user-crud`, and `task-crud`, not by page.
 Keep at most one representative success path and one critical failure path per journey.
 Every E2E names its unique cross-boundary risk. `test:e2e:core` runs only
 `@core`; extended, diagnostic,
 or browser-compatibility suites use separate explicit commands.
 
 Setup rejects an empty-tolerant core command or missing `@core` selector and
-checks Playwright's listed tests for every registered journey tag. The `user-crud`
-source and tag become required atomically in `USER-CRUD-JOURNEY-VERIFY-01`; until
-then the verifier continues to require the existing four implemented sources. The frontend suite
+checks Playwright's listed tests for every registered journey tag. The `task-crud`
+source and tag become required atomically in `TASK-CRUD-JOURNEY-VERIFY-01`; until
+then the verifier continues to require the existing five implemented sources. The frontend suite
 imports the Playwright configuration to require a fresh local server. Full
 verification therefore starts a fresh server and fails when core selection is
 empty.

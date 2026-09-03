@@ -115,6 +115,7 @@ class VerifyContractTests(unittest.TestCase):
         verifier = load_verify_module()
         for task_id in (
             "AUTH-JOURNEY-REVIEW-01",
+            "TASK-CRUD-JOURNEY-REVIEW-01",
             "USER-CRUD-JOURNEY-REVIEW-01",
             "USER-LOGOUT-JOURNEY-REVIEW-01",
         ):
@@ -147,6 +148,7 @@ class VerifyContractTests(unittest.TestCase):
         verifier = load_verify_module()
         for task_id in (
             "AUTH-JOURNEY-REVIEW-01",
+            "TASK-CRUD-JOURNEY-REVIEW-01",
             "USER-CRUD-JOURNEY-REVIEW-01",
             "USER-LOGOUT-JOURNEY-REVIEW-01",
         ):
@@ -406,6 +408,25 @@ class VerifyContractTests(unittest.TestCase):
                 "NOT_STARTED",
             ),
             "JOURNEY-USER-CRUD-01": ({"USER-LOGOUT-JOURNEY-REVIEW-01"}, "BLOCKED"),
+            "TASK-CRUD-CONTRACT-01": ({"JOURNEY-USER-CRUD-01"}, "IN_PROGRESS"),
+            "TASK-CRUD-STORE-01": ({"TASK-CRUD-CONTRACT-01"}, "NOT_STARTED"),
+            "TASK-CRUD-TRANSPORT-01": ({"TASK-CRUD-STORE-01"}, "NOT_STARTED"),
+            "TASK-CRUD-CREATE-01": ({"TASK-CRUD-TRANSPORT-01"}, "NOT_STARTED"),
+            "TASK-CRUD-EDIT-01": ({"TASK-CRUD-CREATE-01"}, "NOT_STARTED"),
+            "TASK-CRUD-STATUS-01": ({"TASK-CRUD-EDIT-01"}, "NOT_STARTED"),
+            "TASK-CRUD-DELETE-REGRESSION-01": (
+                {"TASK-CRUD-STATUS-01"},
+                "NOT_STARTED",
+            ),
+            "TASK-CRUD-JOURNEY-VERIFY-01": (
+                {"TASK-CRUD-DELETE-REGRESSION-01"},
+                "NOT_STARTED",
+            ),
+            "TASK-CRUD-JOURNEY-REVIEW-01": (
+                {"TASK-CRUD-JOURNEY-VERIFY-01"},
+                "NOT_STARTED",
+            ),
+            "JOURNEY-TASK-CRUD-01": ({"TASK-CRUD-JOURNEY-REVIEW-01"}, "BLOCKED"),
         }
 
         human_owned = {
@@ -414,6 +435,7 @@ class VerifyContractTests(unittest.TestCase):
             "JOURNEY-TASK-LIST-01",
             "JOURNEY-TASK-DETAIL-01",
             "JOURNEY-USER-CRUD-01",
+            "JOURNEY-TASK-CRUD-01",
             "QA-04",
         }
         ai_statuses = {"NOT_STARTED", "IN_PROGRESS", "BLOCKED", "AI_VERIFIED"}
@@ -514,6 +536,7 @@ class VerifyContractTests(unittest.TestCase):
     def test_repository_wires_approved_crud_contract(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         crud_contract = (ROOT / "docs/api/crud-openapi.yaml").read_text(encoding="utf-8")
+        project_plan = (ROOT / "docs/project-plan.md").read_text(encoding="utf-8")
         requirements = (ROOT / "docs/quality/requirements.md").read_text(encoding="utf-8")
 
         for relative in ("docs/api/crud-openapi.yaml", "src/generated/crud-openapi.ts"):
@@ -530,14 +553,27 @@ class VerifyContractTests(unittest.TestCase):
         self.assertIn("!src/generated/crud-openapi.ts", biome["files"]["includes"])
         self.assertIn("/api/sign-out:", crud_contract)
         self.assertIn("operationId: signOut", crud_contract)
+        self.assertIn("/api/task:", crud_contract)
+        self.assertIn("operationId: createTask", crud_contract)
+        self.assertIn("operationId: updateTask", crud_contract)
         for requirement_id in (
             "USER-LOGOUT-01",
             "USER-LOGOUT-02",
             "USER-LOGOUT-03",
             "USER-LOGOUT-04",
             "USER-LOGOUT-05",
+            "TASK-CRUD-01",
+            "TASK-CRUD-02",
+            "TASK-CRUD-03",
+            "TASK-CRUD-04",
+            "TASK-CRUD-05",
+            "TASK-CRUD-06",
+            "TASK-CRUD-07",
+            "TASK-CRUD-08",
         ):
             self.assertIn(requirement_id, requirements)
+        self.assertIn("여섯 Golden Journey", project_plan)
+        self.assertIn("`task-crud`", project_plan)
 
     def test_protected_core_journeys_use_authenticated_fixture(self):
         for relative in (
