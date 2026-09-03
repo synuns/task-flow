@@ -484,6 +484,7 @@ class VerifyContractTests(unittest.TestCase):
             "e2e/work-overview.spec.ts",
             "e2e/task-discovery.spec.ts",
             "e2e/task-resolution.spec.ts",
+            "e2e/user-crud.spec.ts",
             "src/mocks/fixtures/auth.ts",
             "src/mocks/fixtures/tasks.ts",
         ):
@@ -528,7 +529,7 @@ class VerifyContractTests(unittest.TestCase):
         )
         combined = result.stdout + result.stderr
         self.assertEqual(result.returncode, 0, combined)
-        for tag in ("@auth", "@work", "@task-discovery", "@task-resolution"):
+        for tag in ("@auth", "@work", "@task-discovery", "@task-resolution", "@user-crud"):
             with self.subTest(tag=tag):
                 self.assertIn(tag, combined)
         for relative in (
@@ -536,6 +537,7 @@ class VerifyContractTests(unittest.TestCase):
             "work-overview.spec.ts",
             "task-discovery.spec.ts",
             "task-resolution.spec.ts",
+            "user-crud.spec.ts",
         ):
             with self.subTest(relative=relative):
                 self.assertIn(relative, combined)

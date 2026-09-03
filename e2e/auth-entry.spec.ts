@@ -20,6 +20,7 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
       JSON.stringify([
         {
           id: "task/A",
+          ownerId: "user-1",
           title: "인코딩된 ID 할 일",
           memo: "로그인 복귀 검증",
           status: "TODO",

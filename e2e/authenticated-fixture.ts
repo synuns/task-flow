@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 
-const refreshToken = "e2e-approved-refresh-token";
+const refreshToken =
+  "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpZCI6InVzZXItMSIsImV4cCI6NDEwMjQ0NDgwMCwianRpIjoiZTJlLWFwcHJvdmVkLXJlZnJlc2gtdG9rZW4ifQ.";
 
 export async function prepareAuthenticatedPage(page: Page): Promise<void> {
   await page.addInitScript(

@@ -2853,7 +2853,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `/tmp/user-crud-delete-desktop.png`; session close 완료. User/소유 Task 영구 삭제는 store
   integration test가 증명하며 브라우저 evidence는 접근 불가만 주장한다.
 
-### [ ] USER-CRUD-JOURNEY-VERIFY-01 User CRUD Journey 통합 검증
+### [x] USER-CRUD-JOURNEY-VERIFY-01 User CRUD Journey 통합 검증
 
 - Requirements: `USER-CRUD-01`~`USER-CRUD-08`
 - Risk: HIGH — 가입부터 탈퇴까지 route/API/store 경계 통합
@@ -2865,9 +2865,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify full`, `git diff --check`
 - Browser verification: named agent-browser session, `390x844`, `1280x720`,
   console/page/network와 screenshot/trace
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; User CRUD 기능 단위 구현 완료 후
-  success/wrong-password 핵심 E2E와 Journey evidence 통합 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root`; focused 5 files/25 tests, quick hook 85 +
+  verifier 20 + Vitest 43/219, mapped User CRUD Chromium 2/2, named agent-browser
+  `user-crud-journey-verify-01` mobile/desktop, corrected full hook 85 + verifier 20 +
+  Vitest 43/219 + build + core Chromium 7/7 + verifier regression 19/19 PASS.
+  `docs/quality/evidence/user-crud.md`에 exact body, non-optimistic/failure/destructive
+  boundary, screenshots, 실패 분류와 correction/rerun을 기록함. 최초 mapped E2E 문구
+  mismatch는 `TEST`, 최초 full의 stale auth/task fixture는 `INTEGRATION/TEST`로 분류해
+  공통 fixture를 보정했고 전체 core 7/7 무재시도로 재검증함. `git diff --check` PASS.
 
 ### [ ] USER-CRUD-JOURNEY-REVIEW-01 User CRUD 계획 완료 적대적 검토
 
@@ -2880,8 +2886,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: corrected target의 focused/quick/E2E/full과
   `pnpm verify setup`, `git diff --check`
 - Browser verification: Journey evidence 재검토; correction이 UI에 영향을 주면 재실행
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; corrected full gate 완료 후 exact
+  User CRUD target의 plan-completion adversarial review 착수.
 
 ### [ ] JOURNEY-USER-CRUD-01 User CRUD 사람 checkpoint
 
