@@ -57,7 +57,7 @@ React 19와 TypeScript로 다음 업무 흐름을 제공하는 제출 가능한 
 - loading, empty, error, success 상태가 적용 가능한 화면에서 구분된다.
 - keyboard 사용, label 연결, focus 이동, modal 접근성, 반응형 layout을 확인한다.
 - format, lint, typecheck, unit/component/integration test, build, core E2E가
-  read-only `./scripts/verify full`에서 통과한다.
+  read-only `pnpm verify full`에서 통과한다.
 - console·network 오류, 비밀정보, debug 출력, 불필요한 생성물, 관련 없는 diff가
   없다.
 - `AI_USAGE.md`와 공개 AI 기록은 사람 검토 결과만 반영한다.
@@ -284,7 +284,7 @@ journey별 대표 success 하나와 critical failure 하나 이하로 유지한�
 2. `docs/coding-standards.md`와 requirement ID, acceptance를 다시 확인한다.
 3. 위험을 분류하고 HIGH면 구현 전에 사람 결정을 요청한다.
 4. 가장 낮은 적합 test level에서 실패 test를 만든다.
-5. 최소 구현 후 대상 test와 `./scripts/verify quick`을 실행한다.
+5. 최소 구현 후 대상 test와 `pnpm verify quick`을 실행한다.
 6. 적용 가능한 browser behavior를 확인하고 evidence를 기록한다.
 7. 실패를 분류하고 root cause를 수정한 뒤 같은 gate를 재실행한다.
 8. TODO 상태와 requirement evidence를 갱신한다.
@@ -315,7 +315,7 @@ only when plan path, requirement/Journey IDs, and target commit are identical.
 
 승인된 scaffold 설계에 따라 React/Vite, quality scripts, token/font,
 OpenAPI generation, MSW, test/browser smoke를 준비한다. Exit:
-`./scripts/verify quick`과 `./scripts/verify full`이 mutation 없이 통과한다.
+`pnpm verify quick`과 `pnpm verify full`이 mutation 없이 통과한다.
 
 ### 2. 애플리케이션 구조·공통 경계
 
@@ -352,7 +352,7 @@ evidence, review가 준비되고 사람 checkpoint를 요청한다.
 
 journey 간 auth transition, stale cache, API error, mock/OAS 일관성, 반응형,
 접근성, AI disclosure를 교차 검토한다. Exit: full adversarial review와
-`./scripts/verify full`이 통과하고 최종 사람 acceptance를 요청한다.
+`pnpm verify full`이 통과하고 최종 사람 acceptance를 요청한다.
 
 ## 변경 관리
 

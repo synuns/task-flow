@@ -2595,3 +2595,17 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   verifier regression 19/19; 기존 non-failing Vite chunk-size advisory 외 unresolved finding
   없음. 이 상태는 AI 검증 완료이며 새로운 `HUMAN_APPROVED` 또는 최종 acceptance를
   주장하지 않음
+### [ ] QA-PNPM-VERIFY-01 pnpm 검증 진입점 통일
+
+- Requirements: `SYS-01`
+- Risk: LOW — 검증 동작을 유지하는 package script와 명령 표기 변경
+- Depends on: `QA-HARNESS-01`
+- Deliverable: `package.json`의 `verify` script와 pnpm 기반 canonical 검증 명령
+- Acceptance: `pnpm verify [setup|quick|full]`이 기존 read-only verifier에 인자를
+  전달하고, 현재 실행 문서와 verifier 안내가 pnpm 명령을 사용한다.
+- Automatic verification: focused verifier contract test, `pnpm verify quick`,
+  `git diff --check`
+- Browser verification: 적용 없음 — 제품 UI 동작 변경 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root`; branch `chore/pnpm-verify`; baseline
+  `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/169 tests.

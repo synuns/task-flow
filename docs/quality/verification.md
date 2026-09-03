@@ -3,10 +3,10 @@
 ## Canonical Commands
 
 ```bash
-./scripts/verify setup
-./scripts/verify quick
-./scripts/verify full
-./scripts/verify
+pnpm verify setup
+pnpm verify quick
+pnpm verify full
+pnpm verify
 ```
 
 No argument means `full`. Every verification mode is read-only and compares a
@@ -44,7 +44,7 @@ is separate:
 pnpm run format
 ```
 
-Review the resulting diff and run `./scripts/verify quick`. No verify command
+Review the resulting diff and run `pnpm verify quick`. No verify command
 may call `pnpm run format` or another write-mode formatter.
 
 ## Test-Level Selection
@@ -83,10 +83,10 @@ environments, then run:
 ```bash
 pnpm install --frozen-lockfile
 pnpm exec playwright install chromium
-./scripts/verify full
+pnpm verify full
 ```
 
-`./scripts/verify full` is the final verdict in both environments. Playwright
+`pnpm verify full` is the final verdict in both environments. Playwright
 keeps one retry only for diagnostics and `failOnFlakyTests: true` makes a flaky
 result fail the gate.
 

@@ -21,7 +21,8 @@
     "test:e2e:smoke": "env -u NO_COLOR playwright test e2e/scaffold.smoke.spec.ts",
     "api:types": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts",
     "api:types:check": "openapi-typescript assignment-original/openapi.yaml -o src/generated/openapi.ts --check",
-    "ai:review": "./scripts/review-ai-record"
+    "ai:review": "./scripts/review-ai-record",
+    "verify": "./scripts/verify"
   },
   "dependencies": {
     "@tanstack/react-query": "5.102.8",

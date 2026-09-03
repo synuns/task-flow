@@ -168,7 +168,7 @@ class VerifyCliTests(unittest.TestCase):
     def test_unknown_mode_fails(self):
         result = self.run_verify("unknown")
         self.assertEqual(result.returncode, 2)
-        self.assertIn("usage:", result.stderr)
+        self.assertIn("usage: pnpm verify [setup|quick|full]", result.stderr)
 
     def test_verify_is_read_only(self):
         before = subprocess.check_output(

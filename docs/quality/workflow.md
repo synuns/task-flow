@@ -5,7 +5,7 @@
 1. Select requirement IDs and acceptance conditions from `requirements.md`.
 2. Classify risk and choose one independently testable unit.
 3. Implement the smallest change and its appropriate automated test.
-4. Run `./scripts/verify quick`.
+4. Run `pnpm verify quick`.
 5. Run applicable browser checks and record evidence.
 6. Classify failures, correct root cause, and rerun the failed gate.
 7. Record evidence and continue low-risk work.
@@ -13,7 +13,7 @@
    plan-completion adversarial review before marking the plan-backed TODO item done.
 9. At a completed golden journey, reuse that review when the target is identical;
    otherwise review only the missing journey scope, then ask for one checkpoint.
-10. After all journeys, run full adversarial review, `./scripts/verify full`, and
+10. After all journeys, run full adversarial review, `pnpm verify full`, and
     final QA.
 11. Ask a person for final acceptance. AI never declares human acceptance.
 
@@ -183,7 +183,7 @@ selects, confirms, or publishes a record for a person. See `verification.md` and
 - [ ] Every requirement row has reproducible evidence and correct status.
 - [ ] All four journey checkpoints are human-approved.
 - [ ] Full adversarial review findings are resolved.
-- [ ] `./scripts/verify full` passes on the intended submission commit.
+- [ ] `pnpm verify full` passes on the intended submission commit.
 - [ ] Core browser evidence exists for all four journeys.
 - [ ] Auth, navigation, stale state, errors, and regressions were cross-checked.
 - [ ] Console and network errors were reviewed.

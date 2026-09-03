@@ -39,8 +39,8 @@ review → request one human checkpoint → run full review and final QA.
 
 Before changing code, locate the applicable Journey by searching requirement ID,
 route, API path, or symbol across `docs/quality/requirements.md`, `TODO.md`, `src`,
-and `e2e`. After the lowest sufficient focused test, run `./scripts/verify quick`
-and the mapped Journey E2E before `./scripts/verify full`.
+and `e2e`. After the lowest sufficient focused test, run `pnpm verify quick`
+and the mapped Journey E2E before `pnpm verify full`.
 
 작업 시작 시 `TODO.md`에서 의존성이 해소된 작업 하나를 선택하고, 종료 전
 상태와 재현 가능한 evidence를 갱신한다. 상위 목표·범위·단계는
@@ -62,13 +62,13 @@ Implementation plan 실행은 격리 worktree를 기본으로 한다. 현재 che
 ## Commands
 
 ```bash
-./scripts/verify setup
-./scripts/verify quick
-./scripts/verify full
+pnpm verify setup
+pnpm verify quick
+pnpm verify full
 ```
 
 Verification is read-only. `pnpm run format` is a separate mutation command;
-review its diff and rerun `./scripts/verify quick` afterward.
+review its diff and rerun `pnpm verify quick` afterward.
 
 ## Evidence and AI Records
 

@@ -156,14 +156,14 @@ def verify_setup():
             path = ROOT / relative
             if not path.is_file():
                 return fail(
-                    "setup", "missing {}".format(relative), "./scripts/verify setup"
+                    "setup", "missing {}".format(relative), "pnpm verify setup"
                 )
         todo_errors = verify_todo_consistency(ROOT)
         if todo_errors:
             return fail(
                 "setup",
                 "TODO state invalid: {}".format(", ".join(todo_errors)),
-                "./scripts/verify setup",
+                "pnpm verify setup",
             )
         ignored = subprocess.run(
             ["git", "check-ignore", "-q", ".codex/review-pending/probe.md"],
@@ -181,21 +181,21 @@ def verify_setup():
         stop_command = hook_command("Stop")
         session_end_command = hook_command("SessionEnd")
     except Exception as error:
-        return fail("setup", "validation error: {}".format(error), "./scripts/verify setup")
+        return fail("setup", "validation error: {}".format(error), "pnpm verify setup")
     if ".codex/hooks/session_hook.py" not in stop_command:
-        return fail("setup", "Stop hook exporter missing", "./scripts/verify setup")
+        return fail("setup", "Stop hook exporter missing", "pnpm verify setup")
     if ".codex/hooks/session_hook.py" not in session_end_command:
         return fail(
             "setup",
             "SessionEnd hook dispatcher missing",
-            "./scripts/verify setup",
+            "pnpm verify setup",
         )
     tooling_errors = verify_review_tooling(ROOT)
     if tooling_errors:
         return fail(
             "setup",
             "review tooling invalid: {}".format(", ".join(tooling_errors)),
-            "./scripts/verify setup",
+            "pnpm verify setup",
         )
     print("PASS setup")
     hook_result = run_stage(
@@ -391,7 +391,7 @@ def require_frontend_scripts(scripts):
         return fail(
             "frontend-scripts",
             "missing package scripts: {}".format(", ".join(missing)),
-            "./scripts/verify full",
+            "pnpm verify full",
         )
     return 0
 
@@ -431,7 +431,7 @@ def verify_frontend(mode):
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     if len(args) > 1 or (args and args[0] not in MODES):
-        print("usage: ./scripts/verify [setup|quick|full]", file=sys.stderr)
+        print("usage: pnpm verify [setup|quick|full]", file=sys.stderr)
         return 2
     mode = args[0] if args else "full"
     try:
@@ -468,7 +468,7 @@ def main(argv=None):
         result = fail(
             "verification",
             "unexpected stage error: {}".format(error),
-            "./scripts/verify {}".format(mode),
+            "pnpm verify {}".format(mode),
         )
     finally:
         try:

@@ -42,9 +42,9 @@ pnpm preview
 ## 검증
 
 ```bash
-./scripts/verify setup
-./scripts/verify quick
-./scripts/verify full
+pnpm verify setup
+pnpm verify quick
+pnpm verify full
 ```
 
 `full`은 format, lint, typecheck, unit test, production build와 네 core Journey의

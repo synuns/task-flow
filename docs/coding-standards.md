@@ -49,7 +49,7 @@ production behavior 변경은 다음 RED–GREEN–REFACTOR 순서를 따른다.
 5. 대상 test와 인접 suite를 실행해 GREEN을 확인한다.
 6. 모든 test가 green인 상태에서만 중복 제거, naming 개선, 작은 module 추출을
    수행한다.
-7. refactor 뒤 대상 suite와 `./scripts/verify quick`을 다시 실행한다.
+7. refactor 뒤 대상 suite와 `pnpm verify quick`을 다시 실행한다.
 
 production code를 먼저 작성했으면 해당 변경을 유지한 채 test를 맞추지 않는다.
 변경을 되돌리고 실패 test부터 다시 시작한다. bugfix는 반드시 재현 test가
@@ -356,8 +356,8 @@ snapshot, screenshot 경로만 남기고 pass라고 쓰지 않는다. expected�
 
 - 한 commit은 한 testable unit만 담는다.
 - 작업 전후 `git status --short`, `git diff --stat`, `git diff`를 확인한다.
-- formatter는 `npm run format`으로 별도 실행하고 diff 검토 뒤
-  `./scripts/verify quick`을 재실행한다.
+- formatter는 `pnpm run format`으로 별도 실행하고 diff 검토 뒤
+  `pnpm verify quick`을 재실행한다.
 - generated diff와 hand-written diff를 구분해 review한다.
 - 사용자 또는 다른 agent가 만든 관련 없는 변경을 수정·삭제·commit하지 않는다.
 - dead code 제거와 rename은 현재 acceptance에 필요한 범위만 수행한다.
@@ -396,6 +396,6 @@ snapshot, screenshot 경로만 남기고 pass라고 쓰지 않는다. expected�
 - [ ] 적용 가능한 접근성과 responsive 상태를 검증했다.
 - [ ] agent-browser로 action, snapshot, console, network, screenshot/trace를
       기록하고 session을 닫았다.
-- [ ] 대상 test와 `./scripts/verify quick`이 read-only로 통과했다.
+- [ ] 대상 test와 `pnpm verify quick`이 read-only로 통과했다.
 - [ ] diff에 사용자 변경, secret, debug, 생성 noise, 관련 없는 수정이 없다.
 - [ ] TODO와 requirement evidence를 갱신했다.

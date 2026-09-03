@@ -454,6 +454,7 @@ class VerifyContractTests(unittest.TestCase):
         package = verifier.package_document()
 
         self.assertEqual(package["packageManager"], "pnpm@10.15.1")
+        self.assertEqual(package["scripts"]["verify"], "./scripts/verify")
         for relative in (
             "pnpm-lock.yaml",
             "e2e/authenticated-fixture.ts",
