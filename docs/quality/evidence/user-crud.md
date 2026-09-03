@@ -69,3 +69,26 @@ introduced: the approved refresh token was not a JWT carrying `user-1`, and auth
 Task omitted `ownerId`. Class: `INTEGRATION/TEST`. The common refresh fixture now carries the
 seed user identity and the custom Task carries `ownerId: user-1`. Focused auth-entry rerun passed
 1/1, then core passed 7/7, and the complete full gate passed 7/7 again without retries.
+
+## USER-CRUD-JOURNEY-REVIEW-01
+
+- Review target: implementation base `9ea74883b989c3e08d661b09b9548ba80a4852f3` through
+  `27d07dc136adae16bd77200f4cf7a61a6e01fbfe`, checked against
+  `docs/superpowers/plans/2026-09-03-user-crud-journey.md` and `USER-CRUD-01`~`08`.
+- Reviewer: Codex `/root`, fresh second-pass plan-completion review after the implementation and
+  Journey verification tasks were closed.
+- Checks: original `assignment-original/openapi.yaml` and `src/generated/openapi.ts` unchanged;
+  CRUD extension/generated/runtime/MSW shapes; no credential in public responses; exact
+  one-field PATCH; cache unchanged before mutation success; outcome-unknown POST without automatic
+  retry; fieldless 400 as form/row alert; wrong-password state preservation; User/owned-Task store
+  cascade; post-delete protected access; responsive/accessibility browser evidence; dependency and
+  FSD architecture diff.
+- Findings: unresolved HIGH, MEDIUM, LOW findings 없음.
+- Corrections: this review task required no product, test, or documentation correction.
+- Rerun: generated contract check plus focused Vitest 10 files/52 tests PASS; `pnpm verify quick`
+  PASS with hook 85, verifier 20, Vitest 43 files/219 tests; mapped User CRUD Chromium 2/2 PASS;
+  `pnpm verify full` PASS with build, core Chromium 7/7 without retry, verifier regression 19/19,
+  and read-only fingerprint check. Existing named browser session and both viewport evidence were
+  re-reviewed; no UI correction triggered a browser rerun. `git diff --check` PASS.
+- Verdict: PASS for AI plan-completion review. Golden Journey acceptance remains the following
+  human checkpoint; no human decision is claimed here.

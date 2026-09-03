@@ -2875,7 +2875,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   mismatch는 `TEST`, 최초 full의 stale auth/task fixture는 `INTEGRATION/TEST`로 분류해
   공통 fixture를 보정했고 전체 core 7/7 무재시도로 재검증함. `git diff --check` PASS.
 
-### [ ] USER-CRUD-JOURNEY-REVIEW-01 User CRUD 계획 완료 적대적 검토
+### [x] USER-CRUD-JOURNEY-REVIEW-01 User CRUD 계획 완료 적대적 검토
 
 - Requirements: `USER-CRUD-01`~`USER-CRUD-08`, `user-crud`
 - Risk: HIGH — 사람 checkpoint 전 exact target의 독립 재검토
@@ -2886,9 +2886,17 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: corrected target의 focused/quick/E2E/full과
   `pnpm verify setup`, `git diff --check`
 - Browser verification: Journey evidence 재검토; correction이 UI에 영향을 주면 재실행
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; corrected full gate 완료 후 exact
-  User CRUD target의 plan-completion adversarial review 착수.
+- Status: AI_VERIFIED
+- Evidence: Review target: `9ea74883b989c3e08d661b09b9548ba80a4852f3`..
+  `27d07dc136adae16bd77200f4cf7a61a6e01fbfe`, User CRUD plan과 `USER-CRUD-01`~`08`;
+  Reviewer: 2026-09-03 Codex `/root` fresh second-pass; Checks: 원본 OpenAPI 무변경,
+  extension/generated/runtime/MSW, credential 비공개, one-field PATCH, 비낙관 cache,
+  POST outcome-unknown, fieldless 400, wrong-password 보존, User/Task cascade, 보호 route,
+  responsive/accessibility, dependency/FSD diff; Findings: unresolved HIGH/MEDIUM/LOW 없음;
+  Corrections: 적용 없음; Rerun: generated check + focused 10 files/52 tests, quick hook 85 +
+  verifier 20 + Vitest 43/219, mapped Chromium 2/2, full build + core Chromium 7/7 무재시도 +
+  verifier regression 19/19 + read-only check, `git diff --check` PASS; Verdict: PASS. 상세 기록은
+  `docs/quality/evidence/user-crud.md`이며 사람 결정은 주장하지 않음.
 
 ### [ ] JOURNEY-USER-CRUD-01 User CRUD 사람 checkpoint
 
@@ -2900,4 +2908,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: 적용 없음 — 사람 결정 gate
 - Browser verification: `docs/quality/evidence/user-crud.md`의 named evidence 검토
 - Status: BLOCKED
-- Evidence: 사람 checkpoint 전 단계가 완료되지 않아 승인 없음; AI가 승인 상태를 기록하지 않음.
+- Evidence: exact review target `27d07dc136adae16bd77200f4cf7a61a6e01fbfe`에 대한 AI
+  Verdict PASS와 focused/quick/E2E/browser/full 근거를
+  `docs/quality/evidence/user-crud.md`에 연결하고 사람 checkpoint를 요청할 준비가 됨.
+  사람 결정 근거 없음; AI가 `HUMAN_APPROVED` 상태를 기록하지 않음.
