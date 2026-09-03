@@ -113,37 +113,39 @@ class VerifyContractTests(unittest.TestCase):
 
     def test_todo_rejects_completed_review_without_review_record(self):
         verifier = load_verify_module()
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "TODO.md").write_text(
-                """### [x] AUTH-JOURNEY-REVIEW-01 review
+        for task_id in ("AUTH-JOURNEY-REVIEW-01", "USER-CRUD-JOURNEY-REVIEW-01"):
+            with self.subTest(task_id=task_id), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "TODO.md").write_text(
+                    f"""### [x] {task_id} review
 - Depends on: 없음
 - Status: AI_VERIFIED
 - Evidence: quick PASS
 """,
-                encoding="utf-8",
-            )
-            errors = verifier.verify_todo_consistency(root)
+                    encoding="utf-8",
+                )
+                errors = verifier.verify_todo_consistency(root)
 
-            self.assertEqual(len(errors), 1)
-            self.assertIn("AUTH-JOURNEY-REVIEW-01 missing review evidence", errors[0])
-            for field in (
-                "Review target:",
-                "Reviewer:",
-                "Checks:",
-                "Findings:",
-                "Corrections:",
-                "Rerun:",
-                "Verdict:",
-            ):
-                self.assertIn(field, errors[0])
+                self.assertEqual(len(errors), 1)
+                self.assertIn(f"{task_id} missing review evidence", errors[0])
+                for field in (
+                    "Review target:",
+                    "Reviewer:",
+                    "Checks:",
+                    "Findings:",
+                    "Corrections:",
+                    "Rerun:",
+                    "Verdict:",
+                ):
+                    self.assertIn(field, errors[0])
 
     def test_todo_accepts_completed_review_record(self):
         verifier = load_verify_module()
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "TODO.md").write_text(
-                """### [x] AUTH-JOURNEY-REVIEW-01 review
+        for task_id in ("AUTH-JOURNEY-REVIEW-01", "USER-CRUD-JOURNEY-REVIEW-01"):
+            with self.subTest(task_id=task_id), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "TODO.md").write_text(
+                    f"""### [x] {task_id} review
 - Depends on: 없음
 - Status: AI_VERIFIED
 - Evidence: Review target: plan, AUTH, abc123
@@ -154,9 +156,9 @@ class VerifyContractTests(unittest.TestCase):
   Rerun: quick PASS
   Verdict: PASS
 """,
-                encoding="utf-8",
-            )
-            self.assertEqual(verifier.verify_todo_consistency(root), [])
+                    encoding="utf-8",
+                )
+                self.assertEqual(verifier.verify_todo_consistency(root), [])
 
     def test_todo_rejects_unapproved_checkpoint_claim(self):
         verifier = load_verify_module()
@@ -366,6 +368,25 @@ class VerifyContractTests(unittest.TestCase):
                 },
                 "BLOCKED",
             ),
+            "USER-CRUD-LOOP-DESIGN-01": (
+                {"CRUD-IMPLEMENTATION-PLANS-01"},
+                "IN_PROGRESS",
+            ),
+            "USER-CRUD-CONTRACT-01": (
+                {"USER-CRUD-LOOP-DESIGN-01"},
+                "NOT_STARTED",
+            ),
+            "USER-CRUD-STORE-01": ({"USER-CRUD-CONTRACT-01"}, "NOT_STARTED"),
+            "USER-CRUD-TRANSPORT-01": ({"USER-CRUD-STORE-01"}, "NOT_STARTED"),
+            "USER-CRUD-SIGNUP-01": ({"USER-CRUD-TRANSPORT-01"}, "NOT_STARTED"),
+            "USER-CRUD-PROFILE-01": ({"USER-CRUD-SIGNUP-01"}, "NOT_STARTED"),
+            "USER-CRUD-DELETE-01": ({"USER-CRUD-PROFILE-01"}, "NOT_STARTED"),
+            "USER-CRUD-JOURNEY-VERIFY-01": ({"USER-CRUD-DELETE-01"}, "NOT_STARTED"),
+            "USER-CRUD-JOURNEY-REVIEW-01": (
+                {"USER-CRUD-JOURNEY-VERIFY-01"},
+                "NOT_STARTED",
+            ),
+            "JOURNEY-USER-CRUD-01": ({"USER-CRUD-JOURNEY-REVIEW-01"}, "BLOCKED"),
         }
 
         human_owned = {
@@ -373,6 +394,7 @@ class VerifyContractTests(unittest.TestCase):
             "JOURNEY-WORK-01",
             "JOURNEY-TASK-LIST-01",
             "JOURNEY-TASK-DETAIL-01",
+            "JOURNEY-USER-CRUD-01",
             "QA-04",
         }
         ai_statuses = {"NOT_STARTED", "IN_PROGRESS", "BLOCKED", "AI_VERIFIED"}

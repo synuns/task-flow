@@ -2685,3 +2685,154 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `git diff --exit-code -- assignment-original pnpm-lock.yaml` PASS,
   `git diff --check` PASS, `pnpm verify setup` PASS — hook 85, verifier 19;
   Verdict: PASS, browser 적용 없음 — 계획 문서만 변경.
+
+## 9. User CRUD Journey 구현
+
+### [x] USER-CRUD-LOOP-DESIGN-01 User CRUD 실행 루프 설계
+
+- Requirements: `USER-CRUD-01`~`USER-CRUD-08`
+- Risk: LOW — 승인된 제품 설계를 기존 검증 정책에 맞는 실행 루프로 구체화
+- Depends on: `CRUD-IMPLEMENTATION-PLANS-01`
+- Deliverable:
+  `docs/superpowers/specs/2026-09-03-user-crud-loop-engineering-design.md`
+- Acceptance: task claim부터 RED/GREEN, focused/quick/browser/evidence/commit과 최종
+  E2E/full/adversarial review/사람 checkpoint까지 dependency graph로 연결된다.
+- Automatic verification: focused verifier contract tests, `pnpm verify setup`,
+  `git diff --check`
+- Browser verification: 적용 없음 — 실행 제어 문서와 verifier 변경만 포함
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; branch `feat/user-crud`,
+  worktree `.worktrees/user-crud`; baseline `pnpm verify quick` PASS — hook 85,
+  verifier 19, Vitest 39 files/182 tests; verifier RED에서
+  `USER-CRUD-LOOP-DESIGN-01` backlog 누락과 `USER-CRUD-JOURNEY-REVIEW-01`의 필수
+  review record 미검증을 2 failures로 재현; loop design, 10-block dependency graph와
+  verifier review owner를 추가한 뒤 focused 3/3 GREEN; task/RED/GREEN/verification/
+  browser/failure/evidence/사람 gate coverage self-review PASS; `pnpm verify setup`
+  PASS — hook 85, verifier 19; `git diff --check` PASS; browser 적용 없음.
+
+### [ ] USER-CRUD-CONTRACT-01 User CRUD 확장 계약 등록
+
+- Requirements: `USER-CRUD-03`, `USER-CRUD-04`, `USER-CRUD-06`
+- Risk: HIGH — 승인된 원본 밖 API를 별도 authoritative contract로 추가
+- Depends on: `USER-CRUD-LOOP-DESIGN-01`
+- Deliverable: `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`,
+  User CRUD requirement/verification map
+- Acceptance: 원본 OpenAPI를 바꾸지 않고 User POST/GET/PATCH/DELETE의 exact schema와
+  generated type, verifier와 quality map이 일치한다.
+- Automatic verification: OpenAPI contract Vitest, generated diff check,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — API·문서 contract task
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; loop 설계 검증 뒤 승인된
+  User CRUD extension OpenAPI와 quality map의 첫 RED 착수.
+
+### [ ] USER-CRUD-STORE-01 사용자 저장소와 Task 소유권 구현
+
+- Requirements: `USER-CRUD-03`, `USER-CRUD-06`, `USER-CRUD-07`
+- Risk: HIGH — credential, auth identity와 영구 삭제 cascade 의미 구현
+- Depends on: `USER-CRUD-CONTRACT-01`
+- Deliverable: resettable User store, user-ID auth fixture, owner-aware Task store
+- Acceptance: canonical 가입/인증/수정/탈퇴와 wrong-password 무변경, User와 소유
+  Task cascade가 store integration에서 증명된다.
+- Automatic verification: user/auth/task fixture와 handler Vitest,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — fixture/store integration task
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] USER-CRUD-TRANSPORT-01 User entity와 API boundary 구현
+
+- Requirements: `USER-CRUD-03`~`USER-CRUD-08`
+- Risk: MEDIUM — generated DTO, runtime guard와 MSW mutation 연결
+- Depends on: `USER-CRUD-STORE-01`
+- Deliverable: `entities/user`, User query key, shared User CRUD API와 handlers
+- Acceptance: 네 endpoint가 exact method/path/body/status/response를 사용하고 credential은
+  public entity에 노출되지 않는다.
+- Automatic verification: user API/handler/architecture Vitest,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — transport/entity task
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] USER-CRUD-SIGNUP-01 회원가입 화면과 진입 UX 구현
+
+- Requirements: `USER-CRUD-01`~`USER-CRUD-03`, `USER-CRUD-08`
+- Risk: MEDIUM — public route, form validation과 결과 미확정 처리
+- Depends on: `USER-CRUD-TRANSPORT-01`
+- Deliverable: `/sign-up`, 로그인 form link, 가입 schema/form와 outcome-unknown UI
+- Acceptance: email/password/confirmation/name만 검증·전송하고 201은 sign-in으로,
+  409만 email field로, 나머지 server 오류는 form alert로 처리한다.
+- Automatic verification: sign-up schema/component/router/auth-boundary Vitest,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: `390x844`, `1280x720` form, error, focus와 route probe
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] USER-CRUD-PROFILE-01 회원정보 한 필드 수정 UX 구현
+
+- Requirements: `USER-CRUD-04`, `USER-CRUD-05`, `USER-CRUD-08`
+- Risk: MEDIUM — query cache와 server-authoritative field mutation
+- Depends on: `USER-CRUD-SIGNUP-01`
+- Deliverable: read-only email, name/memo 연필→체크/X 수정 UI
+- Acceptance: 한 번에 한 field만 편집하고 success 전 표시/cache 불변, 실패 시 draft와
+  server value를 보존하며 field 없는 400을 행 alert로 표시한다.
+- Automatic verification: update-user와 user-profile component Vitest,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: 두 viewport icon label, focus 진입/복원과 실패 상태
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] USER-CRUD-DELETE-01 비밀번호 확인 회원 탈퇴 구현
+
+- Requirements: `USER-CRUD-06`~`USER-CRUD-08`
+- Risk: HIGH — 계정·Task 영구 삭제와 session/cache 종료
+- Depends on: `USER-CRUD-PROFILE-01`
+- Deliverable: password confirmation dialog, delete mutation과 기존 auth termination 연결
+- Acceptance: wrong password와 결과 미확정은 계정/Task/session을 바꾸지 않고 200만
+  session/cache 제거와 `/sign-in` 이동을 만든다.
+- Automatic verification: delete-user/profile/store/handler Vitest,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: 두 viewport dialog focus, close lock, 실패와 success 전환
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] USER-CRUD-JOURNEY-VERIFY-01 User CRUD Journey 통합 검증
+
+- Requirements: `USER-CRUD-01`~`USER-CRUD-08`
+- Risk: HIGH — 가입부터 탈퇴까지 route/API/store 경계 통합
+- Depends on: `USER-CRUD-DELETE-01`
+- Deliverable: `e2e/user-crud.spec.ts`, `docs/quality/evidence/user-crud.md`
+- Acceptance: success와 wrong-password critical failure가 독립 fixture에서 통과하고,
+  삭제의 영구성은 store integration으로 분리 증명된다.
+- Automatic verification: focused suite, `pnpm verify quick`, mapped User CRUD E2E,
+  `pnpm verify full`, `git diff --check`
+- Browser verification: named agent-browser session, `390x844`, `1280x720`,
+  console/page/network와 screenshot/trace
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] USER-CRUD-JOURNEY-REVIEW-01 User CRUD 계획 완료 적대적 검토
+
+- Requirements: `USER-CRUD-01`~`USER-CRUD-08`, `user-crud`
+- Risk: HIGH — 사람 checkpoint 전 exact target의 독립 재검토
+- Depends on: `USER-CRUD-JOURNEY-VERIFY-01`
+- Deliverable: User CRUD evidence의 7-field review record
+- Acceptance: OpenAPI/auth/ownership/UI/mutation/error/E2E/browser/회귀 범위에 unresolved
+  HIGH/MEDIUM finding이 없다.
+- Automatic verification: corrected target의 focused/quick/E2E/full과
+  `pnpm verify setup`, `git diff --check`
+- Browser verification: Journey evidence 재검토; correction이 UI에 영향을 주면 재실행
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] JOURNEY-USER-CRUD-01 User CRUD 사람 checkpoint
+
+- Requirements: `USER-CRUD-01`~`USER-CRUD-08`, `user-crud`
+- Risk: HIGH — User CRUD Golden Journey acceptance는 사람 소유
+- Depends on: `USER-CRUD-JOURNEY-REVIEW-01`
+- Deliverable: automatic/browser/review evidence에 대한 사람 결정
+- Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
+- Automatic verification: 적용 없음 — 사람 결정 gate
+- Browser verification: `docs/quality/evidence/user-crud.md`의 named evidence 검토
+- Status: BLOCKED
+- Evidence: 사람 checkpoint 전 단계가 완료되지 않아 승인 없음; AI가 승인 상태를 기록하지 않음.

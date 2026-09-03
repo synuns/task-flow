@@ -31,7 +31,7 @@
 ```bash
 cd /Users/identity/dev/assignment/kbhc-assgn
 git status --short
-user_plan_target=$(git rev-parse docs/crud-journey-design)
+user_plan_target=$(git rev-parse main)
 git worktree add .worktrees/user-crud -b feat/user-crud "$user_plan_target"
 cd .worktrees/user-crud
 pnpm install --frozen-lockfile
@@ -43,6 +43,7 @@ Expected: branch `feat/user-crud`, clean worktree, 이 plan과 승인된 spec이
 ## File Map
 
 - Add: `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`
+- Add: `docs/superpowers/specs/2026-09-03-user-crud-loop-engineering-design.md`
 - Modify: `package.json`, `src/shared/api/openapi-contract.test.ts`, `scripts/verify`, `tests/test_verify_contract.py`
 - Modify: `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
 - Add: `src/entities/user/model/user.ts`, `src/entities/user/model/user-keys.ts`, `src/entities/user/index.ts`
@@ -105,41 +106,53 @@ export function removeTasksByOwner(ownerId: string): number;
 
 ---
 
+### Task 0: `USER-CRUD-LOOP-DESIGN-01` 실행 루프와 backlog를 고정한다
+
+**Files:** `docs/superpowers/specs/2026-09-03-user-crud-loop-engineering-design.md`, `tests/test_verify_contract.py`, `scripts/verify`, `TODO.md`, this plan
+
+- [ ] **Step 1: verifier backlog/review 기대를 먼저 RED로 만든다**
+
+`tests/test_verify_contract.py`에 `USER-CRUD-LOOP-DESIGN-01`부터
+`JOURNEY-USER-CRUD-01`까지 dependency graph와 User review의 필수 7개 evidence field
+기대를 추가한다.
+
+```bash
+python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_rejects_completed_review_without_review_record tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
+```
+
+Expected RED: loop/TODO blocks와 `USER-CRUD-JOURNEY-REVIEW-01` verifier owner가 없다.
+
+- [ ] **Step 2: 루프 설계, TODO graph와 verifier owner를 추가한다**
+
+루프 문서는 task claim→lookup→RED→GREEN→focused→quick→browser/evidence→commit과
+최종 E2E/full/adversarial review/사람 checkpoint를 정의한다. TODO에는 첫 loop task만
+`IN_PROGRESS`, 구현 task들은 `NOT_STARTED`, 사람 checkpoint는 `[ ]`, `BLOCKED`로
+등록한다. `scripts/verify` review task set에 User review ID를 추가한다.
+
+- [ ] **Step 3: GREEN과 문서 검증 뒤 loop task를 닫는다**
+
+```bash
+python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_rejects_completed_review_without_review_record tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
+pnpm verify setup
+git diff --check
+git add docs/superpowers/specs/2026-09-03-user-crud-loop-engineering-design.md docs/superpowers/plans/2026-09-03-user-crud-journey.md tests/test_verify_contract.py scripts/verify TODO.md
+git commit -m "docs(user): User CRUD 실행 루프 설계"
+```
+
+---
+
 ### Task 1: `USER-CRUD-CONTRACT-01` 확장 계약과 작업 통제면을 추가한다
 
 **Files:** `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`, `package.json`, `src/shared/api/openapi-contract.test.ts`, `scripts/verify`, `tests/test_verify_contract.py`, `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
 
-- [ ] **Step 1: Journey를 다시 찾는다**
+- [ ] **Step 1: loop task를 닫고 contract task를 claim한 뒤 Journey를 다시 찾는다**
 
 ```bash
 rg -n 'USER-CRUD|/api/user|UserResponse|/sign-up|userKeys' docs/quality/requirements.md TODO.md src e2e assignment-original
 git status --short
 ```
 
-- [ ] **Step 2: verifier의 새 backlog/review 기대를 먼저 RED로 만든다**
-
-`tests/test_verify_contract.py`의 granular backlog expectation에
-`USER-CRUD-CONTRACT-01`부터 `JOURNEY-USER-CRUD-01`까지의 dependency/status를
-추가하고, completed review record test가 `USER-CRUD-JOURNEY-REVIEW-01`에도 필수
-review fields를 요구하게 한다.
-
-```bash
-python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
-```
-
-Expected RED: TODO block과 verifier review task 등록이 아직 없다.
-
-- [ ] **Step 3: TODO task와 verifier review owner를 등록한다**
-
-`USER-CRUD-CONTRACT-01`, `USER-CRUD-STORE-01`, `USER-CRUD-TRANSPORT-01`, `USER-CRUD-SIGNUP-01`, `USER-CRUD-PROFILE-01`, `USER-CRUD-DELETE-01`, `USER-CRUD-JOURNEY-VERIFY-01`, `USER-CRUD-JOURNEY-REVIEW-01`, `JOURNEY-USER-CRUD-01` block을 acceptance/verification/evidence 필드와 함께 추가한다. 첫 task만 `IN_PROGRESS`, 구현 task들은 `NOT_STARTED`, 사람 checkpoint는 `[ ]`, `BLOCKED`로 둔다. `scripts/verify`의 `review_tasks` set에는 새 review ID를 추가한다.
-
-```bash
-python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
-```
-
-Expected GREEN: 두 verifier tests PASS.
-
-- [ ] **Step 4: extension contract가 없음을 실패로 고정한다**
+- [ ] **Step 2: extension contract가 없음을 실패로 고정한다**
 
 `src/shared/api/openapi-contract.test.ts`에 다음 contract check를 추가한다.
 
@@ -159,7 +172,7 @@ pnpm vitest run src/shared/api/openapi-contract.test.ts
 
 Expected RED: `@/generated/crud-openapi`을 찾을 수 없다.
 
-- [ ] **Step 5: 최소 User OpenAPI를 작성하고 생성 script를 확장한다**
+- [ ] **Step 3: 최소 User OpenAPI를 작성하고 생성 script를 확장한다**
 
 `docs/api/crud-openapi.yaml`은 OpenAPI 3.0.3 문서로 `/api/user`의 POST/GET/PATCH/DELETE, bearer security, 201/200/400/401/409와 exact schemas만 정의한다. 핵심 union은 다음처럼 `oneOf`와 `additionalProperties: false`를 사용한다.
 
@@ -200,11 +213,11 @@ pnpm vitest run src/shared/api/openapi-contract.test.ts
 
 Expected GREEN: contract test PASS, 원본 `src/generated/openapi.ts` diff 없음.
 
-- [ ] **Step 6: requirement와 verification map을 확장한다**
+- [ ] **Step 4: requirement와 verification map을 확장한다**
 
 `docs/project-plan.md`에는 승인된 extension authority와 `/sign-up`, `/user` CRUD 범위를 추가한다. `docs/quality/requirements.md`에는 `USER-CRUD-01`~`08` acceptance와 `user-crud` positive/failure table을, `docs/quality/verification.md`에는 `e2e/user-crud.spec.ts` mapping을 추가한다. 이 단계의 active map은 기존 네 Journey와 `user-crud`까지 다섯이며, `task-crud`는 다음 독립 계획에서 여섯 번째로 전환한다.
 
-- [ ] **Step 7: 검증하고 commit한다**
+- [ ] **Step 5: 검증하고 commit한다**
 
 ```bash
 pnpm verify quick
