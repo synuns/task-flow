@@ -1,7 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { userKeys } from "@/entities/user";
+import { UpdateUserField } from "@/features/update-user";
 import { getUser, useApiClient } from "@/shared/api";
 import { AsyncError, AsyncLoading, Card, CardContent, Skeleton } from "@/shared/ui";
-import { useQuery } from "@tanstack/react-query";
 
 function errorMessage(error: unknown): string {
   return error && typeof error === "object" && "message" in error
@@ -11,6 +13,7 @@ function errorMessage(error: unknown): string {
 
 export function UserProfile() {
   const client = useApiClient();
+  const [editingField, setEditingField] = useState<"name" | "memo" | null>(null);
   const query = useQuery({
     queryKey: userKeys.all,
     queryFn: ({ signal }) => getUser(client, signal),
@@ -39,13 +42,27 @@ export function UserProfile() {
       <CardContent>
         <dl className="divide-y">
           <div className="grid gap-1 py-4 first:pt-0 sm:grid-cols-[8rem_1fr] sm:gap-4">
-            <dt className="font-medium text-muted-foreground text-sm">이름</dt>
-            <dd className="font-medium">{query.data.name}</dd>
+            <dt className="font-medium text-muted-foreground text-sm">이메일</dt>
+            <dd>{query.data.email}</dd>
           </div>
-          <div className="grid gap-1 py-4 last:pb-0 sm:grid-cols-[8rem_1fr] sm:gap-4">
-            <dt className="font-medium text-muted-foreground text-sm">메모</dt>
-            <dd className="whitespace-pre-wrap">{query.data.memo}</dd>
-          </div>
+          <UpdateUserField
+            field="name"
+            label="이름"
+            value={query.data.name}
+            editing={editingField === "name"}
+            disabled={editingField !== null && editingField !== "name"}
+            onStart={() => setEditingField("name")}
+            onFinish={() => setEditingField(null)}
+          />
+          <UpdateUserField
+            field="memo"
+            label="메모"
+            value={query.data.memo}
+            editing={editingField === "memo"}
+            disabled={editingField !== null && editingField !== "memo"}
+            onStart={() => setEditingField("memo")}
+            onFinish={() => setEditingField(null)}
+          />
         </dl>
       </CardContent>
     </Card>

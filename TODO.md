@@ -2809,7 +2809,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `/tmp/user-crud-signup-desktop.png`, `/tmp/user-crud-signup-duplicate-desktop.png`;
   session close 완료.
 
-### [ ] USER-CRUD-PROFILE-01 회원정보 한 필드 수정 UX 구현
+### [x] USER-CRUD-PROFILE-01 회원정보 한 필드 수정 UX 구현
 
 - Requirements: `USER-CRUD-04`, `USER-CRUD-05`, `USER-CRUD-08`
 - Risk: MEDIUM — query cache와 server-authoritative field mutation
@@ -2820,9 +2820,15 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: update-user와 user-profile component Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 두 viewport icon label, focus 진입/복원과 실패 상태
-- Status: IN_PROGRESS
-- Evidence: 2026-09-03 Codex `/root` task block owner; sign-up browser 검증 완료 후
-  canonical email과 name/memo 단일 필드 수정 Journey lookup 착수.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root`; `pnpm exec vitest run src/features/update-user
+  src/widgets/user-profile/user-profile.test.tsx` 1 file/5 tests PASS, `pnpm verify quick`
+  85 hook + 20 verifier + 42 files/216 tests PASS, `git diff --check` PASS. agent-browser
+  `user-crud-profile`에서 `390x844`, `1280x720` canonical email, 연필→체크/X,
+  한 field edit lock, input focus, success 후 표시 갱신, fetch 실패 뒤 row alert와 draft
+  `보존할드래프트`, 가로 overflow 없음 확인. screenshots:
+  `/tmp/user-crud-profile-mobile.png`, `/tmp/user-crud-profile-desktop.png`,
+  `/tmp/user-crud-profile-error-desktop.png`; session close 완료.
 
 ### [ ] USER-CRUD-DELETE-01 비밀번호 확인 회원 탈퇴 구현
 
@@ -2835,8 +2841,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: delete-user/profile/store/handler Vitest,
   `pnpm verify quick`, `git diff --check`
 - Browser verification: 두 viewport dialog focus, close lock, 실패와 success 전환
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; `USER-CRUD-PROFILE-01`
+  AI 검증 완료 후 비밀번호 확인 탈퇴 Journey lookup 착수.
 
 ### [ ] USER-CRUD-JOURNEY-VERIFY-01 User CRUD Journey 통합 검증
 
