@@ -2432,7 +2432,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Verdict: PASS. 필수 plan-completion adversarial review 완료. Human decision:
   2026-09-03 사용자가 최종 acceptance 요청에 선택 1로 명시 승인했다.
 
-### [ ] NAV-SELECTED-LINE-01 navigation selected 표시선 제거
+### [x] NAV-SELECTED-LINE-01 navigation selected 표시선 제거
 
 - Requirements: `NAV-01`, `NAV-03`
 - Risk: LOW — selected 표현의 국소 CSS 변경
@@ -2445,8 +2445,20 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `e2e/work-overview.spec.ts`
 - Browser verification: 390×844/1280×720 selected navigation의 pseudo-element,
   배경색, `aria-current`, focus, console/error 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-03 Codex `/root`; branch `fix/nav-selected-line`; start SHA
   `be409b0bca978298f2a37c9ce650df9870bc8f07`; 사용자가 pseudo-element class 제거,
   별도 선 부재 test 생략, selected 배경색 유지 설계를 명시 승인. Baseline
   `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/169 tests.
+  Implementation `67c7dc2`: focused shell/router 2 files/9 tests, quick hook 85·verifier
+  19·Vitest 38/169, mapped work-overview Chromium 1/1 PASS. Agent-browser
+  `nav-selected-line-01`의 1280×720/390×844에서 current background와
+  `aria-current`, 2px focus, exact viewport width를 유지하고 `::before`가
+  `content: none`, transparent, auto size임을 확인했다. 익명 bootstrap의 expected
+  refresh 401 뒤 buffer를 clear한 최종 console/page-error는 비었고 session과 Vite
+  server를 종료했다. Screenshot과 전체 record:
+  `docs/quality/evidence/work-overview.md#nav-selected-line-01`. Plan-completion review
+  target `67c7dc2`; reviewer `/root` explicit inline second-pass; 공통 active branch,
+  selected background/semantics/focus, test·dependency 최소성, evidence/TODO와 diff를
+  재검토해 findings 없음. `git diff --check`와 setup hook 85·verifier 19 PASS;
+  Verdict: PASS. `HUMAN_APPROVED`나 final acceptance는 새로 기록하지 않음.

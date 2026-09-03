@@ -1,5 +1,52 @@
 # Work Overview Evidence
 
+## NAV-SELECTED-LINE-01
+
+Requirement/Journey: `NAV-01`, `NAV-03`; `work-overview`
+Implementation commit: `67c7dc2bcf32c40383acdd8f6827f431319faf7f`
+Agent-browser session: `nav-selected-line-01`
+Route/Viewport: `/sign-in`; Chromium 1280×720과 390×844
+Precondition: fresh anonymous app state; Vite `pnpm dev --host 127.0.0.1 --port
+4173`
+Actions: current `로그인` navigation link의 accessible state와 computed link/
+`::before` style을 두 viewport에서 확인하고, fresh document에서 Tab 세 번으로
+current link에 focus한 뒤 screenshot, network, console과 page-error를 확인했다.
+Expected: selected pseudo-element line이 없고 `aria-current="page"`, Yellow selected
+background, 2px keyboard focus와 viewport 내 layout은 유지된다.
+Actual: 두 viewport 모두 current link는 `aria-current="page"`, computed background
+`oklab(0.886773 -0.0168817 0.181406 / 0.35)`였다. `::before`는 `content: none`,
+`width/height: auto`, transparent background여서 mobile 상단선과 desktop 좌측선을
+그리지 않았다. Focus는 `로그인` link에 도달해 `2px solid` outline을 유지했다.
+Mobile link 높이는 48px였고 `innerWidth=390`, `scrollWidth=390`; desktop도
+`innerWidth=1280`, `scrollWidth=1280`이었다.
+Console/Network: anonymous bootstrap의 expected `POST /api/refresh` 401 뒤 console와
+page-error buffer를 clear하고 focus interaction을 재실행했으며 최종 두 출력은
+비어 있었다. `network requests --filter api`는 `No requests captured`였다.
+Screenshot/Trace: `/tmp/kbhc-nav-selected-line-01-desktop.png`,
+`/tmp/kbhc-nav-selected-line-01-mobile.png`
+Failure class: 없음. 익명 bootstrap 401은 승인된 auth 동작이며 product failure가
+아니다.
+Correction: 없음.
+Rerun verdict: PASS. Focused shell/router 2 files/9 tests, `./scripts/verify quick`
+hook 85·verifier 19·Vitest 38 files/169 tests, mapped work-overview Chromium 1/1 PASS.
+
+Plan-completion review target: design
+`docs/superpowers/specs/2026-09-03-navigation-selected-line-removal-design.md`, plan
+`docs/superpowers/plans/2026-09-03-navigation-selected-line-removal.md`, implementation
+commit `67c7dc2bcf32c40383acdd8f6827f431319faf7f`.
+Reviewer: `/root` explicit inline second-pass role; implementation diff를 닫고 전체
+설계·계획·requirement와 evidence를 처음부터 다시 대조했다.
+Checks: 공통 active branch의 pseudo-element utility 제거, selected background와
+`aria-current`, 2px focus와 route/layout 유지, 선 부재 전용 test·새 abstraction·
+dependency 부재, 자동/browser evidence, TODO dependency/status, secret/debug/
+generated/unrelated diff를 확인했다.
+Findings: HIGH/MEDIUM/LOW 없음.
+Corrections: 적용 없음.
+Rerun: `rg` source/style scan, exact base-to-implementation diff review,
+`git diff --check`, `./scripts/verify setup` hook 85·verifier 19 PASS. 앞선 focused,
+quick, mapped Chromium과 named agent-browser 결과를 재대조했다.
+Verdict: PASS.
+
 ## WORK-JOURNEY-VERIFY-01
 
 Requirement/Journey/case trace: `SYS-03`, `NAV-01`, `NAV-03`, `DASH-01`, `USER-01`; `work-overview`; `WORK-P1-1` AppShell/router plus navigation browser record, `WORK-P1-2` dashboard widget/API plus `/`, `WORK-P1-3` profile widget/API plus `/user`, `WORK-P1-4` AppShell/theme plus both viewports, `WORK-E1` terminal-401 request/provider/cache and anonymous route-boundary contracts.
