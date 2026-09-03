@@ -2612,11 +2612,13 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/169 tests.
   TDD RED는 package `verify` key 누락 `KeyError`와 기존 executable usage assertion
   실패를 각각 재현했고, GREEN focused 2/2와 `pnpm verify setup` PASS. Implementation
-  target `799ee2a`에서 `pnpm verify quick` PASS — hook 85, verifier 19, Vitest 38/169;
+  target `0d80be4`에서 `pnpm verify quick` PASS — hook 85, verifier 19, Vitest 38/169;
   `pnpm verify full` PASS — build, Chromium core 5/5, verifier regression 19/19.
   Browser verification은 제품 UI 변경이 없어 적용하지 않았다. Review target:
-  `799ee2a`; Reviewer: 구현 commit 뒤 `/root` explicit second-pass role; Checks:
+  `b8f4505`; Reviewer: 최신 `main` rebase 뒤 `/root` explicit second-pass role; Checks:
   package alias/인자 전달, CLI usage와 failure reproduction, canonical 현재 문서,
-  기존 read-only 동작, dependency/lockfile/UI 무변경, diff 범위; Findings: 없음;
-  Corrections: 적용 없음; Rerun: focused 2/2, `pnpm verify setup`, `pnpm verify quick`,
-  `pnpm verify full`, `git diff --check` PASS; Verdict: PASS.
+  기존 read-only 동작, dependency/lockfile/UI 무변경, REM/QA TODO block 항목별 보존과
+  diff 범위; Findings: 없음; Corrections: rebase TODO 추가 위치 충돌에서 양쪽 block을
+  모두 보존; Rerun: `pnpm verify full` PASS — hook 85, verifier 19, Vitest 39/182,
+  build, Chromium core 5/5, verifier regression 19/19; `git diff --check` PASS;
+  Verdict: PASS.
