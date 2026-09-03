@@ -47,7 +47,7 @@ Expected: branch `feat/task-crud`, clean worktree, User CRUD plan의 owner-aware
 ## File Map
 
 - Modify: `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`, `src/shared/api/openapi-contract.test.ts`
-- Modify: `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
+- Modify: `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `scripts/verify`, `tests/test_verify_contract.py`, `TODO.md`
 - Add: `src/entities/task/model/task.ts`
 - Modify: `src/entities/task/index.ts`, `src/entities/task/ui/task-card.tsx`, `src/entities/task/ui/task-card.test.tsx`
 - Modify: `src/shared/api/tasks.ts`, `src/shared/api/tasks.test.ts`, `src/shared/api/index.ts`
@@ -89,18 +89,32 @@ export function getDashboardMetrics(ownerId: string): DashboardResponse;
 
 ### Task 1: `TASK-CRUD-CONTRACT-01` Task 확장 계약과 작업 통제면을 추가한다
 
-**Files:** `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`, `src/shared/api/openapi-contract.test.ts`, `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
+**Files:** `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`, `src/shared/api/openapi-contract.test.ts`, `scripts/verify`, `tests/test_verify_contract.py`, `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
 
-- [ ] **Step 1: Journey lookup과 TODO 등록을 수행한다**
+- [ ] **Step 1: Journey lookup을 수행한다**
 
 ```bash
 rg -n 'TASK-CRUD|/api/task|TaskStatus|TaskDetailResponse|numOfRestTask|TaskCard' docs/quality/requirements.md TODO.md src e2e assignment-original docs/api
 git status --short
 ```
 
-`TASK-CRUD-CONTRACT-01`, `TASK-CRUD-STORE-01`, `TASK-CRUD-TRANSPORT-01`, `TASK-CRUD-CREATE-01`, `TASK-CRUD-EDIT-01`, `TASK-CRUD-STATUS-01`, `TASK-CRUD-DELETE-REGRESSION-01`, `TASK-CRUD-JOURNEY-VERIFY-01`, `TASK-CRUD-JOURNEY-REVIEW-01`, `JOURNEY-TASK-CRUD-01` block을 추가한다. 첫 task만 `IN_PROGRESS`다.
+- [ ] **Step 2: verifier의 Task backlog/review 기대를 RED로 만든다**
 
-- [ ] **Step 2: generated contract RED를 추가한다**
+`tests/test_verify_contract.py`에 `TASK-CRUD-CONTRACT-01`부터
+`JOURNEY-TASK-CRUD-01`까지 dependency/status와
+`TASK-CRUD-JOURNEY-REVIEW-01`의 필수 review fields 기대를 추가한다.
+
+```bash
+python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
+```
+
+Expected RED: Task TODO blocks와 review owner가 없다.
+
+- [ ] **Step 3: TODO dependency graph와 verifier review owner를 등록한다**
+
+`TASK-CRUD-CONTRACT-01`, `TASK-CRUD-STORE-01`, `TASK-CRUD-TRANSPORT-01`, `TASK-CRUD-CREATE-01`, `TASK-CRUD-EDIT-01`, `TASK-CRUD-STATUS-01`, `TASK-CRUD-DELETE-REGRESSION-01`, `TASK-CRUD-JOURNEY-VERIFY-01`, `TASK-CRUD-JOURNEY-REVIEW-01`, `JOURNEY-TASK-CRUD-01` block을 추가한다. 첫 task만 `IN_PROGRESS`, 구현 task들은 `NOT_STARTED`, 사람 checkpoint는 `[ ]`, `BLOCKED`로 둔다. `scripts/verify`의 review task set에 새 review ID를 추가한다.
+
+- [ ] **Step 4: generated contract RED를 추가한다**
 
 ```ts
 type TaskStatus = crudComponents["schemas"]["TaskStatus"];
@@ -118,7 +132,7 @@ pnpm vitest run src/shared/api/openapi-contract.test.ts
 
 Expected RED: extension에 Task paths/status가 없다.
 
-- [ ] **Step 3: Task schemas와 paths를 CRUD OpenAPI에 추가한다**
+- [ ] **Step 5: Task schemas와 paths를 CRUD OpenAPI에 추가한다**
 
 POST `/api/task` 201, GET list/detail 200, PATCH detail 200, DELETE 기존 200을 정의한다. `CreateTaskRequest`에는 status가 없고 `UpdateTaskRequest`는 exact one-of다.
 
@@ -164,14 +178,14 @@ git diff --exit-code -- assignment-original src/generated/openapi.ts
 
 Expected GREEN: extension test PASS, 원본과 원본 generated diff 없음.
 
-- [ ] **Step 4: quality map을 확정하고 commit한다**
+- [ ] **Step 6: quality map을 확정하고 commit한다**
 
-`docs/quality/requirements.md`에 `TASK-CRUD-01`~`08`과 positive/status-failure cases, `verification.md`에 `task-crud` route/API/source/E2E mapping을 추가한다. 기존 task-discovery/resolution의 accepted behavior를 삭제하지 않는다.
+`docs/project-plan.md`의 Journey map을 `task-crud`까지 여섯 개로 전환한다. `docs/quality/requirements.md`에 `TASK-CRUD-01`~`08`과 positive/status-failure cases, `verification.md`에 `task-crud` route/API/source/E2E mapping을 추가한다. 기존 task-discovery/resolution의 accepted behavior를 삭제하지 않는다.
 
 ```bash
 pnpm verify quick
 git diff --check
-git add docs/api/crud-openapi.yaml src/generated/crud-openapi.ts src/shared/api/openapi-contract.test.ts docs/project-plan.md docs/quality/requirements.md docs/quality/verification.md TODO.md
+git add docs/api/crud-openapi.yaml src/generated/crud-openapi.ts src/shared/api/openapi-contract.test.ts scripts/verify tests/test_verify_contract.py docs/project-plan.md docs/quality/requirements.md docs/quality/verification.md TODO.md
 git commit -m "docs(task): 할 일 CRUD 계약과 여정 등록"
 ```
 
@@ -404,13 +418,18 @@ git commit -m "test(task): CRUD 확장 후 삭제 계약 보존"
 
 ### Task 8: `TASK-CRUD-JOURNEY-VERIFY-01` 핵심 E2E와 browser evidence를 완성한다
 
-**Files:** `e2e/task-crud.spec.ts`, `docs/quality/evidence/task-crud.md`, `scripts/verify` only if needed, `TODO.md`
+**Files:** `e2e/task-crud.spec.ts`, `docs/quality/evidence/task-crud.md`, `scripts/verify`, `tests/test_verify_contract.py`, `TODO.md`
 
 - [ ] **Step 1: positive와 critical failure core cases를 작성한다**
 
 positive case는 목록 header→create modal→201 TODO→refetched list에서 response ID 존재→detail→title 또는 memo 수정→IN_PROGRESS/DONE 상태 변경→dashboard 수치→기존 exact-ID 삭제를 검증한다. created item 위치는 assertion하지 않는다.
 
 failure case는 status PATCH 실패 뒤 detail의 이전 active status와 dashboard 수치가 그대로인지 검증한다. 각 case는 독립 fixture와 user-owned task state를 사용한다.
+
+`tests/test_verify_contract.py`의 core source/tag 및 protected Journey expectation에
+`e2e/task-crud.spec.ts`, `@task-crud`를 먼저 추가해 RED를 확인한 다음
+`scripts/verify`의 required core source를 확장한다. 이 Journey는
+`e2e/authenticated-fixture.ts`를 import해야 한다.
 
 정확한 test title은 `@core Task CRUD 성공 흐름과 소유 상태를 유지한다`와
 `@core 상태 변경 실패는 상세와 현황 값을 보존한다`로 고정한다.
@@ -432,7 +451,7 @@ agent-browser skill을 읽고 `TASK-CRUD-JOURNEY-VERIFY-01` session으로 `390x8
 ```bash
 pnpm verify full
 git diff --check
-git add e2e/task-crud.spec.ts docs/quality/evidence/task-crud.md scripts/verify TODO.md
+git add e2e/task-crud.spec.ts docs/quality/evidence/task-crud.md scripts/verify tests/test_verify_contract.py TODO.md
 git commit -m "test(task): 할 일 CRUD 여정 근거 추가"
 ```
 

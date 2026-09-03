@@ -43,7 +43,7 @@ Expected: branch `feat/user-crud`, clean worktree, 이 plan과 승인된 spec이
 ## File Map
 
 - Add: `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`
-- Modify: `package.json`, `src/shared/api/openapi-contract.test.ts`
+- Modify: `package.json`, `src/shared/api/openapi-contract.test.ts`, `scripts/verify`, `tests/test_verify_contract.py`
 - Modify: `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
 - Add: `src/entities/user/model/user.ts`, `src/entities/user/model/user-keys.ts`, `src/entities/user/index.ts`
 - Delete after consumers move: `src/widgets/user-profile/model/user-keys.ts`
@@ -87,18 +87,39 @@ export function removeTasksByOwner(ownerId: string): number;
 
 ### Task 1: `USER-CRUD-CONTRACT-01` 확장 계약과 작업 통제면을 추가한다
 
-**Files:** `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`, `package.json`, `src/shared/api/openapi-contract.test.ts`, `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
+**Files:** `docs/api/crud-openapi.yaml`, `src/generated/crud-openapi.ts`, `package.json`, `src/shared/api/openapi-contract.test.ts`, `scripts/verify`, `tests/test_verify_contract.py`, `docs/project-plan.md`, `docs/quality/requirements.md`, `docs/quality/verification.md`, `TODO.md`
 
-- [ ] **Step 1: Journey를 다시 찾고 TODO task들을 등록한다**
+- [ ] **Step 1: Journey를 다시 찾는다**
 
 ```bash
 rg -n 'USER-CRUD|/api/user|UserResponse|/sign-up|userKeys' docs/quality/requirements.md TODO.md src e2e assignment-original
 git status --short
 ```
 
-`USER-CRUD-CONTRACT-01`, `USER-CRUD-STORE-01`, `USER-CRUD-TRANSPORT-01`, `USER-CRUD-SIGNUP-01`, `USER-CRUD-PROFILE-01`, `USER-CRUD-DELETE-01`, `USER-CRUD-JOURNEY-VERIFY-01`, `USER-CRUD-JOURNEY-REVIEW-01`, `JOURNEY-USER-CRUD-01` block을 acceptance/verification/evidence 필드와 함께 추가한다. 첫 task만 `IN_PROGRESS`, 나머지는 `NOT_STARTED`로 둔다.
+- [ ] **Step 2: verifier의 새 backlog/review 기대를 먼저 RED로 만든다**
 
-- [ ] **Step 2: extension contract가 없음을 실패로 고정한다**
+`tests/test_verify_contract.py`의 granular backlog expectation에
+`USER-CRUD-CONTRACT-01`부터 `JOURNEY-USER-CRUD-01`까지의 dependency/status를
+추가하고, completed review record test가 `USER-CRUD-JOURNEY-REVIEW-01`에도 필수
+review fields를 요구하게 한다.
+
+```bash
+python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
+```
+
+Expected RED: TODO block과 verifier review task 등록이 아직 없다.
+
+- [ ] **Step 3: TODO task와 verifier review owner를 등록한다**
+
+`USER-CRUD-CONTRACT-01`, `USER-CRUD-STORE-01`, `USER-CRUD-TRANSPORT-01`, `USER-CRUD-SIGNUP-01`, `USER-CRUD-PROFILE-01`, `USER-CRUD-DELETE-01`, `USER-CRUD-JOURNEY-VERIFY-01`, `USER-CRUD-JOURNEY-REVIEW-01`, `JOURNEY-USER-CRUD-01` block을 acceptance/verification/evidence 필드와 함께 추가한다. 첫 task만 `IN_PROGRESS`, 구현 task들은 `NOT_STARTED`, 사람 checkpoint는 `[ ]`, `BLOCKED`로 둔다. `scripts/verify`의 `review_tasks` set에는 새 review ID를 추가한다.
+
+```bash
+python3 -m unittest tests.test_verify_contract.VerifyContractTests.test_repository_todo_contains_granular_journey_backlog tests.test_verify_contract.VerifyContractTests.test_todo_accepts_completed_review_record -v
+```
+
+Expected GREEN: 두 verifier tests PASS.
+
+- [ ] **Step 4: extension contract가 없음을 실패로 고정한다**
 
 `src/shared/api/openapi-contract.test.ts`에 다음 contract check를 추가한다.
 
@@ -118,7 +139,7 @@ pnpm vitest run src/shared/api/openapi-contract.test.ts
 
 Expected RED: `@/generated/crud-openapi`을 찾을 수 없다.
 
-- [ ] **Step 3: 최소 User OpenAPI를 작성하고 생성 script를 확장한다**
+- [ ] **Step 5: 최소 User OpenAPI를 작성하고 생성 script를 확장한다**
 
 `docs/api/crud-openapi.yaml`은 OpenAPI 3.0.3 문서로 `/api/user`의 POST/GET/PATCH/DELETE, bearer security, 201/200/400/401/409와 exact schemas만 정의한다. 핵심 union은 다음처럼 `oneOf`와 `additionalProperties: false`를 사용한다.
 
@@ -159,16 +180,16 @@ pnpm vitest run src/shared/api/openapi-contract.test.ts
 
 Expected GREEN: contract test PASS, 원본 `src/generated/openapi.ts` diff 없음.
 
-- [ ] **Step 4: requirement와 verification map을 확장한다**
+- [ ] **Step 6: requirement와 verification map을 확장한다**
 
-`docs/project-plan.md`에는 승인된 extension authority, `/sign-up`, `/user` CRUD 범위와 여섯 Journey map을 추가한다. `docs/quality/requirements.md`에는 `USER-CRUD-01`~`08` acceptance와 `user-crud` positive/failure table을, `docs/quality/verification.md`에는 `e2e/user-crud.spec.ts` mapping을 추가한다. 기존 네 Journey 문구는 여섯 Journey로 고친다.
+`docs/project-plan.md`에는 승인된 extension authority와 `/sign-up`, `/user` CRUD 범위를 추가한다. `docs/quality/requirements.md`에는 `USER-CRUD-01`~`08` acceptance와 `user-crud` positive/failure table을, `docs/quality/verification.md`에는 `e2e/user-crud.spec.ts` mapping을 추가한다. 이 단계의 active map은 기존 네 Journey와 `user-crud`까지 다섯이며, `task-crud`는 다음 독립 계획에서 여섯 번째로 전환한다.
 
-- [ ] **Step 5: 검증하고 commit한다**
+- [ ] **Step 7: 검증하고 commit한다**
 
 ```bash
 pnpm verify quick
 git diff --check
-git add docs/api/crud-openapi.yaml src/generated/crud-openapi.ts package.json src/shared/api/openapi-contract.test.ts docs/project-plan.md docs/quality/requirements.md docs/quality/verification.md TODO.md
+git add docs/api/crud-openapi.yaml src/generated/crud-openapi.ts package.json src/shared/api/openapi-contract.test.ts scripts/verify tests/test_verify_contract.py docs/project-plan.md docs/quality/requirements.md docs/quality/verification.md TODO.md
 git commit -m "docs(user): 사용자 CRUD 계약과 여정 등록"
 ```
 
@@ -393,7 +414,7 @@ git commit -m "feat(user): 비밀번호 확인 회원 탈퇴 추가"
 
 ### Task 7: `USER-CRUD-JOURNEY-VERIFY-01` 핵심 E2E와 browser evidence를 완성한다
 
-**Files:** `e2e/user-crud.spec.ts`, `docs/quality/evidence/user-crud.md`, `scripts/verify`, `TODO.md`
+**Files:** `e2e/user-crud.spec.ts`, `docs/quality/evidence/user-crud.md`, `scripts/verify`, `tests/test_verify_contract.py`, `TODO.md`
 
 - [ ] **Step 1: 두 core case를 작성한다**
 
@@ -402,7 +423,7 @@ positive case는 로그인 link→가입 validation→201→sign-in→profile �
 정확한 test title은 `@core user CRUD 성공 뒤 보호 경계를 닫는다`와
 `@core 잘못된 탈퇴 비밀번호는 상태를 보존한다`로 고정한다.
 
-E2E request interception은 POST body에 confirmation/memo가 없고 PATCH가 one-field인지 확인한다. `scripts/verify`가 고정 Journey/review ID 목록을 검사한다면 user IDs를 추가하고 verifier contract test를 먼저 RED로 만든다.
+E2E request interception은 POST body에 confirmation/memo가 없고 PATCH가 one-field인지 확인한다. `tests/test_verify_contract.py`의 required core source/tag expectation에 `e2e/user-crud.spec.ts`, `@user-crud`를 먼저 추가해 RED를 확인하고, `scripts/verify`의 required core source에 해당 file을 등록한다. signed-out에서 시작하는 Journey이므로 authenticated-fixture 강제 목록에는 넣지 않는다.
 
 - [ ] **Step 2: 자동 검증을 순서대로 실행한다**
 
@@ -421,7 +442,7 @@ agent-browser skill을 읽고 `USER-CRUD-JOURNEY-VERIFY-01`이 포함된 session
 ```bash
 pnpm verify full
 git diff --check
-git add e2e/user-crud.spec.ts docs/quality/evidence/user-crud.md scripts/verify TODO.md
+git add e2e/user-crud.spec.ts docs/quality/evidence/user-crud.md scripts/verify tests/test_verify_contract.py TODO.md
 git commit -m "test(user): 사용자 CRUD 여정 근거 추가"
 ```
 
