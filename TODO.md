@@ -2431,3 +2431,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   scanner/pending/non-managed/assignment/generated/package/diff/status audit PASS;
   Verdict: PASS. 필수 plan-completion adversarial review 완료. Human decision:
   2026-09-03 사용자가 최종 acceptance 요청에 선택 1로 명시 승인했다.
+
+### [ ] NAV-SELECTED-LINE-01 navigation selected 표시선 제거
+
+- Requirements: `NAV-01`, `NAV-03`
+- Risk: LOW — selected 표현의 국소 CSS 변경
+- Depends on: `NAV-PRIMARY-01`, `AUTH-NAV-01`
+- Deliverable: mobile 상단선과 desktop 좌측선 제거, selected 배경색과
+  `aria-current` 유지
+- Acceptance: 모든 navigation action에서 viewport별 selected 선이 사라지고 기존
+  배경색, route semantics, keyboard focus와 layout이 유지된다.
+- Automatic verification: focused shell/router test, `./scripts/verify quick`, mapped
+  `e2e/work-overview.spec.ts`
+- Browser verification: 390×844/1280×720 selected navigation의 pseudo-element,
+  배경색, `aria-current`, focus, console/error 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root`; branch `fix/nav-selected-line`; start SHA
+  `be409b0bca978298f2a37c9ce650df9870bc8f07`; 사용자가 pseudo-element class 제거,
+  별도 선 부재 test 생략, selected 배경색 유지 설계를 명시 승인. Baseline
+  `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/169 tests.
