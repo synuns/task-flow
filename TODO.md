@@ -2465,3 +2465,86 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   range diff check가 실패해 `TOOLING`으로 분류하고 `01bfa05`에서 한 줄 제거. 동일
   gate rerun은 focused 9/9, quick 38/169, mapped Chromium 1/1, range diff와 clean
   status 모두 PASS. `HUMAN_APPROVED`나 final acceptance는 새로 기록하지 않음.
+### [ ] REM-AUTH-ID-01 인코딩된 task ID 인증 경로 교정
+
+- Requirements: `AUTH-07`, `NAV-03`, `TASK-LIST-05`, `TASK-DETAIL-01`
+- Risk: HIGH — 보호 route와 로그인 복귀 경로의 task ID 허용 범위
+- Depends on: `QA-04`
+- Deliverable: encoded slash ID의 보호 경로 판정, 안전한 복귀와 회귀 test
+- Acceptance: `task/A`가 `/task/task%2FA`로 상세 조회되고 anonymous 진입은 로그인
+  뒤 같은 URL로 복귀하며 외부 URL과 raw 다중 segment는 계속 거부된다.
+- Automatic verification: return-to/auth boundary/router Vitest, auth-entry Playwright,
+  `./scripts/verify quick`
+- Browser verification: anonymous encoded route, 로그인 복귀, reload와 상세 표시
+- Status: IN_PROGRESS
+- Evidence: 2026-09-03 Codex `/root` task block owner; 사용자가 encoded slash ID 지원과
+  `docs/superpowers/specs/2026-09-03-review-remediation-design.md`를 명시 승인;
+  isolated worktree `fix/review-remediation`; baseline `./scripts/verify quick` PASS
+
+### [ ] REM-RESPONSIVE-01 긴 task 문자열 반응형 표시
+
+- Requirements: `TASK-DETAIL-01`, `TASK-DETAIL-03`, `TASK-DETAIL-04`
+- Risk: MEDIUM — OpenAPI상 길이 제한 없는 문자열의 모바일 표시
+- Depends on: `REM-AUTH-ID-01`
+- Deliverable: title, memo와 삭제 확인 ID의 container 내 줄바꿈과 회귀 test
+- Acceptance: 390x844에서 500자 공백 없는 값을 표시해도 document와 dialog overflow가
+  없고 원본 값과 exact delete guard가 보존된다.
+- Automatic verification: task detail/delete dialog Vitest, `./scripts/verify quick`
+- Browser verification: 390x844 detail와 delete dialog bounding rect
+- Status: NOT_STARTED
+- Evidence: 구현 전
+
+### [ ] REM-MOCK-CONTRACT-01 저장된 mock task 계약 검증
+
+- Requirements: `SYS-04`, `TASK-LIST-01`, `TASK-DETAIL-01`
+- Risk: MEDIUM — 제출 API 대체 구현의 OAS 응답 정합성
+- Depends on: `REM-RESPONSIVE-01`
+- Deliverable: exact key, status와 RFC 3339를 검증하는 sessionStorage 복원 경계
+- Acceptance: 추가 key, 잘못된 status/date-time 또는 malformed JSON은 응답에 섞이지
+  않고 기본 fixture로 복구되며 유효 저장 값과 삭제 persistence는 유지된다.
+- Automatic verification: fixture/handler/task API Vitest, `./scripts/verify quick`
+- Browser verification: 적용 없음 — 저장 경계 integration test가 위험을 직접 증명
+- Status: NOT_STARTED
+- Evidence: 구현 전
+
+### [ ] REM-BOOTSTRAP-01 mock 시작 실패 복구
+
+- Requirements: `SYS-04`
+- Risk: LOW — worker 시작 실패 시 blank root를 복구 UI로 교체
+- Depends on: `REM-MOCK-CONTRACT-01`
+- Deliverable: 성공 application mount와 실패/reload 경계를 가진 bootstrap
+- Acceptance: worker 성공 전 application을 렌더링하지 않고 rejection은 한국어 alert와
+  다시 시도 button을 표시하며 click은 reload를 한 번 요청한다.
+- Automatic verification: bootstrap/architecture Vitest, `./scripts/verify quick`
+- Browser verification: production preview 정상 bootstrap과 console/page error
+- Status: NOT_STARTED
+- Evidence: 구현 전
+
+### [ ] REM-VERIFY-01 read-only 구조 검사와 국소 dead code 정리
+
+- Requirements: 전체 architecture와 verification contract
+- Risk: LOW — 제품 동작을 바꾸지 않는 test fixture 위치와 미사용 표면 정리
+- Depends on: `REM-BOOTSTRAP-01`
+- Deliverable: repository 밖 Biome fixture, 최소 AttemptGuard API와 dialog trigger
+- Acceptance: architecture test 전후 repository status가 같고 allowed/blocked import
+  판정과 delete attempt의 중복·stale 방지가 그대로 통과한다.
+- Automatic verification: architecture/attempt/dialog Vitest, diff/status check,
+  `./scripts/verify quick`
+- Browser verification: task-resolution dialog focus와 delete Journey 회귀
+- Status: NOT_STARTED
+- Evidence: 구현 전
+
+### [ ] REM-FINAL-01 코드 리뷰 후속 수정 최종 검증
+
+- Requirements: 위 후속 수정의 전체 requirement와 Golden Journey
+- Risk: HIGH — 계획 완료 review와 사람 checkpoint 뒤 최종 상태 전이
+- Depends on: `REM-AUTH-ID-01`, `REM-RESPONSIVE-01`, `REM-MOCK-CONTRACT-01`,
+  `REM-BOOTSTRAP-01`, `REM-VERIFY-01`
+- Deliverable: plan-completion adversarial review, browser evidence, canonical full QA
+- Acceptance: unresolved HIGH/MEDIUM finding이 없고 quick, mapped Journey, browser probe와
+  `./scripts/verify full`이 통과하며 사람 checkpoint 결과를 과대 표시하지 않는다.
+- Automatic verification: focused test, `./scripts/verify quick`, `./scripts/verify full`,
+  `git diff --check`
+- Browser verification: encoded auth return과 390x844 long-string detail/dialog
+- Status: NOT_STARTED
+- Evidence: 구현 전
