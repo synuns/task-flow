@@ -2595,7 +2595,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   verifier regression 19/19; 기존 non-failing Vite chunk-size advisory 외 unresolved finding
   없음. 이 상태는 AI 검증 완료이며 새로운 `HUMAN_APPROVED` 또는 최종 acceptance를
   주장하지 않음
-### [ ] QA-PNPM-VERIFY-01 pnpm 검증 진입점 통일
+
+### [x] QA-PNPM-VERIFY-01 pnpm 검증 진입점 통일
 
 - Requirements: `SYS-01`
 - Risk: LOW — 검증 동작을 유지하는 package script와 명령 표기 변경
@@ -2606,6 +2607,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: focused verifier contract test, `pnpm verify quick`,
   `git diff --check`
 - Browser verification: 적용 없음 — 제품 UI 동작 변경 없음
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-03 Codex `/root`; branch `chore/pnpm-verify`; baseline
   `./scripts/verify quick` PASS — hook 85, verifier 19, Vitest 38 files/169 tests.
+  TDD RED는 package `verify` key 누락 `KeyError`와 기존 executable usage assertion
+  실패를 각각 재현했고, GREEN focused 2/2와 `pnpm verify setup` PASS. Implementation
+  target `799ee2a`에서 `pnpm verify quick` PASS — hook 85, verifier 19, Vitest 38/169;
+  `pnpm verify full` PASS — build, Chromium core 5/5, verifier regression 19/19.
+  Browser verification은 제품 UI 변경이 없어 적용하지 않았다. Review target:
+  `799ee2a`; Reviewer: 구현 commit 뒤 `/root` explicit second-pass role; Checks:
+  package alias/인자 전달, CLI usage와 failure reproduction, canonical 현재 문서,
+  기존 read-only 동작, dependency/lockfile/UI 무변경, diff 범위; Findings: 없음;
+  Corrections: 적용 없음; Rerun: focused 2/2, `pnpm verify setup`, `pnpm verify quick`,
+  `pnpm verify full`, `git diff --check` PASS; Verdict: PASS.
