@@ -99,7 +99,7 @@ describe("app router", () => {
     const currentLabel = path.startsWith("/task") ? "할 일" : heading;
     const currentLink = screen.getByRole("link", { name: currentLabel });
     expect(currentLink).toHaveAttribute("aria-current", "page");
-    expect(currentLink).toHaveClass("bg-primary/35", "before:bg-ring");
+    expect(currentLink).toHaveClass("bg-primary/35");
   });
 
   it("keeps the application shell while bootstrap blocks protected content", () => {

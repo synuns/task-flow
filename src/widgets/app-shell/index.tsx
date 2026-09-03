@@ -6,7 +6,7 @@ export type AuthAction = { kind: "sign-in"; to: "/sign-in" } | { kind: "profile"
 const itemClass = ({ isActive }: { isActive: boolean }) =>
   `relative flex min-h-12 items-center justify-center gap-1 rounded-lg px-3 py-2 font-medium text-xs transition-colors md:justify-start md:gap-3 md:text-sm ${
     isActive
-      ? "bg-primary/35 text-foreground before:absolute before:inset-x-4 before:-top-px before:h-0.5 before:bg-ring md:before:inset-y-2 md:before:left-0 md:before:right-auto md:before:h-auto md:before:w-0.5"
+      ? "bg-primary/35 text-foreground"
       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
   }`;
 
