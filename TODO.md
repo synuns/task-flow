@@ -3197,7 +3197,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   hook 85, verifier 20, Vitest 47 files/248 tests; 첫 lint의 group role은
   `UX_ACCESSIBILITY`로 분류해 native fieldset으로 교정, browser는 Journey verify로 이관.
 
-### [ ] TASK-CRUD-DELETE-REGRESSION-01 CRUD 확장 후 기존 삭제 계약 보존
+### [x] TASK-CRUD-DELETE-REGRESSION-01 CRUD 확장 후 기존 삭제 계약 보존
 
 - Requirements: `TASK-CRUD-07`, `TASK-CRUD-08`, `TASK-DETAIL-03`~`TASK-DETAIL-05`
 - Risk: HIGH — 승인된 destructive-data semantics 회귀 방지
@@ -3206,8 +3206,13 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: 기존 삭제 feature를 재사용하고 proven gap이 없으면 production code를 추가하지 않는다.
 - Automatic verification: delete-task/detail/handler focused Vitest, `pnpm verify quick`
 - Browser verification: Journey verify task에서 기존 삭제 modal과 redirect 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: AI_VERIFIED
+- Evidence: 2026-09-03 Codex `/root` task block owner; `TASK-CRUD-STATUS-01`
+  commit `3af2ca9` 뒤 delete transport, bounded resolution, dialog, cache eviction, owner-aware handler의
+  모든 caller를 재검토함. exact-ID, 1회 DELETE와 최대 1회 auth replay, 200-only redirect,
+  cross-user 404, unknown 결과 GET reconciliation이 이미 보존되어 제품 코드를 추가하지 않음.
+  focused 6 files/46 tests와 `pnpm verify quick` PASS — hook 85, verifier 20, Vitest
+  47 files/248 tests; 삭제 browser 검증은 Journey verify task로 이관.
 
 ### [ ] TASK-CRUD-JOURNEY-VERIFY-01 Task CRUD Journey 통합 검증
 
