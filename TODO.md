@@ -3347,7 +3347,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `e68e770`; protected root 제거, unrelated cache 보존, 새 generation commit과 late
   refresh 격리를 fresh second-pass로 검사해 unresolved HIGH/MEDIUM/LOW finding 없음.
 
-### [ ] REVIEW-AUTH-TERMINATE-01 Refresh 중 명시적 session 종료
+### [x] REVIEW-AUTH-TERMINATE-01 Refresh 중 명시적 session 종료
 
 - Requirements: `USER-CRUD-06`, `USER-LOGOUT-04`, `USER-LOGOUT-05`
 - Risk: HIGH — sign-out/delete-user 성공 뒤 refresh된 같은 session을 종료
@@ -3359,9 +3359,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: router/sign-out/delete-user/API focused Vitest,
   `pnpm verify quick`
 - Browser verification: `REVIEW-AUTH-JOURNEY-01`의 logout/reload/direct-entry 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root`가 `REVIEW-AUTH-CACHE-01` AI_VERIFIED 뒤 같은
-  worktree에서 task block ownership을 전환함. Token rotation/new generation TDD RED 시작.
+  worktree에서 task block ownership을 전환함. TDD RED 3 failed/9 skipped는 sign-out과
+  delete-user가 refresh 전 token으로 종료하고 새 generation에도 terminate를 호출하는
+  결함을 재현함. 시작 generation과 응답 시점 최신 snapshot 비교 후 focused
+  4 files/23 tests PASS. 첫 quick은 test formatting 2곳으로 실패해 `TEST`로 교정했고,
+  두 번째 quick의 공유 `/tmp/codex-session-linked.md` FileNotFoundError는
+  `TEST/ENVIRONMENT`로 분류해 해당 hook test 단독 PASS를 확인함. 최종
+  `pnpm verify quick` PASS — hook 88, verifier 20, format/lint/typecheck, Vitest
+  48 files/281 tests. Review target `5470891`; same-generation token rotation, newer
+  generation 보존, exact-200 이전 불변과 terminal 401 exact snapshot을 fresh second-pass로
+  검사해 unresolved HIGH/MEDIUM/LOW finding 없음.
 
 ### [ ] REVIEW-AUTH-JOURNEY-01 인증 correction 통합 검증과 적대적 검토
 
@@ -3376,8 +3385,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   user-crud mapped Playwright, `pnpm verify full`, authoritative diff
 - Browser verification: production preview에서 변형 route, logout/reload/direct `/user`,
   console/page error 확인
-- Status: NOT_STARTED
-- Evidence: 시작 전. 이전 세 구현 task 완료 뒤 현재 session이 review target을 고정한다.
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root`가 세 구현 task AI_VERIFIED 뒤 같은 worktree에서
+  Cycle 1 corrected target 통합 검증과 적대적 검토 ownership을 시작함.
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
