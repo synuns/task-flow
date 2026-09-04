@@ -2,22 +2,38 @@
 
 ## 사용한 도구와 모델
 
-- 도구: OpenAI Codex
-- 모델: `gpt-5.6-sol`
+| 항목 | 내용 |
+| --- | --- |
+| 도구 | OpenAI Codex |
+| 모델 | `gpt-5.6-sol` |
 
 ## 적용한 작업 범위
 
-- 과제 요구사항 분석과 프로젝트 구조 결정
-- Codex 사용 기록 자동화 설계 및 구현
-- 이후 구현 과정의 코드 작성, 테스트, 검토 보조
+- 요구사항과 OpenAPI 계약 분석
+- 프로젝트 구조와 Journey 설계
+- 애플리케이션·MSW mock API 구현
+- 단위·통합·E2E 테스트와 browser QA
+- 코드 검토, 문서화, 검증 evidence 작성
+- 프롬프트 기록의 마스킹·검토·게시 자동화
+
+## 사용한 스킬
+
+| 단계 | 스킬 | 사용 목적 |
+| --- | --- | --- |
+| 요구 분석·설계 | `brainstorming`, `frontend-design` | 요구를 설계로 구체화하고 화면 방향 결정 |
+| 작업 분리·계획 | `using-git-worktrees`, `writing-plans` | 격리 checkout과 실행 가능한 단계 작성 |
+| 구현 | `executing-plans`, `subagent-driven-development`, `test-driven-development` | 계획 단위 실행과 RED → GREEN 구현 |
+| 문제 해결·검토 | `systematic-debugging`, `requesting-code-review`, `verification-before-completion` | root cause 수정, 적대적 검토, 완료 전 증거 확인 |
+| Browser QA | `agent-browser` | 실제 route, viewport, keyboard, console, network 검증 |
 
 ## 핵심 프롬프트 요약
 
-- 과제 원본 문서를 별도 디렉터리로 분리
-- Codex Stop Hook으로 사용자 프롬프트, 도구 작업, 최종 응답 기록
-- SessionEnd Hook으로 세션 기록 인덱스 자동 생성
-- 시스템·개발자 지침과 내부 reasoning 제외
-- 비밀정보 자동 마스킹, 비추적 후보 생성, 사람 검토 후 명시적 게시
+- 원본 문서와 OpenAPI를 기준으로 기능과 품질 요구를 Requirement ID로 추적
+- 기능을 독립적인 Golden Journey로 분리하고 단계별 설계·구현·검증
+- loading, empty, error, success와 접근성·반응형 상태 확인
+- focused test, quick, Journey E2E, browser QA, full QA 순서로 검증
+- Codex lifecycle hook으로 작업 기록 후보 생성
+- 비밀정보 자동 마스킹 후 사람 검토를 통과한 기록만 게시
 
 ## 사람이 최종 검증한 내용
 
@@ -28,54 +44,9 @@
 
 ## 자동 검증 내역
 
-- 자동화 결과는 사람 검증으로 간주하지 않으며 제출 전 확인된 결과만 수동 기록합니다.
+자동 검증은 사람 검토를 대체하지 않습니다. 제출 전 확인된 결과와 재현 명령은
+`TODO.md`와 `docs/quality/evidence/`에서 관리합니다.
 
-## 전체 프롬프트와 작업 기록
+## 프롬프트 작업 기록
 
-Lifecycle 훅은 pending 후보와 metadata만 생성합니다. 사람은 먼저
-`.codex/review-pending/`의 세션 Markdown을 검수한 뒤 아래 명령을 실행합니다.
-
-```bash
-pnpm run ai:review
-```
-
-명령은 검수 대기 세션 ID 목록을 보여주고 번호 선택 후 선택한 session ID와
-정확한 record ID를 다시 표시합니다. 정확히 `y`+Enter로 확인한 record만
-artifact로 게시합니다.
-다른 입력, EOF, signal은 취소되며 AI와 non-TTY 실행은 게시할 수 없습니다.
-reviewer는 `git config user.name`에서만 읽으며 출력 가능한 Unicode 이름을
-허용하고 제어 문자는 거부합니다. 자동 마스킹은 사람 검토를 대체하지
-않습니다. 게시 transaction은 current closed record를 다시 검증한 뒤 staging,
-artifact atomic rename, public index 갱신 순서로 실행되며 재실행해도 동일
-결과를 냅니다.
-`artifacts/`에는 사람 승인 기록만 추가합니다.
-
-### 검토 완료 기록
-
-<!-- reviewed-records:start -->
-- [검토 완료 세션 `01a04ddf-4d15-74f3-8568-99bf5272814e.s0001`](./artifacts/codex-session-01a04ddf-4d15-74f3-8568-99bf5272814e.s0001.md)
-- [검토 완료 세션 `01a04ddf-5be6-7322-838c-12e18fc2d714.s0001`](./artifacts/codex-session-01a04ddf-5be6-7322-838c-12e18fc2d714.s0001.md)
-- [검토 완료 세션 `01a04ffd-0cb5-75e0-8cef-0ed1fbe5ceda.s0001`](./artifacts/codex-session-01a04ffd-0cb5-75e0-8cef-0ed1fbe5ceda.s0001.md)
-- [검토 완료 세션 `01a04ffd-1913-77f0-bf79-373841e3ca81.s0001`](./artifacts/codex-session-01a04ffd-1913-77f0-bf79-373841e3ca81.s0001.md)
-- [검토 완료 세션 `01a052d2-7802-7e10-b3ba-b89a95e9f783.s0001`](./artifacts/codex-session-01a052d2-7802-7e10-b3ba-b89a95e9f783.s0001.md)
-- [검토 완료 세션 `01a052ec-d26a-7032-a6be-cf60cca407b6.s0001`](./artifacts/codex-session-01a052ec-d26a-7032-a6be-cf60cca407b6.s0001.md)
-- [검토 완료 세션 `01a052ed-46d9-75a2-9589-4fc69a430e9f.s0001`](./artifacts/codex-session-01a052ed-46d9-75a2-9589-4fc69a430e9f.s0001.md)
-- [검토 완료 세션 `01a05814-fa00-7891-b4d6-fd563f5ecf3e.s0001`](./artifacts/codex-session-01a05814-fa00-7891-b4d6-fd563f5ecf3e.s0001.md)
-- [검토 완료 세션 `01a05ab5-6373-7620-a6db-87ff765586a4.s0001`](./artifacts/codex-session-01a05ab5-6373-7620-a6db-87ff765586a4.s0001.md)
-- [검토 완료 세션 `01a05abc-6c6d-77f0-a445-4d31442b3f3d.s0001`](./artifacts/codex-session-01a05abc-6c6d-77f0-a445-4d31442b3f3d.s0001.md)
-- [검토 완료 세션 `01a05acd-15c6-7f63-a78d-12d641fe269a.s0001`](./artifacts/codex-session-01a05acd-15c6-7f63-a78d-12d641fe269a.s0001.md)
-- [검토 완료 세션 `01a05b8b-0a5b-74b0-8176-835ce81e007d.s0001`](./artifacts/codex-session-01a05b8b-0a5b-74b0-8176-835ce81e007d.s0001.md)
-- [검토 완료 세션 `01a05bac-7de2-7b10-9cad-2854a37dccb5.s0001`](./artifacts/codex-session-01a05bac-7de2-7b10-9cad-2854a37dccb5.s0001.md)
-- [검토 완료 세션 `01a05bd4-00d9-7450-a803-7f09064e3ef5.s0001`](./artifacts/codex-session-01a05bd4-00d9-7450-a803-7f09064e3ef5.s0001.md)
-- [검토 완료 세션 `01a05c2e-ff40-76d1-9487-2fb88087e317.s0001`](./artifacts/codex-session-01a05c2e-ff40-76d1-9487-2fb88087e317.s0001.md)
-- [검토 완료 세션 `01a05c41-55fe-7e62-913b-287359671160.s0001`](./artifacts/codex-session-01a05c41-55fe-7e62-913b-287359671160.s0001.md)
-- [검토 완료 세션 `01a05d12-7ce7-7240-b44a-f525ce4fe48c.s0001`](./artifacts/codex-session-01a05d12-7ce7-7240-b44a-f525ce4fe48c.s0001.md)
-- [검토 완료 세션 `01a05d86-f1bc-7293-aab2-857e54d4f227.s0001`](./artifacts/codex-session-01a05d86-f1bc-7293-aab2-857e54d4f227.s0001.md)
-- [검토 완료 세션 `01a05fe4-56c0-7913-8227-4be99311ca8d.s0001`](./artifacts/codex-session-01a05fe4-56c0-7913-8227-4be99311ca8d.s0001.md)
-- [검토 완료 세션 `01a06562-5f5d-7223-8ae5-89658e5a0380.s0001`](./artifacts/codex-session-01a06562-5f5d-7223-8ae5-89658e5a0380.s0001.md)
-- [검토 완료 세션 `01a06566-63aa-7bd0-957a-90a80719de16.s0001`](./artifacts/codex-session-01a06566-63aa-7bd0-957a-90a80719de16.s0001.md)
-- [검토 완료 세션 `01a06569-91c4-7db2-98de-06e3911ec38c.s0001`](./artifacts/codex-session-01a06569-91c4-7db2-98de-06e3911ec38c.s0001.md)
-- [검토 완료 세션 `01a06574-2be0-7030-bfbb-83bbcd950880.s0001`](./artifacts/codex-session-01a06574-2be0-7030-bfbb-83bbcd950880.s0001.md)
-<!-- reviewed-records:end -->
-
-- [전체 프롬프트와 작업 기록](./artifacts/index.md)
+- [작업 주제별 프롬프트 기록](./artifacts/index.md)

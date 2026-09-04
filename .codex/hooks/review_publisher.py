@@ -21,10 +21,6 @@ from render_artifact_index import (
 from session_records import RecordError, RecordStore, canonical_json
 
 
-START = "<!-- reviewed-records:start -->"
-END = "<!-- reviewed-records:end -->"
-
-
 class PublicationError(ValueError):
     def __init__(self, code):
         super().__init__(code)
@@ -87,23 +83,6 @@ def reviewed_content(candidate: bytes, receipt: ReviewReceipt) -> bytes:
     ]
     lines = text.splitlines()
     return ("\n".join(lines[:1] + metadata + lines[1:]).rstrip() + "\n").encode("utf-8")
-
-
-def update_usage(document: str, filenames, indexer) -> str:
-    if document.count(START) != 1 or document.count(END) != 1:
-        raise PublicationError("usage_markers_invalid")
-    start_position = document.index(START)
-    end_position = document.index(END)
-    if start_position >= end_position:
-        raise PublicationError("usage_markers_invalid")
-    links = []
-    for filename in sorted(set(filenames)):
-        identifier = indexer.session_id_from_artifact_filename(filename)
-        if identifier is None:
-            raise PublicationError("invalid_public_filename")
-        links.append("- [검토 완료 세션 `{}`](./artifacts/{})".format(identifier, filename))
-    managed = START + "\n" + ("\n".join(links) + "\n" if links else "") + END
-    return document[:start_position] + managed + document[end_position + len(END):]
 
 
 def read_candidate_once(path: Path):
@@ -265,13 +244,6 @@ def publish_receipt(repo_root: Path, receipt: ReviewReceipt) -> PublicationResul
                 atomic_write_index(artifacts / "index.md", render_index(filenames, titles))
                 completed = _mark_step(completed, "public_index")
                 check_cancel()
-                usage_path = repo_root / "AI_USAGE.md"
-                usage = usage_path.read_text(encoding="utf-8")
-                import render_artifact_index
-                atomic_usage = update_usage(usage, filenames, render_artifact_index)
-                store.atomic_write_bytes(usage_path, atomic_usage.encode("utf-8"))
-                completed = _mark_step(completed, "ai_usage")
-                check_cancel()
                 if metadata.get("state") != "published":
                     store.mark_published_locked(current, receipt.record_id, receipt.candidate_sha256)
                 completed = _mark_step(completed, "metadata")
@@ -310,11 +282,6 @@ def rollback_journal(repo_root, record_id, assume_locked=False):
                 filenames = list(titles)
                 remaining = [name for name in filenames if name != destination.name]
                 atomic_write_index(artifacts / "index.md", render_index(remaining, titles))
-                filenames = [name for name in filenames if name != destination.name]
-                usage_path = repo_root / "AI_USAGE.md"
-                if usage_path.is_file():
-                    import render_artifact_index
-                    store.atomic_write_bytes(usage_path, update_usage(usage_path.read_text(encoding="utf-8"), filenames, render_artifact_index).encode("utf-8"))
             current = store.current_ref(journal["session_id"], migrate=False)
             if current is not None and current.state == "published":
                 store._rewrite_state(current, "closed", "PublishRollback")

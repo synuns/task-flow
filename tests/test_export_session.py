@@ -507,16 +507,17 @@ class ProjectWiringTests(unittest.TestCase):
             "## 핵심 프롬프트 요약",
             "## 사람이 최종 검증한 내용",
             "## 자동 검증 내역",
-            "## 전체 프롬프트와 작업 기록",
+            "## 프롬프트 작업 기록",
         ):
             self.assertIn(heading, document)
         self.assertIn(
-            "[전체 프롬프트와 작업 기록](./artifacts/index.md)",
+            "[작업 주제별 프롬프트 기록](./artifacts/index.md)",
             document,
         )
         self.assertNotIn("[세션 기록 디렉터리](./artifacts/)", document)
-        self.assertEqual(document.count("<!-- reviewed-records:start -->"), 1)
-        self.assertEqual(document.count("<!-- reviewed-records:end -->"), 1)
+        self.assertNotIn("<!-- reviewed-records:start -->", document)
+        self.assertNotIn("<!-- reviewed-records:end -->", document)
+        self.assertNotRegex(document, r"\./artifacts/codex-session-[^)]+\.md")
         self.assertEqual(document.count("- [ ]") + document.count("- [x]"), 4)
 
 

@@ -152,8 +152,7 @@ mismatch, and revalidates the current closed record under lock before any public
 write.
 Published records alone are indexed in `artifacts/index.md`. The explicit
 publisher holds the shared index lock and writes the reviewed artifact,
-canonical index, and fully regenerated managed `AI_USAGE.md` region in that
-order, rolling earlier files back if a later write fails. The region is derived
-only from post-publication canonical index filenames, so stale, malformed,
-missing, and unindexed links are removed. `SessionEnd` validates and prunes the
-index only; it never rewrites `AI_USAGE.md`.
+then the canonical index, rolling the artifact back if the index write fails.
+`AI_USAGE.md` links only to that index and is never rewritten by publication or
+`SessionEnd`. Stale, malformed, missing, and unindexed links are removed from
+the canonical index during regeneration.

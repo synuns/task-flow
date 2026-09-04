@@ -115,7 +115,11 @@ class ReviewCliTests(unittest.TestCase):
             artifacts = root / "artifacts"
             artifacts.mkdir()
             (artifacts / "index.md").write_text(render_artifact_index.render_index([]), encoding="utf-8")
-            (root / "AI_USAGE.md").write_text("<!-- reviewed-records:start -->\n<!-- reviewed-records:end -->\n", encoding="utf-8")
+            (root / "AI_USAGE.md").write_text(
+                "## 프롬프트 작업 기록\n\n"
+                "- [작업 주제별 프롬프트 기록](./artifacts/index.md)\n",
+                encoding="utf-8",
+            )
             output = TtyStringIO()
             with mock.patch.object(review_ai_record, "git_config_name", return_value="Human Reviewer"):
                 result = review_ai_record.run_review(root, TtyStringIO("1\ny\n"), output)
@@ -136,7 +140,11 @@ class ReviewCliTests(unittest.TestCase):
             artifacts = root / "artifacts"
             artifacts.mkdir()
             (artifacts / "index.md").write_text(render_artifact_index.render_index([]), encoding="utf-8")
-            (root / "AI_USAGE.md").write_text("<!-- reviewed-records:start -->\n<!-- reviewed-records:end -->\n", encoding="utf-8")
+            (root / "AI_USAGE.md").write_text(
+                "## 프롬프트 작업 기록\n\n"
+                "- [작업 주제별 프롬프트 기록](./artifacts/index.md)\n",
+                encoding="utf-8",
+            )
             output = TtyStringIO()
             with mock.patch.object(review_ai_record, "git_config_name", return_value="Human Reviewer"):
                 result = review_ai_record.run_review(root, TtyStringIO("1\ny\n"), output)

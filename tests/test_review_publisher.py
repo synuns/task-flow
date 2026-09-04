@@ -31,7 +31,11 @@ class PublisherTransactionTests(unittest.TestCase):
         artifacts = self.root / "artifacts"
         artifacts.mkdir()
         (artifacts / "index.md").write_text(render_artifact_index.render_index([]), encoding="utf-8")
-        (self.root / "AI_USAGE.md").write_text("<!-- reviewed-records:start -->\n<!-- reviewed-records:end -->\n", encoding="utf-8")
+        (self.root / "AI_USAGE.md").write_text(
+            "## 프롬프트 작업 기록\n\n"
+            "- [작업 주제별 프롬프트 기록](./artifacts/index.md)\n",
+            encoding="utf-8",
+        )
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -45,6 +49,7 @@ class PublisherTransactionTests(unittest.TestCase):
         )
 
     def test_publish_is_idempotent(self):
+        usage_before = (self.root / "AI_USAGE.md").read_text(encoding="utf-8")
         first = review_publisher.publish_receipt(self.root, self.receipt())
         second = review_publisher.publish_receipt(self.root, self.receipt())
         self.assertEqual(first.status, "published")
@@ -52,6 +57,10 @@ class PublisherTransactionTests(unittest.TestCase):
         index = (self.root / "artifacts" / "index.md").read_text(encoding="utf-8")
         self.assertEqual(sum(self.closed.record_id in line for line in index.splitlines()), 1)
         self.assertEqual(self.store.read_metadata(self.closed.record_id)["state"], "published")
+        self.assertEqual(
+            (self.root / "AI_USAGE.md").read_text(encoding="utf-8"),
+            usage_before,
+        )
 
     def test_publish_preserves_existing_artifact_title(self):
         artifacts = self.root / "artifacts"
