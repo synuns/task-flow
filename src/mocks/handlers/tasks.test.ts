@@ -121,6 +121,19 @@ describe("task handlers", () => {
     });
   });
 
+  it("returns an empty list and zero dashboard for the empty-state account", async () => {
+    const token = startAuthSession("user-empty").accessToken;
+
+    expect(await apiRequest("/api/task?page=1", "GET", token)).toEqual({
+      status: 200,
+      body: { data: [], hasNext: false },
+    });
+    expect(await apiRequest("/api/dashboard", "GET", token)).toEqual({
+      status: 200,
+      body: { numOfTask: 0, numOfRestTask: 0, numOfDoneTask: 0 },
+    });
+  });
+
   it("restores every record when the task store resets", async () => {
     await apiRequest("/api/task/task-1", "DELETE");
     resetTaskStore();

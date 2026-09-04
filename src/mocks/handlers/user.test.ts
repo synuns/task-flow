@@ -67,6 +67,20 @@ describe("user handlers", () => {
     expect(invalid.response.status).toBe(400);
   });
 
+  it("returns the empty-state test account profile", async () => {
+    const token = startAuthSession("user-empty").accessToken;
+    const result = await apiRequest("/api/user", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    expect(result.response.status).toBe(200);
+    expect(result.body).toEqual({
+      email: "empty@example.com",
+      name: "빈 목록 사용자",
+      memo: "등록된 할 일이 없는 계정",
+    });
+  });
+
   it("preserves the account on wrong password and revokes it only after 200", async () => {
     const token = startAuthSession("user-1").accessToken;
     const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };

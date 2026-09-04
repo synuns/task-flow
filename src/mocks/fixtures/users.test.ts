@@ -40,6 +40,11 @@ describe("user fixture store", () => {
     expect(findUser(created?.id ?? "")).toBeNull();
   });
 
+  it("authenticates the fixed empty and error test accounts", () => {
+    expect(authenticateUser("empty@example.com", "Password1")?.id).toBe("user-empty");
+    expect(authenticateUser("error@example.com", "Password1")?.id).toBe("user-error");
+  });
+
   it("removes every task owned by the deleted seed user", () => {
     expect(removeAccount("user-1", "Password1")).toEqual({ removedTaskCount: 30 });
     expect(findUser("user-1")).toBeNull();
