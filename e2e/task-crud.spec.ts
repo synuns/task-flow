@@ -1,5 +1,30 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { prepareAuthenticatedPage } from "./authenticated-fixture";
+
+async function openTaskFromList(page: Page, id: string, title: RegExp): Promise<void> {
+  const terminal = page.getByText("모든 할 일을 불러왔습니다.");
+  const loadMore = page.getByRole("button", { name: "다음 페이지 불러오기" });
+  for (let pageNumber = 1; pageNumber <= 16; pageNumber += 1) {
+    await expect(terminal.or(loadMore)).toBeVisible();
+    if (await terminal.isVisible()) break;
+    const nextPage = page.waitForResponse((response) => {
+      const request = response.request();
+      return new URL(response.url()).pathname === "/api/task" && request.method() === "GET";
+    });
+    await loadMore.evaluate((button: HTMLButtonElement) => button.click());
+    await nextPage;
+    await expect(terminal.or(loadMore)).toBeVisible();
+  }
+  await expect(terminal).toBeVisible();
+  const list = page.getByRole("region", { name: "할 일 목록" });
+  await list.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+    element.dispatchEvent(new Event("scroll"));
+  });
+  const taskLink = page.getByRole("link", { name: title });
+  await expect(taskLink).toHaveAttribute("href", `/task/${id}`);
+  await taskLink.click();
+}
 
 test.describe("@task-crud", () => {
   test("@core Task CRUD 성공 흐름과 소유 상태를 유지한다", async ({ page }) => {
@@ -35,7 +60,7 @@ test.describe("@task-crud", () => {
     expect(createResponse.status()).toBe(201);
     const created = (await createResponse.json()) as { id: string };
 
-    await page.goto(`/task/${created.id}`);
+    await openTaskFromList(page, created.id, /CRUD 여정 할 일/);
     await expect(page).toHaveURL(new RegExp(`/task/${created.id}$`));
     await expect(page.getByRole("button", { name: "할 일", exact: true })).toHaveAttribute(
       "aria-pressed",
@@ -76,7 +101,8 @@ test.describe("@task-crud", () => {
       "11",
     );
 
-    await page.goto(`/task/${created.id}`);
+    await page.getByRole("link", { name: "할 일", exact: true }).click();
+    await openTaskFromList(page, created.id, /수정한 CRUD 여정/);
     await page.getByRole("button", { name: "할 일 삭제" }).click();
     const confirmId = page.getByRole("textbox", { name: "할 일 ID" });
     await confirmId.fill(`${created.id} `);
