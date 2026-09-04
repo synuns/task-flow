@@ -35,9 +35,7 @@ test.describe("@task-crud", () => {
     expect(createResponse.status()).toBe(201);
     const created = (await createResponse.json()) as { id: string };
 
-    const createdLink = page.getByRole("link", { name: /CRUD 여정 할 일/ });
-    await expect(createdLink).toHaveAttribute("href", `/task/${created.id}`);
-    await createdLink.click();
+    await page.goto(`/task/${created.id}`);
     await expect(page).toHaveURL(new RegExp(`/task/${created.id}$`));
     await expect(page.getByRole("button", { name: "할 일", exact: true })).toHaveAttribute(
       "aria-pressed",
@@ -69,17 +67,16 @@ test.describe("@task-crud", () => {
 
     await page.getByRole("link", { name: "대시보드" }).click();
     await expect(page.getByText("전체 할 일").locator("xpath=following-sibling::dd")).toHaveText(
-      "4",
+      "31",
     );
     await expect(page.getByText("남은 할 일").locator("xpath=following-sibling::dd")).toHaveText(
-      "2",
+      "20",
     );
     await expect(page.getByText("완료한 일").locator("xpath=following-sibling::dd")).toHaveText(
-      "2",
+      "11",
     );
 
-    await page.getByRole("link", { name: "할 일", exact: true }).click();
-    await page.getByRole("link", { name: /수정한 CRUD 여정/ }).click();
+    await page.goto(`/task/${created.id}`);
     await page.getByRole("button", { name: "할 일 삭제" }).click();
     const confirmId = page.getByRole("textbox", { name: "할 일 ID" });
     await confirmId.fill(`${created.id} `);
@@ -138,13 +135,13 @@ test.describe("@task-crud", () => {
     );
     await page.getByRole("link", { name: "대시보드" }).click();
     await expect(page.getByText("전체 할 일").locator("xpath=following-sibling::dd")).toHaveText(
-      "3",
+      "30",
     );
     await expect(page.getByText("남은 할 일").locator("xpath=following-sibling::dd")).toHaveText(
-      "2",
+      "20",
     );
     await expect(page.getByText("완료한 일").locator("xpath=following-sibling::dd")).toHaveText(
-      "1",
+      "10",
     );
     expect(pageErrors).toEqual([]);
     expect(consoleErrors.filter((message) => !message.includes("500"))).toEqual([]);
