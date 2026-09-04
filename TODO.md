@@ -3303,7 +3303,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   PASS — hook 88, verifier 20; `git diff --check` PASS. Verdict: PASS, unresolved
   HIGH/MEDIUM/LOW 설계 finding 없음. 구현 결과의 `HUMAN_APPROVED`는 주장하지 않음.
 
-### [ ] REVIEW-AUTH-ROUTE-01 Router와 auth route 정책 일치
+### [x] REVIEW-AUTH-ROUTE-01 Router와 auth route 정책 일치
 
 - Requirements: `NAV-02`, `NAV-03`, `AUTH-07`
 - Risk: HIGH — Router가 허용하는 변형 pathname에도 승인된 보호 경계를 적용
@@ -3316,10 +3316,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify quick`
 - Browser verification: `REVIEW-AUTH-JOURNEY-01`에서 anonymous `/user/`와 authenticated
   `/sign-in/` production preview 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. Worktree
   `.worktrees/final-review-auth`, branch `fix/final-review-auth`; `pnpm install --frozen-lockfile`
-  완료, baseline `pnpm verify setup` PASS — hook 88, verifier 20. TDD RED 시작.
+  완료, baseline `pnpm verify setup` PASS — hook 88, verifier 20. TDD RED는 route-policy
+  module 부재와 기존 문자열 판정으로 3 files, 9 failed/30 passed; 구현 뒤 focused
+  4 files/62 tests PASS. 첫 quick은 Biome 배열 줄바꿈 1건으로 실패해 `IMPLEMENTATION`으로
+  분류하고 제시 형식만 교정함. 재실행 `pnpm verify quick` PASS — hook 88, verifier 20,
+  format/lint/typecheck, Vitest 48 files/277 tests. Review target `fdf42b0`; 등록 pattern과
+  router route, canonical/variant/unknown/malformed return-to, FSD import를 fresh
+  second-pass로 검사해 unresolved HIGH/MEDIUM/LOW finding 없음. `git diff --check` PASS.
 
 ### [ ] REVIEW-AUTH-CACHE-01 Sign-in principal cache 격리
 
@@ -3332,8 +3338,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: auth-provider/authenticated-request focused Vitest,
   `pnpm verify quick`
 - Browser verification: `REVIEW-AUTH-JOURNEY-01`의 account transition 검토
-- Status: NOT_STARTED
-- Evidence: 시작 전. `REVIEW-AUTH-ROUTE-01` 완료 뒤 현재 session이 소유권을 전환한다.
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root`가 `REVIEW-AUTH-ROUTE-01` AI_VERIFIED 뒤 같은
+  worktree에서 task block ownership을 전환함. 이전 principal cache TDD RED 시작.
 
 ### [ ] REVIEW-AUTH-TERMINATE-01 Refresh 중 명시적 session 종료
 
