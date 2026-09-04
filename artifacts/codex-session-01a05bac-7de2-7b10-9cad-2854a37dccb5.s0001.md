@@ -104,6 +104,9 @@ A person must review and explicitly publish any tracked AI record.
 
 journey 기획 구현 이전 ui-foundation을 먼저 작업하고 넘어가자
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -5392,11 +5395,16 @@ Output:
 
 이번 작업은 **기존 primitive를 검증·필요 최소 보완해 foundation을 먼저 닫는 범위**로 진행할까요, 아니면 기존 디자인까지 다시 조정할까요? 제 권장은 전자입니다.
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 전자로 진행할것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5444,11 +5452,16 @@ Output:
 
 이 구조로 확정할까요?
 
+</details>
+
 ## Turn 3
 
 ### User prompt
 
 확정
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -5462,11 +5475,16 @@ Output:
 
 이 검증 설계까지 확정할까요?
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 기능 확장은 모두 덜어내고 foundation 계약 검증 및 최소 교정
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5911,11 +5929,16 @@ Output:
 
 `./scripts/verify setup`도 통과했습니다. 구현 계획 작성 전에 문서를 검토하고 승인해주세요.
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6972,11 +6995,16 @@ Output:
 
 어느 방식으로 진행할까요?
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -11369,11 +11397,16 @@ Implementation complete. What would you like to do?
 
 Which option?
 
+</details>
+
 ## Turn 7
 
 ### User prompt
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -11789,3 +11822,5 @@ Output:
 - `main`에 fast-forward 병합 완료: `52d200f`
 - 최종 `./scripts/verify quick` PASS — 36 files, 128 tests
 - [계약 테스트](~/dev/assignment/kbhc-assgn/src/shared/ui/ui-foundation.test.tsx)와 [검증 근거](~/dev/assignment/kbhc-assgn/docs/quality/evidence/ui-foundation.md) 추가. Production 변경·기능 확장 없음.
+</details>
+

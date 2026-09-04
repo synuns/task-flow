@@ -99,6 +99,9 @@ A person must review and explicitly publish any tracked AI record.
 
 시나리오 기반의 루프가 진행될때 기반이 되는 하네스나 워크플로우 구성, 루프 엔지니어링이 잘 갖춰져있는지 리뷰 진행
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -8888,6 +8891,8 @@ Playwright는 로컬에서 `forbidOnly=false`이고([playwright.config.ts](~/dev
 
 판정은 “하네스 실행력은 충분하지만 루프 종결 신뢰성은 보강 필요”입니다. 우선순위는 Journey 인증 독립화 → TODO 사람 gate 강제 → `.only` 차단 → review evidence 검증 순서가 적절합니다.
 
+</details>
+
 ## Turn 2
 
 ### User prompt
@@ -8903,6 +8908,9 @@ Playwright는 로컬에서 `forbidOnly=false`이고([playwright.config.ts](~/dev
 - 독립 리뷰는 필드 보충만으로 완료 처리 금지. 실제 리뷰 수행과 대상 commit 기록 필요
 - 누락된 verifier 회귀 테스트도 canonical full에 포함
 수정 후 full 재검증. 새 기능이나 CI 구축으로 범위 확대 금지.
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -10315,11 +10323,16 @@ FILE artifacts/index.md
 
 문구만 보충하는 방식은 제외하고, 범용 workflow 엔진도 범위 밖으로 두겠습니다. 이 설계로 진행해도 될까요?
 
+</details>
+
 ## Turn 3
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -10451,11 +10464,16 @@ Output:
 
 구현 계획 작성 전 문서를 검토해 주세요. 변경 없으면 승인해 주시면 바로 계획 작성 후 구현으로 진행하겠습니다.
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -11184,11 +11202,16 @@ Ready to implement <feature-name>
 
 현재 `main` checkout입니다. 변경 격리를 위해 `.worktrees/scenario-loop-harness` 작업트리를 생성해 진행해도 될까요?
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -20415,11 +20438,16 @@ Implementation complete. What would you like to do?
 
 Which option?
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -20833,3 +20861,5 @@ main
 - feature worktree 및 branch 정리 완료
 - `main` clean
 - 사람 승인 근거 없는 checkpoint와 QA-01/02 `BLOCKED` 상태는 유지했습니다.
+</details>
+

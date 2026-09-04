@@ -93,6 +93,9 @@ A person must review and explicitly publish any tracked AI record.
 
 todo 에서 css 스타일 토큰 관련 내용이 있는지 확인해줘
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -175,11 +178,16 @@ Output:
 
 그 외 `token` 검색 결과는 인증 access token 관련 내용으로 CSS와 무관합니다.
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 color token 관련 구현 내용 검증해봐
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -3786,6 +3794,8 @@ color:var(--foreground)
 
 보완점: [theme-contract.test.ts](~/dev/assignment/kbhc-assgn/src/test/theme-contract.test.ts:4)는 문자열 존재만 검사해 향후 feature-local 색상 리터럴 유입을 막지 못합니다. 따라서 현재 `SYS-02: IN_PROGRESS` 상태가 적절하며, 실제 UI 구현 시 정적 literal 검사까지 추가해야 최종 검증 가능합니다.
 
+</details>
+
 ## Turn 3
 
 ### User prompt
@@ -3864,6 +3874,9 @@ kb 헬스케어의 스타일 테마를 파악해서 global.css를 세팅하자
 }
 
 해당 내용은 shadcn의 토큰이야
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -4421,11 +4434,16 @@ f482330 feat(architecture): 앱 provider와 route 구성
 
 토큰 구조만 유지하고 `primary`·`sidebar-primary`를 KB 옐로우 계열로 조정할까요, 아니면 제공한 녹색 값을 그대로 적용할까요?
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 KB 기준으로 모두 변경해
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -4482,11 +4500,16 @@ Output:
 
 대안은 primary만 노란색으로 바꾸거나 light theme만 맞추는 방식이지만 “모두 KB 기준”에는 부족합니다. 이 전체 매핑으로 진행해도 될까요?
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 모두 안된다면 어울리는 색상 혹은 대표적으로 알려져있는 좋은 조합으로 세팅해줘도 좋아
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -4815,11 +4838,16 @@ Output:
 
 공식 KB Yellow/Gray와 [KB올라케어 화면](https://apps.apple.com/kr/app/id1538105223)을 기준으로 구성했습니다. 문서를 승인해 주시면 구현 계획 작성 후 `globals.css`에 적용하겠습니다.
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5376,11 +5404,16 @@ Output:
 
 어떤 방식으로 진행할까요?
 
+</details>
+
 ## Turn 7
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6811,11 +6844,16 @@ main
 
 현재 일반 `main` 체크아웃입니다. 안전한 구현을 위해 프로젝트 내부 `.worktrees/kb-ollacare-theme`에 격리 worktree를 만들어 진행해도 될까요?
 
+</details>
+
 ## Turn 8
 
 ### User prompt
 
 worktree 만들어서 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9127,6 +9165,8 @@ Implementation complete. What would you like to do?
 
 Which option?
 
+</details>
+
 ## Turn 9
 
 ### User prompt
@@ -9138,6 +9178,9 @@ Which option?
 </environment_context>
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9500,3 +9543,5 @@ d24dd14 docs(theme): 색상 테마 검증 근거 기록
 - `main`에 병합 완료: `a9243b2`; feature worktree와 branch 제거
 - [globals.css](~/dev/assignment/kbhc-assgn/src/styles/globals.css:11)에 KB light/dark 토큰 적용
 - `verify quick` PASS(86 setup, 20 Vitest), production build PASS. 전체 `SYS-02`는 실제 UI 적용 전까지 `IN_PROGRESS` 유지
+</details>
+

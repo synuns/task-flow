@@ -112,6 +112,9 @@ todo에서 다음 개발할 journey 찾기
 해당 journey 완료시점까지 loop 엔지니어링 기획
 개발 실행
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -7252,11 +7255,16 @@ Output:
 
 다음 대상은 `task-discovery` Journey이며 첫 작업은 `TASK-CARD-VIEW-01`입니다. 기존 구현을 재사용해 카드→가상 viewport→pagination→상태 화면→통합 검증→독립 review까지 완료하고, 사람 checkpoint 승인을 요청하는 시점을 이번 실행의 종료점으로 잡아도 될까요?
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7268,11 +7276,16 @@ Output:
 
 1번 방식으로 설계하겠습니다. 이 접근을 승인하시나요?
 
+</details>
+
 ## Turn 3
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7287,11 +7300,16 @@ Output:
 
 이 범위·구조를 승인하시나요?
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7306,11 +7324,16 @@ Output:
 
 이 화면·상태 설계를 승인하시나요?
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7325,11 +7348,16 @@ Output:
 
 이 검증·종료 설계까지 승인하시나요?
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9133,11 +9161,16 @@ Output:
 
 Focused contract 1/1, setup 86+19 tests가 통과했습니다. 구현 계획 작성 전에 spec을 검토·승인해 주세요.
 
+</details>
+
 ## Turn 7
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -10589,11 +10622,16 @@ Output:
 
 어느 방식으로 진행할까요?
 
+</details>
+
 ## Turn 8
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -21053,11 +21091,16 @@ MEDIUM/LOW 4건은 모두 수정됐으며 focused 31, quick 150, E2E 1/1이 PASS
 
 권장안을 승인하시면 `승인`이라고 답해주세요.
 
+</details>
+
 ## Turn 9
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -24166,11 +24209,16 @@ task-discovery Journey 개발·독립 리뷰·전체 QA가 완료됐습니다. �
 
 이 Journey를 수용하시면 `승인`이라고 답해주세요.
 
+</details>
+
 ## Turn 10
 
 ### User prompt
 
 수동 체크리스트 정리해서 알려줘
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -25039,6 +25087,8 @@ Chrome DevTools에서 각각 확인합니다.
 
 자동 검증과 실패·빈 목록 상태 근거는 [task-discovery.md](~/dev/assignment/kbhc-assgn/.worktrees/feat-task-discovery-loop/docs/quality/evidence/task-discovery.md)에 기록되어 있습니다. 위 필수 항목이 모두 통과하면 `승인`이라고 답하면 됩니다.
 
+</details>
+
 ## Turn 11
 
 ### User prompt
@@ -25046,6 +25096,9 @@ Chrome DevTools에서 각각 확인합니다.
 리뷰 완료. 승인 체크 완료
 상태랑 문서 정합성 맞추고 
 main merge 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -26822,11 +26875,16 @@ main
 
 로컬 `main` merge만 수행했으며 원격 push는 하지 않았습니다.
 
+</details>
+
 ## Turn 12
 
 ### User prompt
 
 워크트리 전부 정리하고 커밋되지 않은 내역 커밋
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -27745,3 +27803,5 @@ PASS verify-tests
 - 미커밋 AI 기록 4건 커밋: `3c31324 docs(ai): 검토 완료 세션 기록 추가`
 - `git status` clean, `./scripts/verify setup` PASS
 - 미병합 branch `feat/ui-shell`, `feat/ui-state`는 데이터 보존을 위해 유지했습니다.
+</details>
+

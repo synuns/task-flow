@@ -99,6 +99,9 @@ A person must review and explicitly publish any tracked AI record.
 
 남은 투두 파악하고 우선순위 알려줘
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -2797,6 +2800,8 @@ requirements_in_progress=1
 
 주의할 점은 현재 `NOT_STARTED` 작업이 하나도 없고, 열린 항목이 모두 `IN_PROGRESS` 또는 `BLOCKED`라는 것입니다. 새 세션에서 이어간다면 먼저 Journey 리뷰 작업의 소유권을 명시적으로 인계·정리하는 게 안전합니다. 새 기능 구현이나 구조 변경은 필요 없습니다.
 
+</details>
+
 ## Turn 2
 
 ### User prompt
@@ -2806,6 +2811,9 @@ requirements_in_progress=1
 더 세부적으로 남은 작업 투두에 추가해주고
 
 journey 별 개발 루프 돌릴때 문제가 없는지 보완할 점이 있는지 파악해줘
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -8026,12 +8034,17 @@ Output:
 
 기존 `AI_VERIFIED` 이력은 보존하는 방식으로 진행해도 될까요, 아니면 기존 구현 항목의 상태도 전부 미완료로 되돌릴까요?
 
+</details>
+
 ## Turn 3
 
 ### User prompt
 
 권장 방향이 좋아보임
 세분화된 작업이 없어서 기준이 애매했을 뿐이니까
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -8106,11 +8119,16 @@ Journey 루프도 `구현 → focused test → quick → agent-browser → evide
 
 이 설계대로 spec을 작성하고 `TODO.md` 세분화까지 진행해도 될까요?
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -8651,11 +8669,16 @@ Output:
 
 `brainstorming`의 spec 검토 단계입니다. 문서가 괜찮다고 확인해주시면 세부 구현 계획을 작성하고 `TODO.md`에 반영하겠습니다.
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -10244,11 +10267,16 @@ Output:
 
 어느 방식으로 진행할까요?
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -11125,6 +11153,8 @@ superproject=
 
 현재 일반 checkout의 `main` 브랜치입니다. 변경을 보호하기 위해 `.worktrees/journey-backlog` 격리 worktree와 작업 브랜치를 만들어 진행해도 될까요?
 
+</details>
+
 ## Turn 7
 
 ### User prompt
@@ -11133,6 +11163,9 @@ superproject=
 worktree 관련 질문은 질문 없이 분리후 작업하도록 워크플로우 지침도 추가할것
 
 워크플로우 설계에서도 QA 게이트가 잘 동작하는지도 리뷰해
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -18652,11 +18685,16 @@ Implementation complete. What would you like to do?
 
 Which option?
 
+</details>
+
 ## Turn 8
 
 ### User prompt
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -19174,3 +19212,5 @@ main
 - 작업 트리 clean
 - 원격 `git pull`은 저장소 접근 권한 오류로 수행되지 않았습니다.
 - 다음 우선순위: `UI-FOUNDATION-01`
+</details>
+

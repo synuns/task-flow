@@ -109,6 +109,9 @@ A person must review and explicitly publish any tracked AI record.
 
 다음 개발 journey todo에서 파악
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -3648,6 +3651,8 @@ and does not count as an independent review
 
 참고로 `TODO.md`의 현재 진행 요약은 아직 auth-entry를 `IN_PROGRESS`로 표시해 실제 checkpoint 상태와 어긋납니다: [TODO.md](~/dev/assignment/kbhc-assgn/TODO.md:45). 파일 변경은 하지 않았습니다.
 
+</details>
+
 ## Turn 2
 
 ### User prompt
@@ -3655,6 +3660,9 @@ and does not count as an independent review
 work-overview journey 대상으로 루프 작업 시작
 먼저 관련 기획문서, api 명세, 화면 기획 context에 추가
 journey 전체 루프 설계 시작
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5187,11 +5195,16 @@ Output:
 
 확인할 것은 하나입니다. 이미 구현된 `DashboardSummary`·`UserProfile`·`AppShell`을 기준으로 **부족한 부분만 수정하고 현재 커밋 evidence를 새로 만드는 루프**로 설계할까요? 이 방식을 권장합니다.
 
+</details>
+
 ## Turn 3
 
 ### User prompt
 
 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5254,12 +5267,17 @@ Output:
 
 이 범위와 루프 구조로 설계를 확정해도 될까요?
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 1 설계로 진행
 범위 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5948,11 +5966,16 @@ AuthRouteBoundary
 
 이 작업 경계와 데이터 흐름을 승인해 주세요.
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6132,11 +6155,16 @@ src/mocks/fixtures/auth.test.ts:20:    vi.resetModules();
 
 이 마지막 섹션까지 승인하면 설계 문서 작성과 TODO context 반영을 시작하겠습니다.
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -7575,11 +7603,16 @@ Output:
 
 작성된 spec을 검토해 승인해 주세요. 승인 후 실행 계획을 작성하겠습니다.
 
+</details>
+
 ## Turn 7
 
 ### User prompt
 
 설계 승인하고 루프 시작
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9635,11 +9668,16 @@ Output:
 1. **Subagent-Driven (권장)** — task별 fresh agent와 단계별 review
 2. **Inline Execution** — 현재 세션에서 순차 실행
 
+</details>
+
 ## Turn 8
 
 ### User prompt
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -13981,11 +14019,16 @@ Output:
 
 현재 evidence를 기준으로 `JOURNEY-WORK-01` 사람 checkpoint 승인을 요청합니다. 승인하시면 `승인`이라고 답해주세요. AI는 아직 `HUMAN_APPROVED`를 기록하지 않았습니다.
 
+</details>
+
 ## Turn 9
 
 ### User prompt
 
 확인해야하는 동작 리스트 보여줘
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -14518,11 +14561,16 @@ src/widgets/user-profile/user-profile.test.tsx src/app/router.test.tsx`,
 
 전체 근거는 [work-overview evidence](~/dev/assignment/kbhc-assgn/.worktrees/work-overview-loop/docs/quality/evidence/work-overview.md)에 있습니다. 위 항목이 만족되면 `승인`이라고 답해 주세요.
 
+</details>
+
 ## Turn 10
 
 ### User prompt
 
 개발 환경 열기
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -15161,11 +15209,16 @@ http://127.0.0.1:4173/
 - 크기: 1280×720
 - 개발 서버와 브라우저 세션은 실행 상태로 유지 중입니다.
 
+</details>
+
 ## Turn 11
 
 ### User prompt
 
 승인. 최종 승인도 반영 완료
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -15459,12 +15512,17 @@ PASS verify-tests
 
 다만 TODO의 단계 요약은 아직 `IN_PROGRESS`, Evidence는 “사람 승인 대기”로 남아 있습니다. 이 두 문구도 사람 승인 기록에서 정정해야 완전히 일치합니다. 프로젝트 전체 최종 승인은 다른 Journey와 통합 QA가 남아 있어 아직 대상이 아닙니다.
 
+</details>
+
 ## Turn 12
 
 ### User prompt
 
 프로젝트 전체 최종 승인은 아직이 맞음
 남은 사람 승인이 뭔지 알려줄래?
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -16289,12 +16347,17 @@ its requirement IDs, independent initial state, OpenAPI contract, actions,
 
 즉, 앞으로 필요한 핵심 승인은 `task-discovery → task-resolution → 프로젝트 최종 승인` 순서입니다.
 
+</details>
+
 ## Turn 13
 
 ### User prompt
 
 현재 작업에서 대상 journey는 work야
 나머지는 아직 작업 시작하지 않은 부분이잖아
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -16307,6 +16370,8 @@ its requirement IDs, independent initial state, OpenAPI contract, actions,
 - 현재 범위의 사람 checkpoint: 완료
 
 남은 것은 승인 작업이 아니라, 사람이 반영한 TODO 기록의 문구 정합성 보완과 브랜치 마감뿐입니다. `task-discovery`와 `task-resolution`은 이번 범위 밖입니다.
+
+</details>
 
 ## Turn 14
 
@@ -16332,6 +16397,9 @@ its requirement IDs, independent initial state, OpenAPI contract, actions,
     - work_task4_verify: Pauli
   </subagents>
 </environment_context>
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -16541,11 +16609,16 @@ index d7b98fc..16d61d4 100644
 
 승인 기록의 문구 정합성을 보완하고 `TODO.md`를 커밋하면 브랜치를 닫을 수 있습니다. 코드나 테스트 작업은 남아 있지 않습니다.
 
+</details>
+
 ## Turn 15
 
 ### User prompt
 
 나머지 정합성 맞추고 main merge
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -17300,3 +17373,5 @@ main 병합 완료했습니다.
 - `feat/work-overview-loop` 브랜치와 worktree 정리 완료
 - 기존 `AI_USAGE.md`·artifact 미커밋 변경은 그대로 보존
 - 원격 저장소에는 push하지 않았습니다.
+</details>
+

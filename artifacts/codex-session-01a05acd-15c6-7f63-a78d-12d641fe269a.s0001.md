@@ -165,6 +165,9 @@ Keep the register conversational and tuned: plain verbs, sentence case, no fille
 
 </skill>
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -6344,21 +6347,31 @@ Output:
 2. **중립적인 업무 관리 도구**: 과제 명세에 가장 보수적으로 맞춘 생산성 화면
 3. **KB 브랜드 중심 관리 화면**: 건강관리 서사는 줄이고 Yellow·Charcoal 브랜드 인상을 강조
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 2번 스타일 토큰은 참고만 했을 뿐이야
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 다음 선택은 화면으로 보는 편이 더 정확합니다. 브라우저 탭에서 레이아웃 시안과 디자인 방향을 나란히 비교해드릴까요? 아직 새 기능이라 토큰을 조금 많이 사용할 수 있습니다. 동의하시면 첫 비교 화면을 열겠습니다.
+
+</details>
 
 ## Turn 3
 
 ### User prompt
 
 비교 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -7387,12 +7400,17 @@ Output:
 
 마음에 드는 시안을 클릭하고, 선택 이유나 바꾸고 싶은 점을 여기에도 남겨주세요.
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 A가 좋아보임. 깔끔하게 목표에만 집중할 수 있는 디자인으로 보여짐.
 추가로 journey마다 UX를 최대한 깔끔하게 설계할 수 있도록 신경쓸것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -7598,11 +7616,16 @@ A안을 기준으로 네 Journey의 핵심 행동, 실패 복구, shadcn/ui prim
 
 구조 승인 또는 수정 필요를 선택하고, 변경할 Journey가 있다면 여기에도 적어주세요.
 
+</details>
+
 ## Turn 5
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -7757,6 +7780,8 @@ Output:
 
 시각 언어 승인 또는 수정 필요를 선택해주세요.
 
+</details>
+
 ## Turn 6
 
 ### User prompt
@@ -7767,6 +7792,9 @@ https://apps.apple.com/kr/app/kb%EC%98%A4%EC%BC%80%EC%96%B4/id1597675315
 오케어 앱 스크린샷을 파악해서 핵심 색상은 오케어에서 사용하는 노란색으로 사용하고 그걸 기준으로해서 어울리는 색상을 가져오도록 해.
 
 조화로운 색상 팔레트는 https://color.adobe.com/kr/create/color-wheel 이 사이트를 참고해
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9288,11 +9316,16 @@ Adobe Color의 보색 원리를 약하게 적용해 Yellow와 저채도 blue를 
 
 palette 승인 또는 수정 필요를 선택해주세요.
 
+</details>
+
 ## Turn 7
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9502,12 +9535,17 @@ Desktop·mobile navigation과 loading, empty, error, 404, modal 상태 문법을
 
 승인되면 설계 문서 작성과 자체 검토 단계로 진행하겠습니다.
 
+</details>
+
 ## Turn 8
 
 ### User prompt
 
 승인
 단, 모바일 내비게이션의 경우에는 아이콘을 잘 활용해서 깔끔하게 구성할 것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -10638,11 +10676,16 @@ Output:
 
 문서를 검토하고 수정할 부분이 있는지 알려주세요. 승인 후 구현 계획을 작성하겠습니다.
 
+</details>
+
 ## Turn 9
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -16275,11 +16318,16 @@ Output:
 
 구현 전 shadcn/ui 런타임 의존성은 정확한 dry-run 결과를 먼저 제시하고 승인을 받습니다.
 
+</details>
+
 ## Turn 10
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -17045,11 +17093,16 @@ Inline 실행 전 두 가지 승인이 필요합니다.
 
 `lucide-react`는 기존 것을 재사용하며 `Sidebar`는 추가하지 않습니다. 두 항목을 승인하면 공식 registry dry-run 결과를 재확인한 뒤 구현을 시작하겠습니다.
 
+</details>
+
 ## Turn 11
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -44667,11 +44720,16 @@ Output:
 
 어느 옵션으로 진행할까요?
 
+</details>
+
 ## Turn 12
 
 ### User prompt
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -45304,3 +45362,5 @@ main
 - 작업 worktree 제거
 - feature branch 삭제
 - `main` 작업공간 clean
+</details>
+

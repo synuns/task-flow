@@ -271,13 +271,18 @@ for path in paths:
     if any(value in {"<details>", "</details>"} for _, value in visible):
         raise ValueError("existing_details:{}".format(path))
 
-    turns = [
-        (index, int(match.group(1)))
-        for index, value in visible
-        if (match := turn_pattern.fullmatch(value))
-    ]
-    if [number for _, number in turns] != list(range(1, len(turns) + 1)):
-        raise ValueError("nonsequential_turns:{}".format(path))
+    turns = []
+    expected_turn = 1
+    for index, value in visible:
+        match = turn_pattern.fullmatch(value)
+        if match is None:
+            continue
+        number = int(match.group(1))
+        if number == expected_turn:
+            turns.append((index, number))
+            expected_turn += 1
+        elif number > expected_turn:
+            raise ValueError("missing_turn:{}:{}".format(path, expected_turn))
 
     insertions = []
     for position, (start, _) in enumerate(turns):

@@ -117,6 +117,9 @@ journey를 두가지 추가 기획해야해
 
 각각에 대해서 api 설계 뿐만아니라 UI/UX 설계도 필요해
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -5706,15 +5709,22 @@ result, target SHA, browser precondition/action/expected/actual과 correction �
 1. 로그인 사용자의 계정 생성·조회·수정·탈퇴
 2. 관리자가 여러 사용자를 목록·생성·조회·수정·삭제하는 관리 기능
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 1
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 최소 계정 모델을 `email`, `password`, `name`, `memo`로 두고, 회원정보 수정은 `name`과 `memo`만 허용할까요? 이메일·비밀번호 변경은 이번 Journey에서 제외하는 구성이 가장 작습니다.
+
+</details>
 
 ## Turn 3
 
@@ -5722,9 +5732,14 @@ result, target SHA, browser precondition/action/expected/actual과 correction �
 
 승인 password,email 수정은 제외
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 Task CRUD는 생성 시 `title`, `memo`만 입력하고 `status`는 `TODO`로 시작하며, 수정 화면에서 `title`, `memo`, `status(TODO/DONE)`를 변경하도록 설계할까요?
+
+</details>
 
 ## Turn 4
 
@@ -5738,9 +5753,14 @@ status에 progress 상태도 추가
 
 status에 in-progress 상태도 추가
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 상태값은 API에서 `TODO | IN_PROGRESS | DONE`으로 정의하고, 수정 화면의 선택 항목에서 세 상태 사이를 자유롭게 변경하도록 할까요? 별도 상태 전이 규칙은 두지 않는 최소 설계입니다.
+
+</details>
 
 ## Turn 6
 
@@ -5748,9 +5768,14 @@ status에 in-progress 상태도 추가
 
 승인
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 회원가입 성공 후에는 자동 로그인보다 기존 인증 경계를 재사용해 `/sign-in`으로 이동하고 새 계정으로 로그인하도록 할까요? 이 방식이 API와 구현 범위가 가장 작습니다.
+
+</details>
 
 ## Turn 7
 
@@ -5758,9 +5783,14 @@ status에 in-progress 상태도 추가
 
 승인
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 회원 탈퇴는 현재 비밀번호를 다시 입력해야 `DELETE /api/user`를 호출하고, 성공하면 인증 상태와 보호 캐시를 비운 뒤 `/sign-in`으로 이동하도록 설계할까요?
+
+</details>
 
 ## Turn 8
 
@@ -5768,9 +5798,14 @@ status에 in-progress 상태도 추가
 
 승인
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 회원 탈퇴 시 그 사용자의 Task도 함께 영구 삭제하는 것으로 할까요? 계정만 삭제하고 Task를 남기는 고아 데이터는 만들지 않는 구성이 권장됩니다.
+
+</details>
 
 ## Turn 9
 
@@ -5778,15 +5813,23 @@ status에 in-progress 상태도 추가
 
 승인
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 다음 선택은 화면으로 보는 편이 더 명확합니다. 브라우저 탭에 생성·수정 화면의 와이어프레임과 배치 비교안을 보여드릴까요? 새 기능이라 토큰 사용량이 다소 늘 수 있습니다.
+
+</details>
 
 ## Turn 10
 
 ### User prompt
 
 비교시안 생성
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6202,11 +6245,16 @@ Output:
 
 세 가지 CRUD 화면 배치안을 표시했습니다. 카드를 클릭해 하나를 선택한 뒤 알려주세요. 저는 **A. 전용 페이지**를 권장합니다.
 
+</details>
+
 ## Turn 11
 
 ### User prompt
 
 C
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6260,6 +6308,8 @@ Output:
 
 C안을 다음처럼 적용하겠습니다: 로그인 화면의 `회원가입` modal, 회원정보의 `수정` modal, 할 일 목록의 `새 할 일` modal, 상세 화면의 `수정` modal. 삭제는 각각 별도 확인 modal을 유지합니다. 이 구성을 승인할까요?
 
+</details>
+
 ## Turn 12
 
 ### User prompt
@@ -6268,6 +6318,9 @@ C안을 다음처럼 적용하겠습니다: 로그인 화면의 `회원가입` m
 회원 정보 수정은 해당 UI에서 수정 버튼으로 제어하는 편이 훨씬 UX가 좋고
 할일 추가는 모달을 띄우기 위한 추가 버튼까지 기획이 되어야해 기존 화면과 잘 어우러지도록
 삭제는 기존과 유지하면 될거 같네
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6331,6 +6384,8 @@ Output:
 
 시안을 확인하고 승인 여부를 알려주세요.
 
+</details>
+
 ## Turn 13
 
 ### User prompt
@@ -6343,6 +6398,9 @@ Output:
 회원가입시에 메모 입력은 제거
 
 회원 정보의 수정은 정보 우측의 수정 아이콘 버튼을 두어서 한가지 정보씩 수정하고 업데이트하는 UX 채택할것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6406,6 +6464,8 @@ Output:
 
 시안을 확인하고 승인 여부를 알려주세요.
 
+</details>
+
 ## Turn 14
 
 ### User prompt
@@ -6414,6 +6474,9 @@ Output:
 하단에 에러메시지 안내가 잘되어서 회원가입 경험에 문제 없도록 해줘
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6475,21 +6538,31 @@ Output:
 
 비밀번호 확인은 API 요청에서 제외합니다.
 
+</details>
+
 ## Turn 15
 
 ### User prompt
 
 승인
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 Task 입력 규칙은 제목을 공백 제거 후 `1–100자` 필수, 메모를 `0–500자` 선택으로 두고, 생성 상태는 `TODO`로 고정하겠습니다. 수정 modal에서는 제목·메모·상태(`TODO | IN_PROGRESS | DONE`)를 함께 저장하도록 할까요?
+
+</details>
 
 ## Turn 16
 
 ### User prompt
 
 아니 그냥 생성시 투두 고정 상태 선택은 리스트에서 할 수 있도록하기
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6554,6 +6627,8 @@ Output:
 
 시안을 확인하고 승인 여부를 알려주세요.
 
+</details>
+
 ## Turn 17
 
 ### User prompt
@@ -6563,6 +6638,9 @@ Output:
 리스트에서 상태 변경 쉽고 빠르게 하는 방법 없을까?
 
 좋은 방법 없다면 디테일 페이지에서 제어하도록하는게 좋아보여
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6624,6 +6702,8 @@ Output:
 
 현재 가상 목록과 전체 카드 링크 구조에는 **C. 상세 페이지 제어**를 권장합니다. 시안에서 선택해 주세요.
 
+</details>
+
 ## Turn 18
 
 ### User prompt
@@ -6631,6 +6711,9 @@ Output:
 C가 제일 나아 보이네
 
 디테일에서 내용 수정 UX는 회원 정보에서의 UX와 통일해줘
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6677,6 +6760,8 @@ User/Task의 `PATCH`를 한 필드로 제한해 행 단위 수정 UX와 API 동�
 
 이 API 경계를 승인할까요?
 
+</details>
+
 ## Turn 19
 
 ### User prompt
@@ -6686,6 +6771,9 @@ User/Task의 `PATCH`를 한 필드로 제한해 행 단위 수정 UX와 API 동�
 이렇게 해줘
 
 API 는 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -6705,11 +6793,16 @@ Task 상태는 상세 페이지의 `할 일 / 진행 중 / 완료` 3단계 버�
 
 이 UI 상호작용 설계를 승인할까요?
 
+</details>
+
 ## Turn 20
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -7737,6 +7830,8 @@ MSW 계정·Task 저장은 기존처럼 브라우저 `sessionStorage` 기반의 
 
 이 구조와 데이터 흐름을 승인할까요?
 
+</details>
+
 ## Turn 21
 
 ### User prompt
@@ -7746,6 +7841,9 @@ MSW 계정·Task 저장은 기존처럼 브라우저 `sessionStorage` 기반의 
 
 위 기획들을 기반으로 모든 기능을 포괄할 수 있도록
 journey를 설계
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7807,6 +7905,8 @@ journey를 설계
 
 이 Journey 구성을 승인할까요?
 
+</details>
+
 ## Turn 22
 
 ### User prompt
@@ -7814,6 +7914,9 @@ journey를 설계
 - 로그인 실패만으로 영구 삭제 증명 불가. E2E는 접근 불가만 검증. User와 소유 Task 제거는 store integration test로 증명
 - 새 Task 최상단은 정렬 계약이 있을 때만 고정. 계약 없으면 목록 존재만 검증
 - 가장 중요한 실패 경로 명시 필요. User는 잘못된 탈퇴 비밀번호, Task는 상태 변경 실패 후 rollback 추천
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7832,11 +7935,16 @@ journey를 설계
 
 이 수정된 Journey 경계를 승인할까요?
 
+</details>
+
 ## Turn 23
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7868,6 +7976,8 @@ journey를 설계
 
 이 오류·검증 설계를 승인하면 설계 문서와 실행 원장을 작성하겠습니다.
 
+</details>
+
 ## Turn 24
 
 ### User prompt
@@ -7875,6 +7985,9 @@ journey를 설계
 - 낙관적 업데이트 제외와 rollback 문구 충돌. 상태와 dashboard는 성공 응답 전까지 변경 금지
 - 서버 400에 필드 식별자가 없으면 필드 오류로 매핑 금지. form alert로 처리
 - POST의 network/invalid-response는 결과 미확정. 자동 재시도 금지. Task 생성은 목록 재조회 후 재시도 허용, 회원가입은 재로그인 또는 중복 이메일 응답으로 결과 확인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -7892,11 +8005,16 @@ journey를 설계
 
 이 교정된검증 계약을 최종 승인할까요?
 
+</details>
+
 ## Turn 25
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9057,11 +9175,16 @@ Output:
 
 명세를 검토해 주세요. 승인되면 `user-crud`와 `task-crud`를 분리한 구현 계획을 작성하겠습니다.
 
+</details>
+
 ## Turn 26
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -15968,11 +16091,16 @@ c981746 docs: CRUD 계획 검증 경계 보완
 
 다음 단계는 `User CRUD`부터 구현하는 것입니다. 원하면 인라인 실행 또는 명시적 위임 실행 중 하나로 시작할 수 있습니다.
 
+</details>
+
 ## Turn 27
 
 ### User prompt
 
 아니야 일단 계획까지만 작업 완료해서 main merge
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -16846,11 +16974,16 @@ branch refs/heads/main
 - [User CRUD 계획](~/dev/assignment/kbhc-assgn/docs/superpowers/plans/2026-09-03-user-crud-journey.md)
 - [Task CRUD 계획](~/dev/assignment/kbhc-assgn/docs/superpowers/plans/2026-09-03-task-crud-journey.md)
 
+</details>
+
 ## Turn 28
 
 ### User prompt
 
 지금 각각의 joruney 개발을 병렬로 해도 문제없는지 체크
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -17012,11 +17145,16 @@ docs/superpowers/plans/2026-09-03-user-crud-journey.md:471:### Task 8: `USER-CRU
 
 결론: 지금 즉시 두 Journey 전체를 병렬 실행하는 것은 비추천이며, 현재 계획 기준으로는 User CRUD를 먼저 진행해야 합니다.
 
+</details>
+
 ## Turn 29
 
 ### User prompt
 
 User CRUD journey에 대한 루프 엔지니어링 설계 후 개발 시작
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -56977,11 +57115,16 @@ Output:
 - 검증 완료: Vitest 219/219, User E2E 2/2, core E2E 7/7, full PASS.
 - 사람 checkpoint만 남았습니다. [검증 근거](~/dev/assignment/kbhc-assgn/.worktrees/user-crud/docs/quality/evidence/user-crud.md)를 검토하고 승인 또는 수정 요청해주세요.
 
+</details>
+
 ## Turn 30
 
 ### User prompt
 
 수동 리뷰항목 리스트
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -57037,6 +57180,8 @@ Output:
 
 상세 자동·브라우저 근거: [user-crud.md](~/dev/assignment/kbhc-assgn/.worktrees/user-crud/docs/quality/evidence/user-crud.md)
 
+</details>
+
 ## Turn 31
 
 ### User prompt
@@ -57044,6 +57189,9 @@ Output:
 모두 동작 양호
 깜빡한 기획 추가
 회원 정보 페이지에 로그아웃 기능 추가 필요
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -58631,11 +58779,16 @@ index only; it never rewrites `AI_USAGE.md`.
 
 원본 OpenAPI에는 로그아웃 API가 없습니다. `POST /api/sign-out` 확장 계약을 추가해 refresh cookie 폐기, access token·보호 캐시 정리 후 `/sign-in` 이동까지 보장하는 방식으로 설계해도 될까요?
 
+</details>
+
 ## Turn 32
 
 ### User prompt
 
 추가 설계 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -58657,12 +58810,17 @@ index only; it never rewrites `AI_USAGE.md`.
 
 이 설계로 확정할까요?
 
+</details>
+
 ## Turn 33
 
 ### User prompt
 
 방식은 A로 확정
 설계중 로그아웃 확인 모달도 추가로 필요
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -58678,11 +58836,16 @@ A 방식에 확인 모달을 포함해 다음처럼 수정합니다.
 
 이 수정 설계를 승인하면 설계 문서와 구현 계획을 작성하겠습니다.
 
+</details>
+
 ## Turn 34
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -60124,11 +60287,16 @@ PASS verify-tests
 
 `pnpm verify setup` 통과, 작업트리 clean입니다. 구현 계획 작성 전 명세를 검토하고 승인 또는 변경사항을 알려주세요.
 
+</details>
+
 ## Turn 35
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -62112,11 +62280,16 @@ PASS verify-tests
 
 실행 방식은 1) 작업별 병렬 에이전트, 2) 현재 세션에서 순차 실행 중 선택해주세요.
 
+</details>
+
 ## Turn 36
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -76318,11 +76491,16 @@ d496657 test(user): 로그아웃 여정 근거 추가
 
 확인 후 `승인` 또는 문제가 있는 항목을 알려주세요. 사람 승인 전까지 `JOURNEY-USER-CRUD-01`은 `BLOCKED`로 유지했고 아직 main에는 병합하지 않았습니다.
 
+</details>
+
 ## Turn 37
 
 ### User prompt
 
 승인하고 main merge
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -78016,3 +78194,5 @@ Deleted branch feat/user-crud (was 2421483).
 - `feat/user-crud` 브랜치와 worktree 정리 완료
 - 원격 접근 권한 오류로 push/pull은 하지 못했습니다.
 - 기존 `AI_USAGE.md`, `artifacts/` 변경은 그대로 보존했습니다.
+</details>
+

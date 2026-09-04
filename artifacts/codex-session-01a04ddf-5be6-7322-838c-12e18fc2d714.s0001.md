@@ -86,6 +86,9 @@ worktree에서 전체 기획문서와 그에 기반한 투두리스트 작성할
 기획문서는 superpowers 나 혹은 세부 기능에 대한 계획 문서와는 별개이며 상위의 문서임.
 투두리스트는 에이전트가 남은 작업을 판단하며 참고하는 문서로 사용
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -2235,11 +2238,16 @@ Output:
 
 상위 기획문서에 제품 요구사항뿐 아니라 기술 구조·인증 정책 결정점·개발 단계·검증 전략까지 포함할까요?
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 포함 할 것 단, 각 세부 사항의 기준은 required.md 문서를 기반으로 할 것이며 목표까지의 단계를 세부적으로 나누어서 에이전트가 작업 할때 빈틈없이 검증 가능한 단위로 일할 수 있도록 할 것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -2471,6 +2479,8 @@ Ready to implement <feature-name>
 
 추천안 1 구조로 진행해도 될까요? 승인 후 격리 worktree 생성, 기준 검증, 문서 작성·검증·커밋 진행.
 
+</details>
+
 ## Turn 3
 
 ### User prompt
@@ -2487,6 +2497,9 @@ Ready to implement <feature-name>
 - SOLID 원칙 기반으로 코드를 작성하고 모듈화를 우선시 하되 기존의 코드를 재작성하지 않도록 코드베이스를 살펴볼것
 
 더 필요한 규약이 있으면 보완해줘
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -6398,21 +6411,31 @@ shadcn `search`·`view`·`add` 절차는 [공식 CLI 문서](https://ui.shadcn.c
 
 구현 전 세 문서 검토 필요. 수정 의견 있으면 반영.
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 승인
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 기획문서 승인 확인. 다음 작업 시작점: `SCF-01 package와 toolchain 기반`. 구현 요청 전까지 추가 변경 없음.
+
+</details>
 
 ## Turn 5
 
 ### User prompt
 
 다른 문서들도 모두 승인했으니 worktree 정리하고 main에 병합
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -7071,6 +7094,8 @@ b95cd80 docs(scaffold): shadcn 설정을 FSD 설계로 유예
 - 별도 `frontend-scaffolding` worktree는 유지
 - 원격 push는 수행하지 않음
 
+</details>
+
 ## Turn 6
 
 ### User prompt
@@ -7101,6 +7126,11 @@ To github.com:synuns/kbhc-assgn.git
 
 clear
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 컨텍스트 정리됨. 다음 요청 대기.
+</details>
+

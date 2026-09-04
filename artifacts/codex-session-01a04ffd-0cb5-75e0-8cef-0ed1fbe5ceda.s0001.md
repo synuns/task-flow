@@ -93,6 +93,9 @@ A person must review and explicitly publish any tracked AI record.
 
 아키텍처 기반 작업 필요
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Tool activity
 
 #### `exec`
@@ -2882,21 +2885,31 @@ Output:
 
 이번 작업 대상을 `TODO.md`의 `DEC-ARCH-01 애플리케이션 구조 상세 설계`로 진행하면 될까요?
 
+</details>
+
 ## Turn 2
 
 ### User prompt
 
 진행
 
+<details>
+<summary>작업 내용 보기</summary>
+
 ### Assistant response
 
 `DEC-AUTH-01`과 `DEC-DELETE-01`의 정책 결정은 별도로 남기고, 이번 설계에서는 해당 기능이 연결될 인터페이스와 경계만 정의해도 될까요?
+
+</details>
 
 ## Turn 3
 
 ### User prompt
 
 진행
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -2953,11 +2966,16 @@ Output:
 
 1번 접근으로 설계를 구체화할까요?
 
+</details>
+
 ## Turn 4
 
 ### User prompt
 
 1번이 올바름
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -3596,6 +3614,8 @@ src/
 
 이 구조와 경계가 맞으면 다음으로 provider·route·API 데이터 흐름을 확정하겠습니다. 승인할까요?
 
+</details>
+
 ## Turn 5
 
 ### User prompt
@@ -3607,6 +3627,9 @@ src/
 - 빈 layer와 빈 index.ts 생성 금지
 - 실제 소비 시점에만 directory와 public API 생성
 - Biome import 경계 규칙 검증 포함
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -3698,11 +3721,16 @@ feature/entity
 
 이 provider·route·API 흐름을 승인할까요?
 
+</details>
+
 ## Turn 6
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -3747,11 +3775,16 @@ feature/entity
 
 이 마지막 섹션까지 승인하면 설계 문서를 작성하고 자체 검토 후 커밋하겠습니다. 승인할까요?
 
+</details>
+
 ## Turn 7
 
 ### User prompt
 
 ApiError는 http, invalid-response, network, aborted 판별 union으로 정의 내용 추가
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -3777,12 +3810,17 @@ type ApiError =
 
 이 변경을 포함한 전체 설계를 최종 승인할까요?
 
+</details>
+
 ## Turn 8
 
 ### User prompt
 
 - entities/dashboard 경계 부적절함. dashboard가 독립 도메인 객체 아니면 pages/dashboard 또는 widget에 유지할 것
 - route error boundary는 event handler와 비동기 오류 못 잡음. render와 route 오류만 담당하도록 문구 수정. aborted는 사용자 오류 UI 없이 취소 처리
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Assistant response
 
@@ -3803,11 +3841,16 @@ type ApiError =
 
 이 수정안을 포함한 전체 설계를 최종 승인할까요?
 
+</details>
+
 ## Turn 9
 
 ### User prompt
 
 최종 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -5000,11 +5043,16 @@ Output:
 
 문서를 검토하고 구현 계획 작성으로 넘어가도 되는지 알려주세요.
 
+</details>
+
 ## Turn 10
 
 ### User prompt
 
 승인
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -8270,11 +8318,16 @@ Output:
 
 현재 `ARCH-01`은 `SCF-04` 완료 기록과 사람이 직접 기록하는 `DEC-ARCH-01` 승인 상태가 선행되어야 합니다. 어떤 방식으로 진행할까요?
 
+</details>
+
 ## Turn 11
 
 ### User prompt
 
 2
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -9971,11 +10024,16 @@ main
 
 `.worktrees/architecture-boundaries`를 생성하고, 먼저 기존 scaffold evidence를 재검증해 `SCF-01~04` 상태부터 정리할까요?
 
+</details>
+
 ## Turn 12
 
 ### User prompt
 
 재검증해서 정리할것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -21566,11 +21624,16 @@ Output:
 3. 브랜치와 worktree 유지
 4. 작업 폐기
 
+</details>
+
 ## Turn 13
 
 ### User prompt
 
 1
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -21774,11 +21837,16 @@ main에 커밋되지 않은 변경 3개가 있어 병합을 중단했습니다.
 
 이 변경들을 임시 stash한 뒤 병합하고 다시 적용해도 될까요?
 
+</details>
+
 ## Turn 14
 
 ### User prompt
 
 다시 확인할것
+
+<details>
+<summary>작업 내용 보기</summary>
 
 ### Tool activity
 
@@ -22161,3 +22229,5 @@ branch refs/heads/fix/dec-prefix
 - feature branch와 worktree 삭제 완료
 - main worktree clean, `origin/main`보다 22커밋 앞섬
 - remote 접근 권한 오류로 pull/push는 수행되지 않았습니다.
+</details>
+
