@@ -3368,3 +3368,22 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   상태 값의 `HUMAN_APPROVED` 전환은 사람이 직접 소유하므로 AI는 `AI_VERIFIED`를 유지함.
   상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
+
+### [ ] TOOL-AI-PROMPT-FOLD-DESIGN-01 세션 아티팩트 프롬프트 우선 표시 설계
+
+- Requirements: `SYS-05`
+- Risk: MEDIUM — 사람 검토 기록 23개의 presentation과 후속 candidate 형식 변경
+- Depends on: `DOCS-README-01`
+- Deliverable:
+  `docs/superpowers/specs/2026-09-04-session-artifact-prompt-first-design.md`
+- Acceptance: 각 Turn의 user prompt는 기본 노출되고 tool activity와 assistant
+  response는 하나의 native Markdown details에 포함되며, 기존 게시 기록도 원문과
+  review metadata를 보존한 채 같은 구조로 변환하고 사람이 diff를 다시 검토한다.
+- Automatic verification: 설계 placeholder·모순·범위 자체 검토,
+  `pnpm verify setup`, `git diff --check`
+- Browser verification: 적용 없음 — repository Markdown presentation은 구현 후
+  사람이 실제 renderer에서 접힘·펼치기를 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. 현재 23개 공개 artifact가
+  436,428줄이고 최장 문서가 78,018줄임을 확인했다. 사용자가 user prompt 기본
+  노출, 하단 작업 내용 한 번 접기와 기존 게시 기록 전체 변환을 승인했다.
