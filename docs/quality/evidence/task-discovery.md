@@ -10,7 +10,7 @@ Approved scope: desktop/mobile 목록, Card 내용·keyboard navigation, virtual
 terminal pagination, 상세 이동, console/error 확인과 자동 negative-state evidence
 Status: `HUMAN_APPROVED`; 이 기록은 사용자의 명시적 checkpoint 승인을 반영한다.
 
-## TASK-PAGE-DOCUMENT-SCROLL-01 — checkpoint candidate
+## TASK-PAGE-DOCUMENT-SCROLL-01 — final QA PASS
 
 Requirement/Journey: `TASK-LIST-03`, `TASK-LIST-04`; `task-discovery`, `task-crud`
 Implementation target: `7d995995b71b464a7249266849a8e6de8c1c116c`
@@ -52,6 +52,26 @@ JSDOM `scrollTo` 미구현은 `TOOLING`으로 분류해 최소 test harness 수�
 Rerun verdict: PASS — document-only scroll, 순수 자동 pagination, 목록 내부 terminal,
 desktop/mobile responsive clearance와 기존 Task CRUD 회귀가 모두 통과했다. 사람
 checkpoint와 `HUMAN_APPROVED` 전환은 별도다
+
+Final QA target: `a2cda2a724b9f5c5c3315012044eee412c538be6`
+Full verification: `pnpm verify full` PASS — hook 84, verifier 21, format/lint/OpenAPI
+type check/typecheck, Vitest 49 files/308 tests, production build, Chromium core Journey
+9/9, verifier regression 19/19. 기존 Vite 500kB chunk advisory 외 새 warning은 없었다
+Review target: 위 final QA target, `TASK-LIST-03`, `TASK-LIST-04`, `task-discovery`,
+`task-crud`, approved plan과 current `main` diff
+Reviewer: checkpoint target commit 뒤 편집과 분리한 explicit read-only final second-pass
+`/root/final-review-pass`
+Checks: auth transition/cache cleanup, document navigation, infinite query exact-once와
+partial retry/terminal stop, window virtual measurement와 bounded DOM, mobile/keyboard
+accessibility, Task CRUD, OAS/mock/generated/dependency 불변, console/network evidence,
+weak/duplicate test, unrelated diff, TODO/evidence 정합성
+Findings: unresolved HIGH/MEDIUM/LOW 없음. Vite chunk-size advisory는 이 변경 전부터
+존재하며 기능·회귀를 막지 않는 기존 build advisory다
+Corrections: 적용 없음
+Rerun: `pnpm verify full`, authoritative/product diff, `git diff --check`, clean branch
+status를 final QA target에서 확인했다
+Verdict: PASS — 승인된 checkpoint 범위와 assignment-wide 회귀 검증을 충족했다.
+`HUMAN_APPROVED` 상태는 AI가 변경하지 않았다
 
 ## TASK-LIST-JOURNEY-REVIEW-01 — PASS
 
