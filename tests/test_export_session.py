@@ -518,6 +518,16 @@ class ProjectWiringTests(unittest.TestCase):
         self.assertNotIn("<!-- reviewed-records:start -->", document)
         self.assertNotIn("<!-- reviewed-records:end -->", document)
         self.assertNotRegex(document, r"\./artifacts/codex-session-[^)]+\.md")
+        for skill in (
+            "superpowers:brainstorming",
+            "superpowers:using-git-worktrees",
+            "superpowers:writing-plans",
+            "superpowers:test-driven-development",
+            "frontend-design:frontend-design",
+            "ponytail:ponytail",
+            "agent-browser",
+        ):
+            self.assertIn("`{}`".format(skill), document)
         self.assertEqual(document.count("- [ ]") + document.count("- [x]"), 4)
 
 
