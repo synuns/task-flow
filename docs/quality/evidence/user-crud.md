@@ -176,9 +176,9 @@ native AlertDialog outside-dismiss prevention was reused. Final quick and full g
 Requirement/Journey/case trace: `USER-CRUD-06`, `USER-LOGOUT-04`,
 `USER-LOGOUT-05`; corrected `user-crud` sign-out/delete session boundary.
 
-Target: `c924331ee6449ee413bafdb30f10e49ec15aca41` on
+Target: `1e12ebe16e39d45ec39304be92eff79b7bb7afdd` on
 `fix/final-review-auth`, rebased onto `main`
-`c7d515189ca41641f5d4a217902a568906356b01`.
+`c9c1b928aeb33710be822c0f21d68e4bd1f1a9ac`.
 
 Automatic verification: focused auth/router/API Vitest 9 files/92 tests PASS;
 `pnpm verify quick` PASS with hook 88, verifier 20 and 48 files/281 tests;
@@ -200,7 +200,7 @@ contains neither temporary change.
 
 Review target: `docs/superpowers/plans/2026-09-04-auth-route-session-corrections.md`;
 `USER-CRUD-06`, `USER-LOGOUT-04`, `USER-LOGOUT-05`; target
-`c924331ee6449ee413bafdb30f10e49ec15aca41`
+`1e12ebe16e39d45ec39304be92eff79b7bb7afdd`
 
 Reviewer: Codex `/root`, the implementation author in an explicit fresh
 second-pass role after implementation; runtime policy prohibited subagent review

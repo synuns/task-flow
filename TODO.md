@@ -3389,8 +3389,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Evidence: 2026-09-04 Codex `/root`; Review target:
   `docs/superpowers/plans/2026-09-04-auth-route-session-corrections.md`, requirements
   `NAV-02`, `NAV-03`, `AUTH-07`, `USER-CRUD-06`, `USER-LOGOUT-04`,
-  `USER-LOGOUT-05`, target `c924331ee6449ee413bafdb30f10e49ec15aca41` rebased on
-  `main` `c7d5151`. Reviewer: 구현 작성자인 `/root`가 구현 완료 뒤 명시적으로 분리한
+  `USER-LOGOUT-05`, target `1e12ebe16e39d45ec39304be92eff79b7bb7afdd` rebased on
+  `main` `c9c1b92`. Reviewer: 구현 작성자인 `/root`가 구현 완료 뒤 명시적으로 분리한
   fresh second-pass role; runtime policy가 subagent review를 금지함. Checks: plan acceptance,
   route/router parity와 canonical/trailing/encoded/case/unknown/external/malformed path,
   principal cache와 unrelated cache, refresh replay/terminal 401/stale generation,
@@ -3419,8 +3419,71 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: `docs/quality/evidence/auth-entry.md`,
   `docs/quality/evidence/user-crud.md`
 - Status: BLOCKED
-- Evidence: AI 검증은 완료됐으나 이 Cycle의 명시적인 사람 checkpoint 수락은 아직 없음.
-  AI는 `HUMAN_APPROVED`를 표시하지 않음.
+- Evidence: 2026-09-04 사용자가 `승인하고 2차 모듈 수정 진행`이라고 명시해 다음
+  correction cycle 진행 권한을 확인함. 공식 `HUMAN_APPROVED` 상태와 checkbox는 사람이
+  직접 편집하는 규약에 따라 AI가 변경하지 않음.
+
+### [ ] REVIEW-TASK-LOCK-01 Task 상세 mutation 상호 배제
+
+- Requirements: `TASK-CRUD-05`, `TASK-CRUD-06`, `TASK-CRUD-07`,
+  `TASK-DETAIL-03`~`TASK-DETAIL-05`
+- Risk: HIGH — stale PATCH와 DELETE 동시 실행으로 detail/cache가 역행하는 경계 수정
+- Depends on: `REVIEW-AUTH-JOURNEY-01`
+- Deliverable: page-owned pending owner, feature disabled/pending lifecycle, 회귀 test
+- Acceptance: title/memo/status/delete 중 하나가 pending이면 다른 mutation control이
+  비활성화되고 실패 뒤 기존 draft/error를 유지한 채 lock이 해제된다.
+- Automatic verification: task-detail/update/delete focused Vitest, `pnpm verify quick`
+- Browser verification: `REVIEW-TASK-API-JOURNEY-01`에서 pending/failure 흐름 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. 최신 `main` `c9c1b92`로 충돌
+  없이 rebase했고 Cycle 1 diff와 MSW fixture/E2E 변경을 항목별로 보존함. Requirements,
+  Task detail route/symbol과 task-resolution/task-crud Journey를 검색함. Baseline
+  `pnpm verify quick` PASS — hook 89, verifier 20, format/lint/typecheck,
+  Vitest 48 files/287 tests.
+
+### [ ] REVIEW-TASK-RETRY-01 Infinite query 실패 operation 재실행
+
+- Requirements: `TASK-LIST-01`, `TASK-LIST-04`
+- Risk: MEDIUM — retained data를 보존하며 실패한 page/refetch operation을 재실행
+- Depends on: `REVIEW-TASK-LOCK-01`
+- Deliverable: React Query error-kind 기반 retry action과 widget 회귀 test
+- Acceptance: next-page 실패는 같은 다음 page를, retained-data refetch 실패는 refetch를
+  실행하며 기존 task data는 유지된다.
+- Automatic verification: task-list focused Vitest, `pnpm verify quick`
+- Browser verification: `REVIEW-TASK-API-JOURNEY-01`에서 오류·retry 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] REVIEW-API-RESPONSE-01 User와 Task 성공 응답 OpenAPI 제약
+
+- Requirements: `USER-01`, `TASK-LIST-01`, `TASK-DETAIL-01`, `TASK-CRUD-02`,
+  `TASK-CRUD-04`~`TASK-CRUD-06`
+- Risk: HIGH — schema 밖 성공 body가 cache/UI로 유입되는 trust boundary 수정
+- Depends on: `REVIEW-TASK-RETRY-01`
+- Deliverable: 기존 Zod 기반 strict User/Task response validator와 경계 test
+- Acceptance: exact key/type에 더해 email/길이/status/date-time 제약을 검증하고 정상
+  generated response와 기존 request method/body를 유지한다.
+- Automatic verification: shared API focused Vitest, generated check, `pnpm verify quick`
+- Browser verification: UI 변경 없음 — 통합 task Journey와 API evidence 사용
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] REVIEW-TASK-API-JOURNEY-01 Task와 API correction 통합 검증·적대적 검토
+
+- Requirements: `TASK-LIST-01`, `TASK-LIST-04`, `TASK-DETAIL-01`,
+  `TASK-DETAIL-03`~`TASK-DETAIL-05`, `TASK-CRUD-02`, `TASK-CRUD-04`~`TASK-CRUD-07`,
+  `USER-01`
+- Risk: HIGH — task-discovery/task-resolution/task-crud corrected target 재검토
+- Depends on: `REVIEW-API-RESPONSE-01`
+- Deliverable: focused/quick/mapped E2E/full, production browser와 seven-field evidence
+- Acceptance: mutation lock, retry operation, response validator가 비낙관 cache, 삭제,
+  ownership, auth replay와 OpenAPI를 보존하고 unresolved HIGH/MEDIUM finding이 없다.
+- Automatic verification: Cycle 2 focused Vitest, quick, mapped Playwright, full,
+  authoritative diff
+- Browser verification: production preview pending lock/failure recovery/refetch retry,
+  console/page error
+- Status: NOT_STARTED
+- Evidence: 없음
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 

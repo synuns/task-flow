@@ -111,8 +111,8 @@ human Journey approval.
 
 Requirement/Journey: `NAV-02`, `NAV-03`, `AUTH-07`; corrected `auth-entry` target
 
-Commit: `c924331ee6449ee413bafdb30f10e49ec15aca41` on
-`fix/final-review-auth`, rebased onto `main` `c7d515189ca41641f5d4a217902a568906356b01`
+Commit: `1e12ebe16e39d45ec39304be92eff79b7bb7afdd` on
+`fix/final-review-auth`, rebased onto `main` `c9c1b928aeb33710be822c0f21d68e4bd1f1a9ac`
 
 Route/Viewport: production preview `http://127.0.0.1:4187`; `/user/`,
 `/sign-in/`, `/`; Chromium 1280x720
@@ -157,7 +157,7 @@ verifier regression 19/19. Port 4187 was closed and the worktree returned clean.
 
 Review target: `docs/superpowers/plans/2026-09-04-auth-route-session-corrections.md`;
 `NAV-02`, `NAV-03`, `AUTH-07`; target
-`c924331ee6449ee413bafdb30f10e49ec15aca41`
+`1e12ebe16e39d45ec39304be92eff79b7bb7afdd`
 
 Reviewer: Codex `/root`, the implementation author in an explicit fresh
 second-pass role after implementation; runtime policy prohibited subagent review
