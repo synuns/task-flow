@@ -3368,3 +3368,24 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   상태 값의 `HUMAN_APPROVED` 전환은 사람이 직접 소유하므로 AI는 `AI_VERIFIED`를 유지함.
   상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
+
+## 12. MSW 테스트 계정 보완
+
+### [ ] MSW-TEST-ACCOUNTS-01 기능 확인용 테스트 계정 fixture 보완
+
+- Requirements: `SYS-04`, `DASH-01`, `USER-01`, `TASK-LIST-01`~`TASK-LIST-04`,
+  `TASK-DETAIL-01`~`TASK-DETAIL-02`
+- Risk: MEDIUM — 여러 보호 route가 공유하는 mock 초기 상태와 실패 profile 변경
+- Depends on: `DOCS-README-01`
+- Deliverable: 긴 목록·빈 상태·조회 오류를 재현하는 세 MSW 테스트 계정과 안내·검증 근거
+- Acceptance: 기본 계정은 기존 핵심 Task를 보존한 30개 목록을 실제 scroll로 탐색하고,
+  빈 계정은 dashboard 0/0/0과 빈 목록을, 오류 계정은 로그인 후 모든 보호 GET의
+  network-error 복구 UI를 결정적으로 재현한다.
+- Automatic verification: fixture/handler Vitest, `pnpm verify quick`, mapped E2E,
+  `pnpm verify full`, `git diff --check`
+- Browser verification: 세 계정으로 `/`, `/user`, `/task`, `/task/:id` 상태와
+  scroll/retry/console/page error 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner; branch
+  `feat/msw-test-accounts`; approved design
+  `docs/superpowers/specs/2026-09-04-msw-test-account-fixtures-design.md`.

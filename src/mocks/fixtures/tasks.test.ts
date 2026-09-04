@@ -32,9 +32,9 @@ describe("task fixture persistence", () => {
 
     expect(reloadedModule.findTask("user-1", "task-1")).toBeNull();
     expect(reloadedModule.getDashboardMetrics("user-1")).toEqual({
-      numOfTask: 2,
-      numOfRestTask: 1,
-      numOfDoneTask: 1,
+      numOfTask: 29,
+      numOfRestTask: 19,
+      numOfDoneTask: 10,
     });
   });
 
@@ -59,6 +59,31 @@ describe("task fixture persistence", () => {
     expect(fixture.listTaskPage("user-1", 1).data[0]?.id).toBe("task-1");
   });
 
+  it("seeds enough mixed-status tasks to exercise fifteen pages", async () => {
+    const fixture = await import("./tasks");
+    const pages = Array.from({ length: 15 }, (_, index) =>
+      fixture.listTaskPage("user-1", index + 1),
+    );
+    const seededTasks = pages.flatMap((page) => page.data);
+
+    expect(seededTasks).toHaveLength(30);
+    expect(seededTasks[0]?.id).toBe("task-1");
+    expect(seededTasks.at(-1)?.id).toBe("task-30");
+    expect(pages.slice(0, -1).every((page) => page.hasNext)).toBe(true);
+    expect(pages.at(-1)?.hasNext).toBe(false);
+    expect(
+      seededTasks.reduce<Record<string, number>>((counts, task) => {
+        counts[task.status] = (counts[task.status] ?? 0) + 1;
+        return counts;
+      }, {}),
+    ).toEqual({ TODO: 11, IN_PROGRESS: 9, DONE: 10 });
+    expect(fixture.getDashboardMetrics("user-1")).toEqual({
+      numOfTask: 30,
+      numOfRestTask: 20,
+      numOfDoneTask: 10,
+    });
+  });
+
   it("never exposes tasks owned by another user", async () => {
     const fixture = await import("./tasks");
 
@@ -79,7 +104,7 @@ describe("task fixture persistence", () => {
     const created = firstModule.createStoredTask("user-1", { title: " 새 할 일 " });
 
     expect(created).toEqual({
-      id: "task-4",
+      id: "task-31",
       ownerId: "user-1",
       title: "새 할 일",
       memo: "",
@@ -104,9 +129,9 @@ describe("task fixture persistence", () => {
       status: "IN_PROGRESS",
     });
     expect(fixture.getDashboardMetrics("user-1")).toEqual({
-      numOfTask: 3,
-      numOfRestTask: 2,
-      numOfDoneTask: 1,
+      numOfTask: 30,
+      numOfRestTask: 20,
+      numOfDoneTask: 10,
     });
   });
 

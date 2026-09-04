@@ -38,9 +38,9 @@ describe("task handlers", () => {
 
     expect(beforeList.status).toBe(200);
     expect(beforeDashboard.body).toEqual({
-      numOfTask: 3,
-      numOfRestTask: 2,
-      numOfDoneTask: 1,
+      numOfTask: 30,
+      numOfRestTask: 20,
+      numOfDoneTask: 10,
     });
     expect(deleted).toEqual({ status: 200, body: { success: true } });
     expect(
@@ -48,9 +48,9 @@ describe("task handlers", () => {
     ).not.toContain("task-1");
     expect(afterDetail.status).toBe(404);
     expect(afterDashboard.body).toEqual({
-      numOfTask: 2,
-      numOfRestTask: 1,
-      numOfDoneTask: 1,
+      numOfTask: 29,
+      numOfRestTask: 19,
+      numOfDoneTask: 10,
     });
   });
 
@@ -77,20 +77,19 @@ describe("task handlers", () => {
     },
   );
 
-  it("returns two ordered pages and stops at the terminal page", async () => {
-    const first = (await apiRequest("/api/task?page=1")).body as {
-      data: Array<{ id: string }>;
-      hasNext: boolean;
-    };
-    const second = (await apiRequest("/api/task?page=2")).body as {
-      data: Array<{ id: string }>;
-      hasNext: boolean;
-    };
+  it("returns fifteen ordered pages and stops at the terminal page", async () => {
+    const pages = await Promise.all(
+      Array.from({ length: 15 }, async (_, index) => {
+        const response = await apiRequest(`/api/task?page=${index + 1}`);
+        return response.body as { data: Array<{ id: string }>; hasNext: boolean };
+      }),
+    );
 
-    expect(first).toMatchObject({ hasNext: true });
-    expect(first.data.map((task) => task.id)).toEqual(["task-1", "task-2"]);
-    expect(second).toMatchObject({ hasNext: false });
-    expect(second.data.map((task) => task.id)).toEqual(["task-3"]);
+    expect(pages.flatMap((page) => page.data.map((task) => task.id))).toEqual(
+      Array.from({ length: 30 }, (_, index) => `task-${index + 1}`),
+    );
+    expect(pages.slice(0, -1).every((page) => page.hasNext)).toBe(true);
+    expect(pages.at(-1)?.hasNext).toBe(false);
   });
 
   it("never mutates the store for an unauthorized delete", async () => {
@@ -126,19 +125,20 @@ describe("task handlers", () => {
     await apiRequest("/api/task/task-1", "DELETE");
     resetTaskStore();
 
-    const restoredFirst = (await apiRequest("/api/task?page=1")).body as {
-      data: Array<{ id: string }>;
-    };
-    const restoredSecond = (await apiRequest("/api/task?page=2")).body as {
-      data: Array<{ id: string }>;
-    };
-    const restoredIds = [...restoredFirst.data, ...restoredSecond.data].map((task) => task.id);
-    expect(restoredIds).toEqual(["task-1", "task-2", "task-3"]);
+    const restoredIds = (
+      await Promise.all(
+        Array.from({ length: 15 }, async (_, index) => {
+          const response = await apiRequest(`/api/task?page=${index + 1}`);
+          return (response.body as { data: Array<{ id: string }> }).data;
+        }),
+      )
+    ).flatMap((tasks) => tasks.map((task) => task.id));
+    expect(restoredIds).toEqual(Array.from({ length: 30 }, (_, index) => `task-${index + 1}`));
     expect((await apiRequest("/api/task/task-1")).status).toBe(200);
     expect((await apiRequest("/api/dashboard")).body).toEqual({
-      numOfTask: 3,
-      numOfRestTask: 2,
-      numOfDoneTask: 1,
+      numOfTask: 30,
+      numOfRestTask: 20,
+      numOfDoneTask: 10,
     });
   });
 
@@ -146,11 +146,11 @@ describe("task handlers", () => {
     const created = await apiRequest("/api/task", "POST", accessToken, {
       title: " 새 할 일 ",
     });
-    const id = "task-4";
+    const id = "task-31";
 
     expect(created).toMatchObject({
       status: 201,
-      body: { id: "task-4", title: "새 할 일", memo: "", status: "TODO" },
+      body: { id: "task-31", title: "새 할 일", memo: "", status: "TODO" },
     });
     expect(
       await apiRequest(`/api/task/${id}`, "PATCH", accessToken, { status: "IN_PROGRESS" }),
@@ -160,9 +160,9 @@ describe("task handlers", () => {
       body: { title: "새 할 일", memo: "", status: "IN_PROGRESS" },
     });
     expect((await apiRequest("/api/dashboard")).body).toEqual({
-      numOfTask: 4,
-      numOfRestTask: 3,
-      numOfDoneTask: 1,
+      numOfTask: 31,
+      numOfRestTask: 21,
+      numOfDoneTask: 10,
     });
   });
 

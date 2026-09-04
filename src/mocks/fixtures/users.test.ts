@@ -41,7 +41,7 @@ describe("user fixture store", () => {
   });
 
   it("removes every task owned by the deleted seed user", () => {
-    expect(removeAccount("user-1", "Password1")).toEqual({ removedTaskCount: 3 });
+    expect(removeAccount("user-1", "Password1")).toEqual({ removedTaskCount: 30 });
     expect(findUser("user-1")).toBeNull();
     expect(findTask("user-1", "task-1")).toBeNull();
     expect(findTask("user-1", "task-2")).toBeNull();

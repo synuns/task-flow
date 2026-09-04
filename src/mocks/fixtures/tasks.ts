@@ -26,7 +26,7 @@ export type StoredTask = z.infer<typeof storedTaskSchema>;
 
 const fixtureStorageKey = "__taskflow_msw_task_fixture__";
 
-const seed: StoredTask[] = [
+const baseSeed: StoredTask[] = [
   {
     id: "task-1",
     ownerId: "user-1",
@@ -52,6 +52,23 @@ const seed: StoredTask[] = [
     registerDatetime: "2026-08-30T11:00:00.000Z",
   },
 ];
+
+const generatedSeed = Array.from({ length: 27 }, (_, index): StoredTask => {
+  const taskNumber = index + 4;
+  const suffix = String(taskNumber).padStart(2, "0");
+  const status: StoredTask["status"] =
+    taskNumber % 3 === 1 ? "IN_PROGRESS" : taskNumber % 3 === 2 ? "DONE" : "TODO";
+  return {
+    id: `task-${taskNumber}`,
+    ownerId: "user-1",
+    title: `추가 할 일 ${suffix}`,
+    memo: `무한 스크롤 확인 ${suffix}`,
+    status,
+    registerDatetime: new Date(Date.UTC(2026, 7, 31, 9, index)).toISOString(),
+  };
+});
+
+const seed = [...baseSeed, ...generatedSeed];
 
 function isStoredTask(value: unknown): value is StoredTask {
   return storedTaskSchema.safeParse(value).success;
