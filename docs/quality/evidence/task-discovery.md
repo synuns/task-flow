@@ -20,6 +20,11 @@ PASS, hook 84, verifier 21, Vitest 49 files/308 tests; mapped Chromium
 `e2e/task-discovery.spec.ts e2e/task-crud.spec.ts` PASS, 3/3
 Agent-browser session: `task-page-document-scroll`; production preview
 Route/Viewport: `/task`; Chromium `1280x400`, `390x844`
+Precondition: approved authenticated test account로 로그인하고 기존 owner-aware fixture의
+30개 task를 사용했다. fresh production preview와 browser session에서 `/task`를 열었다
+Expected: document만 스크롤되고 list region은 내부 overflow가 없으며 page 1~15를 각
+1회 요청한 뒤 목록 내부 terminal에서 멈춘다. mounted row는 10개 미만이고 mobile에서
+가로 넘침이나 고정 하단 navigation 가림이 없어야 한다
 Actions/actual: document bottom까지 window scroll해 `/api/task?page=1..15`를 순서대로
 각 1회 불러왔다. 목록 region의 `overflow-y`는 desktop/mobile 모두 `visible`이고
 `scrollHeight === clientHeight`였다. terminal 문구는 같은 region 내부 최하단에 있으며
