@@ -3468,7 +3468,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify quick` PASS — hook 89, verifier 20, format/lint/typecheck,
   Vitest 48 files/288 tests; `git diff --check` PASS.
 
-### [ ] REVIEW-API-RESPONSE-01 User와 Task 성공 응답 OpenAPI 제약
+### [x] REVIEW-API-RESPONSE-01 User와 Task 성공 응답 OpenAPI 제약
 
 - Requirements: `USER-01`, `TASK-LIST-01`, `TASK-DETAIL-01`, `TASK-CRUD-02`,
   `TASK-CRUD-04`~`TASK-CRUD-06`
@@ -3479,10 +3479,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   generated response와 기존 request method/body를 유지한다.
 - Automatic verification: shared API focused Vitest, generated check, `pnpm verify quick`
 - Browser verification: UI 변경 없음 — 통합 task Journey와 API evidence 사용
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. `REVIEW-TASK-RETRY-01`
   AI 검증 완료 후 OpenAPI User/Task 성공 응답 schema와 현행 validator/test를 대조하며
-  작업 시작.
+  작업 시작. RED API 2 files/26 tests 중 email/최대 길이/Task title·memo 제약 8 fail,
+  기존 exact key/type/status/date-time 18 pass로 누락 범위를 분리함. 설치된 Zod의
+  `strictObject`를 사용해 중복 수동 검사 42줄을 제거하고 OpenAPI 제약을 선언함.
+  GREEN API 2 files/26 tests PASS. 첫 quick에서 새 validator가 기존 detail layout의
+  잘못된 500자 title fixture를 거부해 `TEST`로 분류하고 계약 최대값 100으로 교정했으며,
+  동시 실행 부하의 auth test timeout은 focused 재실행에서 재현되지 않음. Target
+  `8582cb8`; API/detail/auth focused 4 files/39 tests, 최종 `pnpm verify quick` PASS —
+  hook 89, verifier 20, generated check/format/lint/typecheck, Vitest 48 files/297 tests.
+  authoritative/generated/dependency diff 없음, `git diff --check` PASS.
 
 ### [ ] REVIEW-TASK-API-JOURNEY-01 Task와 API correction 통합 검증·적대적 검토
 
@@ -3498,8 +3506,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   authoritative diff
 - Browser verification: production preview pending lock/failure recovery/refetch retry,
   console/page error
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. 세 correction unit의 focused와
+  quick 통과 후 mapped Journey, production browser, full, fresh adversarial review 착수.
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
