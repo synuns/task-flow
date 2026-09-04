@@ -15,6 +15,9 @@ Status: `HUMAN_APPROVED`; 이 기록은 사용자의 명시적 checkpoint 승인
 Requirement/Journey: `TASK-LIST-03`, `TASK-LIST-04`; `task-discovery`, `task-crud`
 Implementation target: `7d995995b71b464a7249266849a8e6de8c1c116c`
 Session/branch: Codex `/root`; `fix/task-page-document-scroll`
+Human checkpoint: 2026-09-04 사용자가 `QA 완료 승인하고 main merge`라고 명시해 이
+변경의 checkpoint와 final QA·local main merge 진행을 승인했다. 프로젝트 규약대로 AI가
+기존 Journey status나 checkbox를 `HUMAN_APPROVED`로 대신 변경하지 않는다
 Automatic checks: focused Task list/page Vitest PASS, 2 files/10 tests; `pnpm verify quick`
 PASS, hook 84, verifier 21, Vitest 49 files/308 tests; mapped Chromium
 `e2e/task-discovery.spec.ts e2e/task-crud.spec.ts` PASS, 3/3
