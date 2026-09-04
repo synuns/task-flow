@@ -9,6 +9,7 @@ import { deleteUser, signOut, useApiClient } from "@/shared/api";
 import { AppShell } from "@/widgets/app-shell";
 import { useAuth } from "./auth/auth-provider";
 import { AuthRouteBoundary } from "./auth/auth-route-boundary";
+import { routePaths } from "./auth/route-policy";
 import { RouteErrorBoundary } from "./route-error-boundary";
 
 function AuthShellRoute() {
@@ -17,8 +18,8 @@ function AuthShellRoute() {
     <AppShell
       authAction={
         auth.status.kind === "authenticated"
-          ? { kind: "profile", to: "/user" }
-          : { kind: "sign-in", to: "/sign-in" }
+          ? { kind: "profile", to: routePaths.user }
+          : { kind: "sign-in", to: routePaths.signIn }
       }
     />
   );
@@ -38,14 +39,14 @@ function UserRoute() {
     const snapshot = auth.getSnapshot();
     await deleteUser(client, password);
     auth.terminate(snapshot);
-    navigate("/sign-in", { replace: true });
+    navigate(routePaths.signIn, { replace: true });
   }
 
   async function signOutCurrentSession() {
     const snapshot = auth.getSnapshot();
     await signOut(client);
     auth.terminate(snapshot);
-    navigate("/sign-in", { replace: true });
+    navigate(routePaths.signIn, { replace: true });
   }
 
   return <UserPage onDelete={deleteAccount} onSignOut={signOutCurrentSession} />;
@@ -53,7 +54,7 @@ function UserRoute() {
 
 export const appRoutes: RouteObject[] = [
   {
-    path: "/",
+    path: routePaths.dashboard,
     element: <AuthShellRoute />,
     errorElement: <RouteErrorBoundary />,
     children: [
@@ -61,11 +62,11 @@ export const appRoutes: RouteObject[] = [
         element: <AuthRouteBoundary />,
         children: [
           { index: true, element: <DashboardPage /> },
-          { path: "sign-in", element: <SignInRoute /> },
-          { path: "sign-up", element: <SignUpPage /> },
-          { path: "task", element: <TaskListPage /> },
-          { path: "task/:id", element: <TaskDetailPage /> },
-          { path: "user", element: <UserRoute /> },
+          { path: routePaths.signIn, element: <SignInRoute /> },
+          { path: routePaths.signUp, element: <SignUpPage /> },
+          { path: routePaths.taskList, element: <TaskListPage /> },
+          { path: routePaths.taskDetail, element: <TaskDetailPage /> },
+          { path: routePaths.user, element: <UserRoute /> },
         ],
       },
     ],

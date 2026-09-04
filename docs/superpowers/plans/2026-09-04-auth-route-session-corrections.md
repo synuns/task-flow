@@ -207,8 +207,9 @@ git add src/app/auth src/app/router.tsx src/app/router.test.tsx TODO.md
 git commit -m "fix(auth): 라우터와 보호 경로 판정 일치"
 ```
 
-Expected: quick PASS. `REVIEW-AUTH-ROUTE-01` Evidence에 RED/GREEN/quick 결과를 기록하고
-상태는 적대적 검토 전 `IN_PROGRESS`로 유지한다.
+Expected: quick PASS. Route pattern, malformed return-to, 기존 canonical route 회귀를
+fresh second-pass로 검토하고 finding이 없을 때 `REVIEW-AUTH-ROUTE-01`을
+`AI_VERIFIED`로 닫은 뒤 `REVIEW-AUTH-CACHE-01`을 `IN_PROGRESS`로 전환한다.
 
 ### Task 3: Sign-in principal cache 격리
 

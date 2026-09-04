@@ -89,6 +89,18 @@ describe("AuthRouteBoundary", () => {
     expect(screen.getByTestId("return-to")).toHaveTextContent("/task/task%2FA?tab=memo#content");
   });
 
+  it.each(["/task/", "/task/task-1/", "/user/", "/%74ask", "/USER"])(
+    "redirects an anonymous router path variant: %s",
+    async (pathname) => {
+      auth.controller = controller({ kind: "anonymous" });
+      const router = createMemoryRouter(routes, { initialEntries: [pathname] });
+      render(<RouterProvider router={router} />);
+
+      expect(await screen.findByTestId("location")).toHaveTextContent("/sign-in");
+      expect(screen.getByTestId("return-to")).toHaveTextContent(pathname);
+    },
+  );
+
   it.each([
     ["https://evil.test/task", "/"],
     ["/sign-in", "/"],
@@ -122,6 +134,22 @@ describe("AuthRouteBoundary", () => {
 
     expect(await screen.findByTestId("location")).toHaveTextContent("/");
   });
+
+  it.each(["/sign-in/", "/%73ign-in", "/SIGN-UP"])(
+    "redirects an authenticated public auth path variant: %s",
+    async (pathname) => {
+      auth.controller = controller({
+        kind: "authenticated",
+        generation: 1,
+        accessToken: "token",
+        userId: "user-1",
+      });
+      const router = createMemoryRouter(routes, { initialEntries: [pathname] });
+      render(<RouterProvider router={router} />);
+
+      expect(await screen.findByTestId("location")).toHaveTextContent("/");
+    },
+  );
 
   it("exposes retry without treating unavailable as anonymous", async () => {
     const user = userEvent.setup();

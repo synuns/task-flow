@@ -1,7 +1,8 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { AsyncError, AsyncLoading, Skeleton } from "@/shared/ui";
 import { useAuth } from "./auth-provider";
-import { isProtectedPath, safeReturnTo } from "./return-to";
+import { isProtectedPath, isPublicAuthPath, routePaths } from "./route-policy";
+import { safeReturnTo } from "./return-to";
 
 export function AuthRouteBoundary() {
   const auth = useAuth();
@@ -29,12 +30,9 @@ export function AuthRouteBoundary() {
   }
   if (auth.status.kind === "anonymous" && isProtectedPath(location.pathname)) {
     const returnTo = `${location.pathname}${location.search}${location.hash}`;
-    return <Navigate replace state={{ returnTo }} to="/sign-in" />;
+    return <Navigate replace state={{ returnTo }} to={routePaths.signIn} />;
   }
-  if (
-    auth.status.kind === "authenticated" &&
-    (location.pathname === "/sign-in" || location.pathname === "/sign-up")
-  ) {
+  if (auth.status.kind === "authenticated" && isPublicAuthPath(location.pathname)) {
     const state = location.state as { returnTo?: unknown } | null;
     return (
       <Navigate
