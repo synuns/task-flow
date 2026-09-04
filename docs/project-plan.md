@@ -228,8 +228,8 @@ App bootstrap은 router, query client, auth context, MSW development bootstrap�
 
 - server state: TanStack Query가 loading, error, data, pagination, invalidation을
   관리한다.
-- form state: React Hook Form과 Zod가 sign-in 입력·오류·submit 가능 상태를
-  관리한다.
+- form state: React Hook Form과 Zod가 인증·User·Task 변경 입력과 오류,
+  submit 가능 상태를 관리한다.
 - auth state: 승인된 auth adapter/context만 token과 session transition을
   관리한다.
 - modal state: 해당 feature가 open/close, focus restore, 입력 reset을 관리한다.

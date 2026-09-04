@@ -803,7 +803,7 @@ Required content:
 - Scope: requirements analysis, structure decisions, usage-record automation, later code/test/review assistance.
 - Prompt summary: original-file separation; Stop Hook recording; internal-message exclusion; redaction plus human review.
 - Four unchecked verification items: secret scan, transcript accuracy, tests/app behavior, disclosure accuracy.
-- Link: [세션 기록 디렉터리](./artifacts/).
+- Link: `./artifacts/` 세션 기록 디렉터리.
 - Warning: generated files need manual review before submission.
 
 ~~~markdown

@@ -96,14 +96,15 @@ pnpm preview --host 127.0.0.1 --port 4173
 
 ### Source of Truth
 
-| 우선순위 | 문서                                                                         | 역할                                        |
-| -------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
-| 1        | [`assignment-original/openapi.yaml`](./assignment-original/openapi.yaml)     | API method, path, schema, status, 인증 방식 |
-| 2        | [`assignment-original/requirement.md`](./assignment-original/requirement.md) | 화면, 상호작용, 제출 조건                   |
-| 3        | [`docs/api/crud-openapi.yaml`](./docs/api/crud-openapi.yaml)                 | 기존 요구사항에서 확장한 User·Task CRUD     |
-| 4        | [`docs/quality/requirements.md`](./docs/quality/requirements.md)             | Requirement ID, acceptance, 검증 evidence   |
+| 적용 범위      | 문서                                                                         | 역할                                        |
+| -------------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
+| 원본 API       | [`assignment-original/openapi.yaml`](./assignment-original/openapi.yaml)     | 원본 API의 method, path, schema, status, 인증 방식 |
+| 승인된 CRUD API | [`docs/api/crud-openapi.yaml`](./docs/api/crud-openapi.yaml)                 | 확장된 User·Task CRUD와 겹치는 API 계약     |
+| 화면·제출      | [`assignment-original/requirement.md`](./assignment-original/requirement.md) | 화면, 상호작용, 제출 조건                   |
+| 실행·검증      | [`docs/quality/requirements.md`](./docs/quality/requirements.md)             | Requirement ID, acceptance, 검증 evidence   |
 
-API 세부사항이 다른 문서와 충돌하면 해당 범위의 OpenAPI 계약을 우선합니다.
+API 세부사항이 다른 문서와 충돌하면 원본 범위는 원본 OpenAPI를, 승인된 CRUD 확장과
+겹치는 범위는 CRUD OpenAPI를 우선합니다.
 
 ### Core Requirements
 
@@ -239,7 +240,7 @@ acceptance는 사람이 소유합니다. 상세 규칙은
 | 변경 모듈 focused test               | `pnpm vitest run <test-file>` |
 | 개발 환경·hook·TODO 계약             | `pnpm verify setup`           |
 | format·lint·typecheck·전체 Vitest    | `pnpm verify quick`           |
-| build·6개 core Journey E2E·회귀 검증 | `pnpm verify full`            |
+| build·6개 Journey core E2E·회귀 검증 | `pnpm verify full`            |
 
 <details>
 <summary><strong>Journey별 Playwright 명령</strong></summary>
