@@ -1747,3 +1747,36 @@ rendered UI changed.
 
 Verdict: PASS with no unresolved HIGH, MEDIUM or LOW finding. Person checkpoint and
 canonical `pnpm verify full` remain; `HUMAN_APPROVED` and final acceptance are not claimed.
+
+### TaskFlow 명칭·요구사항 구분 후속 검토
+
+Corrected target: `aedc15528c3688434d04f757c55de632b911199b`, full branch diff from
+`c6351ffa20cc9d752c6b249123a0d2363de633e2`.
+
+Checks:
+
+- README가 원본 과제의 `SYS`, `NAV`, `DASH`, `USER-01`, `AUTH`, `TASK-LIST`,
+  `TASK-DETAIL`과 승인 후 추가한 `USER-CRUD`, `USER-LOGOUT`, `TASK-CRUD`를 서로 다른
+  표로 제시하는지 원본 명세와 requirement checklist에 대조했다.
+- README, document title, app shell, package metadata, 현재 source·E2E·verifier·test
+  fixture에서 `TaskFlow` 명칭이 일치하고 active `KBHC` 문자열이 남지 않았는지
+  확인했다. 원본 과제 파일과 과거 evidence는 추적 기록으로 보존했다.
+- package marker, verifier recursion guard와 MSW fixture storage key의 모든 현재 caller와
+  test가 함께 변경되어 이전 식별자를 참조하지 않는지 검사했다.
+- 원본 계약, generated types와 lockfile이 변경되지 않았고 인증·데이터·삭제 의미에
+  변경이 없는지 확인했다.
+
+Findings: unresolved HIGH, MEDIUM, LOW finding 없음.
+
+Corrections: review 중 추가 correction 없음.
+
+Rerun: 명칭 변경 전 router focused test에서 예상 RED 6건을 확인했다. 구현 후 focused
+Vitest 4 files/23 tests와 Python verifier·hook 62 tests PASS; `pnpm verify quick` PASS —
+hook 88, verifier 20, Vitest 47 files/248 tests. `auth-entry`와 `work-overview` mapped
+Chromium 3/3 PASS. agent-browser 1280x720에서 document title `TaskFlow`, app shell brand와
+기본 navigation을 확인하고 session/server를 닫았다. README local link와 필수 안내 audit,
+artifact 21개 주제·파일 audit, active KBHC scan, authoritative/generated/lockfile diff와
+`git diff --check`도 모두 PASS.
+
+Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
+`HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.

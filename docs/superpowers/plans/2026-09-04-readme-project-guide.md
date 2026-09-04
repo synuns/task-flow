@@ -155,7 +155,7 @@ Expected: hook test, verifier test, format, lint, typecheck, Vitest와 whitespac
 
 원본 계약, README 명령·계정·URL, 21개 제목과 파일 경로, SessionEnd/publication 제목 보존, 관련 없는 diff와 승인 경계를 fresh read-only 관점으로 다시 확인한다. finding은 `REQUIREMENT`, `PRODUCT`, `TEST`, `TOOLING`, `ENVIRONMENT`로 분류하고 교정 뒤 focused/quick을 재실행한다.
 
-- [ ] **Step 5: 프로젝트 명칭과 요구사항 범위 구분**
+- [x] **Step 5: 프로젝트 명칭과 요구사항 범위 구분**
 
 README의 원본 과제 요구사항과 추가 보완 기능을 별도 표로 나누고 공개 프로젝트명을
 `TaskFlow`로 통일한다. router focused test와 실제 browser에서 app shell과 document

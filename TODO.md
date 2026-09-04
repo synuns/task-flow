@@ -3310,7 +3310,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   원본/추가 범위를 분리하고 공개 명칭과 현재 검증 식별자를 TaskFlow로 통일함.
   focused Vitest 4 files/23 tests와 Python verifier·hook 62 tests PASS. agent-browser
   1280x720에서 document title `TaskFlow`, app shell brand 노출과 기본 navigation을 확인하고
-  session/server를 종료함. 후속 exact target review와 사람 checkpoint 전까지
-  `IN_PROGRESS`를 유지함. 기존 review 상세는
+  session/server를 종료함. Corrected target
+  `aedc15528c3688434d04f757c55de632b911199b`의 전체 diff를 다시 검토해 원본/추가
+  요구사항 분리, active KBHC 잔존 0, 명칭·fixture·verifier 일관성, 원본 계약과
+  generated/lockfile 무변경을 확인함. `pnpm verify quick` PASS — hook 88, verifier 20,
+  Vitest 47 files/248 tests; mapped Chromium 3/3, README link/필수 안내, artifact 21개
+  주제/파일 audit와 `git diff --check` PASS. Unresolved HIGH/MEDIUM/LOW finding 없음.
+  사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함. 상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
-  사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함.
