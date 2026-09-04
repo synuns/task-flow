@@ -3346,5 +3346,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Vitest 47 files/248 tests, production build, core Journey Chromium 9/9, verifier regression
   19/19. 기존 non-failing Vite chunk-size advisory 외 새 warning이나 unresolved finding
   없음. `AI_VERIFIED`로 전환하며 `HUMAN_APPROVED` 또는 최종 사람 acceptance를 주장하지
-  않음. 상세 review는
+  않음. 2026-09-04 full gate와 main 통합 결과를 제시한 뒤 사용자가 `승인`으로 응답함.
+  상태 값의 `HUMAN_APPROVED` 전환은 사람이 직접 소유하므로 AI는 `AI_VERIFIED`를 유지함.
+  상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.

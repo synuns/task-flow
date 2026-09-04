@@ -1898,3 +1898,9 @@ Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 �
 
 기존 non-failing Vite chunk-size advisory 외 새 warning은 없고 unresolved HIGH, MEDIUM,
 LOW finding도 없다. `DOCS-README-01`은 `AI_VERIFIED`로 전환한다.
+
+### Product Showcase Final Acceptance Record
+
+2026-09-04 full gate 통과와 main fast-forward 결과를 제시한 뒤 사용자가 `승인`으로
+응답했다. `AGENTS.md`에 따라 `HUMAN_APPROVED` 상태 전환은 사람이 직접 소유하므로 AI는
+해당 상태를 기록하지 않고 `DOCS-README-01`의 `AI_VERIFIED` 상태를 유지한다.
