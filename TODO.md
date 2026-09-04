@@ -3280,6 +3280,24 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   2026-09-04 사용자가 제시된 Task CRUD 수동 checklist를 검토한 뒤 `승인`을 명시해
   review/evidence 포함 exact target `e01c7d8f87e8d34786395da9d22f038e35586945`를 승인함.
 
+### [ ] REVIEW-CORRECTION-DESIGN-01 최종 코드 리뷰 수정 설계
+
+- Requirements: `NAV-02`, `NAV-03`, `AUTH-07`, `USER-CRUD-06`, `USER-LOGOUT-04`,
+  `TASK-CRUD-05`, `TASK-CRUD-06`, `TASK-CRUD-07`, `SYS-05`
+- Risk: HIGH — 인증 route·session 종료와 destructive success 이후 cache 경계를 교정
+- Depends on: `JOURNEY-AUTH-01`, `JOURNEY-WORK-01`, `JOURNEY-TASK-LIST-01`,
+  `JOURNEY-TASK-DETAIL-01`, `JOURNEY-USER-CRUD-01`, `JOURNEY-TASK-CRUD-01`
+- Deliverable: `docs/superpowers/specs/2026-09-04-final-code-review-corrections-design.md`
+  및 세 개의 독립 correction cycle 범위
+- Acceptance: 최종 리뷰의 HIGH/MEDIUM finding과 검증 가능한 LOW finding이 기존
+  OpenAPI·인증·삭제 정책을 바꾸지 않는 testable unit으로 분리된다.
+- Automatic verification: 문서 placeholder·requirement·경로·dependency 정적 검토,
+  `pnpm verify setup`, `git diff --check`
+- Browser verification: 적용 없음 — 구현 cycle의 mapped Journey에서 수행
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. 전체 코드 리뷰에서 인증 2건,
+  Task/API 3건과 정리 항목을 확인했고 사용자가 제시된 세-cycle 설계를 `승인`함.
+
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
 - Requirements: `SYS-04`, `SYS-05`
