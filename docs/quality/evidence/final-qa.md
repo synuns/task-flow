@@ -1849,3 +1849,35 @@ files/248 tests.
 
 Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
 `HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.
+
+### Product Showcase 후속 검토
+
+Review target: `fccceb8`, 승인된 B안과 해당 commit의 전체 diff.
+
+Checks:
+
+- Hero의 기술 배지 4개가 현재 `package.json`의 React 19, TypeScript 5.9, Vite 8,
+  Vitest 4와 일치하고 여섯 section 바로가기가 실제 heading을 가리키는지 확인했다.
+- Quick Start가 첫 section이며 Node.js `||` 조건, 설치·실행 명령, 테스트 계정과 한 개의
+  `IMPORTANT` 초기화 안내가 온전히 표시되는지 검사했다.
+- 실제 로그인 뒤 캡처한 dashboard PNG가 1280×720이고 개인 식별 정보 없이 TaskFlow,
+  navigation과 업무 지표만 노출하며 설명 가능한 alt text를 갖는지 확인했다.
+- Core와 Additional Journey가 Mermaid subgraph와 표에서 같은 여섯 단위로 분리되고,
+  workflow가 `Plan → Build → Verify → Accept` 순서와 focused test 실패 loop를 보존하는지
+  확인했다.
+- production preview, Journey별 Playwright 명령, Architecture만 세 개의 `<details>`에
+  들어가고 핵심 요구사항·Journey·검증 명령은 처음부터 보이는지 검사했다.
+- 모든 local Markdown link와 표 열 수를 확인하고 원본 명세, 제품 source, E2E,
+  dependency, generated type이 이 commit에서 변경되지 않았음을 확인했다.
+
+Findings: unresolved HIGH, MEDIUM, LOW finding 없음. Markdown 파일은 저장소 Biome 설정의
+대상이 아니므로 별도 README 구조·링크·표 계약으로 검증했다.
+
+Rerun: README Product Showcase 계약과 local link audit PASS; PNG 형식·1280×720·32,190
+bytes 확인; `git diff --check` PASS. `pnpm verify quick` PASS — hook 88, verifier 20,
+Vitest 47 files/248 tests. mapped `work-overview` Chromium 1/1 PASS. agent-browser에서 실제
+로그인 후 dashboard를 캡처하고 예상된 최초 refresh 401 외 page 동작을 확인한 뒤
+browser session과 development server를 종료했다.
+
+Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
+`HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.
