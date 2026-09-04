@@ -167,9 +167,9 @@ title을 확인한 뒤 plan-completion review를 새 exact target으로 갱신�
 
 Quick Start를 상단으로 옮기고 요구사항·기능·문서 설명을 표로 구조화한다. 여섯
 Journey의 분리 기준과 구현 단위를 추가하고 workflow는 Mermaid 뒤에 단계별 표를 둔다.
-`AI_USAGE.md`에는 사용 스킬을 정리하고 프롬프트 기록은 artifact index 링크 하나만
-남긴다. publisher가 AI_USAGE 목록을 재생성하지 않는 회귀 test를 RED → GREEN으로
-확인한다.
+`AI_USAGE.md`에는 사용 스킬을 컬렉션 전체 식별자로 정리하고 `ponytail:ponytail`을
+포함하며, 프롬프트 기록은 artifact index 링크 하나만 남긴다. publisher가 AI_USAGE
+목록을 재생성하지 않는 회귀 test를 RED → GREEN으로 확인한다.
 
 - [ ] **Step 7: evidence와 상태 완료**
 

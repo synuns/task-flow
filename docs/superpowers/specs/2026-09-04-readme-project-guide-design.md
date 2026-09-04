@@ -25,9 +25,10 @@ README는 다음 순서로 작성한다.
 7. focused test와 `pnpm verify setup|quick|full`, Journey E2E의 용도를 구분한다.
 8. 핵심 디렉터리 역할과 상세 문서 링크를 표로 정리한다.
 
-`AI_USAGE.md`는 사용한 스킬을 단계별로 정리하고, 하단 `프롬프트 작업 기록`에는
-`artifacts/index.md` 링크만 둔다. 공개 기록 목록의 단일 출처는 artifact index이며
-publisher는 `AI_USAGE.md`를 다시 생성하지 않는다.
+`AI_USAGE.md`는 사용한 스킬을 단계별로 정리한다. 컬렉션 소속 스킬은
+`컬렉션:스킬` 전체 식별자를 쓰고 Ponytail 사용도 포함한다. 하단 `프롬프트 작업
+기록`에는 `artifacts/index.md` 링크만 둔다. 공개 기록 목록의 단일 출처는 artifact
+index이며 publisher는 `AI_USAGE.md`를 다시 생성하지 않는다.
 
 ## 아티팩트 인덱스
 
