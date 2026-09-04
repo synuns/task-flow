@@ -140,7 +140,9 @@ export function TaskList() {
           <AlertDescription>
             <p>{errorMessage(query.error)}</p>
             <Button
-              onClick={() => void query.fetchNextPage()}
+              onClick={() =>
+                void (query.isFetchNextPageError ? query.fetchNextPage() : query.refetch())
+              }
               size="sm"
               type="button"
               variant="outline"
