@@ -1,8 +1,8 @@
 <h1 align="center">TaskFlow</h1>
 
 <p align="center">
-  <strong>OpenAPI 기반 업무 관리 SPA</strong><br />
-  React 19와 TypeScript로 구현하고 MSW로 API 환경을 재현했습니다.
+  <strong>업무의 시작부터 완료까지, 한눈에</strong><br />
+  할 일과 진행 상황을 한곳에서 관리하는 TaskFlow입니다.
 </p>
 
 <p align="center">

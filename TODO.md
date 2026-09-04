@@ -3718,6 +3718,13 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   상태 값의 `HUMAN_APPROVED` 전환은 사람이 직접 소유하므로 AI는 `AI_VERIFIED`를 유지함.
   상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
+  후속 README 문구 피드백에서 상단의 중복 기술 요약을 제품 가치 중심 문구로 교정함.
+  Review target: `2ddf1818ff7301bdd1ba225cb7781577d97d99f4` 기준 README working-tree diff;
+  Reviewer: Codex `/root` explicit second-pass role; Checks: 명료성, 기존 문체, 하단
+  Project Overview·Tech Stack과의 중복, 구현 범위와 문구의 일치, unrelated diff;
+  Findings: none; Corrections: 상단 두 줄만 교체; Rerun: `git diff --check`,
+  `pnpm verify quick` PASS — hook 84, verifier 21, Vitest 49 files/314 tests;
+  Verdict: PASS. README-only copy 변경으로 browser 검증은 적용 없음.
 
 ### [x] TOOL-AI-PROMPT-FOLD-DESIGN-01 세션 아티팩트 프롬프트 우선 표시 설계
 
