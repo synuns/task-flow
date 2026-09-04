@@ -28,11 +28,11 @@
 - Consumes: 기존 `render_index(filenames)`와 `list_published_artifact_names(index_path, artifacts_dir)`
 - Produces: `render_index(filenames, titles=None)`와 `list_published_artifact_titles(index_path, artifacts_dir)`의 실패하는 계약 test
 
-- [ ] **Step 1: 작업 block 등록**
+- [x] **Step 1: 작업 block 등록**
 
 `TODO.md`의 통합·제출 QA 절에 `DOCS-README-01`을 `IN_PROGRESS`로 추가한다. Requirements는 `SYS-04`, `SYS-05`, dependency는 완료된 `QA-03`, deliverable은 README와 작업 주제형 아티팩트 인덱스다. Evidence에는 이번 세션, branch `docs/readme-guide`, 시작 SHA `c6351ffa20cc9d752c6b249123a0d2363de633e2`를 기록한다.
 
-- [ ] **Step 2: 제목 보존 test 작성**
+- [x] **Step 2: 제목 보존 test 작성**
 
 다음 동작을 `ArtifactIndexRenderTests`에 추가한다.
 
@@ -47,7 +47,7 @@ def test_custom_titles_survive_index_rebuild(self):
 
 잘못된 `]`, newline 또는 빈 제목의 링크가 `ValueError("invalid_index_link")`로 거부되는 case도 같은 test에 포함한다.
 
-- [ ] **Step 3: focused test가 RED인지 확인**
+- [x] **Step 3: focused test가 RED인지 확인**
 
 Run: `python3 -m unittest tests.test_render_artifact_index.ArtifactIndexRenderTests -v`
 
@@ -66,7 +66,7 @@ Expected: 새 API가 없거나 `render_index`가 두 번째 인자를 받지 않
 - Consumes: Task 1의 제목 보존 계약
 - Produces: `Dict[str, str]` 제목 map을 읽고 기존 공개 제목을 유지하는 renderer와 publisher
 
-- [ ] **Step 1: 최소 제목 parser와 renderer 구현**
+- [x] **Step 1: 최소 제목 parser와 renderer 구현**
 
 인덱스 링크 canonical 형식을 아래처럼 만든다.
 
@@ -76,11 +76,11 @@ Expected: 새 API가 없거나 `render_index`가 두 번째 인자를 받지 않
 
 `render_index`는 optional title map에서 파일별 제목을 읽고, 없으면 `Codex 세션`을 쓴다. `list_published_artifact_titles`는 링크 text, session ID와 filename의 일치를 검증한 뒤 현재 존재하는 artifact의 제목 map을 반환한다. 기존 `list_published_artifact_names`는 그 map의 key 목록을 반환해 caller 호환성을 유지한다.
 
-- [ ] **Step 2: 재생성 caller에서 제목 보존**
+- [x] **Step 2: 재생성 caller에서 제목 보존**
 
 SessionEnd hook과 publication add/remove transaction은 rewrite 직전에 title map을 읽고 `render_index(filenames, titles)`로 전달한다. 새 artifact만 fallback 제목을 사용한다.
 
-- [ ] **Step 3: 공개 기록 21개의 주제 작성**
+- [x] **Step 3: 공개 기록 21개의 주제 작성**
 
 `artifacts/index.md`에 다음 작업 주제를 session ID 앞에 붙인다.
 
@@ -110,13 +110,13 @@ navigation 선택 표시선 제거
 
 목록 순서는 기존 session ID 순서와 일치한다.
 
-- [ ] **Step 4: focused test GREEN 확인**
+- [x] **Step 4: focused test GREEN 확인**
 
 Run: `python3 -m unittest tests.test_render_artifact_index tests.test_review_publisher -v`
 
 Expected: 모든 index·publisher test PASS.
 
-- [ ] **Step 5: 구현 commit**
+- [x] **Step 5: 구현 commit**
 
 ```bash
 git add TODO.md .codex/hooks/render_artifact_index.py .codex/hooks/review_publisher.py tests/test_render_artifact_index.py tests/test_review_publisher.py artifacts/index.md

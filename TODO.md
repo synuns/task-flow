@@ -3279,3 +3279,24 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `docs/quality/evidence/task-crud.md`를 검토해 승인 또는 correction을 명시해야 함.
   2026-09-04 사용자가 제시된 Task CRUD 수동 checklist를 검토한 뒤 `승인`을 명시해
   review/evidence 포함 exact target `e01c7d8f87e8d34786395da9d22f038e35586945`를 승인함.
+
+### [ ] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
+
+- Requirements: `SYS-04`, `SYS-05`
+- Risk: LOW — accepted behavior를 바꾸지 않는 제출 문서와 인덱스 표시 개선
+- Depends on: `QA-03`
+- Deliverable: 과제 범위, 실행·로그인·검증 방법, 에이전트 workflow를 연결하는
+  `README.md`와 작업 주제를 표시하는 `artifacts/index.md`
+- Acceptance: README에서 원본 요구사항과 API 계약, route별 기능, 환경 실행,
+  테스트 계정, 검증 명령, agent workflow와 상세 문서를 찾을 수 있고, 공개 세션
+  링크는 주제와 session ID를 함께 표시하며 자동 재생성 후에도 주제를 유지한다.
+- Automatic verification: artifact index focused unit test, README local link 검사,
+  `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — 제품 화면 동작을 변경하지 않는 문서와 hook
+  index 표시 계약
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root`; branch `docs/readme-guide`; start SHA
+  `c6351ffa20cc9d752c6b249123a0d2363de633e2`; Requirements/Journey 검색과 기존
+  `QA-03`, `README.md`, `package.json`, `playwright.config.ts`, 공개 artifact 21개,
+  index renderer·publisher contract를 확인함. Baseline `pnpm verify quick` PASS — hook
+  85, verifier 20, Vitest 47 files/248 tests.

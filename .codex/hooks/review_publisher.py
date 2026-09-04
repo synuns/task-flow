@@ -14,7 +14,7 @@ from artifact_contract import artifact_filename, split_record_id
 from render_artifact_index import (
     atomic_write_index,
     index_lock,
-    list_published_artifact_names,
+    list_published_artifact_titles,
     rebuild_pending_index,
     render_index,
 )
@@ -258,10 +258,11 @@ def publish_receipt(repo_root: Path, receipt: ReviewReceipt) -> PublicationResul
                 completed = _mark_step(completed, "artifact")
                 journal = write_journal(repo_root, receipt, "committing", completed)
                 check_cancel()
-                filenames = list_published_artifact_names(artifacts / "index.md", artifacts)
+                titles = list_published_artifact_titles(artifacts / "index.md", artifacts)
+                filenames = list(titles)
                 if destination.name not in filenames:
                     filenames.append(destination.name)
-                atomic_write_index(artifacts / "index.md", render_index(filenames))
+                atomic_write_index(artifacts / "index.md", render_index(filenames, titles))
                 completed = _mark_step(completed, "public_index")
                 check_cancel()
                 usage_path = repo_root / "AI_USAGE.md"
@@ -305,8 +306,10 @@ def rollback_journal(repo_root, record_id, assume_locked=False):
                 destination.unlink()
             filenames = []
             if artifacts.exists():
-                filenames = list_published_artifact_names(artifacts / "index.md", artifacts)
-                atomic_write_index(artifacts / "index.md", render_index([name for name in filenames if name != destination.name]))
+                titles = list_published_artifact_titles(artifacts / "index.md", artifacts)
+                filenames = list(titles)
+                remaining = [name for name in filenames if name != destination.name]
+                atomic_write_index(artifacts / "index.md", render_index(remaining, titles))
                 filenames = [name for name in filenames if name != destination.name]
                 usage_path = repo_root / "AI_USAGE.md"
                 if usage_path.is_file():

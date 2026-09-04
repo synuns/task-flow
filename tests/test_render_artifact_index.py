@@ -76,6 +76,42 @@ class ArtifactIndexRenderTests(unittest.TestCase):
         )
         self.assertTrue(first.endswith("\n"))
 
+    def test_custom_title_survives_index_rebuild(self):
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = Path(directory)
+            filename = "codex-session-session-a.md"
+            (artifacts / filename).write_text("reviewed\n", encoding="utf-8")
+            titles = {filename: "인증 진입 Journey"}
+            content = render_artifact_index.render_index([filename], titles)
+            index = artifacts / "index.md"
+            index.write_text(content, encoding="utf-8")
+
+            rebuilt_titles = (
+                render_artifact_index.list_published_artifact_titles(
+                    index,
+                    artifacts,
+                )
+            )
+
+        self.assertEqual(rebuilt_titles, titles)
+        self.assertEqual(
+            render_artifact_index.render_index(
+                list(rebuilt_titles),
+                rebuilt_titles,
+            ),
+            content,
+        )
+
+    def test_invalid_custom_titles_are_rejected(self):
+        filename = "codex-session-session-a.md"
+        for title in ("", "닫힌] 제목", "두\n줄 제목"):
+            with self.subTest(title=title):
+                with self.assertRaisesRegex(ValueError, "invalid_index_title"):
+                    render_artifact_index.render_index(
+                        [filename],
+                        {filename: title},
+                    )
+
     def test_published_selection_ignores_unindexed_contract_file(self):
         with tempfile.TemporaryDirectory() as directory:
             artifacts = Path(directory)
@@ -288,11 +324,13 @@ class SessionEndCliTests(unittest.TestCase):
 class ProjectArtifactIndexTests(unittest.TestCase):
     def test_tracked_index_matches_current_artifacts(self):
         artifacts = ROOT / "artifacts"
+        titles = render_artifact_index.list_published_artifact_titles(
+            artifacts / "index.md",
+            artifacts,
+        )
         expected = render_artifact_index.render_index(
-            render_artifact_index.list_published_artifact_names(
-                artifacts / "index.md",
-                artifacts,
-            )
+            list(titles),
+            titles,
         )
         index_path = artifacts / "index.md"
         self.assertTrue(index_path.is_file(), "tracked artifact index must exist")

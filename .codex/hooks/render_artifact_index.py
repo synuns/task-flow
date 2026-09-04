@@ -12,7 +12,7 @@ import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator, List
+from typing import Dict, Iterator, List, Optional
 
 from artifact_contract import (
     artifact_filename,
@@ -24,12 +24,12 @@ from artifact_contract import (
 
 INDEX_HEADER = "# Codex 세션 기록 인덱스"
 INDEX_NOTICE = (
-    "> 게시 명령과 SessionEnd Hook이 자동 생성합니다. 직접 수정하지 마세요."
+    "> 게시 명령과 SessionEnd Hook이 파일 목록을 관리합니다. 작업 주제는 공개 기록을 검토한 사람이 작성합니다."
 )
 LOCK_TIMEOUT_SECONDS = 1.0
 LOCK_RETRY_SECONDS = 0.05
 INDEX_LINK_PATTERN = re.compile(
-    r"^- \[Codex 세션 `([^`]+)`\]\(\./([^)]+)\)$"
+    r"^- \[([^\[\]`\r\n]+) — `([^`]+)`\]\(\./([^)]+)\)$"
 )
 
 
@@ -48,14 +48,23 @@ def list_artifact_names(artifacts_dir: Path) -> List[str]:
     return sorted(set(names))
 
 
-def render_index(filenames: List[str]) -> str:
+def render_index(
+    filenames: List[str],
+    titles: Optional[Dict[str, str]] = None,
+) -> str:
     lines = [INDEX_HEADER, "", INDEX_NOTICE, ""]
+    titles = titles or {}
     for filename in sorted(set(filenames)):
         session_id = session_id_from_artifact_filename(filename)
         if session_id is None:
             raise ValueError("invalid_artifact_filename")
+        title = titles.get(filename, "Codex 세션")
+        if INDEX_LINK_PATTERN.fullmatch(
+            "- [{} — `{}`](./{})".format(title, session_id, filename)
+        ) is None:
+            raise ValueError("invalid_index_title")
         lines.append(
-            "- [Codex 세션 `{}`](./{})".format(session_id, filename)
+            "- [{} — `{}`](./{})".format(title, session_id, filename)
         )
     return "\n".join(lines).rstrip() + "\n"
 
@@ -107,31 +116,42 @@ def rebuild_pending_index(pending_dir: Path) -> None:
         )
 
 
-def list_published_artifact_names(
+def list_published_artifact_titles(
     index_path: Path,
     artifacts_dir: Path,
-) -> List[str]:
+) -> Dict[str, str]:
     if not index_path.exists():
-        return []
+        return {}
     if index_path.is_symlink() or not index_path.is_file():
         raise ValueError("invalid_index_path")
     content = index_path.read_text(encoding="utf-8")
-    names = []
+    titles = {}
     for line in content.splitlines():
         if not line.startswith("- "):
             continue
         match = INDEX_LINK_PATTERN.fullmatch(line)
         if match is None:
             raise ValueError("invalid_index_link")
-        session_id, filename = match.groups()
+        title, session_id, filename = match.groups()
         if session_id_from_artifact_filename(filename) != session_id:
             raise ValueError("invalid_index_link")
-        names.append(filename)
-    if render_index(names) != content:
+        titles[filename] = title
+    if render_index(list(titles), titles) != content:
         raise ValueError("invalid_index_content")
 
     available = set(list_artifact_names(artifacts_dir))
-    return [filename for filename in names if filename in available]
+    return {
+        filename: title
+        for filename, title in titles.items()
+        if filename in available
+    }
+
+
+def list_published_artifact_names(
+    index_path: Path,
+    artifacts_dir: Path,
+) -> List[str]:
+    return list(list_published_artifact_titles(index_path, artifacts_dir))
 
 
 def atomic_write_index(path: Path, content: str) -> None:
@@ -237,13 +257,13 @@ def run_hook(hook_input: object, repo_root: Path) -> int:
     try:
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         with index_lock(artifacts_dir / ".index.lock"):
-            filenames = list_published_artifact_names(
+            titles = list_published_artifact_titles(
                 artifacts_dir / "index.md",
                 artifacts_dir,
             )
             atomic_write_index(
                 artifacts_dir / "index.md",
-                render_index(filenames),
+                render_index(list(titles), titles),
             )
     except IndexLockTimeout:
         return fail(repo_root, "lock_timeout", session_id)
