@@ -85,12 +85,12 @@ Expected: hook/verifier, format, lint, OpenAPI type check, TypeScript와 전체 
 `docs/quality/evidence/final-qa.md`에 Review target, Reviewer, Checks, Findings,
 Corrections, Rerun, Verdict를 기록하고 TODO는 `IN_PROGRESS`로 유지한다.
 
-- [ ] **Step 4: 사람 checkpoint를 요청한다**
+- [x] **Step 4: 사람 checkpoint를 요청한다**
 
 교정 diff, focused audit, quick gate와 적대적 검토 결과를 제시한다. 사람 응답 전에는
 `DOCS-FINAL-CONSISTENCY-01`을 완료하거나 `AI_VERIFIED`로 전환하지 않는다.
 
-- [ ] **Step 5: 승인 뒤 full review와 최종 read-only gate를 실행한다**
+- [x] **Step 5: 승인 뒤 full review와 최종 read-only gate를 실행한다**
 
 Run: `pnpm verify full && pnpm verify setup && git diff --check`
 

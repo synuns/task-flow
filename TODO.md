@@ -3870,7 +3870,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 
 ## 14. 최종 문서 정합성
 
-### [ ] DOCS-FINAL-CONSISTENCY-01 제출 문서 전체 정합성 검토
+### [x] DOCS-FINAL-CONSISTENCY-01 제출 문서 전체 정합성 검토
 
 - Requirements: `SYS-04`, `SYS-05`, final documentation quality
 - Risk: LOW — accepted behavior를 바꾸지 않는 문서·참조·상태 교정
@@ -3882,7 +3882,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: Markdown link/path와 current fact focused audit,
   `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — 제품 UI와 browser behavior를 변경하지 않는 문서 검토
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. Worktree
   `.worktrees/final-doc-consistency`, branch `docs/final-doc-consistency`; Requirements,
   README/AI_USAGE, TODO, 핵심 품질 문서, 원본과 repository inventory를 확인함. 최초
@@ -3898,4 +3898,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Vitest 49 files/314 tests. 적대적 검토에서 계획의 사람 checkpoint 순서 누락을
   `PROCESS` finding으로 찾아 상태 전환 전 checkpoint를 두도록 교정했으며 unresolved
   HIGH/MEDIUM/LOW finding은 0. 제품·OpenAPI·generated·dependency diff는 0. 사람
-  checkpoint와 그 뒤 full/final QA를 기다리므로 상태는 `IN_PROGRESS`를 유지함.
+  checkpoint 후보 `d212fe3`을 제시한 뒤 사용자가 `승인`함. 승인된 target의 canonical
+  `pnpm verify full` PASS — hook 84, verifier 21, Vitest 49 files/314 tests, production
+  build, Chromium core Journey 9/9, verifier regression 19/19. 기존 Vite chunk-size
+  advisory 외 새 warning은 없고 browser behavior를 바꾸는 diff도 없음. 최종 setup,
+  focused audit, whitespace와 authoritative/product diff를 재확인해 `AI_VERIFIED`로 전환함.
