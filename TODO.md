@@ -3908,7 +3908,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 
 ## 15. 할 일 페이지 문서 스크롤
 
-### [ ] TASK-PAGE-DOCUMENT-SCROLL-01 전체 화면 스크롤과 순수 무한 pagination
+### [x] TASK-PAGE-DOCUMENT-SCROLL-01 전체 화면 스크롤과 순수 무한 pagination
 
 - Requirements: `TASK-LIST-03`, `TASK-LIST-04`
 - Risk: MEDIUM — window virtual measurement와 golden-journey scrolling 변경
@@ -3921,8 +3921,31 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   task-discovery/task-crud E2E, `pnpm verify full`
 - Browser verification: `/task`, 1280×400과 390×844, document scroll/DOM bound/request
   sequence/terminal 위치/console/page error
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root`; branch `fix/task-page-document-scroll`; start SHA
   `637c323487cf1ee5e913d93a24e08f1eea590de6`; approved design
   `docs/superpowers/specs/2026-09-04-task-page-document-scroll-design.md`; plan
-  `docs/superpowers/plans/2026-09-04-task-page-document-scroll.md`.
+  `docs/superpowers/plans/2026-09-04-task-page-document-scroll.md`. Implementation
+  `7d99599`; focused Task list/page 2 files/10 tests PASS; `pnpm verify quick` PASS —
+  hook 84, verifier 21, Vitest 49 files/308 tests; mapped task-discovery/task-crud
+  Chromium 3/3 PASS. Production `/task` browser session
+  `task-page-document-scroll`에서 desktop 1280×400은 page 1~15 exact once,
+  document 3100/viewport 400px, scrollY 2700, mounted 4/30을 확인했다. Mobile
+  390×844은 폭 390/390, mounted 8/30, terminal bottom 732px < fixed navigation top
+  779px이었다. 두 viewport 모두 list `overflow-y: visible`, 내부
+  `scrollHeight === clientHeight`, 수동 next-page button 없음, terminal의 목록 region
+  소속, MSW 200 only console와 page error 0을 확인했다. Screenshots와 failure
+  classification은 `docs/quality/evidence/task-discovery.md`에 기록했다. Review target:
+  `docs/superpowers/plans/2026-09-04-task-page-document-scroll.md`, `TASK-LIST-03`,
+  `TASK-LIST-04`, initial `643d20c79fea46f3b80123d1891b98390a5e8581`, corrected
+  `056e0f1c8d44ef3cf79f767c2592b3fdfbbd4e9a`; Reviewer: 구현 commit 고정 뒤 편집과
+  분리한 explicit read-only second-pass `/root/review-pass-2`; Checks: 승인 design/plan,
+  window `scrollMargin` 좌표, exact-once/terminal/partial retry, bounded DOM,
+  keyboard native document semantics, mobile clearance, task-crud regression,
+  console/network, API/auth/cache 불변, test strength, authoritative/unrelated diff와 TODO
+  dependency/status; Findings: 제품 HIGH/MEDIUM/LOW 0, initial LOW `EVIDENCE` 1 — browser
+  precondition과 expected geometry가 암시적으로만 기록됨; Corrections: approved auth와
+  30-task fixture, document/list/request/mounted/mobile 기대값을 evidence에 명시;
+  Rerun: corrected target에서 focused 2 files/10 tests, `pnpm verify quick` 49 files/308
+  tests, mapped Chromium 3/3, authoritative diff와 `git diff --check` PASS; Verdict: PASS —
+  unresolved finding 0. 이 상태는 AI 검증 완료이며 새 `HUMAN_APPROVED`를 주장하지 않음.
