@@ -7,7 +7,7 @@ import { TaskListPage } from "@/pages/task-list";
 import { UserPage } from "@/pages/user";
 import { deleteUser, signOut, useApiClient } from "@/shared/api";
 import { AppShell } from "@/widgets/app-shell";
-import { useAuth } from "./auth/auth-provider";
+import { type AuthController, useAuth } from "./auth/auth-provider";
 import { AuthRouteBoundary } from "./auth/auth-route-boundary";
 import { routePaths } from "./auth/route-policy";
 import { RouteErrorBoundary } from "./route-error-boundary";
@@ -30,22 +30,27 @@ function SignInRoute() {
   return <SignInPage onAuthenticated={auth.acceptSignIn} />;
 }
 
+function terminateStartedGeneration(auth: AuthController, generation: number) {
+  const current = auth.getSnapshot();
+  if (current.generation === generation) auth.terminate(current);
+}
+
 function UserRoute() {
   const auth = useAuth();
   const client = useApiClient();
   const navigate = useNavigate();
 
   async function deleteAccount(password: string) {
-    const snapshot = auth.getSnapshot();
+    const generation = auth.getSnapshot().generation;
     await deleteUser(client, password);
-    auth.terminate(snapshot);
+    terminateStartedGeneration(auth, generation);
     navigate(routePaths.signIn, { replace: true });
   }
 
   async function signOutCurrentSession() {
-    const snapshot = auth.getSnapshot();
+    const generation = auth.getSnapshot().generation;
     await signOut(client);
-    auth.terminate(snapshot);
+    terminateStartedGeneration(auth, generation);
     navigate(routePaths.signIn, { replace: true });
   }
 

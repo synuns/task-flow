@@ -1,4 +1,4 @@
-import { ApiClientProvider, type ApiClient } from "@/shared/api";
+import { ApiClientProvider, type ApiClient, type AuthSnapshot } from "@/shared/api";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -30,7 +30,7 @@ function controller(status: AuthStatus): AuthController {
 const apiClient: ApiClient = {
   request: async <T,>(
     input: RequestInfo | URL,
-    _init: RequestInit,
+    init: RequestInit,
     isSuccess: (value: unknown) => value is T,
   ) => {
     const pathname = new URL(String(input)).pathname;
@@ -40,7 +40,9 @@ const apiClient: ApiClient = {
         : pathname === "/api/sign-out"
           ? { success: true }
           : pathname === "/api/user"
-            ? { email: "user@example.com", name: "김담당", memo: "오늘도 차근차근" }
+            ? init.method === "DELETE"
+              ? { success: true }
+              : { email: "user@example.com", name: "김담당", memo: "오늘도 차근차근" }
             : pathname === "/api/task/task-1"
               ? {
                   title: "첫 번째 할 일",
@@ -53,6 +55,22 @@ const apiClient: ApiClient = {
     return body;
   },
 };
+
+function clientChangingSession(change: () => void): ApiClient {
+  return {
+    request: async <T,>(
+      input: RequestInfo | URL,
+      init: RequestInit,
+      isSuccess: (value: unknown) => value is T,
+    ) => {
+      const pathname = new URL(String(input)).pathname;
+      if (pathname === "/api/sign-out" || (pathname === "/api/user" && init.method === "DELETE")) {
+        change();
+      }
+      return apiClient.request(input, init, isSuccess);
+    },
+  };
+}
 
 afterEach(() => {
   cleanup();
@@ -163,6 +181,121 @@ describe("app router", () => {
 
     expect(await screen.findByRole("heading", { name: "로그인" })).toBeInTheDocument();
     expect(active.terminate).toHaveBeenCalledWith({ generation: 1, accessToken: "token" });
+  });
+
+  it("terminates the refreshed snapshot after sign-out succeeds", async () => {
+    const user = userEvent.setup();
+    let current: AuthSnapshot = { generation: 1, accessToken: "token" };
+    const active = controller({
+      kind: "authenticated",
+      generation: 1,
+      accessToken: "token",
+      userId: "user-1",
+    });
+    active.getSnapshot = vi.fn(() => current);
+    active.terminate = vi.fn(() => {
+      active.status = { kind: "anonymous" };
+    });
+    auth.controller = active;
+    const client = clientChangingSession(() => {
+      current = { generation: 1, accessToken: "refreshed" };
+    });
+    const router = createMemoryRouter(appRoutes, { initialEntries: ["/user"] });
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ApiClientProvider client={client}>
+          <RouterProvider router={router} />
+        </ApiClientProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "로그아웃" }));
+    await user.click(
+      within(screen.getByRole("alertdialog", { name: "로그아웃하시겠어요?" })).getByRole("button", {
+        name: "로그아웃",
+      }),
+    );
+
+    expect(await screen.findByRole("heading", { name: "로그인" })).toBeInTheDocument();
+    expect(active.terminate).toHaveBeenCalledWith({ generation: 1, accessToken: "refreshed" });
+  });
+
+  it("terminates the refreshed snapshot after account deletion succeeds", async () => {
+    const user = userEvent.setup();
+    let current: AuthSnapshot = { generation: 1, accessToken: "token" };
+    const active = controller({
+      kind: "authenticated",
+      generation: 1,
+      accessToken: "token",
+      userId: "user-1",
+    });
+    active.getSnapshot = vi.fn(() => current);
+    active.terminate = vi.fn(() => {
+      active.status = { kind: "anonymous" };
+    });
+    auth.controller = active;
+    const client = clientChangingSession(() => {
+      current = { generation: 1, accessToken: "refreshed" };
+    });
+    const router = createMemoryRouter(appRoutes, { initialEntries: ["/user"] });
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ApiClientProvider client={client}>
+          <RouterProvider router={router} />
+        </ApiClientProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "회원 탈퇴" }));
+    await user.type(screen.getByLabelText("현재 비밀번호"), "Password1");
+    await user.click(screen.getByRole("button", { name: "탈퇴 확인" }));
+
+    expect(await screen.findByRole("heading", { name: "로그인" })).toBeInTheDocument();
+    expect(active.terminate).toHaveBeenCalledWith({ generation: 1, accessToken: "refreshed" });
+  });
+
+  it("preserves a newer generation after sign-out succeeds", async () => {
+    const user = userEvent.setup();
+    let current: AuthSnapshot = { generation: 1, accessToken: "token" };
+    const active = controller({
+      kind: "authenticated",
+      generation: 1,
+      accessToken: "token",
+      userId: "user-1",
+    });
+    active.getSnapshot = vi.fn(() => current);
+    active.terminate = vi.fn();
+    auth.controller = active;
+    const client = clientChangingSession(() => {
+      current = { generation: 2, accessToken: "new-session" };
+      active.status = {
+        kind: "authenticated",
+        generation: 2,
+        accessToken: "new-session",
+        userId: "user-2",
+      };
+    });
+    const router = createMemoryRouter(appRoutes, { initialEntries: ["/user"] });
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ApiClientProvider client={client}>
+          <RouterProvider router={router} />
+        </ApiClientProvider>
+      </QueryClientProvider>,
+    );
+
+    await user.click(await screen.findByRole("button", { name: "로그아웃" }));
+    await user.click(
+      within(screen.getByRole("alertdialog", { name: "로그아웃하시겠어요?" })).getByRole("button", {
+        name: "로그아웃",
+      }),
+    );
+
+    expect(await screen.findByRole("heading", { name: "대시보드" })).toBeInTheDocument();
+    expect(active.terminate).not.toHaveBeenCalled();
   });
 
   it("renders the route error boundary for render failures", async () => {
