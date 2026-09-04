@@ -3374,7 +3374,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
 
-### [ ] TOOL-AI-PROMPT-FOLD-DESIGN-01 세션 아티팩트 프롬프트 우선 표시 설계
+### [x] TOOL-AI-PROMPT-FOLD-DESIGN-01 세션 아티팩트 프롬프트 우선 표시 설계
 
 - Requirements: `SYS-05`
 - Risk: MEDIUM — 사람 검토 기록 23개의 presentation과 후속 candidate 형식 변경
@@ -3388,7 +3388,12 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify setup`, `git diff --check`
 - Browser verification: 적용 없음 — repository Markdown presentation은 구현 후
   사람이 실제 renderer에서 접힘·펼치기를 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. 현재 23개 공개 artifact가
   436,428줄이고 최장 문서가 78,018줄임을 확인했다. 사용자가 user prompt 기본
   노출, 하단 작업 내용 한 번 접기와 기존 게시 기록 전체 변환을 승인했다.
+  설계 commit `ac84146`; 사용자 written spec 승인 후
+  `docs/superpowers/plans/2026-09-04-session-artifact-prompt-first.md`에 renderer
+  TDD, 23개 insertion-only 변환, 사람 재검토와 plan-completion review 순서를
+  구체화했다. Placeholder·모순·범위 자체 검토, `pnpm verify setup` 108 tests와
+  `git diff --check` PASS. 구현과 기존 공개 기록 변경은 별도 task가 소유한다.
