@@ -3303,6 +3303,69 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   PASS — hook 88, verifier 20; `git diff --check` PASS. Verdict: PASS, unresolved
   HIGH/MEDIUM/LOW 설계 finding 없음. 구현 결과의 `HUMAN_APPROVED`는 주장하지 않음.
 
+### [ ] REVIEW-AUTH-ROUTE-01 Router와 auth route 정책 일치
+
+- Requirements: `NAV-02`, `NAV-03`, `AUTH-07`
+- Risk: HIGH — Router가 허용하는 변형 pathname에도 승인된 보호 경계를 적용
+- Depends on: `REVIEW-CORRECTION-DESIGN-01`
+- Deliverable: React Router matcher를 공유하는 route policy와 boundary/return-to/router
+  회귀 test
+- Acceptance: trailing slash, percent-encoded static segment와 case variant가 canonical
+  route와 같은 anonymous/authenticated redirect를 만들고 외부·미등록 returnTo는 거부된다.
+- Automatic verification: route-policy/return-to/auth-boundary/router focused Vitest,
+  `pnpm verify quick`
+- Browser verification: `REVIEW-AUTH-JOURNEY-01`에서 anonymous `/user/`와 authenticated
+  `/sign-in/` production preview 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. Worktree
+  `.worktrees/final-review-auth`, branch `fix/final-review-auth`; `pnpm install --frozen-lockfile`
+  완료, baseline `pnpm verify setup` PASS — hook 88, verifier 20. TDD RED 시작.
+
+### [ ] REVIEW-AUTH-CACHE-01 Sign-in principal cache 격리
+
+- Requirements: `AUTH-07`
+- Risk: HIGH — 새 session에 이전 principal의 보호 query data가 보이지 않도록 격리
+- Depends on: `REVIEW-AUTH-ROUTE-01`
+- Deliverable: 성공 sign-in 전 protected query cancel/remove와 provider 회귀 test
+- Acceptance: dashboard/tasks/task/user cache는 제거되고 unrelated cache는 유지되며
+  새 sign-in generation과 late refresh 격리는 기존 정책을 유지한다.
+- Automatic verification: auth-provider/authenticated-request focused Vitest,
+  `pnpm verify quick`
+- Browser verification: `REVIEW-AUTH-JOURNEY-01`의 account transition 검토
+- Status: NOT_STARTED
+- Evidence: 시작 전. `REVIEW-AUTH-ROUTE-01` 완료 뒤 현재 session이 소유권을 전환한다.
+
+### [ ] REVIEW-AUTH-TERMINATE-01 Refresh 중 명시적 session 종료
+
+- Requirements: `USER-CRUD-06`, `USER-LOGOUT-04`, `USER-LOGOUT-05`
+- Risk: HIGH — sign-out/delete-user 성공 뒤 refresh된 같은 session을 종료
+- Depends on: `REVIEW-AUTH-CACHE-01`
+- Deliverable: 시작 generation과 응답 시점 최신 snapshot을 비교하는 route action과
+  token rotation/new generation 회귀 test
+- Acceptance: exact 200 중 token만 갱신되면 최신 snapshot을 종료하고 generation이
+  교체되면 새 session을 보존하며 실패 응답은 기존 session/cache/route를 유지한다.
+- Automatic verification: router/sign-out/delete-user/API focused Vitest,
+  `pnpm verify quick`
+- Browser verification: `REVIEW-AUTH-JOURNEY-01`의 logout/reload/direct-entry 확인
+- Status: NOT_STARTED
+- Evidence: 시작 전. `REVIEW-AUTH-CACHE-01` 완료 뒤 현재 session이 소유권을 전환한다.
+
+### [ ] REVIEW-AUTH-JOURNEY-01 인증 correction 통합 검증과 적대적 검토
+
+- Requirements: `NAV-02`, `NAV-03`, `AUTH-07`, `USER-CRUD-06`, `USER-LOGOUT-04`,
+  `USER-LOGOUT-05`
+- Risk: HIGH — auth-entry와 user-crud Golden Journey의 corrected target 재검토
+- Depends on: `REVIEW-AUTH-TERMINATE-01`
+- Deliverable: focused/quick/mapped E2E/full, production browser와 seven-field review evidence
+- Acceptance: route/cache/termination correction이 OpenAPI와 기존 refresh/replay/stale
+  generation/삭제 정책을 보존하고 unresolved HIGH/MEDIUM finding이 없다.
+- Automatic verification: auth/router focused Vitest, `pnpm verify quick`, auth-entry와
+  user-crud mapped Playwright, `pnpm verify full`, authoritative diff
+- Browser verification: production preview에서 변형 route, logout/reload/direct `/user`,
+  console/page error 확인
+- Status: NOT_STARTED
+- Evidence: 시작 전. 이전 세 구현 task 완료 뒤 현재 session이 review target을 고정한다.
+
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
 - Requirements: `SYS-04`, `SYS-05`
