@@ -75,6 +75,10 @@ describe("user API", () => {
   it.each([
     ["missing User field", { email: "user@example.com", name: "김담당" }],
     ["extra User field", { ...user, password: "Password1" }],
+    ["invalid email", { ...user, email: "not-an-email" }],
+    ["email over 254 characters", { ...user, email: `${"a".repeat(243)}@example.com` }],
+    ["name over 50 characters", { ...user, name: "이".repeat(51) }],
+    ["memo over 500 characters", { ...user, memo: "메".repeat(501) }],
   ])("rejects an invalid %s", async (_case, body) => {
     await expect(getUser(clientFor(body, {}))).rejects.toMatchObject({
       kind: "invalid-response",

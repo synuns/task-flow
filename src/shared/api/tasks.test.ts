@@ -86,6 +86,22 @@ describe("tasks API", () => {
   });
 
   it.each([
+    ["empty title", { id: "task-1", title: "", memo: "메모", status: "TODO" }],
+    [
+      "title over 100 characters",
+      { id: "task-1", title: "할".repeat(101), memo: "메모", status: "TODO" },
+    ],
+    [
+      "memo over 500 characters",
+      { id: "task-1", title: "할 일", memo: "메".repeat(501), status: "TODO" },
+    ],
+  ])("rejects a task-list item with %s", async (_case, item) => {
+    await expect(
+      getTasks(clientFor({ data: [item], hasNext: false }, {}), 1),
+    ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
+  it.each([
     [
       "top-level",
       {
@@ -133,6 +149,41 @@ describe("tasks API", () => {
           capture,
         ),
         "task-1",
+      ),
+    ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
+  it("rejects a task detail without a date-time offset", async () => {
+    await expect(
+      getTaskDetail(
+        clientFor(
+          {
+            title: "할 일",
+            memo: "메모",
+            status: "TODO",
+            registerDatetime: "2026-08-30T09:00:00",
+          },
+          {},
+        ),
+        "task-1",
+      ),
+    ).rejects.toMatchObject({ kind: "invalid-response" });
+  });
+
+  it("rejects a created task whose title exceeds the response contract", async () => {
+    await expect(
+      createTask(
+        clientFor(
+          {
+            id: "task-1",
+            title: "할".repeat(101),
+            memo: "",
+            status: "TODO",
+            registerDatetime: "2026-08-30T09:00:00.000Z",
+          },
+          {},
+        ),
+        { title: "새 할 일" },
       ),
     ).rejects.toMatchObject({ kind: "invalid-response" });
   });

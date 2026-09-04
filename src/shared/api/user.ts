@@ -1,4 +1,5 @@
 import type { components } from "@/generated/crud-openapi";
+import { z } from "zod";
 import type { ApiClient } from "./api-client-context";
 import { hasExactKeys, requestJson } from "./request";
 
@@ -12,13 +13,14 @@ export type UpdateUserInput = GeneratedUpdateUserInput;
 export type UserProfileData = GeneratedUserResponse;
 export type DeleteUserResult = GeneratedDeleteUserResponse;
 
+const userSchema = z.strictObject({
+  email: z.email().max(254),
+  name: z.string().max(50),
+  memo: z.string().max(500),
+});
+
 function isUser(value: unknown): value is GeneratedUserResponse {
-  return (
-    hasExactKeys(value, ["email", "name", "memo"]) &&
-    typeof value.email === "string" &&
-    typeof value.name === "string" &&
-    typeof value.memo === "string"
-  );
+  return userSchema.safeParse(value).success;
 }
 
 function isDeleteUserResult(value: unknown): value is GeneratedDeleteUserResponse {

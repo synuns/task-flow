@@ -13,50 +13,29 @@ export type TaskDetailData = components["schemas"]["TaskDetailResponse"];
 export type CreatedTaskData = components["schemas"]["CreatedTaskResponse"];
 export type DeleteTaskResult = components["schemas"]["DeleteTaskResponse"];
 
-function isTaskStatus(value: unknown): value is TaskStatusData {
-  return value === "TODO" || value === "IN_PROGRESS" || value === "DONE";
-}
-
-function isTaskItem(value: unknown): value is TaskListItem {
-  return (
-    hasExactKeys(value, ["id", "title", "memo", "status"]) &&
-    typeof value.id === "string" &&
-    typeof value.title === "string" &&
-    typeof value.memo === "string" &&
-    isTaskStatus(value.status)
-  );
-}
+const taskFields = {
+  title: z.string().min(1).max(100),
+  memo: z.string().max(500),
+  status: z.enum(["TODO", "IN_PROGRESS", "DONE"]),
+};
+const taskItemSchema = z.strictObject({ id: z.string(), ...taskFields });
+const taskPageSchema = z.strictObject({ data: z.array(taskItemSchema), hasNext: z.boolean() });
+const taskDetailSchema = z.strictObject({
+  ...taskFields,
+  registerDatetime: z.iso.datetime({ offset: true }),
+});
+const createdTaskSchema = taskDetailSchema.extend({ id: z.string() });
 
 function isTaskPage(value: unknown): value is GeneratedTaskListResponse {
-  return (
-    hasExactKeys(value, ["data", "hasNext"]) &&
-    Array.isArray(value.data) &&
-    value.data.every(isTaskItem) &&
-    typeof value.hasNext === "boolean"
-  );
+  return taskPageSchema.safeParse(value).success;
 }
 
 function isTaskDetail(value: unknown): value is TaskDetailData {
-  return (
-    hasExactKeys(value, ["title", "memo", "status", "registerDatetime"]) &&
-    typeof value.title === "string" &&
-    typeof value.memo === "string" &&
-    isTaskStatus(value.status) &&
-    z.iso.datetime({ offset: true }).safeParse(value.registerDatetime).success
-  );
+  return taskDetailSchema.safeParse(value).success;
 }
 
 function isCreatedTask(value: unknown): value is CreatedTaskData {
-  return (
-    hasExactKeys(value, ["id", "title", "memo", "status", "registerDatetime"]) &&
-    typeof value.id === "string" &&
-    isTaskDetail({
-      title: value.title,
-      memo: value.memo,
-      status: value.status,
-      registerDatetime: value.registerDatetime,
-    })
-  );
+  return createdTaskSchema.safeParse(value).success;
 }
 
 function isDeleteTaskResult(value: unknown): value is DeleteTaskResult {

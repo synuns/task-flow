@@ -76,7 +76,7 @@ describe("TaskDetailPage", () => {
   });
 
   it("keeps long contract strings inside the detail layout", async () => {
-    const title = "A".repeat(500);
+    const title = "A".repeat(100);
     const memo = "B".repeat(500);
     const client: ApiClient = {
       request: async <T,>(
