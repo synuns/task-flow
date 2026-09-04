@@ -40,13 +40,13 @@
 - Consumes: `SessionData.turns`, `TurnData.prompts`, `TurnData.tools`, and `TurnData.responses`.
 - Produces: unchanged `render_markdown(session: SessionData, home: Optional[Path] = None) -> str` with prompt-first Markdown.
 
-- [ ] **Step 1: Start the implementation task**
+- [x] **Step 1: Start the implementation task**
 
 Add `TOOL-AI-PROMPT-FOLD-01` to `TODO.md` with requirement `SYS-05`, dependency
 `TOOL-AI-PROMPT-FOLD-DESIGN-01`, status `IN_PROGRESS`, the current session as
 owner, and the accepted spec and this plan as deliverables.
 
-- [ ] **Step 2: Write the failing renderer tests**
+- [x] **Step 2: Write the failing renderer tests**
 
 Extend `test_render_is_ordered_and_deterministic` and add the empty-work case:
 
@@ -87,7 +87,7 @@ def test_render_omits_empty_work_details(self):
     self.assertNotIn("<details>", rendered)
 ```
 
-- [ ] **Step 3: Run the focused RED test**
+- [x] **Step 3: Run the focused RED test**
 
 Run:
 
@@ -100,7 +100,7 @@ python3 -m unittest \
 Expected: the deterministic test fails because `<details>` count is `0`; the
 empty-work test passes and protects the no-op case.
 
-- [ ] **Step 4: Implement the minimal renderer change**
+- [x] **Step 4: Implement the minimal renderer change**
 
 In `render_markdown`, keep prompt rendering on `lines` and collect only work
 sections on `work_lines`:
@@ -163,7 +163,7 @@ for index, turn in enumerate(session.turns, 1):
 
 Do not add a helper or configuration for the fixed summary text.
 
-- [ ] **Step 5: Run focused and hook regression tests**
+- [x] **Step 5: Run focused and hook regression tests**
 
 Run:
 
@@ -178,7 +178,7 @@ python3 -m unittest \
 Expected: all tests pass; scanner still finds tool headings inside raw Markdown,
 publisher bytes remain deterministic, and index content is unchanged.
 
-- [ ] **Step 6: Run quick verification and commit**
+- [x] **Step 6: Run quick verification and commit**
 
 Run `pnpm verify quick` and `git diff --check`.
 
@@ -203,7 +203,7 @@ git commit -m "feat(ai): 세션 작업 기록을 기본 접힘으로 렌더링"
 - Consumes: the existing generated `## Turn N`, `### Tool activity`, and `### Assistant response` structure.
 - Produces: insertion-only `<details>` wrappers matching Task 1 output.
 
-- [ ] **Step 1: Confirm the migration target**
+- [x] **Step 1: Confirm the migration target**
 
 Run:
 
@@ -215,7 +215,7 @@ git status --short
 
 Expected: exactly `23` paths and a clean worktree.
 
-- [ ] **Step 2: Perform one validated bulk mechanical rewrite**
+- [x] **Step 2: Perform one validated bulk mechanical rewrite**
 
 Run this one-off standard-library bulk rewrite from the repository root. It
 validates every file before writing any file and preserves the original line
@@ -328,7 +328,7 @@ PY
 Expected: exit `0`; all 23 files change. This is the approved bulk mechanical
 rewrite exception—do not keep the migration script in the repository.
 
-- [ ] **Step 3: Prove the migration is insertion-only and structurally complete**
+- [x] **Step 3: Prove the migration is insertion-only and structurally complete**
 
 Run this exact insertion-only check:
 
@@ -386,7 +386,7 @@ Use `git diff --numstat -- artifacts/codex-session-*.md` and
 `git diff --unified=1 -- artifacts/codex-session-*.md` as the reviewable evidence.
 Expected: 23 changed files, zero deletions, and only wrapper additions.
 
-- [ ] **Step 4: Re-run artifact safety gates**
+- [x] **Step 4: Re-run artifact safety gates**
 
 Run:
 
@@ -403,7 +403,7 @@ git diff --check
 Expected: all pass. Browser Journey E2E is not applicable because application
 behavior is unchanged.
 
-- [ ] **Step 5: Commit the review candidate on the isolated branch**
+- [x] **Step 5: Commit the review candidate on the isolated branch**
 
 ```bash
 git add artifacts/codex-session-*.md
@@ -412,7 +412,7 @@ git commit -m "docs(ai): 기존 세션 작업 기록 접기 적용"
 
 Do not merge and do not mark the TODO complete yet.
 
-- [ ] **Step 6: Request the required human checkpoint**
+- [x] **Step 6: Request the required human checkpoint**
 
 Provide the commit SHA, 23-file diff stat, zero-deletion result, focused/quick
 results, and links to one short and one long migrated artifact. Ask the person
@@ -433,7 +433,7 @@ Expected: explicit approval or correction. AI does not write or alter
 - Consumes: exact Task 1 and Task 2 commit SHAs plus explicit human checkpoint.
 - Produces: completed `TOOL-AI-PROMPT-FOLD-01` evidence and plan-completion review record.
 
-- [ ] **Step 1: Run the plan-completion adversarial review**
+- [x] **Step 1: Run the plan-completion adversarial review**
 
 After human approval, use a fresh second-pass role in the current session. Review:
 
@@ -448,7 +448,7 @@ Record all seven fields from `docs/quality/workflow.md`: Review target, Reviewer
 Checks, Findings, Corrections, Rerun, and Verdict. Resolve every HIGH/MEDIUM
 finding before continuing.
 
-- [ ] **Step 2: Run final verification**
+- [x] **Step 2: Run final verification**
 
 Run:
 
@@ -461,21 +461,21 @@ git status --short
 Expected: quick and diff checks pass; only the intended TODO evidence change is
 uncommitted.
 
-- [ ] **Step 3: Update the task evidence and status**
+- [x] **Step 3: Update the task evidence and status**
 
 In `TODO.md`, record the renderer and migration SHAs, focused and quick commands,
 23-file/zero-deletion migration evidence, human checkpoint wording, and the
 seven-field adversarial review. Set `TOOL-AI-PROMPT-FOLD-01` to checkbox `[x]`
 and status `AI_VERIFIED`; never set `HUMAN_APPROVED`.
 
-- [ ] **Step 4: Commit the completion evidence**
+- [x] **Step 4: Commit the completion evidence**
 
 ```bash
 git add TODO.md
 git commit -m "docs(qa): 세션 프롬프트 표시 검증 근거 기록"
 ```
 
-- [ ] **Step 5: Verify the final branch state**
+- [x] **Step 5: Verify the final branch state**
 
 Run `git status --short --branch` and `git log -3 --oneline`.
 

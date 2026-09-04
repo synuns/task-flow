@@ -3398,7 +3398,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   구체화했다. Placeholder·모순·범위 자체 검토, `pnpm verify setup` 108 tests와
   `git diff --check` PASS. 구현과 기존 공개 기록 변경은 별도 task가 소유한다.
 
-### [ ] TOOL-AI-PROMPT-FOLD-01 세션 아티팩트 프롬프트 우선 표시 구현
+### [x] TOOL-AI-PROMPT-FOLD-01 세션 아티팩트 프롬프트 우선 표시 구현
 
 - Requirements: `SYS-05`
 - Risk: MEDIUM — candidate renderer와 기존 사람 검토 기록 23개의 presentation 변경
@@ -3412,8 +3412,36 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   hook regression, `pnpm verify quick`, `git diff --check`
 - Browser verification: 적용 없음 — application behavior 불변; repository Markdown
   renderer는 사람 checkpoint에서 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner; isolated worktree
   `.worktrees/session-artifact-prompt-first`, branch `feat/session-artifact-prompt-first`,
   start commit `c7d5151`. Baseline `pnpm verify quick` PASS — hook 88, verifier 20,
-  Vitest 47 files/248 tests.
+  Vitest 47 files/248 tests. Renderer RED는 details `0 != 2`로 예상 실패했고
+  prompt-only no-op는 PASS; GREEN focused 2/2, exporter 24/24, scanner·publisher·index
+  28/28 PASS. Renderer commit `ffaad8f`. 기존 artifact 23개, 224 Turns 중 작업이
+  있는 218 Turns에 wrapper 1,090줄만 추가했고 삭제 0줄, `artifacts/index.md` 불변;
+  migration commit `43ede7d`. 첫 migration은 user prompt에 포함된 가짜
+  `## Turn 1`을 실제 Turn으로 오인해 쓰기 전 `TEST` 실패했으며, 순차 번호만
+  선택하고 과거 번호 예시는 건너뛰도록 계획과 실행 scanner를 교정한 뒤 PASS.
+  Focused artifact safety 52 tests와 최종 `pnpm verify quick` PASS — hook 89,
+  verifier 20, Vitest 47 files/248 tests; `git diff --check` PASS. 2026-09-04
+  사용자가 짧은/긴 변환 기록에서 prompt 기본 노출, `작업 내용 보기` 접힘·펼치기,
+  기존 본문과 review metadata 보존을 확인한 뒤 `승인`함.
+  Review target: plan
+  `docs/superpowers/plans/2026-09-04-session-artifact-prompt-first.md`, `SYS-05`,
+  implementation target `43ede7d`.
+  Reviewer: 2026-09-04 Codex `/root`, 최종 변경 작성 후 fresh second-pass role로
+  재검토; runtime 정책에 따라 별도 subagent는 사용하지 않음.
+  Checks: spec/plan 전 항목, renderer tool+response·response-only·empty-work,
+  23개 artifact의 prompt/work/details 경계 224 Turns 전수 검사, insertion-only,
+  redaction/scanner/publisher/lifecycle/index 회귀, dependency·제품·OpenAPI·generated
+  불변, TODO ownership과 사람 checkpoint를 확인.
+  Findings: 실행 중 `TEST` 1건은 위 Turn marker 오인이었고 교정 완료; 최종
+  unresolved HIGH/MEDIUM/LOW finding 없음.
+  Corrections: migration은 기대 순번보다 작은 본문 예시 heading을 무시하고 다음
+  실제 순번을 선택하도록 좁혔으며 계획의 실행 code도 동일하게 갱신.
+  Rerun: artifact 구조 검사 `23 files/224 Turns/218 folds/deletion 0` PASS,
+  focused 52 tests, `pnpm verify quick`, `git diff --check` PASS; 사람 renderer
+  checkpoint 승인.
+  Verdict: PASS. AI는 기존 artifact의 `human-reviewed` metadata를 변경하거나 새
+  사람 승인을 주장하지 않음.
