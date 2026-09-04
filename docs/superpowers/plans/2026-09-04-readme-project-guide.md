@@ -80,7 +80,7 @@ Expected: 새 API가 없거나 `render_index`가 두 번째 인자를 받지 않
 
 SessionEnd hook과 publication add/remove transaction은 rewrite 직전에 title map을 읽고 `render_index(filenames, titles)`로 전달한다. 새 artifact만 fallback 제목을 사용한다.
 
-- [x] **Step 3: 공개 기록 21개의 주제 작성**
+- [x] **Step 3: 공개 기록 23개의 주제 작성**
 
 `artifacts/index.md`에 다음 작업 주제를 session ID 앞에 붙인다.
 
@@ -104,8 +104,10 @@ AI 아티팩트 묶음 게시
 업무 현황 Journey
 할 일 탐색 Journey
 할 일 해결 Journey
+남은 TODO 확인과 세션 아티팩트 게시
 로그인 MSW 404 원인 분석
 navigation 선택 표시선 제거
+User·Task CRUD Journey 확장
 ```
 
 목록 순서는 기존 session ID 순서와 일치한다.
@@ -153,7 +155,7 @@ Expected: hook test, verifier test, format, lint, typecheck, Vitest와 whitespac
 
 - [x] **Step 4: plan-completion 적대적 검토**
 
-원본 계약, README 명령·계정·URL, 21개 제목과 파일 경로, SessionEnd/publication 제목 보존, 관련 없는 diff와 승인 경계를 fresh read-only 관점으로 다시 확인한다. finding은 `REQUIREMENT`, `PRODUCT`, `TEST`, `TOOLING`, `ENVIRONMENT`로 분류하고 교정 뒤 focused/quick을 재실행한다.
+원본 계약, README 명령·계정·URL, 공개 기록 제목과 파일 경로, SessionEnd/publication 제목 보존, 관련 없는 diff와 승인 경계를 fresh read-only 관점으로 다시 확인한다. finding은 `REQUIREMENT`, `PRODUCT`, `TEST`, `TOOLING`, `ENVIRONMENT`로 분류하고 교정 뒤 focused/quick을 재실행한다.
 
 - [x] **Step 5: 프로젝트 명칭과 요구사항 범위 구분**
 
