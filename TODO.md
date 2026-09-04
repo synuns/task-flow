@@ -3486,3 +3486,32 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   canonical full PASS. Verdict: PASS — unresolved HIGH/MEDIUM/LOW finding 없음.
   상세 근거는 `docs/quality/evidence/msw-test-accounts.md`. 사용자의 설계 승인
   checkpoint를 반영했지만 `HUMAN_APPROVED`나 최종 사람 acceptance를 주장하지 않음.
+
+## 13. 제출 아티팩트 경량화
+
+### [x] ARTIFACT-PRUNE-01 비핵심 세션 기록 제외
+
+- Requirements: `SYS-05`
+- Risk: LOW — 사람이 검토한 기록의 내용을 바꾸지 않고 선택 제출 파일만 줄임
+- Depends on: `TOOL-AI-PROMPT-FOLD-01`
+- Deliverable: 사용자가 지정한 비핵심 세션 기록 9개 제외와 canonical artifact index 정리
+- Acceptance: 지정 파일과 index 항목만 제거되고 남은 공개 기록의 내용·review metadata,
+  `AI_USAGE.md`, 제품 code와 제출 계약은 유지된다.
+- Automatic verification: artifact index focused test, 공개 기록 scanner,
+  `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — 제품과 browser behavior 불변
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root` task block owner. 사용자 요청에 따라 AI 게시 절차
+  4개, TODO·게시 확인 1개, 일회성 MSW 404 분석 1개, navigation 소규모 수정 1개,
+  계획 완료 검토 1개, 색상 토큰 1개를 파일 단위 제외함. 시작 target
+  `c9c1b928aeb33710be822c0f21d68e4bd1f1a9ac`; 대상 9개 합계 5,940,169 bytes.
+  남은 기록 14개와 index 항목 14개가 정확히 일치하고 broken link 0, scanner blocking
+  0을 확인함. Focused index test, `pnpm verify setup`, `pnpm verify quick` PASS — hook 89,
+  verifier 20, format/lint/typecheck, Vitest 47 files/254 tests; `git diff --check` PASS.
+  Review target: 시작 target 기준 `TODO.md`, `artifacts/index.md`, 지정 삭제 파일 9개의
+  working diff. Reviewer: 2026-09-04 Codex `/root`, 최종 변경 뒤 fresh second-pass
+  adversarial role. Checks: 삭제 대상 exact set, index와 실제 파일 양방향 일치, 깨진
+  link, 공개 기록 scanner, 제품·계약·의존성·`AI_USAGE.md` 무변경, unrelated diff.
+  Findings: 없음. Corrections: 없음. Rerun: exact-set 검사와 `git diff --check` PASS.
+  Verdict: PASS — unresolved HIGH/MEDIUM/LOW finding 없음. Browser 검증은 제품 behavior
+  불변인 문서 파일 제거라 적용 없음. 사람의 최종 제출 acceptance는 남아 있음.
