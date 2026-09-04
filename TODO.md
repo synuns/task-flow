@@ -3327,7 +3327,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   router route, canonical/variant/unknown/malformed return-to, FSD import를 fresh
   second-pass로 검사해 unresolved HIGH/MEDIUM/LOW finding 없음. `git diff --check` PASS.
 
-### [ ] REVIEW-AUTH-CACHE-01 Sign-in principal cache 격리
+### [x] REVIEW-AUTH-CACHE-01 Sign-in principal cache 격리
 
 - Requirements: `AUTH-07`
 - Risk: HIGH — 새 session에 이전 principal의 보호 query data가 보이지 않도록 격리
@@ -3338,9 +3338,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: auth-provider/authenticated-request focused Vitest,
   `pnpm verify quick`
 - Browser verification: `REVIEW-AUTH-JOURNEY-01`의 account transition 검토
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root`가 `REVIEW-AUTH-ROUTE-01` AI_VERIFIED 뒤 같은
-  worktree에서 task block ownership을 전환함. 이전 principal cache TDD RED 시작.
+  worktree에서 task block ownership을 전환함. TDD RED 1 failed/6 skipped는 기존
+  dashboard/tasks/task/user cache 잔존을 재현함. 기존 `removeProtectedQueries`를
+  sign-in 전에 재사용한 뒤 focused auth 3 files/16 tests와 `pnpm verify quick` PASS —
+  hook 88, verifier 20, format/lint/typecheck, Vitest 48 files/278 tests. Review target
+  `e68e770`; protected root 제거, unrelated cache 보존, 새 generation commit과 late
+  refresh 격리를 fresh second-pass로 검사해 unresolved HIGH/MEDIUM/LOW finding 없음.
 
 ### [ ] REVIEW-AUTH-TERMINATE-01 Refresh 중 명시적 session 종료
 
@@ -3354,8 +3359,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: router/sign-out/delete-user/API focused Vitest,
   `pnpm verify quick`
 - Browser verification: `REVIEW-AUTH-JOURNEY-01`의 logout/reload/direct-entry 확인
-- Status: NOT_STARTED
-- Evidence: 시작 전. `REVIEW-AUTH-CACHE-01` 완료 뒤 현재 session이 소유권을 전환한다.
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root`가 `REVIEW-AUTH-CACHE-01` AI_VERIFIED 뒤 같은
+  worktree에서 task block ownership을 전환함. Token rotation/new generation TDD RED 시작.
 
 ### [ ] REVIEW-AUTH-JOURNEY-01 인증 correction 통합 검증과 적대적 검토
 
