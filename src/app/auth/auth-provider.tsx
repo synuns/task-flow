@@ -108,9 +108,10 @@ export function AuthProvider({
 
   const acceptSignIn = useCallback(
     (tokens: AuthTokenPair) => {
+      removeProtectedQueries();
       commitAuthenticated(tokens, snapshotRef.current.generation + 1);
     },
-    [commitAuthenticated],
+    [commitAuthenticated, removeProtectedQueries],
   );
 
   const refresh = useCallback(

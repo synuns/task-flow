@@ -136,6 +136,20 @@ describe("AuthProvider", () => {
     );
   });
 
+  it("removes protected cache before accepting a new sign-in", async () => {
+    refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "missing" });
+    const view = renderProvider();
+    await screen.findByText("anonymous");
+    seedProtectedQueries(view.queryClient);
+    view.queryClient.setQueryData(["unrelated"], { keep: true });
+
+    view.controller().acceptSignIn(tokens("user-2", 2));
+
+    await screen.findByText("authenticated");
+    expectProtectedQueriesRemoved(view.queryClient);
+    expect(view.queryClient.getQueryData(["unrelated"])).toEqual({ keep: true });
+  });
+
   it("clears every protected cache root only for a matching terminal snapshot", async () => {
     refreshMock.mockRejectedValueOnce({ kind: "http", status: 401, message: "missing" });
     const view = renderProvider();
