@@ -3423,7 +3423,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   correction cycle 진행 권한을 확인함. 공식 `HUMAN_APPROVED` 상태와 checkbox는 사람이
   직접 편집하는 규약에 따라 AI가 변경하지 않음.
 
-### [ ] REVIEW-TASK-LOCK-01 Task 상세 mutation 상호 배제
+### [x] REVIEW-TASK-LOCK-01 Task 상세 mutation 상호 배제
 
 - Requirements: `TASK-CRUD-05`, `TASK-CRUD-06`, `TASK-CRUD-07`,
   `TASK-DETAIL-03`~`TASK-DETAIL-05`
@@ -3434,12 +3434,18 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   비활성화되고 실패 뒤 기존 draft/error를 유지한 채 lock이 해제된다.
 - Automatic verification: task-detail/update/delete focused Vitest, `pnpm verify quick`
 - Browser verification: `REVIEW-TASK-API-JOURNEY-01`에서 pending/failure 흐름 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. 최신 `main` `c9c1b92`로 충돌
   없이 rebase했고 Cycle 1 diff와 MSW fixture/E2E 변경을 항목별로 보존함. Requirements,
   Task detail route/symbol과 task-resolution/task-crud Journey를 검색함. Baseline
   `pnpm verify quick` PASS — hook 89, verifier 20, format/lint/typecheck,
-  Vitest 48 files/287 tests.
+  Vitest 48 files/287 tests. RED `task-detail.test.tsx` 2 failed/9 passed에서 title
+  PATCH와 DELETE pending 중 다른 control이 활성화된 결함을 재현함. 구현 중 direct
+  dialog fixture 누락과 active detail cache eviction 뒤 불필요한 재조회 결함을 분류해,
+  delete owner를 열린 dialog 수명 동안 유지하도록 수정함. Target `8328ca0`; focused
+  Vitest 5 files/31 tests PASS, `pnpm verify quick` PASS — hook 89, verifier 20,
+  format/lint/typecheck, Vitest 48 files/287 tests. 호출부 전수 검색과 `git diff --check`
+  PASS; 새 추상화·의존성·낙관 cache 갱신을 추가하지 않음.
 
 ### [ ] REVIEW-TASK-RETRY-01 Infinite query 실패 operation 재실행
 
@@ -3451,8 +3457,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   실행하며 기존 task data는 유지된다.
 - Automatic verification: task-list focused Vitest, `pnpm verify quick`
 - Browser verification: `REVIEW-TASK-API-JOURNEY-01`에서 오류·retry 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. `REVIEW-TASK-LOCK-01`
+  AI 검증 완료 후 `TaskList` retained-data 오류 분기와 `task-list.test.tsx`의 기존
+  next-page 실패 검증을 확인하며 작업 시작.
 
 ### [ ] REVIEW-API-RESPONSE-01 User와 Task 성공 응답 OpenAPI 제약
 
