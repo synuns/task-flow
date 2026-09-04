@@ -170,3 +170,53 @@ native AlertDialog outside-dismiss prevention was reused. Final quick and full g
   no UI correction required a browser rerun.
 - Verdict: PASS for AI plan-completion review. Golden Journey acceptance remains human-owned;
   no `HUMAN_APPROVED` status is claimed.
+
+## FINAL-REVIEW-AUTH-TERMINATION-01 — 2026-09-04
+
+Requirement/Journey/case trace: `USER-CRUD-06`, `USER-LOGOUT-04`,
+`USER-LOGOUT-05`; corrected `user-crud` sign-out/delete session boundary.
+
+Target: `c924331ee6449ee413bafdb30f10e49ec15aca41` on
+`fix/final-review-auth`, rebased onto `main`
+`c7d515189ca41641f5d4a217902a568906356b01`.
+
+Automatic verification: focused auth/router/API Vitest 9 files/92 tests PASS;
+`pnpm verify quick` PASS with hook 88, verifier 20 and 48 files/281 tests;
+mapped auth-entry/user-crud Chromium 4/4 PASS; isolated-port `pnpm verify full`
+PASS with build, core Chromium 9/9 and verifier regression 19/19.
+
+Browser verification: production preview at `127.0.0.1:4187`; signed in from
+anonymous `/user/`, opened `/user`, confirmed sign-out, reached `/sign-in`, then
+directly re-entered `/user/` and returned to `/sign-in`. `agent-browser errors`
+was empty. The console showed sign-out 200 followed by the expected refresh 401.
+Screenshots shared with the auth correction record:
+`/tmp/final-review-auth-anonymous-user.png` and
+`/tmp/final-review-auth-authenticated-sign-in.png`.
+
+Failure classification/correction/rerun: `ENVIRONMENT`; another worktree used
+the canonical 4173 port. The mapped and full suites ran on isolated port 4187;
+temporary port-only config/test literals were restored afterward. Final diff
+contains neither temporary change.
+
+Review target: `docs/superpowers/plans/2026-09-04-auth-route-session-corrections.md`;
+`USER-CRUD-06`, `USER-LOGOUT-04`, `USER-LOGOUT-05`; target
+`c924331ee6449ee413bafdb30f10e49ec15aca41`
+
+Reviewer: Codex `/root`, the implementation author in an explicit fresh
+second-pass role after implementation; runtime policy prohibited subagent review
+
+Checks: no auth/cache mutation before exact 200; same-generation token rotation
+terminates the response-time snapshot; a newer generation is preserved; terminal
+401 still terminates only its exact snapshot; delete/sign-out failure behavior,
+navigation, modal and account-deletion regressions; OpenAPI/generated/lockfile,
+test duplication, browser console/network and TODO consistency
+
+Findings: no unresolved HIGH, MEDIUM, or LOW finding
+
+Corrections: not applicable
+
+Rerun: focused 9/92, quick 48/281, mapped Chromium 4/4, production browser,
+full core Chromium 9/9, `git diff --check` and authoritative comparisons PASS
+
+Verdict: PASS for AI plan-completion and corrected user-crud review. Human
+checkpoint acceptance remains separate; no `HUMAN_APPROVED` status is claimed.

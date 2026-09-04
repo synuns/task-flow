@@ -106,3 +106,75 @@ unrelated diff and TODO consistency. Corrected-target rerun: focused 4/29, quick
 38/149, Playwright 2/2, browser production evidence unchanged and applicable,
 `git diff --check` and clean worktree PASS. Review verdict: PASS; this is not
 human Journey approval.
+
+## FINAL-REVIEW-AUTH-CORRECTION-01 — 2026-09-04
+
+Requirement/Journey: `NAV-02`, `NAV-03`, `AUTH-07`; corrected `auth-entry` target
+
+Commit: `c924331ee6449ee413bafdb30f10e49ec15aca41` on
+`fix/final-review-auth`, rebased onto `main` `c7d515189ca41641f5d4a217902a568906356b01`
+
+Route/Viewport: production preview `http://127.0.0.1:4187`; `/user/`,
+`/sign-in/`, `/`; Chromium 1280x720
+
+Precondition: fresh named `agent-browser` sessions, production build with MSW,
+empty initial auth state; approved mock credentials `user@example.com` / `Password1`
+
+Actions: entered anonymous `/user/`, signed in and returned to the exact route,
+then entered authenticated `/sign-in/`; reviewed route matcher, protected cache
+cleanup and refresh/session-generation callers; ran focused auth/router tests,
+quick, mapped E2E and full verification
+
+Expected: router-recognized trailing-slash/encoded/case variants receive the
+same auth policy, untrusted return targets fall back to `/`, and a new sign-in
+cannot observe protected query data from the previous principal
+
+Actual: anonymous `/user/` redirected to `/sign-in` and preserved `/user/` for
+successful sign-in; authenticated `/sign-in/` redirected to the dashboard;
+route/cache/generation regression tests passed
+
+Console/Network: MSW recorded expected initial and post-logout refresh 401,
+sign-in 200 and protected GET 200 responses. `agent-browser errors` was empty;
+the browser console contained no unexpected application error.
+
+Screenshot/Trace: `/tmp/final-review-auth-anonymous-user.png`,
+`/tmp/final-review-auth-authenticated-sign-in.png`; passing Playwright cases
+generated no failure trace
+
+Failure class: `ENVIRONMENT` — another worktree owned port 4173, so the first
+mapped E2E and first unmodified full run stopped before Playwright execution.
+One intermediate isolated-port run also stopped because the harness contract
+correctly expected the canonical 4173 command.
+
+Correction: ran browser and Playwright on isolated port 4187. For the full gate,
+temporarily changed only the Playwright and harness-test port literals together,
+ran the complete read-only command, then restored both tracked files.
+
+Rerun verdict: PASS — focused 9 files/92 tests; quick hook 88, verifier 20,
+48 files/281 tests; mapped auth-entry/user-crud Chromium 4/4; full hook 88,
+verifier 20, format/lint/typecheck, 48 files/281 tests, build, core Chromium 9/9,
+verifier regression 19/19. Port 4187 was closed and the worktree returned clean.
+
+Review target: `docs/superpowers/plans/2026-09-04-auth-route-session-corrections.md`;
+`NAV-02`, `NAV-03`, `AUTH-07`; target
+`c924331ee6449ee413bafdb30f10e49ec15aca41`
+
+Reviewer: Codex `/root`, the implementation author in an explicit fresh
+second-pass role after implementation; runtime policy prohibited subagent review
+
+Checks: plan acceptance and omitted steps; router/policy parity; canonical,
+trailing-slash, encoded, case, unknown, external and malformed paths; principal
+cache roots and unrelated cache; refresh replay, terminal 401 and stale generation;
+test strength/duplication; browser console/network; OpenAPI/generated/lockfile and
+unrelated diff; TODO dependency/evidence consistency
+
+Findings: no unresolved HIGH, MEDIUM, or LOW finding
+
+Corrections: no product, test, or documentation correction was required by the
+fresh review
+
+Rerun: the focused, quick, mapped E2E, production-browser and full results above;
+`git diff --check` and authoritative-file comparisons PASS
+
+Verdict: PASS for AI plan-completion and corrected auth-entry review. Human
+checkpoint acceptance remains separate; no `HUMAN_APPROVED` status is claimed.

@@ -3372,7 +3372,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   generation 보존, exact-200 이전 불변과 terminal 401 exact snapshot을 fresh second-pass로
   검사해 unresolved HIGH/MEDIUM/LOW finding 없음.
 
-### [ ] REVIEW-AUTH-JOURNEY-01 인증 correction 통합 검증과 적대적 검토
+### [x] REVIEW-AUTH-JOURNEY-01 인증 correction 통합 검증과 적대적 검토
 
 - Requirements: `NAV-02`, `NAV-03`, `AUTH-07`, `USER-CRUD-06`, `USER-LOGOUT-04`,
   `USER-LOGOUT-05`
@@ -3385,9 +3385,42 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   user-crud mapped Playwright, `pnpm verify full`, authoritative diff
 - Browser verification: production preview에서 변형 route, logout/reload/direct `/user`,
   console/page error 확인
-- Status: IN_PROGRESS
-- Evidence: 2026-09-04 Codex `/root`가 세 구현 task AI_VERIFIED 뒤 같은 worktree에서
-  Cycle 1 corrected target 통합 검증과 적대적 검토 ownership을 시작함.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root`; Review target:
+  `docs/superpowers/plans/2026-09-04-auth-route-session-corrections.md`, requirements
+  `NAV-02`, `NAV-03`, `AUTH-07`, `USER-CRUD-06`, `USER-LOGOUT-04`,
+  `USER-LOGOUT-05`, target `c924331ee6449ee413bafdb30f10e49ec15aca41` rebased on
+  `main` `c7d5151`. Reviewer: 구현 작성자인 `/root`가 구현 완료 뒤 명시적으로 분리한
+  fresh second-pass role; runtime policy가 subagent review를 금지함. Checks: plan acceptance,
+  route/router parity와 canonical/trailing/encoded/case/unknown/external/malformed path,
+  principal cache와 unrelated cache, refresh replay/terminal 401/stale generation,
+  same-generation token rotation/new generation, 실패 전 불변, test 중복·강도,
+  production browser console/network, OpenAPI/generated/lockfile/unrelated diff, TODO 의존성.
+  Findings: unresolved HIGH/MEDIUM/LOW 없음. Corrections: review로 요구된 추가 변경 없음.
+  Rerun: focused 9 files/92 tests; `pnpm verify quick` hook 88, verifier 20,
+  48 files/281 tests; mapped auth-entry/user-crud Chromium 4/4; production preview의
+  anonymous `/user/`, authenticated `/sign-in/`, logout/direct `/user/`; isolated port
+  `pnpm verify full` build, core Chromium 9/9, verifier regression 19/19 PASS;
+  `git diff --check`와 authoritative file comparison PASS. 첫 E2E/full은 다른 worktree의
+  4173 점유로 `ENVIRONMENT` 중단되어 4187로 격리 재실행했고 임시 port-only 두 파일은
+  원복함. 상세 기록 `docs/quality/evidence/auth-entry.md`,
+  `docs/quality/evidence/user-crud.md`. Verdict: PASS. 사람 checkpoint와
+  `HUMAN_APPROVED`는 별도임.
+
+### [ ] REVIEW-AUTH-CHECKPOINT-01 인증 correction 사람 checkpoint
+
+- Requirements: `NAV-02`, `NAV-03`, `AUTH-07`, `USER-CRUD-06`, `USER-LOGOUT-04`,
+  `USER-LOGOUT-05`
+- Risk: MEDIUM — corrected auth-entry/user-crud Golden Journey acceptance
+- Depends on: `REVIEW-AUTH-JOURNEY-01`
+- Deliverable: 사람이 수정 diff와 자동·브라우저·적대적 review evidence를 확인
+- Acceptance: 사람이 Cycle 1 corrected target을 명시적으로 수락한다.
+- Automatic verification: `REVIEW-AUTH-JOURNEY-01` evidence 검토
+- Browser verification: `docs/quality/evidence/auth-entry.md`,
+  `docs/quality/evidence/user-crud.md`
+- Status: BLOCKED
+- Evidence: AI 검증은 완료됐으나 이 Cycle의 명시적인 사람 checkpoint 수락은 아직 없음.
+  AI는 `HUMAN_APPROVED`를 표시하지 않음.
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
