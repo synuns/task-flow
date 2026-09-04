@@ -129,8 +129,8 @@ review only the missing scope when their targets differ.
 
 ## Adversarial Review
 
-After each of `auth-entry`, `work-overview`, `task-discovery`, and
-`task-resolution`, use a fresh reviewer context or explicit second-pass role
+After each of `auth-entry`, `work-overview`, `task-discovery`, `task-resolution`,
+`user-crud`, and `task-crud`, use a fresh reviewer context or explicit second-pass role
 that did not author the final change. Check requirement omissions, negative
 paths, invariants, accessibility, weak or duplicate tests, console/network
 errors, and missing evidence. Resolve findings before requesting checkpoint
@@ -181,10 +181,10 @@ selects, confirms, or publishes a record for a person. See `verification.md` and
 ## Final QA Checklist
 
 - [ ] Every requirement row has reproducible evidence and correct status.
-- [ ] All four journey checkpoints are human-approved.
+- [ ] All six journey checkpoints are human-approved.
 - [ ] Full adversarial review findings are resolved.
 - [ ] `pnpm verify full` passes on the intended submission commit.
-- [ ] Core browser evidence exists for all four journeys.
+- [ ] Core browser evidence exists for all six journeys.
 - [ ] Auth, navigation, stale state, errors, and regressions were cross-checked.
 - [ ] Console and network errors were reviewed.
 - [ ] Accessibility and responsive layouts were spot-checked at recorded viewports.

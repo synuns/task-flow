@@ -3285,13 +3285,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Requirements: `SYS-04`, `SYS-05`
 - Risk: LOW — accepted behavior를 바꾸지 않는 제출 문서와 인덱스 표시 개선
 - Depends on: `QA-03`
-- Deliverable: 원본 과제와 추가 보완 기능을 구분하고 TaskFlow 명칭, 실행·로그인·검증
-  방법, 에이전트 workflow를 연결하는 `README.md`와 작업 주제를 표시하는
-  `artifacts/index.md`
+- Deliverable: 원본 범위와 추가 보완 기능, 여섯 Journey, TaskFlow 명칭,
+  실행·로그인·검증 방법과 Mermaid agent workflow를 연결하는 `README.md`, 사용 스킬과
+  프롬프트 index를 정리한 `AI_USAGE.md`, 작업 주제를 표시하는 `artifacts/index.md`
 - Acceptance: README에서 원본 요구사항과 추가 보완 기능, API 계약, route별 기능, 환경 실행,
   테스트 계정, 검증 명령, agent workflow와 상세 문서를 찾을 수 있고, 공개 세션
   링크는 주제와 session ID를 함께 표시하며 자동 재생성 후에도 주제를 유지하고,
-  공개 프로젝트명은 README·browser title·app shell·package metadata에서 TaskFlow로 일치한다.
+  공개 프로젝트명은 README·browser title·app shell·package metadata에서 TaskFlow로
+  일치하며 AI_USAGE는 개별 기록을 중복 나열하지 않는다.
 - Automatic verification: artifact index focused unit test, README local link 검사,
   `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
 - Browser verification: 1280x720에서 document title과 app shell의 TaskFlow 노출 확인

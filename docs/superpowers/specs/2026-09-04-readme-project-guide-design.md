@@ -15,16 +15,19 @@ metadata에 같은 이름을 사용한다. 원본 과제의 기관명과 과거 
 README는 다음 순서로 작성한다.
 
 1. 프로젝트와 구현 범위를 짧게 소개한다.
-2. 주요 화면과 기능을 route 중심 표로 보여준다.
-3. `assignment-original/requirement.md`의 원본 요구사항과 승인 후 추가한 보완 기능을
+2. 설치, 개발 서버, 테스트 계정, production preview를 바로 실행할 수 있게 안내한다.
+3. 주요 화면과 기술 구성을 표로 보여준다.
+4. `assignment-original/requirement.md`의 원본 요구사항과 승인 후 추가한 보완 기능을
    별도 표로 나누고 API 계약, 구현·검증 문서로 연결한다.
-4. 기술 스택과 핵심 디렉터리 역할을 요약한다.
-5. 설치, 개발 서버, production preview 순서와 접속 URL을 제공한다.
-6. MSW 전용 테스트 계정과 데이터 초기화 조건을 명시한다.
+5. 여섯 Journey의 의미, 분리 기준, 구현 단위와 evidence를 표로 연결한다.
+6. requirement 선택부터 final QA까지의 workflow를 Mermaid로 먼저 시각화하고 단계별
+   설명을 표로 제공한다.
 7. focused test와 `pnpm verify setup|quick|full`, Journey E2E의 용도를 구분한다.
-8. requirement 선택부터 격리 worktree, 구현, 자동·브라우저 검증, evidence 기록,
-   적대적 검토, 사람 checkpoint, final QA로 이어지는 에이전트 workflow를 설명한다.
-9. 원본 명세, 품질 문서, 설계·계획, AI 사용 기록과 세션 아티팩트 링크를 모은다.
+8. 핵심 디렉터리 역할과 상세 문서 링크를 표로 정리한다.
+
+`AI_USAGE.md`는 사용한 스킬을 단계별로 정리하고, 하단 `프롬프트 작업 기록`에는
+`artifacts/index.md` 링크만 둔다. 공개 기록 목록의 단일 출처는 artifact index이며
+publisher는 `AI_USAGE.md`를 다시 생성하지 않는다.
 
 ## 아티팩트 인덱스
 

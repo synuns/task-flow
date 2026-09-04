@@ -161,11 +161,19 @@ README의 원본 과제 요구사항과 추가 보완 기능을 별도 표로 �
 `TaskFlow`로 통일한다. router focused test와 실제 browser에서 app shell과 document
 title을 확인한 뒤 plan-completion review를 새 exact target으로 갱신한다.
 
-- [ ] **Step 6: evidence와 상태 완료**
+- [x] **Step 6: README 구조와 AI 사용 내역 피드백 반영**
+
+Quick Start를 상단으로 옮기고 요구사항·기능·문서 설명을 표로 구조화한다. 여섯
+Journey의 분리 기준과 구현 단위를 추가하고 workflow는 Mermaid 뒤에 단계별 표를 둔다.
+`AI_USAGE.md`에는 사용 스킬을 정리하고 프롬프트 기록은 artifact index 링크 하나만
+남긴다. publisher가 AI_USAGE 목록을 재생성하지 않는 회귀 test를 RED → GREEN으로
+확인한다.
+
+- [ ] **Step 7: evidence와 상태 완료**
 
 `docs/quality/evidence/final-qa.md`와 `TODO.md`에 requirement, exact target, 명령 결과, browser 비적용 사유, review checks/findings/corrections/rerun/verdict를 기록하고 `DOCS-README-01`을 `[x]`/`AI_VERIFIED`로 전환한다.
 
-- [ ] **Step 7: 문서 commit과 최종 확인**
+- [ ] **Step 8: 문서 commit과 최종 확인**
 
 ```bash
 git add README.md TODO.md docs/quality/evidence/final-qa.md docs/superpowers/plans/2026-09-04-readme-project-guide.md
