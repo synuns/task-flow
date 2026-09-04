@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const fixtureStorageKey = "__kbhc_msw_auth_fixture__";
+const fixtureStorageKey = "__taskflow_msw_auth_fixture__";
 
 describe("auth fixture persistence", () => {
   beforeEach(() => {

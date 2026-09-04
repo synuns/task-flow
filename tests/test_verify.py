@@ -28,7 +28,7 @@ def load_verify_module():
 class VerifyCliTests(unittest.TestCase):
     def run_verify(self, *args):
         environment = os.environ.copy()
-        environment["KBHC_VERIFY_SELF_TESTING"] = "1"
+        environment["TASKFLOW_VERIFY_SELF_TESTING"] = "1"
         return subprocess.run(
             [str(VERIFY), *args],
             cwd=str(ROOT),
@@ -55,7 +55,7 @@ class VerifyCliTests(unittest.TestCase):
         package = {
             "packageManager": "pnpm@10.15.1",
             "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
-            "kbhc": {"frontendScaffolded": True},
+            "taskflow": {"frontendScaffolded": True},
         }
         with mock.patch.dict(os.environ, {}, clear=True):
             with mock.patch.object(verifier, "package_document", return_value=package):
@@ -83,7 +83,7 @@ class VerifyCliTests(unittest.TestCase):
         package = {
             "packageManager": "pnpm@10.15.1",
             "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
-            "kbhc": {"frontendScaffolded": True},
+            "taskflow": {"frontendScaffolded": True},
         }
         with mock.patch.object(verifier, "package_document", return_value=package):
             with mock.patch.object(verifier, "run_stage", side_effect=[0, 1]) as run_stage:
@@ -97,9 +97,9 @@ class VerifyCliTests(unittest.TestCase):
         package = {
             "packageManager": "pnpm@10.15.1",
             "scripts": {name: name for name in verifier.REQUIRED_PACKAGE_SCRIPTS},
-            "kbhc": {"frontendScaffolded": True},
+            "taskflow": {"frontendScaffolded": True},
         }
-        with mock.patch.dict(os.environ, {"KBHC_VERIFY_SELF_TESTING": "1"}, clear=True):
+        with mock.patch.dict(os.environ, {"TASKFLOW_VERIFY_SELF_TESTING": "1"}, clear=True):
             with mock.patch.object(verifier, "package_document", return_value=package):
                 with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
                     result = verifier.verify_frontend("full")
@@ -145,7 +145,7 @@ class VerifyCliTests(unittest.TestCase):
         verifier = load_verify_module()
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(package["scripts"]["ai:review"], "./scripts/review-ai-record")
-        self.assertTrue(package["kbhc"]["frontendScaffolded"])
+        self.assertTrue(package["taskflow"]["frontendScaffolded"])
         self.assertEqual(
             set(verifier.REQUIRED_PACKAGE_SCRIPTS) - set(package["scripts"]),
             set(),
@@ -154,7 +154,7 @@ class VerifyCliTests(unittest.TestCase):
 
     def test_default_selects_full_without_nested_subprocess(self):
         verifier = load_verify_module()
-        with mock.patch.dict(os.environ, {"KBHC_VERIFY_SELF_TESTING": "1"}, clear=True):
+        with mock.patch.dict(os.environ, {"TASKFLOW_VERIFY_SELF_TESTING": "1"}, clear=True):
             with mock.patch.object(verifier, "repository_fingerprint", return_value=b"same"):
                 with mock.patch.object(verifier, "verify_setup", return_value=0):
                     with mock.patch.object(verifier, "verify_frontend", return_value=0) as frontend:
@@ -272,7 +272,7 @@ class VerifyCliTests(unittest.TestCase):
                     {
                         "packageManager": "npm@11.0.0",
                         "scripts": {},
-                        "kbhc": {"frontendScaffolded": True},
+                        "taskflow": {"frontendScaffolded": True},
                     }
                 ),
                 encoding="utf-8",

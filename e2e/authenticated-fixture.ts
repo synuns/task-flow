@@ -30,6 +30,6 @@ export async function prepareAuthenticatedPage(page: Page): Promise<void> {
         }),
       );
     },
-    { storageKey: "__kbhc_msw_auth_fixture__", token: refreshToken },
+    { storageKey: "__taskflow_msw_auth_fixture__", token: refreshToken },
   );
 }

@@ -148,7 +148,7 @@ describe("architecture imports", () => {
   });
 
   it("keeps the Biome alias guard executable", () => {
-    const fixtureDirectory = mkdtempSync(resolve(tmpdir(), "kbhc-biome-"));
+    const fixtureDirectory = mkdtempSync(resolve(tmpdir(), "taskflow-biome-"));
     const run = (name: string, source: string) => {
       const path = resolve(fixtureDirectory, name);
       writeFileSync(path, source);

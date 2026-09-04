@@ -3285,15 +3285,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Requirements: `SYS-04`, `SYS-05`
 - Risk: LOW — accepted behavior를 바꾸지 않는 제출 문서와 인덱스 표시 개선
 - Depends on: `QA-03`
-- Deliverable: 과제 범위, 실행·로그인·검증 방법, 에이전트 workflow를 연결하는
-  `README.md`와 작업 주제를 표시하는 `artifacts/index.md`
-- Acceptance: README에서 원본 요구사항과 API 계약, route별 기능, 환경 실행,
+- Deliverable: 원본 과제와 추가 보완 기능을 구분하고 TaskFlow 명칭, 실행·로그인·검증
+  방법, 에이전트 workflow를 연결하는 `README.md`와 작업 주제를 표시하는
+  `artifacts/index.md`
+- Acceptance: README에서 원본 요구사항과 추가 보완 기능, API 계약, route별 기능, 환경 실행,
   테스트 계정, 검증 명령, agent workflow와 상세 문서를 찾을 수 있고, 공개 세션
-  링크는 주제와 session ID를 함께 표시하며 자동 재생성 후에도 주제를 유지한다.
+  링크는 주제와 session ID를 함께 표시하며 자동 재생성 후에도 주제를 유지하고,
+  공개 프로젝트명은 README·browser title·app shell·package metadata에서 TaskFlow로 일치한다.
 - Automatic verification: artifact index focused unit test, README local link 검사,
   `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
-- Browser verification: 적용 없음 — 제품 화면 동작을 변경하지 않는 문서와 hook
-  index 표시 계약
+- Browser verification: 1280x720에서 document title과 app shell의 TaskFlow 노출 확인
 - Status: IN_PROGRESS
 - Evidence: 2026-09-04 Codex `/root`; branch `docs/readme-guide`; start SHA
   `c6351ffa20cc9d752c6b249123a0d2363de633e2`; Requirements/Journey 검색과 기존
@@ -3305,7 +3306,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   발견해 두 경로의 회귀 test를 추가함. Corrected target
   `bcaf6a4f78021bd97f1aa886c9816f0df274ace9`; focused 2/2와 최종
   `pnpm verify quick` PASS — hook 88, verifier 20, Vitest 47 files/248 tests;
-  `git diff --check` PASS. 제품 상호작용 변경이 없어 browser 검증은 적용 없음.
-  Unresolved HIGH/MEDIUM/LOW finding 없음. 상세 review는
+  `git diff --check` PASS. 후속 명칭 요구의 router test RED 6건을 확인한 뒤 README의
+  원본/추가 범위를 분리하고 공개 명칭과 현재 검증 식별자를 TaskFlow로 통일함.
+  focused Vitest 4 files/23 tests와 Python verifier·hook 62 tests PASS. agent-browser
+  1280x720에서 document title `TaskFlow`, app shell brand 노출과 기본 navigation을 확인하고
+  session/server를 종료함. 후속 exact target review와 사람 checkpoint 전까지
+  `IN_PROGRESS`를 유지함. 기존 review 상세는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
   사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함.

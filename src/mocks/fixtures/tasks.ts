@@ -24,7 +24,7 @@ const storedTaskSchema = z.strictObject({
 
 export type StoredTask = z.infer<typeof storedTaskSchema>;
 
-const fixtureStorageKey = "__kbhc_msw_task_fixture__";
+const fixtureStorageKey = "__taskflow_msw_task_fixture__";
 
 const seed: StoredTask[] = [
   {

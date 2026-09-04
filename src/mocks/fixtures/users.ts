@@ -18,7 +18,7 @@ type CreateStoredUser = Pick<StoredUser, "email" | "password" | "name">;
 type UpdateStoredUser = Pick<StoredUser, "name"> | Pick<StoredUser, "memo">;
 type UserStoreState = { sequence: number; users: StoredUser[] };
 
-const fixtureStorageKey = "__kbhc_msw_user_fixture__";
+const fixtureStorageKey = "__taskflow_msw_user_fixture__";
 const seed: StoredUser[] = [
   {
     id: "user-1",

@@ -45,7 +45,7 @@ class ParseRolloutTests(unittest.TestCase):
         self.assertEqual(tool.call_id, "call-1")
         self.assertEqual(tool.name, "exec")
         self.assertEqual(tool.input_text, '{"cmd":"pwd"}')
-        self.assertEqual(tool.output_text, "/workspace/kbhc-assgn")
+        self.assertEqual(tool.output_text, "/workspace/taskflow")
         self.assertEqual(tool.status, "completed")
 
     def test_internal_records_never_render(self):
@@ -199,7 +199,7 @@ class RedactionAndRenderTests(unittest.TestCase):
             "### Tool activity",
             "#### `exec`",
             '{"cmd":"pwd"}',
-            "/workspace/kbhc-assgn",
+            "/workspace/taskflow",
             "### Assistant response",
             "Structure created",
             "## Turn 2",

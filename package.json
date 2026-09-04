@@ -1,5 +1,5 @@
 {
-  "name": "kbhc-assgn",
+  "name": "taskflow",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -59,7 +59,7 @@
     "vite": "8.2.2",
     "vitest": "4.1.11"
   },
-  "kbhc": {
+  "taskflow": {
     "frontendScaffolded": true
   },
   "msw": {

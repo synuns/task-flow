@@ -6,7 +6,7 @@ type AuthFixtureState = {
   activeRefreshTokens: string[];
 };
 
-const fixtureStorageKey = "__kbhc_msw_auth_fixture__";
+const fixtureStorageKey = "__taskflow_msw_auth_fixture__";
 
 function emptyState(): AuthFixtureState {
   return { sequence: 0, currentAccessToken: null, activeRefreshTokens: [] };

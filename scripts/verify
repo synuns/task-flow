@@ -244,9 +244,11 @@ def package_document():
     scripts = package.get("scripts")
     if not isinstance(scripts, dict):
         raise ValueError("package.json scripts must be an object")
-    kbhc = package.get("kbhc")
-    if not isinstance(kbhc, dict) or not isinstance(kbhc.get("frontendScaffolded"), bool):
-        raise ValueError("package.json kbhc.frontendScaffolded must be boolean")
+    taskflow = package.get("taskflow")
+    if not isinstance(taskflow, dict) or not isinstance(
+        taskflow.get("frontendScaffolded"), bool
+    ):
+        raise ValueError("package.json taskflow.frontendScaffolded must be boolean")
     return package
 
 
@@ -378,7 +380,7 @@ def verify_review_tooling(root=ROOT):
         package = json.loads((root / "package.json").read_text(encoding="utf-8"))
         if package.get("scripts", {}).get("ai:review") != "./scripts/review-ai-record":
             return ["ai_review_script_mismatch"]
-        if not isinstance(package.get("kbhc", {}).get("frontendScaffolded"), bool):
+        if not isinstance(package.get("taskflow", {}).get("frontendScaffolded"), bool):
             return ["frontend_scaffold_marker_invalid"]
         executable = root / "scripts" / "review-ai-record"
         if not executable.is_file() or not os.access(str(executable), os.X_OK):
@@ -413,7 +415,7 @@ def verify_frontend(mode):
     if package is None:
         print("SKIP frontend not scaffolded")
         return 0
-    if not package["kbhc"]["frontendScaffolded"]:
+    if not package["taskflow"]["frontendScaffolded"]:
         print("SKIP frontend not scaffolded")
         return 0
     scripts = package["scripts"]
@@ -455,13 +457,13 @@ def main(argv=None):
         if (
             not result
             and mode == "full"
-            and os.environ.get("KBHC_VERIFY_SELF_TESTING") != "1"
+            and os.environ.get("TASKFLOW_VERIFY_SELF_TESTING") != "1"
         ):
             result = run_stage(
                 "verify-regression",
                 [
                     "env",
-                    "KBHC_VERIFY_SELF_TESTING=1",
+                    "TASKFLOW_VERIFY_SELF_TESTING=1",
                     sys.executable,
                     "-m",
                     "unittest",

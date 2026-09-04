@@ -16,7 +16,7 @@ test("@core @auth protects direct entry and restores a refresh-cookie session", 
 
   await page.addInitScript(() => {
     sessionStorage.setItem(
-      "__kbhc_msw_task_fixture__",
+      "__taskflow_msw_task_fixture__",
       JSON.stringify([
         {
           id: "task/A",

@@ -1,6 +1,6 @@
-# KBHC 업무 관리 대시보드
+# TaskFlow
 
-React 19와 TypeScript로 구현한 업무 관리 SPA입니다. 대시보드, 인증, 회원정보,
+TaskFlow는 React 19와 TypeScript로 구현한 업무 관리 SPA입니다. 대시보드, 인증, 회원정보,
 가상화된 할 일 목록과 User·Task CRUD를 제공하며, 제출본에는 OpenAPI 계약을 따르는
 MSW mock API가 포함됩니다.
 
@@ -36,9 +36,13 @@ method·path·schema·status·인증 방식은
 [`docs/api/crud-openapi.yaml`](./docs/api/crud-openapi.yaml)에 있습니다. API 세부사항이
 다른 문서와 충돌하면 OpenAPI 계약을 우선합니다.
 
-아래 표에서 원본 항목, 실행 가능한 acceptance와 검증 evidence를 함께 확인할 수
-있습니다. 전체 상태는
+원본 과제 범위와 승인 후 추가한 보완 기능은 아래에서 분리해 확인할 수 있습니다.
+전체 acceptance와 상태는
 [`docs/quality/requirements.md`](./docs/quality/requirements.md)가 관리합니다.
+
+### 원본 과제 요구사항
+
+`assignment-original/requirement.md`와 원본 OpenAPI에 명시된 제출 범위입니다.
 
 | 요구사항 영역 | Requirement ID | 구현·검증 근거 |
 | --- | --- | --- |
@@ -48,6 +52,14 @@ method·path·schema·status·인증 방식은
 | 로그인 | `AUTH-01`~`AUTH-07` | [인증 진입](./docs/quality/evidence/auth-entry.md) |
 | 할 일 목록 | `TASK-LIST-01`~`TASK-LIST-05` | [할 일 탐색](./docs/quality/evidence/task-discovery.md) |
 | 할 일 상세·삭제 | `TASK-DETAIL-01`~`TASK-DETAIL-05` | [할 일 해결](./docs/quality/evidence/task-resolution.md) |
+
+### 추가 보완 기능
+
+원본 제출 범위를 구현한 뒤 별도 설계와 사람 승인을 거쳐 확장한 기능입니다. 계약은
+`docs/api/crud-openapi.yaml`에서 확인할 수 있습니다.
+
+| 추가 기능 | Requirement ID | 구현·검증 근거 |
+| --- | --- | --- |
 | 회원가입·회원정보 수정·로그아웃·탈퇴 | `USER-CRUD-01`~`USER-CRUD-08`, `USER-LOGOUT-01`~`USER-LOGOUT-05` | [User CRUD](./docs/quality/evidence/user-crud.md) |
 | 할 일 생성·수정·상태 변경 | `TASK-CRUD-01`~`TASK-CRUD-08` | [Task CRUD](./docs/quality/evidence/task-crud.md) |
 

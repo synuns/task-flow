@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 저장소 검토자가 README 한 곳에서 과제 범위, 실행·로그인·검증 방법, 에이전트 workflow와 상세 근거를 찾고, 아티팩트 인덱스에서는 세션별 작업 주제를 식별하게 한다.
+**Goal:** 저장소 검토자가 TaskFlow README 한 곳에서 원본 과제와 추가 보완 범위, 실행·로그인·검증 방법, 에이전트 workflow와 상세 근거를 찾고, 아티팩트 인덱스에서는 세션별 작업 주제를 식별하게 한다.
 
 **Architecture:** README는 기존 원본·품질·실행 문서로 연결하는 얇은 진입점으로 유지한다. 공개 아티팩트 본문은 바꾸지 않고, 인덱스 생성기가 사람이 붙인 링크 제목을 검증해 재생성 때 보존한다.
 
@@ -13,7 +13,7 @@
 - `assignment-original/openapi.yaml`이 API 세부사항의 최우선 계약이다.
 - 기존 architecture, dependency, 인증 정책과 삭제 의미를 변경하지 않는다.
 - 세션 ID와 아티팩트 파일 경로는 변경하지 않는다.
-- 제품 화면 동작은 변경하지 않으므로 새 browser Journey는 만들지 않는다.
+- 명칭은 README, browser title, app shell과 package metadata에서 `TaskFlow`로 통일한다.
 - AI는 `HUMAN_APPROVED`나 최종 acceptance를 기록하지 않는다.
 
 ---
@@ -155,11 +155,17 @@ Expected: hook test, verifier test, format, lint, typecheck, Vitest와 whitespac
 
 원본 계약, README 명령·계정·URL, 21개 제목과 파일 경로, SessionEnd/publication 제목 보존, 관련 없는 diff와 승인 경계를 fresh read-only 관점으로 다시 확인한다. finding은 `REQUIREMENT`, `PRODUCT`, `TEST`, `TOOLING`, `ENVIRONMENT`로 분류하고 교정 뒤 focused/quick을 재실행한다.
 
-- [ ] **Step 5: evidence와 상태 완료**
+- [ ] **Step 5: 프로젝트 명칭과 요구사항 범위 구분**
+
+README의 원본 과제 요구사항과 추가 보완 기능을 별도 표로 나누고 공개 프로젝트명을
+`TaskFlow`로 통일한다. router focused test와 실제 browser에서 app shell과 document
+title을 확인한 뒤 plan-completion review를 새 exact target으로 갱신한다.
+
+- [ ] **Step 6: evidence와 상태 완료**
 
 `docs/quality/evidence/final-qa.md`와 `TODO.md`에 requirement, exact target, 명령 결과, browser 비적용 사유, review checks/findings/corrections/rerun/verdict를 기록하고 `DOCS-README-01`을 `[x]`/`AI_VERIFIED`로 전환한다.
 
-- [ ] **Step 6: 문서 commit과 최종 확인**
+- [ ] **Step 7: 문서 commit과 최종 확인**
 
 ```bash
 git add README.md TODO.md docs/quality/evidence/final-qa.md docs/superpowers/plans/2026-09-04-readme-project-guide.md

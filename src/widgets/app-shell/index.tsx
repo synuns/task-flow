@@ -17,7 +17,7 @@ export function AppShell({ authAction }: { authAction: AuthAction }) {
     <div className="min-h-svh bg-background md:grid md:grid-cols-[14rem_minmax(0,1fr)]">
       <header className="fixed inset-x-0 bottom-0 z-50 border-t bg-card/95 backdrop-blur md:sticky md:top-0 md:flex md:h-svh md:w-auto md:flex-col md:border-t-0 md:border-r md:bg-card md:p-5">
         <div className="hidden px-3 py-2 md:block">
-          <p className="font-semibold text-lg">업무 관리</p>
+          <p className="font-semibold text-lg">TaskFlow</p>
         </div>
         <nav
           aria-label="주요 메뉴"

@@ -88,7 +88,7 @@ describe("app router", () => {
     const navigation = screen.getByRole("navigation", { name: "주요 메뉴" });
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
     expect(navigation.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(3);
-    expect(screen.getByText("업무 관리")).toBeInTheDocument();
+    expect(screen.getByText("TaskFlow")).toBeInTheDocument();
     expect(screen.queryByText("오늘의 목표에 집중하세요.")).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "할 일" })).toHaveAttribute("href", "/task");

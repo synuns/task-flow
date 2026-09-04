@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const fixtureStorageKey = "__kbhc_msw_task_fixture__";
+const fixtureStorageKey = "__taskflow_msw_task_fixture__";
 const storedTask = {
   id: "stored-task",
   ownerId: "user-1",

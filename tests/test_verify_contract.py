@@ -28,7 +28,7 @@ class VerifyContractTests(unittest.TestCase):
             "verify-regression",
             [
                 "env",
-                "KBHC_VERIFY_SELF_TESTING=1",
+                "TASKFLOW_VERIFY_SELF_TESTING=1",
                 sys.executable,
                 "-m",
                 "unittest",
@@ -44,7 +44,7 @@ class VerifyContractTests(unittest.TestCase):
                 with mock.patch.object(verifier, "verify_frontend", return_value=0):
                     with mock.patch.object(verifier, "run_stage", return_value=0) as run_stage:
                         with mock.patch.dict(
-                            os.environ, {"KBHC_VERIFY_SELF_TESTING": "1"}, clear=True
+                            os.environ, {"TASKFLOW_VERIFY_SELF_TESTING": "1"}, clear=True
                         ):
                             result = verifier.main(["full"])
 

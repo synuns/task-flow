@@ -25,7 +25,7 @@ verification fail.
   frontend scaffolding.
 - `full`: `setup`, `quick`, `build`, and `test:e2e:core` after frontend
   scaffolding, then the complete `tests/test_verify.py` verifier regression suite.
-  `KBHC_VERIFY_SELF_TESTING=1` guards nested verifier subprocesses from recursive
+  `TASKFLOW_VERIFY_SELF_TESTING=1` guards nested verifier subprocesses from recursive
   re-entry.
 
 Before `package.json` exists, frontend stages print
