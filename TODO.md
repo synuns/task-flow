@@ -3905,3 +3905,24 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   build, Chromium core Journey 9/9, verifier regression 19/19. 기존 Vite chunk-size
   advisory 외 새 warning은 없고 browser behavior를 바꾸는 diff도 없음. 최종 setup,
   focused audit, whitespace와 authoritative/product diff를 재확인해 `AI_VERIFIED`로 전환함.
+
+## 15. 할 일 페이지 문서 스크롤
+
+### [ ] TASK-PAGE-DOCUMENT-SCROLL-01 전체 화면 스크롤과 순수 무한 pagination
+
+- Requirements: `TASK-LIST-03`, `TASK-LIST-04`
+- Risk: MEDIUM — window virtual measurement와 golden-journey scrolling 변경
+- Depends on: `TASK-LIST-JOURNEY-VERIFY-01`
+- Deliverable: 문서 전체 스크롤 기반 virtual list, 자동 next-page 요청, 목록 내부
+  terminal feedback
+- Acceptance: 내부 overflow와 수동 next-page action 없이 window scroll로 page를 각 1회
+  요청하고, terminal 문구가 목록 최하단에 표시된다.
+- Automatic verification: task-list Vitest, `pnpm verify quick`, mapped
+  task-discovery/task-crud E2E, `pnpm verify full`
+- Browser verification: `/task`, 1280×400과 390×844, document scroll/DOM bound/request
+  sequence/terminal 위치/console/page error
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root`; branch `fix/task-page-document-scroll`; start SHA
+  `637c323487cf1ee5e913d93a24e08f1eea590de6`; approved design
+  `docs/superpowers/specs/2026-09-04-task-page-document-scroll-design.md`; plan
+  `docs/superpowers/plans/2026-09-04-task-page-document-scroll.md`.

@@ -10,9 +10,9 @@ import {
   Skeleton,
 } from "@/shared/ui";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Inbox } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 function errorMessage(error: unknown): string {
   return error && typeof error === "object" && "message" in error
@@ -30,15 +30,21 @@ export function TaskList() {
     getNextPageParam: (lastPage, pages) => (lastPage.hasNext ? pages.length + 1 : undefined),
   });
   const tasks = useMemo(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
-  const virtualizer = useVirtualizer({
+  const [scrollMargin, setScrollMargin] = useState(0);
+  const virtualizer = useWindowVirtualizer({
     count: tasks.length,
-    getScrollElement: () => scrollRef.current,
     estimateSize: () => 96,
     getItemKey: (index) => tasks[index]?.id ?? index,
     overscan: 0,
+    scrollMargin,
   });
   const virtualItems = virtualizer.getVirtualItems();
   const lastVirtualIndex = virtualItems.at(-1)?.index;
+
+  useLayoutEffect(() => {
+    const nextScrollMargin = scrollRef.current?.offsetTop ?? 0;
+    if (scrollMargin !== nextScrollMargin) setScrollMargin(nextScrollMargin);
+  });
 
   useEffect(() => {
     const reachedEnd = tasks.length === 0 || lastVirtualIndex === tasks.length - 1;
@@ -89,52 +95,36 @@ export function TaskList() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <section
-        aria-label="할 일 목록"
-        className="min-h-0 flex-1 overflow-auto rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-        onKeyDown={(event) => {
-          if (
-            event.target !== event.currentTarget &&
-            ["ArrowDown", "ArrowUp", "End", "Home", "PageDown", "PageUp", " "].includes(event.key)
-          ) {
-            event.currentTarget.focus();
-          }
+    <section aria-label="할 일 목록" className="grid gap-3" ref={scrollRef}>
+      <ul
+        className="relative m-0 list-none p-0"
+        style={{
+          height: virtualizer.getTotalSize(),
         }}
-        ref={scrollRef}
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: This named scroll region is the stable keyboard target while virtual rows unmount.
-        tabIndex={0}
       >
-        <ul
-          className="relative m-0 list-none p-0"
-          style={{
-            height: virtualizer.getTotalSize(),
-          }}
-        >
-          {virtualItems.map((virtualItem) => {
-            const task = tasks[virtualItem.index];
-            if (!task) return null;
-            return (
-              <li
-                data-index={virtualItem.index}
-                data-task-row={task.id}
-                key={task.id}
-                ref={virtualizer.measureElement}
-                style={{
-                  left: 0,
-                  minHeight: virtualItem.size,
-                  position: "absolute",
-                  top: 0,
-                  transform: `translateY(${virtualItem.start}px)`,
-                  width: "100%",
-                }}
-              >
-                <TaskCard id={task.id} memo={task.memo} status={task.status} title={task.title} />
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+        {virtualItems.map((virtualItem) => {
+          const task = tasks[virtualItem.index];
+          if (!task) return null;
+          return (
+            <li
+              data-index={virtualItem.index}
+              data-task-row={task.id}
+              key={task.id}
+              ref={virtualizer.measureElement}
+              style={{
+                left: 0,
+                minHeight: virtualItem.size,
+                position: "absolute",
+                top: 0,
+                transform: `translateY(${virtualItem.start - virtualizer.options.scrollMargin}px)`,
+                width: "100%",
+              }}
+            >
+              <TaskCard id={task.id} memo={task.memo} status={task.status} title={task.title} />
+            </li>
+          );
+        })}
+      </ul>
       {query.isError && query.data && (
         <Alert variant="destructive">
           <AlertDescription>
@@ -158,19 +148,9 @@ export function TaskList() {
           <Skeleton className="h-24" />
         </div>
       )}
-      {query.hasNextPage && !query.isError && (
-        <Button
-          disabled={query.isFetchingNextPage}
-          onClick={() => void query.fetchNextPage()}
-          type="button"
-          variant="secondary"
-        >
-          {query.isFetchingNextPage ? "다음 페이지 불러오는 중" : "다음 페이지 불러오기"}
-        </Button>
-      )}
       {!query.hasNextPage && (
         <p className="text-center text-muted-foreground text-sm">모든 할 일을 불러왔습니다.</p>
       )}
-    </div>
+    </section>
   );
 }

@@ -7,18 +7,24 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TaskList } from ".";
 
-vi.mock("@tanstack/react-virtual", () => ({
-  useVirtualizer: ({ count }: { count: number }) => ({
+const { virtualizerMock } = vi.hoisted(() => ({
+  virtualizerMock: ({ count, scrollMargin = 0 }: { count: number; scrollMargin?: number }) => ({
     getTotalSize: () => count * 96,
     getVirtualItems: () =>
       Array.from({ length: count }, (_, index) => ({
         index,
         key: index,
         size: 96,
-        start: index * 96,
+        start: index * 96 + scrollMargin,
       })),
     measureElement: () => undefined,
+    options: { scrollMargin },
   }),
+}));
+
+vi.mock("@tanstack/react-virtual", () => ({
+  useVirtualizer: virtualizerMock,
+  useWindowVirtualizer: virtualizerMock,
 }));
 
 function wrapper(
@@ -41,17 +47,8 @@ function wrapper(
 afterEach(cleanup);
 
 describe("TaskList", () => {
-  it.each([
-    "{ArrowDown}",
-    "{ArrowUp}",
-    "{End}",
-    "{Home}",
-    "{PageDown}",
-    "{PageUp}",
-    " ", // Shift+Space has the same KeyboardEvent.key value.
-  ])("%s from a task card hands focus to the scroll region", async (key) => {
-    const user = userEvent.setup();
-    const client: ApiClient = {
+  it("uses the document as the only scroll surface", async () => {
+    const successClient: ApiClient = {
       request: async <T,>(
         _input: RequestInfo | URL,
         _init: RequestInit,
@@ -65,20 +62,13 @@ describe("TaskList", () => {
         return body;
       },
     };
-    render(<TaskList />, { wrapper: wrapper(client) });
+    render(<TaskList />, { wrapper: wrapper(successClient) });
 
-    const card = await screen.findByRole("link", { name: "첫 번째 할 일 할 일 첫 메모" });
-    const region = screen.getByRole("region", { name: "할 일 목록" });
-    card.focus();
-    await user.keyboard(key);
-
-    expect(region).toHaveFocus();
-    expect(region).toHaveAttribute("tabindex", "0");
-    expect(region).toHaveClass(
-      "outline-none",
-      "focus-visible:ring-2",
-      "focus-visible:ring-ring/50",
-    );
+    const region = await screen.findByRole("region", { name: "할 일 목록" });
+    expect(region).not.toHaveClass("overflow-auto");
+    expect(region).not.toHaveAttribute("tabindex");
+    expect(region).toContainElement(screen.getByText("모든 할 일을 불러왔습니다."));
+    expect(screen.queryByRole("button", { name: /다음 페이지/ })).not.toBeInTheDocument();
   });
 
   it("requests each page once and stops after the terminal page", async () => {
@@ -135,10 +125,9 @@ describe("TaskList", () => {
     expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
     releaseFirst();
     expect(await screen.findByText("첫 번째 할 일")).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "할 일 목록" })).toHaveClass("min-h-0", "flex-1");
     expect(screen.getAllByRole("listitem")[0]).toHaveStyle({ minHeight: "96px" });
     await waitFor(() => expect(requestedPages).toEqual([1, 2]));
-    expect(screen.getByRole("button", { name: "다음 페이지 불러오는 중" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: /다음 페이지/ })).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("다음 할 일을 불러오고 있습니다.");
     releaseSecond();
 

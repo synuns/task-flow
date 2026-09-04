@@ -7,18 +7,24 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TaskListPage } from ".";
 
-vi.mock("@tanstack/react-virtual", () => ({
-  useVirtualizer: ({ count }: { count: number }) => ({
+const { virtualizerMock } = vi.hoisted(() => ({
+  virtualizerMock: ({ count, scrollMargin = 0 }: { count: number; scrollMargin?: number }) => ({
     getTotalSize: () => count * 96,
     getVirtualItems: () =>
       Array.from({ length: count }, (_, index) => ({
         index,
         key: index,
         size: 96,
-        start: index * 96,
+        start: index * 96 + scrollMargin,
       })),
     measureElement: () => undefined,
+    options: { scrollMargin },
   }),
+}));
+
+vi.mock("@tanstack/react-virtual", () => ({
+  useVirtualizer: virtualizerMock,
+  useWindowVirtualizer: virtualizerMock,
 }));
 
 function renderPage(client: ApiClient) {
