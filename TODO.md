@@ -3610,7 +3610,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   각 파일 독립 실행 3/3, 11/11, 7/7 PASS로 확인. 최종 `pnpm verify quick` PASS — hook
   84, verifier 21, format/lint/typecheck, Vitest 49 files/312 tests; `git diff --check` PASS.
 
-### [ ] REVIEW-CYCLE3-JOURNEY-01 mock·도구·surface correction 통합 검증·적대적 검토
+### [x] REVIEW-CYCLE3-JOURNEY-01 mock·도구·surface correction 통합 검증·적대적 검토
 
 - Requirements: Cycle 3 listed requirements와 여섯 Golden Journey
 - Risk: HIGH — 최종 correction 전체 diff와 제출 control plane 회귀
@@ -3621,9 +3621,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: Cycle 3 focused, `pnpm verify quick`, `pnpm verify full`,
   authoritative/generated/lockfile diff와 plan-completion adversarial review
 - Browser verification: 제품 동작 변경 없음 — canonical six Journey core E2E로 회귀 확인
-- Status: IN_PROGRESS
-- Evidence: 2026-09-04 Codex `/root` task block owner; 세 Cycle 3 correction unit의
-  focused/quick 통과 후 통합 full과 frozen-target plan-completion review 준비.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root` task block owner. 최신 `main` `90433c3`로 충돌 없이
+  rebase한 구현 target `034b677`에서 fixture 22/22, Python tooling 55/55,
+  `pnpm verify quick` hook 84·verifier 21·Vitest 49 files/314 tests, canonical full의
+  build·core Chromium 9/9·verifier regression 19/19 PASS. Plan-completion review는
+  LOW 2건(안전 정수 식별자 경계, 계획 검증 명령)을 발견해 target에서 교정했으며
+  TODO ID 140개 duplicate 0, dead export/guard·broken link scan, authoritative/generated/
+  dependency/lockfile diff와 `git diff --check` PASS. Unresolved HIGH/MEDIUM/LOW finding 0.
+  Seven-field 근거는
+  `docs/quality/evidence/final-qa.md#review-cycle3-journey-01-cycle-3-통합-검증과-적대적-검토`.
 
 ### [ ] REVIEW-CYCLE3-CHECKPOINT-01 최종 correction 사람 checkpoint
 
@@ -3634,8 +3641,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
 - Automatic verification: `REVIEW-CYCLE3-JOURNEY-01` evidence 검토
 - Browser verification: canonical core E2E와 적용 가능한 기존 named browser evidence 검토
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: BLOCKED
+- Evidence: Cycle 3 구현, corrected-target quick/full, six Journey core E2E와
+  plan-completion adversarial review 완료. 사람 소유 exact-target checkpoint와 최종
+  acceptance 결정을 기다리며 AI가 `HUMAN_APPROVED`를 대신 기록하지 않음.
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
