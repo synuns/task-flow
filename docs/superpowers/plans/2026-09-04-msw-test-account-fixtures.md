@@ -408,7 +408,7 @@ await page.getByRole("link", { name: /추가 할 일 30/ }).click();
 await expect(page).toHaveURL(/\/task\/task-30$/);
 ```
 
-- [ ] **Step 3: 특수 계정 E2E를 test-first로 작성한다**
+- [ ] **Step 3: 특수 계정 E2E 회귀 검증을 작성한다**
 
 `e2e/msw-test-accounts.spec.ts`에 UI 로그인 helper와 두 독립 case를 작성한다.
 
@@ -444,10 +444,11 @@ test("error account exposes retry UI for every protected read", async ({ page })
 });
 ```
 
-- [ ] **Step 4: mapped E2E RED/GREEN을 확인한다**
+- [ ] **Step 4: mapped E2E GREEN을 확인한다**
 
-먼저 새 E2E를 production 변경 전 실행했을 때 특수 account sign-in이 실패하는 RED를
-기록한다. Task 1~3 구현 뒤 다음 전체 mapped command를 실행한다.
+특수 계정의 production behavior는 Task 2~3의 fixture/handler integration RED가
+소유한다. E2E는 같은 behavior를 중복 RED로 만들지 않고 Task 1~3 구현 뒤 실제 browser
+경계만 다음 command로 검증한다.
 
 ```bash
 pnpm exec playwright test e2e/work-overview.spec.ts e2e/task-discovery.spec.ts e2e/task-resolution.spec.ts e2e/task-crud.spec.ts e2e/msw-test-accounts.spec.ts
