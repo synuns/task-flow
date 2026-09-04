@@ -1702,3 +1702,48 @@ user explicitly approved proceeding with the canonical full gate.
 The existing non-failing Vite chunk-size advisory was the only warning. No unresolved
 HIGH, MEDIUM or LOW finding remains. `REM-FINAL-01` transitions to `AI_VERIFIED`; this
 does not create a new `HUMAN_APPROVED` state or claim final human acceptance.
+
+## README Project Guide Plan-completion Adversarial Review — 2026-09-04
+
+Review target: `bcaf6a4f78021bd97f1aa886c9816f0df274ace9`, full branch diff from
+`c6351ffa20cc9d752c6b249123a0d2363de633e2`, approved design
+`docs/superpowers/specs/2026-09-04-readme-project-guide-design.md`, and implementation
+plan `docs/superpowers/plans/2026-09-04-readme-project-guide.md`.
+
+Reviewer/context: Codex `/root` performed a fresh read-only pass after implementation.
+The active coordination policy did not authorize subagent dispatch, so this review does
+not claim reviewer independence; the following person checkpoint remains the external
+review boundary.
+
+Checks:
+
+- Compared the README requirement table with `assignment-original/requirement.md`, both
+  OpenAPI contracts, `docs/quality/requirements.md` and all six Journey evidence files.
+- Matched Node and pnpm versions, package commands, development and preview URLs, MSW
+  behavior and the local account with `package.json`, `playwright.config.ts`, `src/main.tsx`
+  and the user fixture.
+- Resolved every README local Markdown link and confirmed no referenced target is missing.
+- Read all 21 indexed public records, kept each session ID and filename unchanged, and
+  confirmed the 21 curated topics are unique and non-default.
+- Exercised canonical title parsing and regeneration through SessionEnd and publication
+  paths, including invalid title rejection and existing-title preservation.
+- Confirmed `assignment-original/`, product source, E2E, dependencies, generated types and
+  accepted application behavior are unchanged.
+
+Findings: one Minor `TEST` finding. The first title round-trip test covered the parser and
+renderer helpers but did not directly prove that SessionEnd and the publisher pass the
+title map during regeneration. No requirement, product, integration or UX finding was
+found.
+
+Corrections: updated the SessionEnd test to execute `run_hook` and added a publisher
+transaction regression that keeps an existing custom title while adding a record. The
+correction commit is the review target above.
+
+Rerun: focused SessionEnd/publisher 2/2 PASS; README command/account/URL/link audit PASS;
+21-title canonical index audit PASS; `pnpm verify quick` PASS with hook 88, verifier 20,
+and Vitest 47 files/248 tests; `git diff --check` and authoritative/dependency/product
+scope diff PASS. Browser verification is not applicable because no product interaction or
+rendered UI changed.
+
+Verdict: PASS with no unresolved HIGH, MEDIUM or LOW finding. Person checkpoint and
+canonical `pnpm verify full` remain; `HUMAN_APPROVED` and final acceptance are not claimed.

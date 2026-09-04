@@ -151,7 +151,7 @@ Run: `pnpm verify quick && git diff --check`
 
 Expected: hook test, verifier test, format, lint, typecheck, Vitest와 whitespace check가 모두 PASS.
 
-- [ ] **Step 4: plan-completion 적대적 검토**
+- [x] **Step 4: plan-completion 적대적 검토**
 
 원본 계약, README 명령·계정·URL, 21개 제목과 파일 경로, SessionEnd/publication 제목 보존, 관련 없는 diff와 승인 경계를 fresh read-only 관점으로 다시 확인한다. finding은 `REQUIREMENT`, `PRODUCT`, `TEST`, `TOOLING`, `ENVIRONMENT`로 분류하고 교정 뒤 focused/quick을 재실행한다.
 

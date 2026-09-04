@@ -3299,4 +3299,13 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `c6351ffa20cc9d752c6b249123a0d2363de633e2`; Requirements/Journey 검색과 기존
   `QA-03`, `README.md`, `package.json`, `playwright.config.ts`, 공개 artifact 21개,
   index renderer·publisher contract를 확인함. Baseline `pnpm verify quick` PASS — hook
-  85, verifier 20, Vitest 47 files/248 tests.
+  85, verifier 20, Vitest 47 files/248 tests. README local link·명령·계정·URL 검사와
+  index 21개 파일/고유 주제/canonical rebuild 검사 PASS. Plan-completion review에서
+  SessionEnd와 publisher caller 보존을 직접 검증하지 않던 Minor `TEST` finding을
+  발견해 두 경로의 회귀 test를 추가함. Corrected target
+  `bcaf6a4f78021bd97f1aa886c9816f0df274ace9`; focused 2/2와 최종
+  `pnpm verify quick` PASS — hook 88, verifier 20, Vitest 47 files/248 tests;
+  `git diff --check` PASS. 제품 상호작용 변경이 없어 browser 검증은 적용 없음.
+  Unresolved HIGH/MEDIUM/LOW finding 없음. 상세 review는
+  `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
+  사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함.
