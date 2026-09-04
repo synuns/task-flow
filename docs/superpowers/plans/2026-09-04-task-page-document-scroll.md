@@ -57,39 +57,36 @@ Expected: TODO dependency/status contract PASS.
 
 - [ ] **Step 2: window virtualizer와 문서 흐름의 실패 test를 작성한다**
 
-`src/widgets/task-list/task-list.test.tsx`의 virtualizer mock을 두 hook을 구분하는 mock으로 바꾸고 기존 keyboard handoff test를 문서 스크롤 test로 교체한다.
+`src/widgets/task-list/task-list.test.tsx`의 virtualizer mock이 window 좌표를 지원하게 바꾸고 기존 keyboard handoff test를 문서 스크롤 test로 교체한다. hook 호출 자체는 assertion하지 않고 실제 DOM 결과를 검증한다.
 
 ```tsx
-const { elementVirtualizer, windowVirtualizer } = vi.hoisted(() => {
-  const createVirtualizer = vi.fn(
-    ({ count, scrollMargin = 0 }: { count: number; scrollMargin?: number }) => ({
-      getTotalSize: () => count * 96,
-      getVirtualItems: () =>
-        Array.from({ length: count }, (_, index) => ({
-          index,
-          key: index,
-          size: 96,
-          start: index * 96 + scrollMargin,
-        })),
-      measureElement: () => undefined,
-      options: { scrollMargin },
-    }),
-  );
-  return {
-    elementVirtualizer: vi.fn(createVirtualizer),
-    windowVirtualizer: vi.fn(createVirtualizer),
-  };
-});
-
-vi.mock("@tanstack/react-virtual", () => ({
-  useVirtualizer: elementVirtualizer,
-  useWindowVirtualizer: windowVirtualizer,
+const { virtualizerMock } = vi.hoisted(() => ({
+  virtualizerMock: ({
+    count,
+    scrollMargin = 0,
+  }: {
+    count: number;
+    scrollMargin?: number;
+  }) => ({
+    getTotalSize: () => count * 96,
+    getVirtualItems: () =>
+      Array.from({ length: count }, (_, index) => ({
+        index,
+        key: index,
+        size: 96,
+        start: index * 96 + scrollMargin,
+      })),
+    measureElement: () => undefined,
+    options: { scrollMargin },
+  }),
 }));
 
-afterEach(() => {
-  cleanup();
-  vi.clearAllMocks();
-});
+vi.mock("@tanstack/react-virtual", () => ({
+  useVirtualizer: virtualizerMock,
+  useWindowVirtualizer: virtualizerMock,
+}));
+
+afterEach(cleanup);
 
 it("uses the document as the only scroll surface", async () => {
   const successClient: ApiClient = {
@@ -109,8 +106,6 @@ it("uses the document as the only scroll surface", async () => {
   render(<TaskList />, { wrapper: wrapper(successClient) });
 
   const region = await screen.findByRole("region", { name: "할 일 목록" });
-  expect(windowVirtualizer).toHaveBeenCalled();
-  expect(elementVirtualizer).not.toHaveBeenCalled();
   expect(region).not.toHaveClass("overflow-auto");
   expect(region).not.toHaveAttribute("tabindex");
   expect(region).toContainElement(screen.getByText("모든 할 일을 불러왔습니다."));
