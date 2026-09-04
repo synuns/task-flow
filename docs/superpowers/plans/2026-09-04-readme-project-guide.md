@@ -135,17 +135,17 @@ git commit -m "feat(ai): 세션 인덱스에 작업 주제 보존"
 - Consumes: 실제 `package.json`, `playwright.config.ts`, 원본·품질 문서, Task 2의 주제형 index
 - Produces: 실행 가능한 프로젝트 안내와 `DOCS-README-01` evidence
 
-- [ ] **Step 1: README 재작성**
+- [x] **Step 1: README 재작성**
 
 프로젝트 소개, 주요 route와 기능, 요구사항 확인표, 기술 스택·구조, 설치와 개발/preview URL, MSW 계정, 검증 명령, agent workflow, 문서 지도를 순서대로 작성한다. `assignment-original/requirement.md`가 실제 파일명이며 API 세부사항은 `assignment-original/openapi.yaml`이 우선함을 명시한다.
 
-- [ ] **Step 2: README 자체 검증**
+- [x] **Step 2: README 자체 검증**
 
 Run: README의 상대 Markdown link를 추출해 대상 파일 존재 여부를 확인하는 Python one-shot과 `pnpm verify setup`.
 
 Expected: 깨진 local link 0, setup PASS.
 
-- [ ] **Step 3: quick 검증**
+- [x] **Step 3: quick 검증**
 
 Run: `pnpm verify quick && git diff --check`
 
