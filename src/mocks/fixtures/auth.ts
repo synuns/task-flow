@@ -1,4 +1,4 @@
-export type IssuedTokenPair = { accessToken: string; refreshToken: string };
+type IssuedTokenPair = { accessToken: string; refreshToken: string };
 
 type AuthFixtureState = {
   sequence: number;
@@ -110,10 +110,6 @@ export function bearerUserId(header: string | null): string | null {
     return null;
   }
   return tokenUserId(state.currentAccessToken);
-}
-
-export function acceptsBearer(header: string | null): boolean {
-  return bearerUserId(header) !== null;
 }
 
 export function revokeAuthSession(userId: string): boolean {

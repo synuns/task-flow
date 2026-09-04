@@ -1,7 +1,7 @@
 import { CircleUserRound, LayoutDashboard, ListTodo, LogIn } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
-export type AuthAction = { kind: "sign-in"; to: "/sign-in" } | { kind: "profile"; to: "/user" };
+type AuthAction = { kind: "sign-in"; to: "/sign-in" } | { kind: "profile"; to: "/user" };
 
 const itemClass = ({ isActive }: { isActive: boolean }) =>
   `relative flex min-h-12 items-center justify-center gap-1 rounded-lg px-3 py-2 font-medium text-xs transition-colors md:justify-start md:gap-3 md:text-sm ${

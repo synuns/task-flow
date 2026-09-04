@@ -27,7 +27,7 @@ import {
 
 type DialogState = { kind: "idle" } | { kind: "pending" } | DeleteResolution;
 
-export type DeleteTaskDialogProps = {
+type DeleteTaskDialogProps = {
   taskId: string;
   disabled: boolean;
   onSuccess(): Promise<void>;

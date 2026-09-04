@@ -84,7 +84,7 @@ describe("TaskListPage create journey", () => {
     await user.type(screen.getByRole("textbox", { name: "메모" }), "메모");
     await user.click(screen.getByRole("button", { name: "생성" }));
 
-    expect(await screen.findByRole("link", { name: "새 할 일 메모 상태 할 일" })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: "새 할 일 할 일 메모" })).toHaveAttribute(
       "href",
       "/task/task-server-9",
     );

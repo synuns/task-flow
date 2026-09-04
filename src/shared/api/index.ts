@@ -1,4 +1,4 @@
-export type { ApiError } from "./api-error";
+export { type ApiError, isApiError } from "./api-error";
 export {
   type ApiClient,
   ApiClientProvider,
@@ -39,8 +39,6 @@ export {
   updateTask,
   type DeleteTaskResult,
   type TaskDetailData,
-  type TaskListItem,
   type TaskPage,
-  type TaskStatusData,
   type UpdateTaskInput,
 } from "./tasks";

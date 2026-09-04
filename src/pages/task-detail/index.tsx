@@ -1,7 +1,7 @@
 import { type EditableTaskField, taskKeys } from "@/entities/task";
 import { DeleteTaskDialog, evictTaskSnapshots } from "@/features/delete-task";
 import { TaskStatusControl, UpdateTaskField } from "@/features/update-task";
-import { type ApiError, getTaskDetail, useApiClient } from "@/shared/api";
+import { getTaskDetail, isApiError, useApiClient } from "@/shared/api";
 import {
   Alert,
   AlertDescription,
@@ -15,10 +15,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
-function asApiError(value: unknown): ApiError | null {
-  return value && typeof value === "object" && "kind" in value ? (value as ApiError) : null;
-}
 
 type PendingOwner = EditableTaskField | "status" | "delete";
 
@@ -48,7 +44,7 @@ export function TaskDetailPage() {
     );
   }
   if (query.isError) {
-    const error = asApiError(query.error);
+    const error = isApiError(query.error) ? query.error : null;
     if (error?.kind === "http" && error.status === 404) {
       return (
         <Alert variant="destructive">

@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { TaskStatus } from "../model/task";
 
-export type TaskCardProps = { id: string; title: string; memo: string; status: TaskStatus };
+type TaskCardProps = { id: string; title: string; memo: string; status: TaskStatus };
 
 const statusLabel: Record<TaskStatus, string> = {
   TODO: "할 일",
@@ -14,11 +14,7 @@ const statusLabel: Record<TaskStatus, string> = {
 export function TaskCard({ id, title, memo, status }: TaskCardProps) {
   return (
     <article className="h-full p-1">
-      <Link
-        aria-label={`${title} ${memo} 상태 ${statusLabel[status]}`}
-        className="block h-full rounded-xl"
-        to={`/task/${encodeURIComponent(id)}`}
-      >
+      <Link className="block h-full rounded-xl" to={`/task/${encodeURIComponent(id)}`}>
         <Card className="h-full gap-2 py-3 transition-colors hover:border-ring hover:bg-accent/40">
           <CardContent className="grid h-full grid-cols-[1fr_auto] items-center gap-4">
             <div className="min-w-0">

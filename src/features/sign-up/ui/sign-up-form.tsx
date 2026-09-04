@@ -1,4 +1,4 @@
-import { type ApiError, createUser } from "@/shared/api";
+import { createUser, isApiError } from "@/shared/api";
 import { Alert, AlertDescription, Button, Card, CardContent, Input, Label } from "@/shared/ui";
 import { loginEmailSchema, loginPasswordSchema } from "@/shared/validation";
 import { useRef, useState } from "react";
@@ -8,12 +8,6 @@ import { signUpSchema, type SignUpValues } from "../model/sign-up-schema";
 
 function message(result: ReturnType<typeof loginEmailSchema.safeParse>): true | string {
   return result.success ? true : (result.error.issues[0]?.message ?? "입력값을 확인해주세요.");
-}
-
-function isApiError(value: unknown): value is ApiError {
-  return (
-    !!value && typeof value === "object" && typeof (value as { kind?: unknown }).kind === "string"
-  );
 }
 
 function FieldError({ id, value }: { id: string; value?: string }) {

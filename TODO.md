@@ -3583,7 +3583,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify quick` PASS — hook 84, verifier 21, format/lint/typecheck, Vitest 48
   files/304 tests; `git diff --check` PASS.
 
-### [ ] REVIEW-SURFACE-DOC-01 공개 surface·TaskCard 접근성·문서 정합성
+### [x] REVIEW-SURFACE-DOC-01 공개 surface·TaskCard 접근성·문서 정합성
 
 - Requirements: `TASK-LIST-02`, `TASK-LIST-05`, `SYS-04`, architecture public boundary
 - Risk: LOW — 미사용 export와 중복 accessible name, 과거 실행 설명 정리
@@ -3595,10 +3595,20 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify quick`
 - Browser verification: TaskCard accessible name은 component test로 충분하며 제품 layout
   변경 없음 — 통합 full 회귀 사용
-- Status: IN_PROGRESS
-- Evidence: 2026-09-04 Codex `/root` task block owner; `REVIEW-TOOLING-CONSISTENCY-01`
-  AI 검증 완료 후 TaskCard, ApiError guard와 export reference caller 추적 완료, RED test
-  작성 준비.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root` task block owner. ApiError union 밖 값 4개와 shared
+  guard 부재, TaskCard 중복 accessible name을 RED 2 files/9 tests로 확인함. exact kind,
+  message와 HTTP status를 검사하는 shared guard가 네 중복 구현을 대체하고 visible
+  title/status/memo가 link 이름을 제공하게 함. 참조 검색으로 dead `acceptsBearer`,
+  `CreateTaskValues`, `TaskStatusData`, entity `Task`/`TaskListItem`, shared API
+  `TaskListItem`을 삭제하고 내부에서만 쓰는 type 6개를 비공개로 전환함. Task CRUD 현재
+  요약을 기존 `JOURNEY-TASK-CRUD-01` 승인 상태와 맞추고 과거 DEV-only MSW 단계에
+  2026-09-01 production preview correction을 연결함. Focused 6 files/44 tests와 TaskList
+  selector 교정 4 files/25 tests, typecheck, direct export reference audit PASS. 첫 quick은
+  Biome 한 줄 배치 `IMPLEMENTATION` 실패, 두 번째는 옛 aria-label selector 8건 `TEST`
+  실패를 교정함. 이후 병렬 전체 suite의 무관 UI 8건 timeout을 `ENVIRONMENT`로 분류했고
+  각 파일 독립 실행 3/3, 11/11, 7/7 PASS로 확인. 최종 `pnpm verify quick` PASS — hook
+  84, verifier 21, format/lint/typecheck, Vitest 49 files/312 tests; `git diff --check` PASS.
 
 ### [ ] REVIEW-CYCLE3-JOURNEY-01 mock·도구·surface correction 통합 검증·적대적 검토
 
@@ -3611,8 +3621,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: Cycle 3 focused, `pnpm verify quick`, `pnpm verify full`,
   authoritative/generated/lockfile diff와 plan-completion adversarial review
 - Browser verification: 제품 동작 변경 없음 — canonical six Journey core E2E로 회귀 확인
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner; 세 Cycle 3 correction unit의
+  focused/quick 통과 후 통합 full과 frozen-target plan-completion review 준비.
 
 ### [ ] REVIEW-CYCLE3-CHECKPOINT-01 최종 correction 사람 checkpoint
 

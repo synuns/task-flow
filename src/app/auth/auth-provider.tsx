@@ -2,6 +2,7 @@ import {
   type ApiError,
   type AuthSnapshot,
   type AuthTokenPair,
+  isApiError,
   refreshAccessToken,
 } from "@/shared/api";
 import type { QueryClient } from "@tanstack/react-query";
@@ -39,12 +40,6 @@ const protectedRoots = new Set(["dashboard", "tasks", "task", "user"]);
 
 function sameSnapshot(left: AuthSnapshot, right: AuthSnapshot): boolean {
   return left.generation === right.generation && left.accessToken === right.accessToken;
-}
-
-function isApiError(value: unknown): value is ApiError {
-  return (
-    !!value && typeof value === "object" && typeof (value as { kind?: unknown }).kind === "string"
-  );
 }
 
 function isTerminalRefreshError(value: unknown): boolean {

@@ -4,10 +4,8 @@ import type { ApiClient } from "./api-client-context";
 import { hasExactKeys } from "./request";
 
 type GeneratedTaskListResponse = components["schemas"]["TaskListResponse"];
-export type TaskStatusData = components["schemas"]["TaskStatus"];
 export type CreateTaskInput = components["schemas"]["CreateTaskRequest"];
 export type UpdateTaskInput = components["schemas"]["UpdateTaskRequest"];
-export type TaskListItem = components["schemas"]["TaskItem"];
 export type TaskPage = GeneratedTaskListResponse;
 export type TaskDetailData = components["schemas"]["TaskDetailResponse"];
 export type CreatedTaskData = components["schemas"]["CreatedTaskResponse"];

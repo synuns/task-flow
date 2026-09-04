@@ -1,4 +1,4 @@
-import { type ApiClient, type ApiError, deleteTask, getTaskDetail } from "@/shared/api";
+import { type ApiClient, type ApiError, deleteTask, getTaskDetail, isApiError } from "@/shared/api";
 
 export type DeleteResolution =
   | { kind: "success" }
@@ -9,12 +9,6 @@ export type DeleteResolution =
   | { kind: "stale" };
 
 export type PresenceResolution = Exclude<DeleteResolution, { kind: "success" }>;
-
-function isApiError(value: unknown): value is ApiError {
-  return (
-    !!value && typeof value === "object" && typeof (value as { kind?: unknown }).kind === "string"
-  );
-}
 
 function isUnknownOutcome(error: ApiError): boolean {
   return error.kind === "network" || error.kind === "invalid-response";

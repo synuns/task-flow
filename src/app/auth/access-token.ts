@@ -1,4 +1,4 @@
-export type AccessTokenClaims = { id: string; exp: number };
+type AccessTokenClaims = { id: string; exp: number };
 
 function decodeBase64Url(value: string): string {
   const base64 = value.replaceAll("-", "+").replaceAll("_", "/");

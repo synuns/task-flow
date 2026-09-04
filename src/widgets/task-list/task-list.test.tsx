@@ -67,7 +67,7 @@ describe("TaskList", () => {
     };
     render(<TaskList />, { wrapper: wrapper(client) });
 
-    const card = await screen.findByRole("link", { name: "첫 번째 할 일 첫 메모 상태 할 일" });
+    const card = await screen.findByRole("link", { name: "첫 번째 할 일 할 일 첫 메모" });
     const region = screen.getByRole("region", { name: "할 일 목록" });
     card.focus();
     await user.keyboard(key);

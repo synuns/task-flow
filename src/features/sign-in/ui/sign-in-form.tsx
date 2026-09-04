@@ -1,4 +1,4 @@
-import { type ApiError, type AuthTokenPair, signIn } from "@/shared/api";
+import { type AuthTokenPair, isApiError, signIn } from "@/shared/api";
 import {
   Button,
   Card,
@@ -23,12 +23,6 @@ export type SignInFormProps = { onAuthenticated(tokens: AuthTokenPair): void };
 function validationMessage(field: "email" | "password", value: string): true | string {
   const result = signInSchema.shape[field].safeParse(value);
   return result.success ? true : (result.error.issues[0]?.message ?? "입력값을 확인해주세요.");
-}
-
-function isApiError(value: unknown): value is ApiError {
-  return (
-    !!value && typeof value === "object" && typeof (value as { kind?: unknown }).kind === "string"
-  );
 }
 
 export function SignInForm({ onAuthenticated }: SignInFormProps) {

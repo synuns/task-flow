@@ -798,6 +798,10 @@ export function App() {
 
 - [ ] **Step 6: DEV-only browser mock bootstrap 작성**
 
+> 이 단계의 DEV-only 조건은 이후 승인된
+> [2026-09-01 리뷰 교정 설계](../specs/2026-09-01-review-findings-corrections-design.md)가
+> 대체했다. 현재 제출용 production preview도 MSW를 시작한다.
+
 Create `src/mocks/browser.ts`:
 
 ```ts

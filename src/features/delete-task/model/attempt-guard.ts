@@ -1,4 +1,4 @@
-export type AttemptGuard = {
+type AttemptGuard = {
   begin(): number | null;
   isCurrent(id: number): boolean;
   finish(id: number): void;
