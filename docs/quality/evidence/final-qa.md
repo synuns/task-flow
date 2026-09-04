@@ -1947,3 +1947,41 @@ Verdict: PASS — unresolved HIGH/MEDIUM/LOW finding 0. Cycle 3 사람 checkpoin
 2026-09-04 사용자가 구현 target `95c46a2`의 Cycle 3 결과를 확인한 뒤
 `승인하고 통합`으로 사람 checkpoint와 로컬 `main` 통합을 명시 승인했다.
 `AGENTS.md`에 따라 AI는 `HUMAN_APPROVED` 상태를 대신 기록하지 않는다.
+
+### DOCS-FINAL-CONSISTENCY-01 최종 문서 정합성 사람 checkpoint 후보
+
+Review target: 계획 `docs/superpowers/plans/2026-09-04-final-document-consistency.md`,
+`SYS-04`, `SYS-05`, 문서 교정 target `0735b9e`와 시작 target `2ddf181` 사이 diff.
+
+Reviewer: 2026-09-04 Codex `/root`. 교정과 quick 검증 뒤 frozen target을 처음부터
+다시 읽는 second-pass 역할로 검토했으며 별도 reviewer의 독립성은 주장하지 않는다.
+
+Checks: 원본·CRUD OpenAPI 적용 범위, 48개 requirement의 evidence/status, 141개 TODO
+stable ID와 dependency, README/상위 기획/기술 스택/품질 문서의 route·계정·명령·버전,
+90개 Markdown 문서의 실제 렌더링 link, 공개 artifact index 14개, 여섯 Journey와 core
+E2E 9개, AI disclosure 필수 항목, 과거 evidence 시제·수치 보존, 제품·계약·generated·
+dependency 무변경을 확인했다.
+
+Findings: 현재 문서 MEDIUM 2개와 LOW 3개 범주를 확인했다. Task CRUD requirement 8개가
+완료 evidence와 TODO에도 `NOT_STARTED`였고 README의 단순 우선순위 표가 CRUD OpenAPI의
+승인된 적용 범위를 충분히 표현하지 못했다. User CRUD module 경로, 기술 스택의 route·
+form·Journey 수와 과거 계획의 렌더링 상대 link가 현재 repository와 달랐다. 재검토에서
+계획이 사람 checkpoint 전에 상태 완료를 지시하는 MEDIUM `PROCESS` finding 1건을 추가로
+찾았다. unresolved HIGH/MEDIUM/LOW finding은 0.
+
+Corrections: 여덟 requirement를 증거가 허용하는 `AI_VERIFIED`로 맞추고 scoped OpenAPI
+우선순위를 명시했다. 경로는 `src/features/update-user`, route는 `/sign-up`, Journey는
+6개로 맞추고 form/schema 책임을 현재 범위로 갱신했다. 역사적 수치와 실행 결과는
+그대로 두고 잘못 렌더링되던 예시 link만 plain path로 바꿨다. 계획은 사람 checkpoint,
+승인 뒤 full/final QA, 마지막 상태 전환 순서로 교정했다.
+
+Rerun: Python 표준 라이브러리 focused audit PASS — Markdown 90/link 45, requirement
+48/48 `AI_VERIFIED`, TODO 141/141 unique와 unknown dependency 0, artifact 14/14,
+route 6, 테스트 계정 3, API operation 13, Journey 6/core E2E 9, README 기술 version
+4종 일치. `pnpm verify quick` PASS — hook 84, verifier 21, format/lint/OpenAPI type
+check/typecheck, Vitest 49 files/314 tests. `git diff --check`와 제품·두 OpenAPI·generated·
+dependency/lockfile diff 0도 PASS. 문서 전용 변경이라 browser 검증은 적용하지 않았다.
+
+Verdict: **PASS**. 사람 checkpoint 뒤 canonical full과 최종 상태 전환이 남아 있어
+`DOCS-FINAL-CONSISTENCY-01`은 `IN_PROGRESS`를 유지하며 `HUMAN_APPROVED`나 최종 acceptance를
+주장하지 않는다.

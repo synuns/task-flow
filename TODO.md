@@ -3888,4 +3888,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   README/AI_USAGE, TODO, 핵심 품질 문서, 원본과 repository inventory를 확인함. 최초
   setup은 새 worktree의 `node_modules` 부재로 Playwright/Vitest 실행 2건이 실패해
   `ENVIRONMENT`로 분류했고 `pnpm install --frozen-lockfile` 뒤 hook 84·verifier 21 PASS.
-  실행 계획은 `docs/superpowers/plans/2026-09-04-final-document-consistency.md`.
+  실행 계획은 `docs/superpowers/plans/2026-09-04-final-document-consistency.md`. 현재형
+  오류 5개 범주를 교정한 target `0735b9e`: Task CRUD requirement 8개의 누락 상태,
+  User CRUD 경로, 기술 스택의 route·form·6 Journey 설명, README의 scoped OpenAPI
+  우선순위, 과거 계획에 렌더링되던 잘못된 상대 link. focused audit PASS — Markdown
+  90개/로컬 link 45개, requirement 48개, TODO ID 141개, 공개 artifact 14개, route
+  6개, 계정 3개, API operation 13개, Journey 6개/core E2E 9개가 기준과 일치함.
+  `pnpm verify quick` PASS — hook 84, verifier 21, format/lint/OpenAPI type check/typecheck,
+  Vitest 49 files/314 tests. 적대적 검토에서 계획의 사람 checkpoint 순서 누락을
+  `PROCESS` finding으로 찾아 상태 전환 전 checkpoint를 두도록 교정했으며 unresolved
+  HIGH/MEDIUM/LOW finding은 0. 제품·OpenAPI·generated·dependency diff는 0. 사람
+  checkpoint와 그 뒤 full/final QA를 기다리므로 상태는 `IN_PROGRESS`를 유지함.
