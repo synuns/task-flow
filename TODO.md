@@ -3447,7 +3447,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   format/lint/typecheck, Vitest 48 files/287 tests. 호출부 전수 검색과 `git diff --check`
   PASS; 새 추상화·의존성·낙관 cache 갱신을 추가하지 않음.
 
-### [ ] REVIEW-TASK-RETRY-01 Infinite query 실패 operation 재실행
+### [x] REVIEW-TASK-RETRY-01 Infinite query 실패 operation 재실행
 
 - Requirements: `TASK-LIST-01`, `TASK-LIST-04`
 - Risk: MEDIUM — retained data를 보존하며 실패한 page/refetch operation을 재실행
@@ -3457,10 +3457,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   실행하며 기존 task data는 유지된다.
 - Automatic verification: task-list focused Vitest, `pnpm verify quick`
 - Browser verification: `REVIEW-TASK-API-JOURNEY-01`에서 오류·retry 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. `REVIEW-TASK-LOCK-01`
   AI 검증 완료 후 `TaskList` retained-data 오류 분기와 `task-list.test.tsx`의 기존
-  next-page 실패 검증을 확인하며 작업 시작.
+  next-page 실패 검증을 확인하며 작업 시작. RED task-list 1 file/13 tests 중 retained-data
+  refetch retry 1 fail, 기존 next-page retry 포함 12 pass로 operation 혼동을 재현함.
+  React Query의 기존 `isFetchNextPageError` flag로 retry action만 분기함. Target
+  `3a1a71a`; GREEN task-list 1 file/13 tests PASS. 최초 quick은 test formatting 한 건만
+  실패해 `TEST`로 분류하고 해당 파일만 포맷한 뒤 diff를 검토함. 최종
+  `pnpm verify quick` PASS — hook 89, verifier 20, format/lint/typecheck,
+  Vitest 48 files/288 tests; `git diff --check` PASS.
 
 ### [ ] REVIEW-API-RESPONSE-01 User와 Task 성공 응답 OpenAPI 제약
 
@@ -3473,8 +3479,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   generated response와 기존 request method/body를 유지한다.
 - Automatic verification: shared API focused Vitest, generated check, `pnpm verify quick`
 - Browser verification: UI 변경 없음 — 통합 task Journey와 API evidence 사용
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. `REVIEW-TASK-RETRY-01`
+  AI 검증 완료 후 OpenAPI User/Task 성공 응답 schema와 현행 validator/test를 대조하며
+  작업 시작.
 
 ### [ ] REVIEW-TASK-API-JOURNEY-01 Task와 API correction 통합 검증·적대적 검토
 
