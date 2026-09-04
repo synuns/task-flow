@@ -35,7 +35,7 @@
 - Consumes: 기존 `resetTaskStore(): void`, `listTaskPage(ownerId: string, page: number): TaskListResponse`, `getDashboardMetrics(ownerId: string): DashboardResponse`
 - Produces: `user-1` 소유의 고정 Task 30개와 다음 생성 ID `task-31`
 
-- [ ] **Step 1: TODO에 현재 session 소유 작업을 등록한다**
+- [x] **Step 1: TODO에 현재 session 소유 작업을 등록한다**
 
 `TODO.md` 끝에 다음 작업 block을 추가하고 다른 완료 block은 수정하지 않는다.
 
@@ -62,7 +62,7 @@
   `docs/superpowers/specs/2026-09-04-msw-test-account-fixtures-design.md`.
 ```
 
-- [ ] **Step 2: 30개 seed 계약을 실패 test로 작성한다**
+- [x] **Step 2: 30개 seed 계약을 실패 test로 작성한다**
 
 `src/mocks/fixtures/tasks.test.ts`에 다음 test를 추가한다.
 
@@ -93,7 +93,7 @@ it("seeds enough mixed-status tasks to exercise fifteen pages", async () => {
 });
 ```
 
-- [ ] **Step 3: RED를 확인한다**
+- [x] **Step 3: RED를 확인한다**
 
 Run:
 
@@ -103,7 +103,7 @@ pnpm vitest run src/mocks/fixtures/tasks.test.ts
 
 Expected: 새 test가 현재 seed 길이 `3` 때문에 실패한다.
 
-- [ ] **Step 4: 기존 세 Task 뒤에 deterministic seed 27개를 추가한다**
+- [x] **Step 4: 기존 세 Task 뒤에 deterministic seed 27개를 추가한다**
 
 `src/mocks/fixtures/tasks.ts`에서 기존 세 Task를 `baseSeed`로 이름만 바꾸고 다음
 값을 이어 붙인다. 기존 세 object 내용은 수정하지 않는다.
@@ -127,7 +127,7 @@ const generatedSeed = Array.from({ length: 27 }, (_, index): StoredTask => {
 const seed: StoredTask[] = [...baseSeed, ...generatedSeed];
 ```
 
-- [ ] **Step 5: 새 seed로 달라진 실제 store/handler 기대값만 교정한다**
+- [x] **Step 5: 새 seed로 달라진 실제 store/handler 기대값만 교정한다**
 
 다음 값으로 갱신한다.
 
@@ -155,7 +155,7 @@ expect(
 ).toEqual([...Array.from({ length: 14 }, () => true), false]);
 ```
 
-- [ ] **Step 6: focused GREEN과 quick gate를 확인한다**
+- [x] **Step 6: focused GREEN과 quick gate를 확인한다**
 
 Run:
 
@@ -166,7 +166,7 @@ pnpm verify quick
 
 Expected: focused suite와 전체 quick gate가 모두 PASS한다.
 
-- [ ] **Step 7: diff를 검토하고 커밋한다**
+- [x] **Step 7: diff를 검토하고 커밋한다**
 
 ```bash
 git diff --check
@@ -188,7 +188,7 @@ git commit -m "feat(msw): 기본 테스트 계정 할 일 fixture 확장"
 - Consumes: 기존 `authenticateUser`, owner-aware Task 조회와 `startAuthSession(userId)`
 - Produces: `testAccountIds: { primary: "user-1"; empty: "user-empty"; error: "user-error" }`와 세 seed User
 
-- [ ] **Step 1: 특수 계정 identity와 빈 상태를 실패 test로 작성한다**
+- [x] **Step 1: 특수 계정 identity와 빈 상태를 실패 test로 작성한다**
 
 `src/mocks/fixtures/users.test.ts`에는 두 특수 계정의 인증 identity를, handler
 test에는 빈 계정의 profile·dashboard·task page를 추가한다.
@@ -217,7 +217,7 @@ it("returns zero dashboard metrics and a terminal empty page for the empty accou
 `src/mocks/handlers/user.test.ts`에서는 `user-empty` token의 GET body가
 `empty@example.com`, `빈 목록 사용자`, `등록된 할 일이 없는 계정`인지 검사한다.
 
-- [ ] **Step 2: RED를 확인한다**
+- [x] **Step 2: RED를 확인한다**
 
 ```bash
 pnpm vitest run src/mocks/fixtures/users.test.ts src/mocks/handlers/tasks.test.ts src/mocks/handlers/user.test.ts
@@ -225,7 +225,7 @@ pnpm vitest run src/mocks/fixtures/users.test.ts src/mocks/handlers/tasks.test.t
 
 Expected: 두 email은 인증되지 않고 empty profile test가 401로 실패한다.
 
-- [ ] **Step 3: 공유 ID와 User seed를 최소 구현한다**
+- [x] **Step 3: 공유 ID와 User seed를 최소 구현한다**
 
 `src/mocks/fixtures/test-accounts.ts`:
 
@@ -259,7 +259,7 @@ export const testAccountIds = {
 `testAccountIds.primary`도 기존 seed User ID에 사용한다. sequence는 `1`로 유지해
 새 회원가입 ID `user-2`와 named test IDs가 충돌하지 않게 한다.
 
-- [ ] **Step 4: focused GREEN과 quick gate를 확인한다**
+- [x] **Step 4: focused GREEN과 quick gate를 확인한다**
 
 ```bash
 pnpm vitest run src/mocks/fixtures/users.test.ts src/mocks/handlers/tasks.test.ts src/mocks/handlers/user.test.ts
@@ -269,7 +269,7 @@ pnpm verify quick
 Expected: 특수 계정 인증, empty profile, dashboard와 목록이 PASS하고 기존 가입
 sequence·소유권 test도 PASS한다.
 
-- [ ] **Step 5: diff를 검토하고 커밋한다**
+- [x] **Step 5: diff를 검토하고 커밋한다**
 
 ```bash
 git diff --check
@@ -290,7 +290,7 @@ git commit -m "feat(msw): 빈 상태 테스트 계정 추가"
 - Consumes: `testAccountIds.error`, `bearerUserId(header: string | null): string | null`, MSW `HttpResponse.error()`
 - Produces: `user-error`의 dashboard/user/task-list/task-detail GET network failure
 
-- [ ] **Step 1: 네 GET failure를 test-first로 고정한다**
+- [x] **Step 1: 네 GET failure를 test-first로 고정한다**
 
 `src/mocks/handlers/tasks.test.ts`:
 
@@ -316,7 +316,7 @@ it("returns a network error for the error account profile read", async () => {
 });
 ```
 
-- [ ] **Step 2: RED를 확인한다**
+- [x] **Step 2: RED를 확인한다**
 
 ```bash
 pnpm vitest run src/mocks/handlers/tasks.test.ts src/mocks/handlers/user.test.ts
@@ -325,7 +325,7 @@ pnpm vitest run src/mocks/handlers/tasks.test.ts src/mocks/handlers/user.test.ts
 Expected: task list/dashboard는 정상 empty 200, detail은 404, profile은 200을
 반환해 네 rejection assertion이 실패한다.
 
-- [ ] **Step 3: 기존 GET handler에 한 guard씩 추가한다**
+- [x] **Step 3: 기존 GET handler에 한 guard씩 추가한다**
 
 두 handler module에서 `testAccountIds`를 import한다. 인증 실패 401 분기는 먼저
 유지하고, 유효한 error 계정에만 다음 guard를 적용한다.
@@ -337,7 +337,7 @@ if (userId === testAccountIds.error) return HttpResponse.error();
 적용 위치는 `GET /api/dashboard`, `GET /api/user`, `GET /api/task`,
 `GET /api/task/:id` 네 곳뿐이다. POST/PATCH/DELETE handler는 수정하지 않는다.
 
-- [ ] **Step 4: focused GREEN과 quick gate를 확인한다**
+- [x] **Step 4: focused GREEN과 quick gate를 확인한다**
 
 ```bash
 pnpm vitest run src/mocks/handlers/tasks.test.ts src/mocks/handlers/user.test.ts
@@ -346,7 +346,7 @@ pnpm verify quick
 
 Expected: 네 network failure와 기존 401/404/success/mutation test가 모두 PASS한다.
 
-- [ ] **Step 5: diff를 검토하고 커밋한다**
+- [x] **Step 5: diff를 검토하고 커밋한다**
 
 ```bash
 git diff --check
@@ -369,7 +369,7 @@ git commit -m "feat(msw): 조회 오류 테스트 계정 추가"
 - Consumes: 세 email/공통 password와 default metrics `30/20/10`, delete metrics `29/19/10`, created-DONE metrics `31/20/11`
 - Produces: 긴 목록 scroll과 empty/error 계정의 실제 browser 회귀 test 및 사용자 안내
 
-- [ ] **Step 1: 기존 core E2E의 고정 seed 기대값을 변경한다**
+- [x] **Step 1: 기존 core E2E의 고정 seed 기대값을 변경한다**
 
 다음 수치만 새 seed에 맞춘다.
 
@@ -380,7 +380,7 @@ task-crud 생성 Task를 DONE으로 바꾼 뒤: 31 / 20 / 11
 task-crud failed status 보존: 30 / 20 / 10
 ```
 
-- [ ] **Step 2: task-discovery가 실제 scroll로 15 page를 읽게 한다**
+- [x] **Step 2: task-discovery가 실제 scroll로 15 page를 읽게 한다**
 
 초기 render에서 `task-1`을 확인한 뒤 named region의 scroll을 반복하고, page
 `1`~`15`가 각각 한 번 호출됐는지 검사한다. terminal에서는 `task-30` link를
@@ -408,7 +408,7 @@ await page.getByRole("link", { name: /추가 할 일 30/ }).click();
 await expect(page).toHaveURL(/\/task\/task-30$/);
 ```
 
-- [ ] **Step 3: 특수 계정 E2E 회귀 검증을 작성한다**
+- [x] **Step 3: 특수 계정 E2E 회귀 검증을 작성한다**
 
 `e2e/msw-test-accounts.spec.ts`에 UI 로그인 helper와 두 독립 case를 작성한다.
 
@@ -444,7 +444,7 @@ test("error account exposes retry UI for every protected read", async ({ page })
 });
 ```
 
-- [ ] **Step 4: mapped E2E GREEN을 확인한다**
+- [x] **Step 4: mapped E2E GREEN을 확인한다**
 
 특수 계정의 production behavior는 Task 2~3의 fixture/handler integration RED가
 소유한다. E2E는 같은 behavior를 중복 RED로 만들지 않고 Task 1~3 구현 뒤 실제 browser
@@ -456,7 +456,7 @@ pnpm exec playwright test e2e/work-overview.spec.ts e2e/task-discovery.spec.ts e
 
 Expected: 기존 네 Journey와 새 account suite가 retry 없이 PASS한다.
 
-- [ ] **Step 5: README Test Account 표를 용도 중심으로 갱신한다**
+- [x] **Step 5: README Test Account 표를 용도 중심으로 갱신한다**
 
 ```markdown
 | 용도 | 이메일 | 비밀번호 |
@@ -468,7 +468,7 @@ Expected: 기존 네 Journey와 새 account suite가 retry 없이 PASS한다.
 
 기존 sessionStorage 초기화 안내는 그대로 둔다.
 
-- [ ] **Step 6: quick과 diff를 확인하고 커밋한다**
+- [x] **Step 6: quick과 diff를 확인하고 커밋한다**
 
 ```bash
 pnpm verify quick
@@ -488,7 +488,7 @@ git commit -m "test(msw): 테스트 계정 브라우저 검증 추가"
 - Consumes: Task 1~4의 exact commit과 세 테스트 계정
 - Produces: 재현 가능한 automatic/browser/review evidence와 `MSW-TEST-ACCOUNTS-01` `AI_VERIFIED` 상태
 
-- [ ] **Step 1: agent-browser 지침을 읽고 production preview를 시작한다**
+- [x] **Step 1: agent-browser 지침을 읽고 production preview를 시작한다**
 
 `agent-browser` skill의 `SKILL.md`를 읽은 뒤 task ID가 포함된 named session을
 사용한다. 별도 terminal에서 다음 server를 유지한다.
@@ -497,27 +497,27 @@ git commit -m "test(msw): 테스트 계정 브라우저 검증 추가"
 pnpm build && pnpm preview --host 127.0.0.1 --port 4173
 ```
 
-- [ ] **Step 2: 기본 계정의 실제 infinite scroll을 확인한다**
+- [x] **Step 2: 기본 계정의 실제 infinite scroll을 확인한다**
 
 `user@example.com`으로 로그인하고 `/task`를 1280x720과 390x844에서 연다.
 초기 request page보다 큰 page가 실제 wheel/End scroll 뒤 요청되고 `task-30`, terminal
 message, bounded mounted row, 정확한 document width가 보이는지 확인한다.
 
-- [ ] **Step 3: 빈 계정과 오류 계정의 route 상태를 확인한다**
+- [x] **Step 3: 빈 계정과 오류 계정의 route 상태를 확인한다**
 
 fresh session에서 `empty@example.com`의 `/` `0/0/0`, `/task` empty message를
 확인한다. 다른 fresh session에서 `error@example.com`의 `/`, `/user`, `/task`,
 `/task/task-1` alert와 retry action을 확인한다. 각 session에서 console, page errors,
 API request와 screenshot을 기록하고 session/server를 종료한다.
 
-- [ ] **Step 4: evidence 문서를 작성한다**
+- [x] **Step 4: evidence 문서를 작성한다**
 
 `docs/quality/evidence/msw-test-accounts.md`에 requirement IDs, exact commit, route와
 viewport, precondition, actions, expected/actual, console/network, screenshot/trace,
 failure class, correction, rerun verdict를 기록한다. credential 값은 README에 이미
 공개된 고정 fixture만 기록하고 access/refresh token은 기록하지 않는다.
 
-- [ ] **Step 5: canonical full gate와 immutability를 확인한다**
+- [x] **Step 5: canonical full gate와 immutability를 확인한다**
 
 ```bash
 pnpm verify full
@@ -529,7 +529,7 @@ git status --short
 Expected: full gate가 read-only PASS하고 authoritative contract, generated code,
 dependency와 lockfile diff가 없다.
 
-- [ ] **Step 6: plan-completion adversarial review를 수행한다**
+- [x] **Step 6: plan-completion adversarial review를 수행한다**
 
 fresh reviewer context를 사용할 수 있으면 구현 author와 분리하고, 사용할 수 없으면
 구현을 끝낸 뒤 explicit second-pass role로 전환한다. 승인 spec/plan, account identity,
@@ -538,7 +538,7 @@ OpenAPI/auth/delete 보존, weak tests, E2E scroll, browser diagnostics, README,
 unrelated diff를 검토한다. 모든 HIGH/MEDIUM finding을 수정하고 영향 gate를 다시
 실행한다.
 
-- [ ] **Step 7: TODO evidence와 상태를 갱신하고 커밋한다**
+- [x] **Step 7: TODO evidence와 상태를 갱신하고 커밋한다**
 
 `MSW-TEST-ACCOUNTS-01` Evidence에 RED/GREEN, focused/quick/mapped/full 결과,
 browser session과 review의 일곱 필드(`Review target`, `Reviewer`, `Checks`,
