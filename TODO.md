@@ -54,7 +54,7 @@
 | 5. task-discovery  | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 6. task-resolution | 화면 구현·통합 검증·review 후 사람 checkpoint   | HUMAN_APPROVED                 |
 | 7. user-crud       | 구현·통합 검증·review 후 사람 checkpoint        | HUMAN_APPROVED                 |
-| 8. task-crud       | 구현·통합 검증·review 후 사람 checkpoint        | IN_PROGRESS                    |
+| 8. task-crud       | 구현·통합 검증·review 후 사람 checkpoint        | HUMAN_APPROVED                 |
 | 9. 통합·제출 QA    | 여섯 checkpoint와 full QA 후 사람 최종 acceptance | IN_PROGRESS                  |
 
 ## 0. 기획·결정 준비
@@ -3539,7 +3539,77 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Browser verification: named `review-cycle2` production record
 - Status: BLOCKED
 - Evidence: Cycle 2 구현·자동/브라우저 검증·plan-completion review 완료. 사람의 명시적
-  checkpoint 결정을 기다리며 AI가 승인 상태를 대신 기록하지 않음.
+  checkpoint 결정을 기다리며 AI가 승인 상태를 대신 기록하지 않음. 2026-09-04 사용자가
+  `승인하고 2차 모듈 수정 진행`, `승인 3차 모듈 수정 진행`으로 후속 cycle 진행을
+  명시했으나, 사람 소유 `HUMAN_APPROVED` 상태는 AI가 대신 변경하지 않음.
+
+### [ ] REVIEW-MOCK-INVARIANT-01 저장된 mock 식별자 불변식
+
+- Requirements: `SYS-04`, `USER-CRUD-03`, `TASK-LIST-01`, `TASK-CRUD-02`
+- Risk: MEDIUM — 손상된 sessionStorage가 중복 User/Task identity를 만드는 경계
+- Depends on: `REVIEW-TASK-API-JOURNEY-01`
+- Deliverable: User ID/email/sequence와 Task ID load invariant 및 회귀 test
+- Acceptance: 중복 ID, 비정규·중복 email, 뒤처진 User sequence를 seed로 복구하고 정상
+  persisted state와 storage write 실패 시 메모리 동작을 보존한다.
+- Automatic verification: fixture focused Vitest, `pnpm verify quick`
+- Browser verification: mock 내부 load 경계로 적용 없음 — 통합 full 회귀 사용
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner; 승인된 Cycle 3 설계와 User/Task
+  storage load/create caller를 추적하고 RED test 작성 준비.
+
+### [ ] REVIEW-TOOLING-CONSISTENCY-01 hook·TODO verifier·publication journal 정리
+
+- Requirements: `SYS-05`, agent verification control plane
+- Risk: MEDIUM — parser 중복과 불완전 publication recovery가 검토 기록을 어긋나게 함
+- Depends on: `REVIEW-MOCK-INVARIANT-01`
+- Deliverable: adapter 단일 parser, duplicate TODO ID 검증, committing journal 복구
+- Acceptance: exporter가 adapter model/parser만 사용하고, verifier가 stable ID 중복을
+  거부하며, 최종 journal write 실패 뒤 재실행이 complete로 수렴한다.
+- Automatic verification: Python hook/verifier/publisher focused unittest, `pnpm verify quick`
+- Browser verification: 적용 없음 — repository tooling
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] REVIEW-SURFACE-DOC-01 공개 surface·TaskCard 접근성·문서 정합성
+
+- Requirements: `TASK-LIST-02`, `TASK-LIST-05`, `SYS-04`, architecture public boundary
+- Risk: LOW — 미사용 export와 중복 accessible name, 과거 실행 설명 정리
+- Depends on: `REVIEW-TOOLING-CONSISTENCY-01`
+- Deliverable: 참조 없는 export 제거, shared ApiError guard, TaskCard와 문서 교정
+- Acceptance: 사용되지 않는 type/function export가 없고 TaskCard link 이름은 visible
+  content에서 계산되며, 과거 DEV-only MSW 문서가 제출 preview correction을 연결한다.
+- Automatic verification: component/API focused Vitest, typecheck, reference scan,
+  `pnpm verify quick`
+- Browser verification: TaskCard accessible name은 component test로 충분하며 제품 layout
+  변경 없음 — 통합 full 회귀 사용
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] REVIEW-CYCLE3-JOURNEY-01 mock·도구·surface correction 통합 검증·적대적 검토
+
+- Requirements: Cycle 3 listed requirements와 여섯 Golden Journey
+- Risk: HIGH — 최종 correction 전체 diff와 제출 control plane 회귀
+- Depends on: `REVIEW-SURFACE-DOC-01`
+- Deliverable: focused/quick/full, 정적 audit와 seven-field review evidence
+- Acceptance: mock identity, parser, TODO 원장, publication recovery, public surface와
+  접근성·문서가 교정되고 accepted behavior에 unresolved HIGH/MEDIUM/LOW finding이 없다.
+- Automatic verification: Cycle 3 focused, `pnpm verify quick`, `pnpm verify full`,
+  authoritative/generated/lockfile diff와 plan-completion adversarial review
+- Browser verification: 제품 동작 변경 없음 — canonical six Journey core E2E로 회귀 확인
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] REVIEW-CYCLE3-CHECKPOINT-01 최종 correction 사람 checkpoint
+
+- Requirements: `REVIEW-CYCLE3-JOURNEY-01`의 listed Requirements/Journeys
+- Risk: HIGH — 최종 완료와 제출 acceptance는 사람 소유
+- Depends on: `REVIEW-CYCLE3-JOURNEY-01`
+- Deliverable: Cycle 3 결과와 전체 correction evidence에 대한 사람 결정
+- Acceptance: 사람이 exact target과 evidence를 검토하고 승인 또는 correction을 명시한다.
+- Automatic verification: `REVIEW-CYCLE3-JOURNEY-01` evidence 검토
+- Browser verification: canonical core E2E와 적용 가능한 기존 named browser evidence 검토
+- Status: NOT_STARTED
+- Evidence: 없음
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
