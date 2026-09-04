@@ -3867,3 +3867,25 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Findings: 없음. Corrections: 없음. Rerun: exact-set 검사와 `git diff --check` PASS.
   Verdict: PASS — unresolved HIGH/MEDIUM/LOW finding 없음. Browser 검증은 제품 behavior
   불변인 문서 파일 제거라 적용 없음. 사람의 최종 제출 acceptance는 남아 있음.
+
+## 14. 최종 문서 정합성
+
+### [ ] DOCS-FINAL-CONSISTENCY-01 제출 문서 전체 정합성 검토
+
+- Requirements: `SYS-04`, `SYS-05`, final documentation quality
+- Risk: LOW — accepted behavior를 바꾸지 않는 문서·참조·상태 교정
+- Depends on: `REVIEW-CYCLE3-JOURNEY-01`
+- Deliverable: 핵심 현재 문서와 과거 설계·계획·evidence의 링크, 경로, 명령, 버전,
+  route, test account, Requirement/TODO 상태를 원본·OpenAPI·repository와 전수 대조
+- Acceptance: 현재형 문서 주장이 authoritative source와 일치하고 깨진 로컬 참조나
+  실행 불가능한 canonical 명령이 없으며 과거 evidence는 당시 기록으로 보존된다.
+- Automatic verification: Markdown link/path와 current fact focused audit,
+  `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — 제품 UI와 browser behavior를 변경하지 않는 문서 검토
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner. Worktree
+  `.worktrees/final-doc-consistency`, branch `docs/final-doc-consistency`; Requirements,
+  README/AI_USAGE, TODO, 핵심 품질 문서, 원본과 repository inventory를 확인함. 최초
+  setup은 새 worktree의 `node_modules` 부재로 Playwright/Vitest 실행 2건이 실패해
+  `ENVIRONMENT`로 분류했고 `pnpm install --frozen-lockfile` 뒤 hook 84·verifier 21 PASS.
+  실행 계획은 `docs/superpowers/plans/2026-09-04-final-document-consistency.md`.
