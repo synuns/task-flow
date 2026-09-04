@@ -178,16 +178,17 @@ Journey의 분리 기준과 구현 단위를 추가하고 workflow는 Mermaid �
 구분하고 보조 명령과 Architecture는 `<details>`로 접는다. 테스트 계정 초기화는 하나의
 `IMPORTANT` alert로 강조하고 Node.js `||` 조건은 표 밖에서 온전히 표시한다.
 
-- [ ] **Step 8: evidence와 상태 완료**
+- [x] **Step 8: evidence와 상태 완료**
 
 `docs/quality/evidence/final-qa.md`와 `TODO.md`에 requirement, exact target, 명령 결과, browser 비적용 사유, review checks/findings/corrections/rerun/verdict를 기록하고 `DOCS-README-01`을 `[x]`/`AI_VERIFIED`로 전환한다.
 
-- [ ] **Step 9: 문서 commit과 최종 확인**
+- [x] **Step 9: 문서 commit과 최종 확인**
 
 ```bash
-git add README.md AI_USAGE.md TODO.md docs/assets/taskflow-dashboard.png docs/quality/evidence/final-qa.md docs/superpowers/specs/2026-09-04-readme-project-guide-design.md docs/superpowers/plans/2026-09-04-readme-project-guide.md
-git commit -m "docs: 프로젝트 실행과 검증 안내 정리"
+git add TODO.md docs/quality/evidence/final-qa.md docs/superpowers/plans/2026-09-04-readme-project-guide.md
+git commit -m "docs(qa): README 완료 근거 기록"
 git status --short
 ```
 
-Expected: tracked working tree clean. 사람 checkpoint 전에는 새 `HUMAN_APPROVED`나 final acceptance를 기록하지 않는다.
+Expected: tracked working tree clean. 사람 checkpoint 승인과 full QA 결과를 기록하되
+`HUMAN_APPROVED`나 최종 사람 acceptance 상태는 만들지 않는다.

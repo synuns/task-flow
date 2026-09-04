@@ -3280,7 +3280,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   2026-09-04 사용자가 제시된 Task CRUD 수동 checklist를 검토한 뒤 `승인`을 명시해
   review/evidence 포함 exact target `e01c7d8f87e8d34786395da9d22f038e35586945`를 승인함.
 
-### [ ] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
+### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
 - Requirements: `SYS-04`, `SYS-05`
 - Risk: LOW — accepted behavior를 바꾸지 않는 제출 문서와 인덱스 표시 개선
@@ -3297,7 +3297,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Automatic verification: artifact index focused unit test, README local link 검사,
   `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
 - Browser verification: 1280x720에서 document title과 app shell의 TaskFlow 노출 확인
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root`; branch `docs/readme-guide`; start SHA
   `c6351ffa20cc9d752c6b249123a0d2363de633e2`; Requirements/Journey 검색과 기존
   `QA-03`, `README.md`, `package.json`, `playwright.config.ts`, 공개 artifact 21개,
@@ -3341,5 +3341,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Plan-completion review target `fccceb8`에서 Hero 버전·anchor, Quick Start, 실제 screenshot,
   Journey/workflow Mermaid, details 경계, local link·table과 product/dependency 무변경을
   재검토해 PASS; unresolved HIGH/MEDIUM/LOW finding 없음.
-  사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함. 상세 review는
+  2026-09-04 사용자가 구현·검토 결과를 확인한 뒤 사람 checkpoint를 명시 승인함.
+  승인 뒤 canonical `pnpm verify full` PASS — hook 88, verifier 20, format/lint/typecheck,
+  Vitest 47 files/248 tests, production build, core Journey Chromium 9/9, verifier regression
+  19/19. 기존 non-failing Vite chunk-size advisory 외 새 warning이나 unresolved finding
+  없음. `AI_VERIFIED`로 전환하며 `HUMAN_APPROVED` 또는 최종 사람 acceptance를 주장하지
+  않음. 상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
