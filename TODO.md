@@ -3332,5 +3332,11 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Frontend Design 1개, 독립 agent-browser와 `ponytail:ponytail`을 컬렉션·출처별
   전체 식별자로 교정함. 계약 test RED 1건 뒤 GREEN, 최종 quick 재실행 PASS;
   식별자 12개와 하단 index-only 구조 audit PASS. Unresolved HIGH/MEDIUM/LOW finding
-  없음. 사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함. 상세 review는
+  없음. 승인된 B안 Product Showcase에 Hero, 정적 배지 4개, section 바로가기, 실제
+  1280x720 dashboard 화면, Core/Additional Journey와 4단계 workflow Mermaid,
+  `IMPORTANT` alert와 보조 정보 `<details>`를 적용함. README showcase/local link 계약과
+  이미지 크기 검사 PASS; agent-browser에서 로그인 후 실제 dashboard와 console을 확인하고
+  session/server를 종료함. `pnpm verify quick` PASS — hook 88, verifier 20, Vitest 47
+  files/248 tests; mapped `work-overview` Chromium 1/1 PASS; `git diff --check` PASS.
+  사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함. 상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.

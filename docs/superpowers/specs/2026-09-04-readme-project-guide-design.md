@@ -25,6 +25,24 @@ README는 다음 순서로 작성한다.
 7. focused test와 `pnpm verify setup|quick|full`, Journey E2E의 용도를 구분한다.
 8. 핵심 디렉터리 역할과 상세 문서 링크를 표로 정리한다.
 
+## Product Showcase
+
+승인된 B안은 GitHub Markdown의 기본 기능과 실제 제품 화면으로 프로젝트를 소개한다.
+
+- 상단 Hero에 한 줄 설명, React·TypeScript·Vite·Vitest 정적 배지와 주요 section
+  바로가기를 둔다.
+- Quick Start는 최상단에 유지하고 테스트 데이터 초기화 안내만 `IMPORTANT` alert로
+  강조한다.
+- 로그인 후 대시보드의 실제 1280×720 화면 한 장을 repository 안에 저장한다.
+- Core 4개와 Additional 2개 Journey는 별도 Mermaid subgraph와 표로 함께 표시한다.
+- workflow Mermaid는 `Plan → Build → Verify → Accept` 네 단계로 묶는다.
+- production preview, Journey별 E2E 명령, Architecture처럼 보조 정보만 `<details>`로
+  접는다.
+- Node.js의 `||` 조건은 Markdown 표 밖에 두어 열 구분자로 오인되지 않게 한다.
+
+커스텀 배너, 테마별 이미지와 여러 화면 갤러리는 추가하지 않는다. 제품 변경 때 관리할
+이미지는 대시보드 한 장으로 제한한다.
+
 `AI_USAGE.md`는 사용한 스킬을 단계별로 정리한다. 컬렉션 소속 스킬은
 `컬렉션:스킬` 전체 식별자를 쓰고 Ponytail 사용도 포함한다. 하단 `프롬프트 작업
 기록`에는 `artifacts/index.md` 링크만 둔다. 공개 기록 목록의 단일 출처는 artifact

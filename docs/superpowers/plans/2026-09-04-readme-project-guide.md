@@ -171,14 +171,21 @@ Journey의 분리 기준과 구현 단위를 추가하고 workflow는 Mermaid �
 포함하며, 프롬프트 기록은 artifact index 링크 하나만 남긴다. publisher가 AI_USAGE
 목록을 재생성하지 않는 회귀 test를 RED → GREEN으로 확인한다.
 
-- [ ] **Step 7: evidence와 상태 완료**
+- [x] **Step 7: Product Showcase 디자인 적용**
+
+상단 Hero·정적 기술 배지·section 바로가기를 추가하고 실제 1280×720 dashboard 화면을
+한 장만 저장한다. Core와 Additional Journey, 개발 workflow를 Mermaid subgraph로
+구분하고 보조 명령과 Architecture는 `<details>`로 접는다. 테스트 계정 초기화는 하나의
+`IMPORTANT` alert로 강조하고 Node.js `||` 조건은 표 밖에서 온전히 표시한다.
+
+- [ ] **Step 8: evidence와 상태 완료**
 
 `docs/quality/evidence/final-qa.md`와 `TODO.md`에 requirement, exact target, 명령 결과, browser 비적용 사유, review checks/findings/corrections/rerun/verdict를 기록하고 `DOCS-README-01`을 `[x]`/`AI_VERIFIED`로 전환한다.
 
-- [ ] **Step 8: 문서 commit과 최종 확인**
+- [ ] **Step 9: 문서 commit과 최종 확인**
 
 ```bash
-git add README.md TODO.md docs/quality/evidence/final-qa.md docs/superpowers/plans/2026-09-04-readme-project-guide.md
+git add README.md AI_USAGE.md TODO.md docs/assets/taskflow-dashboard.png docs/quality/evidence/final-qa.md docs/superpowers/specs/2026-09-04-readme-project-guide-design.md docs/superpowers/plans/2026-09-04-readme-project-guide.md
 git commit -m "docs: 프로젝트 실행과 검증 안내 정리"
 git status --short
 ```

@@ -2,9 +2,9 @@
 
 ## 사용한 도구와 모델
 
-| 항목 | 내용 |
-| --- | --- |
-| 도구 | OpenAI Codex |
+| 항목 | 내용          |
+| ---- | ------------- |
+| 도구 | OpenAI Codex  |
 | 모델 | `gpt-5.6-sol` |
 
 ## 적용한 작업 범위
@@ -20,15 +20,15 @@
 
 컬렉션에 포함된 스킬은 `컬렉션:스킬` 형식의 전체 식별자로 표시합니다.
 
-| 단계 | 컬렉션·출처 | 스킬 식별자 | 사용 목적 |
-| --- | --- | --- | --- |
-| 요구 분석·설계 | Superpowers | `superpowers:brainstorming` | 요구를 설계로 구체화 |
-| 화면 설계 | Frontend Design | `frontend-design:frontend-design` | 화면의 시각 방향과 UI 구성 결정 |
-| 작업 분리·계획 | Superpowers | `superpowers:using-git-worktrees`, `superpowers:writing-plans` | 격리 checkout과 실행 가능한 단계 작성 |
-| 구현 | Superpowers | `superpowers:executing-plans`, `superpowers:subagent-driven-development`, `superpowers:test-driven-development` | 계획 단위 실행과 RED → GREEN 구현 |
-| 문제 해결·검토 | Superpowers | `superpowers:systematic-debugging`, `superpowers:requesting-code-review`, `superpowers:verification-before-completion` | root cause 수정, 적대적 검토, 완료 전 증거 확인 |
-| Browser QA | 독립 스킬 | `agent-browser` | 실제 route, viewport, keyboard, console, network 검증 |
-| 최소 구현 원칙 | Ponytail | `ponytail:ponytail` | 기존 구조를 재사용하고 필요한 최소 변경만 구현 |
+| 단계           | 컬렉션·출처     | 스킬 식별자                                                                                                            | 사용 목적                                             |
+| -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 요구 분석·설계 | Superpowers     | `superpowers:brainstorming`                                                                                            | 요구를 설계로 구체화                                  |
+| 화면 설계      | Frontend Design | `frontend-design:frontend-design`                                                                                      | 화면의 시각 방향과 UI 구성 결정                       |
+| 작업 분리·계획 | Superpowers     | `superpowers:using-git-worktrees`, `superpowers:writing-plans`                                                         | 격리 checkout과 실행 가능한 단계 작성                 |
+| 구현           | Superpowers     | `superpowers:executing-plans`, `superpowers:subagent-driven-development`, `superpowers:test-driven-development`        | 계획 단위 실행과 RED → GREEN 구현                     |
+| 문제 해결·검토 | Superpowers     | `superpowers:systematic-debugging`, `superpowers:requesting-code-review`, `superpowers:verification-before-completion` | root cause 수정, 적대적 검토, 완료 전 증거 확인       |
+| Browser QA     | 독립 스킬       | `agent-browser`                                                                                                        | 실제 route, viewport, keyboard, console, network 검증 |
+| 최소 구현 원칙 | Ponytail        | `ponytail:ponytail`                                                                                                    | 기존 구조를 재사용하고 필요한 최소 변경만 구현        |
 
 ## 핵심 프롬프트 요약
 
