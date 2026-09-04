@@ -30,7 +30,7 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
   await expect(page.getByText("삭제 검증 대상")).toBeVisible();
   const mountedBeforeScroll = await page.locator("[data-task-row]").count();
   expect(mountedBeforeScroll).toBeGreaterThan(0);
-  expect(mountedBeforeScroll).toBeLessThan(30);
+  expect(mountedBeforeScroll).toBeLessThan(10);
 
   const list = page.getByRole("region", { name: "할 일 목록" });
   for (let pageNumber = 2; pageNumber <= 15; pageNumber += 1) {
@@ -45,7 +45,7 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
       .toContain(String(pageNumber));
   }
   await expect(page.getByText("모든 할 일을 불러왔습니다.")).toBeVisible();
-  expect(await page.locator("[data-task-row]").count()).toBeLessThan(30);
+  expect(await page.locator("[data-task-row]").count()).toBeLessThan(10);
   expect(taskRequests.map((request) => request.page)).toEqual(
     Array.from({ length: 15 }, (_, index) => String(index + 1)),
   );
