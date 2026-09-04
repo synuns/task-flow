@@ -257,10 +257,12 @@ def render_markdown(session: SessionData, home: Optional[Path] = None) -> str:
                     "",
                 ]
             )
+
+        work_lines = []
         if turn.tools:
-            lines.extend(["### Tool activity", ""])
+            work_lines.extend(["### Tool activity", ""])
             for tool in turn.tools:
-                lines.extend(
+                work_lines.extend(
                     [
                         "#### `{}`".format(redact(tool.name, home)),
                         "",
@@ -280,11 +282,22 @@ def render_markdown(session: SessionData, home: Optional[Path] = None) -> str:
                     ]
                 )
         if turn.responses:
-            lines.extend(
+            work_lines.extend(
                 [
                     "### Assistant response",
                     "",
                     redact("\n\n".join(turn.responses), home),
+                    "",
+                ]
+            )
+        if work_lines:
+            lines.extend(
+                [
+                    "<details>",
+                    "<summary>작업 내용 보기</summary>",
+                    "",
+                    *work_lines,
+                    "</details>",
                     "",
                 ]
             )

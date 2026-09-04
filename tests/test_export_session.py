@@ -191,6 +191,14 @@ class RedactionAndRenderTests(unittest.TestCase):
         first = export_session.render_markdown(session)
         second = export_session.render_markdown(session)
         self.assertEqual(first, second)
+        self.assertEqual(first.count("<details>"), 2)
+        self.assertEqual(first.count("<summary>작업 내용 보기</summary>"), 2)
+        self.assertEqual(first.count("</details>"), 2)
+        self.assertLess(first.index("Create structure"), first.index("<details>"))
+        first_work = first.split("<details>", 1)[1].split("</details>", 1)[0]
+        self.assertNotIn("Create structure", first_work)
+        self.assertIn("### Tool activity", first_work)
+        self.assertIn("### Assistant response", first_work)
         expected = [
             "Human review required before submission",
             "## Turn 1",
@@ -210,6 +218,20 @@ class RedactionAndRenderTests(unittest.TestCase):
         for value in expected:
             position = first.index(value, position + 1)
         self.assertTrue(first.endswith("\n"))
+
+    def test_render_omits_empty_work_details(self):
+        session = export_session.SessionData(
+            "session-123",
+            "model",
+            "started",
+            "cwd",
+            [export_session.TurnData("turn-1", prompts=["Prompt only"])],
+        )
+
+        rendered = export_session.render_markdown(session)
+
+        self.assertIn("### User prompt\n\nPrompt only", rendered)
+        self.assertNotIn("<details>", rendered)
 
     def test_fence_expands_for_embedded_backticks(self):
         block = export_session.fenced("before ``` after")

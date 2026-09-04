@@ -3397,3 +3397,23 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   TDD, 23개 insertion-only 변환, 사람 재검토와 plan-completion review 순서를
   구체화했다. Placeholder·모순·범위 자체 검토, `pnpm verify setup` 108 tests와
   `git diff --check` PASS. 구현과 기존 공개 기록 변경은 별도 task가 소유한다.
+
+### [ ] TOOL-AI-PROMPT-FOLD-01 세션 아티팩트 프롬프트 우선 표시 구현
+
+- Requirements: `SYS-05`
+- Risk: MEDIUM — candidate renderer와 기존 사람 검토 기록 23개의 presentation 변경
+- Depends on: `TOOL-AI-PROMPT-FOLD-DESIGN-01`
+- Deliverable: prompt는 기본 노출하고 tool activity와 assistant response를 Turn별
+  native Markdown details에 넣는 exporter와 기존 공개 artifact 변환
+- Acceptance: 미래 candidate와 기존 23개 artifact에서 user prompt는 details 밖에
+  있고 작업 내용만 `작업 내용 보기` 아래 접히며, 기존 기록은 insertion-only로
+  보존되고 사람이 변환 diff와 실제 접힘·펼치기를 다시 검토한다.
+- Automatic verification: renderer RED/GREEN test, artifact insertion-only 검사,
+  hook regression, `pnpm verify quick`, `git diff --check`
+- Browser verification: 적용 없음 — application behavior 불변; repository Markdown
+  renderer는 사람 checkpoint에서 확인
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner; isolated worktree
+  `.worktrees/session-artifact-prompt-first`, branch `feat/session-artifact-prompt-first`,
+  start commit `c7d5151`. Baseline `pnpm verify quick` PASS — hook 88, verifier 20,
+  Vitest 47 files/248 tests.
