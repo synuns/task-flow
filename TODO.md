@@ -3644,7 +3644,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
 - Status: BLOCKED
 - Evidence: Cycle 3 구현, corrected-target quick/full, six Journey core E2E와
   plan-completion adversarial review 완료. 사람 소유 exact-target checkpoint와 최종
-  acceptance 결정을 기다리며 AI가 `HUMAN_APPROVED`를 대신 기록하지 않음.
+  acceptance 결정을 기다리며 AI가 `HUMAN_APPROVED`를 대신 기록하지 않음. 2026-09-04
+  사용자가 target `95c46a2` 결과에 `승인하고 통합`으로 응답해 로컬 `main` 통합을
+  명시 승인했지만, 상태 값은 사람 직접 편집 규약에 따라 AI가 변경하지 않음.
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 
