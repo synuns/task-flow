@@ -3292,7 +3292,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   테스트 계정, 검증 명령, agent workflow와 상세 문서를 찾을 수 있고, 공개 세션
   링크는 주제와 session ID를 함께 표시하며 자동 재생성 후에도 주제를 유지하고,
   공개 프로젝트명은 README·browser title·app shell·package metadata에서 TaskFlow로
-  일치하며 AI_USAGE는 개별 기록을 중복 나열하지 않는다.
+  일치하며 AI_USAGE는 개별 기록을 중복 나열하지 않고 컬렉션 소속 스킬의 전체
+  식별자와 Ponytail 사용을 표시한다.
 - Automatic verification: artifact index focused unit test, README local link 검사,
   `pnpm verify setup`, `pnpm verify quick`, `git diff --check`
 - Browser verification: 1280x720에서 document title과 app shell의 TaskFlow 노출 확인
@@ -3327,6 +3328,9 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   41 tests, 최종 `pnpm verify quick` PASS — hook 88, verifier 20, Vitest 47 files/248
   tests. README/AI_USAGE local link, 사용자 피드백 11항목, 스킬 11개 artifact 근거,
   index 23개 파일/주제, 원본 계약·generated·lockfile 무변경과 `git diff --check` PASS.
-  Unresolved HIGH/MEDIUM/LOW finding 없음. 사람 checkpoint와 canonical full gate 전까지
-  `IN_PROGRESS`를 유지함. 상세 review는
+  후속 target `47d43a9224fd882edad2cbf699fb7f30348d4467`에서 Superpowers 9개,
+  Frontend Design 1개, 독립 agent-browser와 `ponytail:ponytail`을 컬렉션·출처별
+  전체 식별자로 교정함. 계약 test RED 1건 뒤 GREEN, 최종 quick 재실행 PASS;
+  식별자 12개와 하단 index-only 구조 audit PASS. Unresolved HIGH/MEDIUM/LOW finding
+  없음. 사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함. 상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.

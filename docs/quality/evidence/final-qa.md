@@ -1827,3 +1827,25 @@ mapped Chromium 3/3과 agent-browser 1280x720 명칭 evidence를 재사용했다
 
 Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
 `HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.
+
+### 스킬 컬렉션 식별자 후속 검토
+
+Review target: `47d43a9224fd882edad2cbf699fb7f30348d4467`.
+
+Checks: AI_USAGE의 Superpowers 스킬 9개가 `superpowers:*`, 화면 설계가
+`frontend-design:frontend-design`, Ponytail이 `ponytail:ponytail` 전체 식별자를 사용하며
+독립 `agent-browser`와 출처가 구분되는지 확인했다. 프롬프트 기록 하단의 index-only
+구조와 기존 disclosure 항목도 함께 검사했다.
+
+Findings: 전체 식별자를 요구하는 새 contract test가 기존 축약 이름에서 예상 RED 1건을
+발견했다. 교정 후 unresolved HIGH, MEDIUM, LOW finding은 없다.
+
+Corrections: 스킬 표에 컬렉션·출처 열을 추가하고 모든 컬렉션 스킬을 전체 식별자로
+바꿨으며 Ponytail의 최소 구현 원칙 사용을 추가했다.
+
+Rerun: focused disclosure contract PASS; 12개 스킬 식별자와 index-only 구조 audit,
+`git diff --check` PASS. `pnpm verify quick` PASS — hook 88, verifier 20, Vitest 47
+files/248 tests.
+
+Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
+`HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.
