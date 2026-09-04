@@ -1780,3 +1780,50 @@ artifact 21개 주제·파일 audit, active KBHC scan, authoritative/generated/l
 
 Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
 `HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.
+
+### README 구조·Journey·AI 사용 내역 피드백 검토
+
+Review target: `89154545753046e7227bf55100ed90d6510894b3`, latest main
+`4c29d3de67c020b41c4bc6ed281e94a5be7ac11b`에서 시작한 전체 branch diff.
+
+Checks:
+
+- `Quick Start`가 첫 section이고 설치, 개발 서버, 테스트 계정, preview가 순서대로
+  실행 가능한지 실제 package script와 fixture에 대조했다.
+- README가 Journey의 정의와 사용자 결과·계약과 상태·독립 검증·원본/추가 범위라는
+  분리 기준을 설명하고, 여섯 Journey를 Requirement ID와 evidence에 빠짐없이 연결하는지
+  확인했다.
+- Mermaid workflow가 설명보다 먼저 나오고 requirement 선택, 격리 worktree, 구현,
+  focused test 실패 loop, quick, Journey E2E/browser, evidence, 적대적 검토, 사람
+  checkpoint, full QA 순서를 보존하는지 검사했다.
+- README에 `과제 요구사항` 표현이 없고 주요 정보가 표와 code block으로 구조화됐는지,
+  두 문서의 모든 local Markdown link가 존재하는지 확인했다.
+- AI_USAGE의 11개 스킬 각각이 공개 artifact에 사용 근거가 있고, 하단
+  `프롬프트 작업 기록`에는 artifact index 링크 하나만 있으며 개별 session 링크와
+  managed marker가 없는지 검사했다.
+- publisher가 reviewed artifact와 canonical index만 갱신하고 AI_USAGE를 읽거나 쓰지
+  않으며, 성공·취소·idempotency와 제목 보존 test가 계속 통과하는지 확인했다.
+- latest main에 추가된 사람 검토 artifact 2개를 byte 변경 없이 보존하고, 전체 23개
+  index entry가 고유 주제·session ID·실제 파일을 갖는지 확인했다.
+- 원본 OpenAPI와 requirement, generated types, lockfile이 변경되지 않았고 기존 제품
+  명칭·인증·데이터·삭제 동작에 추가 변경이 없는지 검사했다.
+
+Findings: 초기 focused test에서 2건의 예상 `TEST` failure를 확인했다. marker가 없는
+AI_USAGE에서 publisher가 `usage_markers_invalid`로 실패했고 disclosure contract가 이전
+heading을 요구했다. 문서 목록만 삭제하면 다음 게시에서 다시 생성되는 root cause였다.
+교정 후 unresolved HIGH, MEDIUM, LOW finding은 없다.
+
+Corrections: publisher의 AI_USAGE managed-region 생성·rollback을 제거하고 canonical
+artifact index를 유일한 기록 목록으로 유지했다. disclosure와 publication test를 새
+계약으로 갱신했으며 현재 verification 문서도 같은 publication 순서를 설명하도록
+교정했다.
+
+Rerun: publisher/review/disclosure focused 41 tests PASS. 최신 main rebase 뒤
+`pnpm verify quick` PASS — hook 88, verifier 20, format/lint/typecheck, Vitest 47 files/248
+tests. README/AI_USAGE 구조와 local link audit, 11개 스킬 artifact 근거, index 23개
+파일·고유 주제 audit, publisher focused 4 tests, authoritative/generated/lockfile diff와
+`git diff --check`가 모두 PASS. 이번 후속 변경은 제품 UI를 바꾸지 않아 이전 target의
+mapped Chromium 3/3과 agent-browser 1280x720 명칭 evidence를 재사용했다.
+
+Verdict: **PASS**. 사람 checkpoint와 canonical `pnpm verify full`은 남아 있으며,
+`HUMAN_APPROVED` 또는 최종 acceptance를 주장하지 않는다.

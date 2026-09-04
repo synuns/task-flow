@@ -3317,5 +3317,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   generated/lockfile 무변경을 확인함. `pnpm verify quick` PASS — hook 88, verifier 20,
   Vitest 47 files/248 tests; mapped Chromium 3/3, README link/필수 안내, artifact 21개
   주제/파일 audit와 `git diff --check` PASS. Unresolved HIGH/MEDIUM/LOW finding 없음.
-  사람 checkpoint와 canonical full gate 전까지 `IN_PROGRESS`를 유지함. 상세 review는
+  후속 README 피드백에서 Quick Start를 최상단으로 옮기고 여섯 Journey의 정의·분리
+  기준·구현 단위와 Mermaid workflow/단계 표를 추가함. AI_USAGE에는 실제 사용 스킬을
+  단계별로 정리하고 개별 검토 기록 목록을 제거함. 게시 도구가 목록을 되살리던 경로를
+  `TEST`로 분류해 marker 없는 AI_USAGE에서 RED 2건을 확인한 뒤 artifact index만
+  갱신하도록 교정함. 최신 main의 사람 검토 기록 2개를 보존해 rebase하고 인덱스
+  23개에 고유 주제를 적용함. Review target
+  `89154545753046e7227bf55100ed90d6510894b3`; focused publisher/review/disclosure
+  41 tests, 최종 `pnpm verify quick` PASS — hook 88, verifier 20, Vitest 47 files/248
+  tests. README/AI_USAGE local link, 사용자 피드백 11항목, 스킬 11개 artifact 근거,
+  index 23개 파일/주제, 원본 계약·generated·lockfile 무변경과 `git diff --check` PASS.
+  Unresolved HIGH/MEDIUM/LOW finding 없음. 사람 checkpoint와 canonical full gate 전까지
+  `IN_PROGRESS`를 유지함. 상세 review는
   `docs/quality/evidence/final-qa.md#readme-project-guide-plan-completion-adversarial-review--2026-09-04`.
