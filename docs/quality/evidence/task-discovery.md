@@ -10,6 +10,41 @@ Approved scope: desktop/mobile 목록, Card 내용·keyboard navigation, virtual
 terminal pagination, 상세 이동, console/error 확인과 자동 negative-state evidence
 Status: `HUMAN_APPROVED`; 이 기록은 사용자의 명시적 checkpoint 승인을 반영한다.
 
+## TASK-PAGE-DOCUMENT-SCROLL-01 — checkpoint candidate
+
+Requirement/Journey: `TASK-LIST-03`, `TASK-LIST-04`; `task-discovery`, `task-crud`
+Implementation target: `7d995995b71b464a7249266849a8e6de8c1c116c`
+Session/branch: Codex `/root`; `fix/task-page-document-scroll`
+Automatic checks: focused Task list/page Vitest PASS, 2 files/10 tests; `pnpm verify quick`
+PASS, hook 84, verifier 21, Vitest 49 files/308 tests; mapped Chromium
+`e2e/task-discovery.spec.ts e2e/task-crud.spec.ts` PASS, 3/3
+Agent-browser session: `task-page-document-scroll`; production preview
+Route/Viewport: `/task`; Chromium `1280x400`, `390x844`
+Actions/actual: document bottom까지 window scroll해 `/api/task?page=1..15`를 순서대로
+각 1회 불러왔다. 목록 region의 `overflow-y`는 desktop/mobile 모두 `visible`이고
+`scrollHeight === clientHeight`였다. terminal 문구는 같은 region 내부 최하단에 있으며
+수동 `다음 페이지 불러오기` 버튼은 없었다. Desktop은 문서 3100/viewport 400px,
+scrollY 2700, mounted 4/30이고 mobile은 문서 3200/viewport 844px, scrollY 2356,
+mounted 8/30, 폭 390/390이었다. Mobile terminal bottom 732px은 고정 하단 navigation
+top 779px 위에 있어 가리지 않았다
+Contract/navigation: mapped E2E가 bearer authorization, exact page 1~15, terminal stop,
+bounded mounted rows, 마지막 `task-30` 상세 이동을 검증했다. Task CRUD Journey도 제거된
+버튼 대신 document scroll로 목표 task를 찾고 기존 수정·상태 변경·삭제 흐름을 유지했다
+Console/Network: Resource Timing에서 exact page `1`~`15`를 확인했다. console은 MSW
+200 informational logs만 있었고 page error는 없었다. agent-browser request monitor의
+MSW Service Worker 미수집은 기존 `TOOLING` 제약이며 Resource Timing과 Playwright로
+보완했다
+Screenshot/Trace: `/tmp/kbhc-task-page-document-scroll-desktop.png`,
+`/tmp/kbhc-task-page-document-scroll-mobile.png`; mapped Playwright failure trace 없음
+Failure class/correction: initial focused RED는 내부 `overflow-auto`를 확인했다.
+구현 뒤 stale virtualizer mock과 제거된 class/button 기대는 `TEST`, formatter 실패와
+JSDOM `scrollTo` 미구현은 `TOOLING`으로 분류해 최소 test harness 수정 후 재검증했다.
+기존 E2E의 element scroll/button 의존과 viewport 밖 terminal에 대한 `isVisible()` 조건은
+`TEST`로 분류하고 window scroll 및 목표 link 존재 조건으로 교정했다
+Rerun verdict: PASS — document-only scroll, 순수 자동 pagination, 목록 내부 terminal,
+desktop/mobile responsive clearance와 기존 Task CRUD 회귀가 모두 통과했다. 사람
+checkpoint와 `HUMAN_APPROVED` 전환은 별도다
+
 ## TASK-LIST-JOURNEY-REVIEW-01 — PASS
 
 Review target: plan `docs/superpowers/plans/2026-09-02-task-discovery-journey.md`;

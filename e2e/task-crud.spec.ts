@@ -3,25 +3,18 @@ import { prepareAuthenticatedPage } from "./authenticated-fixture";
 
 async function openTaskFromList(page: Page, id: string, title: RegExp): Promise<void> {
   const terminal = page.getByText("모든 할 일을 불러왔습니다.");
-  const loadMore = page.getByRole("button", { name: "다음 페이지 불러오기" });
-  for (let pageNumber = 1; pageNumber <= 16; pageNumber += 1) {
-    await expect(terminal.or(loadMore)).toBeVisible();
-    if (await terminal.isVisible()) break;
-    const nextPage = page.waitForResponse((response) => {
-      const request = response.request();
-      return new URL(response.url()).pathname === "/api/task" && request.method() === "GET";
-    });
-    await loadMore.evaluate((button: HTMLButtonElement) => button.click());
-    await nextPage;
-    await expect(terminal.or(loadMore)).toBeVisible();
-  }
-  await expect(terminal).toBeVisible();
-  const list = page.getByRole("region", { name: "할 일 목록" });
-  await list.evaluate((element) => {
-    element.scrollTop = element.scrollHeight;
-    element.dispatchEvent(new Event("scroll"));
-  });
   const taskLink = page.getByRole("link", { name: title });
+  await expect
+    .poll(
+      async () => {
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        return taskLink.count();
+      },
+      { timeout: 20_000 },
+    )
+    .toBe(1);
+
+  await expect(terminal).toBeVisible();
   await expect(taskLink).toHaveAttribute("href", `/task/${id}`);
   await taskLink.click();
 }
