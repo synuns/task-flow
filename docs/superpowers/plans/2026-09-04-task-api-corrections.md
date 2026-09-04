@@ -150,4 +150,3 @@ git add TODO.md docs/quality/evidence/task-discovery.md \
   docs/quality/evidence/task-resolution.md docs/quality/evidence/task-crud.md
 git commit -m "docs(qa): Task와 API 수정 통합 검증 근거 기록"
 ```
-
