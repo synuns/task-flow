@@ -3562,7 +3562,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify quick` PASS — hook 89, verifier 20, format/lint/typecheck, Vitest 48
   files/304 tests; `git diff --check` PASS.
 
-### [ ] REVIEW-TOOLING-CONSISTENCY-01 hook·TODO verifier·publication journal 정리
+### [x] REVIEW-TOOLING-CONSISTENCY-01 hook·TODO verifier·publication journal 정리
 
 - Requirements: `SYS-05`, agent verification control plane
 - Risk: MEDIUM — parser 중복과 불완전 publication recovery가 검토 기록을 어긋나게 함
@@ -3572,10 +3572,16 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   거부하며, 최종 journal write 실패 뒤 재실행이 complete로 수렴한다.
 - Automatic verification: Python hook/verifier/publisher focused unittest, `pnpm verify quick`
 - Browser verification: 적용 없음 — repository tooling
-- Status: IN_PROGRESS
-- Evidence: 2026-09-04 Codex `/root` task block owner; `REVIEW-MOCK-INVARIANT-01`
-  AI 검증 완료 후 exporter/adapter, TODO parser와 publisher transaction caller 추적 완료,
-  RED test 작성 준비.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root` task block owner. RED에서 exporter 중복 parser/model
+  symbol 6개, duplicate TODO ID 미검출, final journal write 실패 뒤 `committing` 잔류를
+  각각 재현함. adapter 직접 parse로 test를 전환하고 exporter의 중복 parser 142줄을
+  삭제했으며, stable ID 덮어쓰기 전 오류와 published side effect의 pending index/journal
+  복구를 추가함. 첫 quick 뒤 설계 대조에서 미사용 legacy exporter CLI/helper 6개가 남은
+  LOW finding을 발견해 ownership RED를 확장하고 CLI test와 구현을 삭제함. 교정 중 test의
+  `json` import 삭제 오류 3건은 `TEST`로 분류해 복원. 최종 focused Python 55 tests,
+  `pnpm verify quick` PASS — hook 84, verifier 21, format/lint/typecheck, Vitest 48
+  files/304 tests; `git diff --check` PASS.
 
 ### [ ] REVIEW-SURFACE-DOC-01 공개 surface·TaskCard 접근성·문서 정합성
 
@@ -3589,8 +3595,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `pnpm verify quick`
 - Browser verification: TaskCard accessible name은 component test로 충분하며 제품 layout
   변경 없음 — 통합 full 회귀 사용
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner; `REVIEW-TOOLING-CONSISTENCY-01`
+  AI 검증 완료 후 TaskCard, ApiError guard와 export reference caller 추적 완료, RED test
+  작성 준비.
 
 ### [ ] REVIEW-CYCLE3-JOURNEY-01 mock·도구·surface correction 통합 검증·적대적 검토
 

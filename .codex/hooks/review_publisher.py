@@ -207,6 +207,20 @@ def publish_receipt(repo_root: Path, receipt: ReviewReceipt) -> PublicationResul
             destination = artifacts / artifact_filename(receipt.record_id)
             reviewed = reviewed_content(candidate, receipt)
             if metadata.get("state") == "published" and _public_review_matches(destination, receipt.candidate_sha256):
+                try:
+                    journal = read_journal(repo_root, receipt.record_id)
+                except PublicationError as error:
+                    if error.code != "journal_missing":
+                        raise
+                else:
+                    if journal.get("state") == "committing":
+                        rebuild_pending_index(store.pending)
+                        write_journal(
+                            repo_root,
+                            receipt,
+                            "complete",
+                            ["artifact", "public_index", "metadata", "pending_index"],
+                        )
                 return PublicationResult("already_published", receipt.record_id)
             if metadata.get("state") != "closed":
                 raise PublicationError("record_not_closed")

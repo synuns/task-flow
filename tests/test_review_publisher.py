@@ -62,6 +62,35 @@ class PublisherTransactionTests(unittest.TestCase):
             usage_before,
         )
 
+    def test_recovery_completes_journal_after_final_journal_write_failure(self):
+        write_journal = review_publisher.write_journal
+        failed = False
+
+        def fail_final_write(repo_root, receipt, state, completed_steps, last_error=None):
+            nonlocal failed
+            if state == "complete" and not failed:
+                failed = True
+                raise OSError("final journal write failed")
+            return write_journal(repo_root, receipt, state, completed_steps, last_error)
+
+        with mock.patch.object(review_publisher, "write_journal", side_effect=fail_final_write):
+            with self.assertRaises(OSError):
+                review_publisher.publish_receipt(self.root, self.receipt())
+
+        self.assertEqual(self.store.read_metadata(self.closed.record_id)["state"], "published")
+        self.assertEqual(
+            review_publisher.journal_status(self.root, self.closed.record_id)["state"],
+            "committing",
+        )
+
+        result = review_publisher.resume_journal(self.root, self.closed.record_id)
+
+        self.assertEqual(result.status, "already_published")
+        self.assertEqual(
+            review_publisher.journal_status(self.root, self.closed.record_id)["state"],
+            "complete",
+        )
+
     def test_publish_preserves_existing_artifact_title(self):
         artifacts = self.root / "artifacts"
         existing = "codex-session-existing.md"

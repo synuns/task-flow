@@ -14,6 +14,29 @@ from tests.test_verify import ROOT, load_verify_module
 
 
 class VerifyContractTests(unittest.TestCase):
+    def test_todo_rejects_duplicate_stable_task_id(self):
+        verifier = load_verify_module()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "TODO.md").write_text(
+                """### [ ] TASK-DUPLICATE-01 first
+- Depends on: 없음
+- Status: NOT_STARTED
+- Evidence: 없음
+
+### [ ] TASK-DUPLICATE-01 second
+- Depends on: 없음
+- Status: NOT_STARTED
+- Evidence: 없음
+""",
+                encoding="utf-8",
+            )
+
+            self.assertEqual(
+                verifier.verify_todo_consistency(root),
+                ["duplicate task ID TASK-DUPLICATE-01"],
+            )
+
     def test_outer_full_runs_complete_verifier_regression_suite(self):
         verifier = load_verify_module()
         with mock.patch.object(verifier, "repository_fingerprint", return_value=b"same"):

@@ -17,19 +17,12 @@ SPEC = importlib.util.spec_from_file_location("export_session", MODULE_PATH)
 export_session = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = export_session
 SPEC.loader.exec_module(export_session)
+import transcript_adapter
 
 
 class ParseRolloutTests(unittest.TestCase):
-    def setUp(self):
-        self.warnings = []
-
     def parse(self, path=FIXTURE):
-        return export_session.parse_rollout(
-            path,
-            "session-123",
-            "fallback-model",
-            lambda event, line: self.warnings.append((event, line)),
-        )
+        return transcript_adapter.read_transcript(path, "session-123", "fallback-model").session
 
     def test_visible_records_are_grouped(self):
         session = self.parse()
@@ -59,7 +52,7 @@ class ParseRolloutTests(unittest.TestCase):
             lines = FIXTURE.read_text(encoding="utf-8").splitlines()
             lines.insert(4, "{not-json")
             path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-            with self.assertRaises(export_session.TranscriptError) as raised:
+            with self.assertRaises(transcript_adapter.TranscriptError) as raised:
                 self.parse(path)
         self.assertEqual(raised.exception.code, "malformed_json")
 
@@ -182,12 +175,9 @@ class RedactionAndRenderTests(unittest.TestCase):
         )
 
     def test_render_is_ordered_and_deterministic(self):
-        session = export_session.parse_rollout(
-            FIXTURE,
-            "session-123",
-            "fallback-model",
-            lambda event, line: None,
-        )
+        session = transcript_adapter.read_transcript(
+            FIXTURE, "session-123", "fallback-model"
+        ).session
         first = export_session.render_markdown(session)
         second = export_session.render_markdown(session)
         self.assertEqual(first, second)
@@ -220,12 +210,12 @@ class RedactionAndRenderTests(unittest.TestCase):
         self.assertTrue(first.endswith("\n"))
 
     def test_render_omits_empty_work_details(self):
-        session = export_session.SessionData(
+        session = transcript_adapter.SessionData(
             "session-123",
             "model",
             "started",
             "cwd",
-            [export_session.TurnData("turn-1", prompts=["Prompt only"])],
+            [transcript_adapter.TurnData("turn-1", prompts=["Prompt only"])],
         )
 
         rendered = export_session.render_markdown(session)
@@ -239,222 +229,26 @@ class RedactionAndRenderTests(unittest.TestCase):
         self.assertTrue(block.endswith("\n````"))
 
 
-class HookCliTests(unittest.TestCase):
-    def run_cli(self, repo_root, stdin_text):
-        return subprocess.run(
-            [sys.executable, str(MODULE_PATH), "--repo-root", str(repo_root)],
-            input=stdin_text,
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-
-    def payload(self, repo_root):
-        return {
-            "hook_event_name": "Stop",
-            "session_id": "session-123",
-            "transcript_path": str(FIXTURE),
-            "cwd": str(repo_root),
-            "model": "gpt-5.6-sol",
-            "turn_id": "turn-2",
-        }
-
-    def transcript_with_prompt(self, path, prompt):
-        records = []
-        for line in FIXTURE.read_text(encoding="utf-8").splitlines():
-            record = json.loads(line)
-            payload = record.get("payload", {})
-            if (
-                record.get("type") == "response_item"
-                and payload.get("type") == "message"
-                and payload.get("role") == "user"
-            ):
-                payload["content"][0]["text"] = prompt
-            records.append(json.dumps(record))
-        path.write_text("\n".join(records) + "\n", encoding="utf-8")
-
-    def test_success_is_idempotent(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            first_result = self.run_cli(root, json.dumps(self.payload(root)))
-            candidate = (
-                root
-                / ".codex"
-                / "review-pending"
-                / "codex-session-session-123.md"
-            )
-            first = candidate.read_text(encoding="utf-8")
-            second_result = self.run_cli(root, json.dumps(self.payload(root)))
-            second = candidate.read_text(encoding="utf-8")
-            artifacts_exist = (root / "artifacts").exists()
-        self.assertEqual(first_result.returncode, 0)
-        self.assertEqual(json.loads(first_result.stdout), {"continue": True})
-        self.assertEqual(json.loads(second_result.stdout), {"continue": True})
-        self.assertEqual(first, second)
-        self.assertEqual(first.count("## Turn 1"), 1)
-        self.assertFalse(artifacts_exist)
-
-    def test_missing_transcript_preserves_previous_candidate(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            candidate_path = (
-                root / ".codex" / "review-pending" / "codex-session-session-123.md"
-            )
-            candidate_path.parent.mkdir(parents=True)
-            candidate_path.write_text("existing\n", encoding="utf-8")
-            payload = self.payload(root)
-            payload["transcript_path"] = str(root / "secret-name.jsonl")
-            result = self.run_cli(root, json.dumps(payload))
-            candidate = candidate_path.read_text(encoding="utf-8")
-            log = (root / ".codex" / "hooks" / "export-session.log").read_text(
-                encoding="utf-8"
-            )
-        self.assertEqual(json.loads(result.stdout), {"continue": True})
-        self.assertEqual(candidate, "existing\n")
-        self.assertIn("missing_transcript", log)
-        self.assertNotIn("secret-name.jsonl", log)
-
-    def test_quoted_secret_suffix_never_reaches_pending_candidate(self):
-        prompt = "\n".join(
-            [
-                'api_key="alpha beta,gamma&delta"; safe=yes',
-                "password='one two,three&four'; safe=yes",
-                '"access_token": "json value,tail&more", "safe": true',
-                'secret="alpha \\"quoted\\",beta&gamma"; safe=yes',
-                "secret='one \\'quoted\\',two&three'; safe=yes",
-            ]
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            transcript = root / "rollout.jsonl"
-            self.transcript_with_prompt(transcript, prompt)
-            payload = self.payload(root)
-            payload["transcript_path"] = str(transcript)
-            result = self.run_cli(root, json.dumps(payload))
-            candidate = (
-                root
-                / ".codex"
-                / "review-pending"
-                / "codex-session-session-123.md"
-            ).read_text(encoding="utf-8")
-
-        self.assertEqual(json.loads(result.stdout), {"continue": True})
-        for raw_suffix in (
-            "alpha beta,gamma&delta",
-            "one two,three&four",
-            "json value,tail&more",
-            '\\"quoted\\",beta&gamma',
-            "\\'quoted\\',two&three",
-        ):
-            self.assertNotIn(raw_suffix, candidate)
-        self.assertIn('api_key="[REDACTED]"; safe=yes', candidate)
-        self.assertIn("password='[REDACTED]'; safe=yes", candidate)
-        self.assertIn(
-            '"access_token": "[REDACTED]", "safe": true',
-            candidate,
-        )
-        self.assertIn('secret="[REDACTED]"; safe=yes', candidate)
-        self.assertIn("secret='[REDACTED]'; safe=yes", candidate)
-
-    def test_refresh_token_suffix_never_reaches_pending_candidate(self):
-        raw_values = (
-            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNhbWVsIn0.camel-pending_suffix",
-            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InNuYWtlIn0.snake-pending_suffix",
-            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImtlYmFiIn0.kebab-pending_suffix",
-            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNvb2tpZSJ9.cookie-pending_suffix",
-        )
-        prompt = "\n".join(
-            [
-                "refreshToken={}".format(raw_values[0]),
-                "refresh_token='{}'".format(raw_values[1]),
-                '\"refresh-token\": \"{}\"'.format(raw_values[2]),
-                "Cookie: token={}; theme=dark".format(raw_values[3]),
-            ]
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            transcript = root / "rollout.jsonl"
-            self.transcript_with_prompt(transcript, prompt)
-            payload = self.payload(root)
-            payload["transcript_path"] = str(transcript)
-
-            result = self.run_cli(root, json.dumps(payload))
-            candidate = (
-                root
-                / ".codex"
-                / "review-pending"
-                / "codex-session-session-123.md"
-            ).read_text(encoding="utf-8")
-
-        self.assertEqual(json.loads(result.stdout), {"continue": True})
-        for value in raw_values:
-            self.assertNotIn(value, candidate)
-            self.assertNotIn(value.rsplit(".", 1)[1], candidate)
-        self.assertEqual(candidate.count("[REDACTED]"), 8)
-
-    def test_repeated_refresh_cookie_suffix_never_reaches_pending_candidate(self):
-        raw_values = (
-            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6ImZpcnN0In0.pending-first_suffix",
-            "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InNlY29uZCJ9.pending-second_suffix",
-        )
-        prompt = (
-            "Cookie: token=[REDACTED]; token={}; token={}; theme=dark".format(
-                *raw_values
-            )
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            transcript = root / "rollout.jsonl"
-            self.transcript_with_prompt(transcript, prompt)
-            payload = self.payload(root)
-            payload["transcript_path"] = str(transcript)
-
-            result = self.run_cli(root, json.dumps(payload))
-            candidate = (
-                root
-                / ".codex"
-                / "review-pending"
-                / "codex-session-session-123.md"
-            ).read_text(encoding="utf-8")
-
-        self.assertEqual(json.loads(result.stdout), {"continue": True})
-        for value in raw_values:
-            self.assertNotIn(value, candidate)
-            self.assertNotIn(value.rsplit(".", 1)[1], candidate)
-        self.assertIn(
-            "Cookie: token=[REDACTED]; token=[REDACTED]; "
-            "token=[REDACTED]; theme=dark",
-            candidate,
-        )
-
-    def test_invalid_stdin_and_unsafe_session_write_nothing(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            invalid = self.run_cli(root, "not-json")
-            payload = self.payload(root)
-            payload["session_id"] = "..."
-            unsafe = self.run_cli(root, json.dumps(payload))
-            pending_directory = root / ".codex" / "review-pending"
-        self.assertEqual(json.loads(invalid.stdout), {"continue": True})
-        self.assertEqual(json.loads(unsafe.stdout), {"continue": True})
-        self.assertFalse(pending_directory.exists())
-
-    def test_cwd_outside_repo_is_rejected(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            payload = self.payload(root)
-            payload["cwd"] = str(root.parent)
-            result = self.run_cli(root, json.dumps(payload))
-            log = (root / ".codex" / "hooks" / "export-session.log").read_text(
-                encoding="utf-8"
-            )
-            pending_directory = root / ".codex" / "review-pending"
-        self.assertEqual(json.loads(result.stdout), {"continue": True})
-        self.assertIn("cwd_outside_repo", log)
-        self.assertFalse(pending_directory.exists())
-
 
 class ProjectWiringTests(unittest.TestCase):
+    def test_exporter_uses_adapter_as_the_only_parser_owner(self):
+        for name in (
+            "ToolActivity",
+            "TurnData",
+            "SessionData",
+            "extract_visible_text",
+            "_legacy_parse_rollout",
+            "parse_rollout",
+            "log_event",
+            "atomic_write",
+            "cwd_is_inside_repo",
+            "run_hook",
+            "parse_args",
+            "main",
+        ):
+            with self.subTest(name=name):
+                self.assertFalse(hasattr(export_session, name))
+
     def test_pending_records_are_ignored(self):
         result = subprocess.run(
             ["git", "check-ignore", "-q", ".codex/review-pending/probe.md"],
