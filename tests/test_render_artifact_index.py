@@ -78,7 +78,9 @@ class ArtifactIndexRenderTests(unittest.TestCase):
 
     def test_custom_title_survives_index_rebuild(self):
         with tempfile.TemporaryDirectory() as directory:
-            artifacts = Path(directory)
+            root = Path(directory)
+            artifacts = root / "artifacts"
+            artifacts.mkdir()
             filename = "codex-session-session-a.md"
             (artifacts / filename).write_text("reviewed\n", encoding="utf-8")
             titles = {filename: "인증 진입 Journey"}
@@ -86,13 +88,20 @@ class ArtifactIndexRenderTests(unittest.TestCase):
             index = artifacts / "index.md"
             index.write_text(content, encoding="utf-8")
 
-            rebuilt_titles = (
-                render_artifact_index.list_published_artifact_titles(
-                    index,
-                    artifacts,
-                )
+            result = render_artifact_index.run_hook(
+                {
+                    "hook_event_name": "SessionEnd",
+                    "session_id": "session-b",
+                    "cwd": str(root),
+                },
+                root,
+            )
+            rebuilt_titles = render_artifact_index.list_published_artifact_titles(
+                index,
+                artifacts,
             )
 
+        self.assertEqual(result, 0)
         self.assertEqual(rebuilt_titles, titles)
         self.assertEqual(
             render_artifact_index.render_index(

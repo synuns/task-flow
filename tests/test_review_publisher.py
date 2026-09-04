@@ -53,6 +53,26 @@ class PublisherTransactionTests(unittest.TestCase):
         self.assertEqual(sum(self.closed.record_id in line for line in index.splitlines()), 1)
         self.assertEqual(self.store.read_metadata(self.closed.record_id)["state"], "published")
 
+    def test_publish_preserves_existing_artifact_title(self):
+        artifacts = self.root / "artifacts"
+        existing = "codex-session-existing.md"
+        (artifacts / existing).write_text("reviewed\n", encoding="utf-8")
+        (artifacts / "index.md").write_text(
+            render_artifact_index.render_index(
+                [existing],
+                {existing: "인증 진입 Journey"},
+            ),
+            encoding="utf-8",
+        )
+
+        review_publisher.publish_receipt(self.root, self.receipt())
+
+        titles = render_artifact_index.list_published_artifact_titles(
+            artifacts / "index.md",
+            artifacts,
+        )
+        self.assertEqual(titles[existing], "인증 진입 Journey")
+
     def test_pending_record_rejected(self):
         self.store.session_start("session-123", "resume")
         with self.assertRaises(review_publisher.PublicationError) as raised:
