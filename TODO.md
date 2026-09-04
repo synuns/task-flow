@@ -3889,7 +3889,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   setup은 새 worktree의 `node_modules` 부재로 Playwright/Vitest 실행 2건이 실패해
   `ENVIRONMENT`로 분류했고 `pnpm install --frozen-lockfile` 뒤 hook 84·verifier 21 PASS.
   실행 계획은 `docs/superpowers/plans/2026-09-04-final-document-consistency.md`. 현재형
-  오류 5개 범주를 교정한 target `0735b9e`: Task CRUD requirement 8개의 누락 상태,
+  오류 5개 범주를 교정한 target `0735b9e`(main rebase 후 동등 target `0c67603`):
+  Task CRUD requirement 8개의 누락 상태,
   User CRUD 경로, 기술 스택의 route·form·6 Journey 설명, README의 scoped OpenAPI
   우선순위, 과거 계획에 렌더링되던 잘못된 상대 link. focused audit PASS — Markdown
   90개/로컬 link 45개, requirement 48개, TODO ID 141개, 공개 artifact 14개, route
@@ -3898,7 +3899,8 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   Vitest 49 files/314 tests. 적대적 검토에서 계획의 사람 checkpoint 순서 누락을
   `PROCESS` finding으로 찾아 상태 전환 전 checkpoint를 두도록 교정했으며 unresolved
   HIGH/MEDIUM/LOW finding은 0. 제품·OpenAPI·generated·dependency diff는 0. 사람
-  checkpoint 후보 `d212fe3`을 제시한 뒤 사용자가 `승인`함. 승인된 target의 canonical
+  checkpoint 후보 `d212fe3`(main rebase 후 동등 target `80675f6`)을 제시한 뒤
+  사용자가 `승인`함. 승인된 target의 canonical
   `pnpm verify full` PASS — hook 84, verifier 21, Vitest 49 files/314 tests, production
   build, Chromium core Journey 9/9, verifier regression 19/19. 기존 Vite chunk-size
   advisory 외 새 warning은 없고 browser behavior를 바꾸는 diff도 없음. 최종 setup,

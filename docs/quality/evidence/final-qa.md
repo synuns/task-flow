@@ -1952,6 +1952,7 @@ Verdict: PASS — unresolved HIGH/MEDIUM/LOW finding 0. Cycle 3 사람 checkpoin
 
 Review target: 계획 `docs/superpowers/plans/2026-09-04-final-document-consistency.md`,
 `SYS-04`, `SYS-05`, 문서 교정 target `0735b9e`와 시작 target `2ddf181` 사이 diff.
+별도 README 문구 commit 위로 rebase한 동등 교정 target은 `0c67603`이다.
 
 Reviewer: 2026-09-04 Codex `/root`. 교정과 quick 검증 뒤 frozen target을 처음부터
 다시 읽는 second-pass 역할로 검토했으며 별도 reviewer의 독립성은 주장하지 않는다.
@@ -1989,7 +1990,8 @@ Verdict: **PASS**. 사람 checkpoint 뒤 canonical full과 최종 상태 전환�
 ### DOCS-FINAL-CONSISTENCY-01 승인 후 최종 QA
 
 2026-09-04 사용자가 checkpoint 후보 `d212fe3`의 교정·focused audit·quick·적대적
-검토 결과를 확인한 뒤 `승인`했다. `AGENTS.md`에 따라 이 응답을 `HUMAN_APPROVED`
+검토 결과를 확인한 뒤 `승인`했다. main rebase 후 동등 checkpoint target은
+`80675f6`이다. `AGENTS.md`에 따라 이 응답을 `HUMAN_APPROVED`
 상태로 대신 기록하지 않고, 승인 뒤 canonical final gate를 실행했다.
 
 `pnpm verify full` PASS — hook 84/84, verifier contract 21/21, format/lint/OpenAPI type
