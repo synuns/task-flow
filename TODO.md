@@ -3543,7 +3543,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   `승인하고 2차 모듈 수정 진행`, `승인 3차 모듈 수정 진행`으로 후속 cycle 진행을
   명시했으나, 사람 소유 `HUMAN_APPROVED` 상태는 AI가 대신 변경하지 않음.
 
-### [ ] REVIEW-MOCK-INVARIANT-01 저장된 mock 식별자 불변식
+### [x] REVIEW-MOCK-INVARIANT-01 저장된 mock 식별자 불변식
 
 - Requirements: `SYS-04`, `USER-CRUD-03`, `TASK-LIST-01`, `TASK-CRUD-02`
 - Risk: MEDIUM — 손상된 sessionStorage가 중복 User/Task identity를 만드는 경계
@@ -3553,9 +3553,14 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   persisted state와 storage write 실패 시 메모리 동작을 보존한다.
 - Automatic verification: fixture focused Vitest, `pnpm verify quick`
 - Browser verification: mock 내부 load 경계로 적용 없음 — 통합 full 회귀 사용
-- Status: IN_PROGRESS
-- Evidence: 2026-09-04 Codex `/root` task block owner; 승인된 Cycle 3 설계와 User/Task
-  storage load/create caller를 추적하고 RED test 작성 준비.
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root` task block owner. User/Task load와 create caller를
+  추적하고 RED 2 files/20 tests에서 User 중복 ID, 비정규 email, 중복 canonical email,
+  뒤처진 sequence와 Task 중복 ID 5건만 실패함을 확인. 기존 Zod schema 뒤 `Set`과
+  `user-N` 최대 suffix 검사만 추가해 정상 persisted User의 다음 ID `user-42`, 정상 Task
+  load와 기존 storage write 실패 동작을 보존함. GREEN 2 files/20 tests,
+  `pnpm verify quick` PASS — hook 89, verifier 20, format/lint/typecheck, Vitest 48
+  files/304 tests; `git diff --check` PASS.
 
 ### [ ] REVIEW-TOOLING-CONSISTENCY-01 hook·TODO verifier·publication journal 정리
 
@@ -3567,8 +3572,10 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   거부하며, 최종 journal write 실패 뒤 재실행이 complete로 수렴한다.
 - Automatic verification: Python hook/verifier/publisher focused unittest, `pnpm verify quick`
 - Browser verification: 적용 없음 — repository tooling
-- Status: NOT_STARTED
-- Evidence: 없음
+- Status: IN_PROGRESS
+- Evidence: 2026-09-04 Codex `/root` task block owner; `REVIEW-MOCK-INVARIANT-01`
+  AI 검증 완료 후 exporter/adapter, TODO parser와 publisher transaction caller 추적 완료,
+  RED test 작성 준비.
 
 ### [ ] REVIEW-SURFACE-DOC-01 공개 surface·TaskCard 접근성·문서 정합성
 

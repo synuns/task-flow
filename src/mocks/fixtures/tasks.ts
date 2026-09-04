@@ -79,7 +79,9 @@ function loadTasks(): StoredTask[] {
     const raw = globalThis.sessionStorage?.getItem(fixtureStorageKey);
     if (!raw) return structuredClone(seed);
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.every(isStoredTask)
+    return Array.isArray(parsed) &&
+      parsed.every(isStoredTask) &&
+      new Set(parsed.map(({ id }) => id)).size === parsed.length
       ? structuredClone(parsed)
       : structuredClone(seed);
   } catch {

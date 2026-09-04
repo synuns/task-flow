@@ -51,6 +51,26 @@ describe("task fixture persistence", () => {
     expect(fixture.listTaskPage("user-1", 1).data[0]?.id).toBe("task-1");
   });
 
+  it("restores the seed instead of accepting duplicate task IDs", async () => {
+    sessionStorage.setItem(
+      fixtureStorageKey,
+      JSON.stringify([storedTask, { ...storedTask, ownerId: "user-2" }]),
+    );
+
+    const fixture = await import("./tasks");
+
+    expect(fixture.findTask("user-1", "stored-task")).toBeNull();
+    expect(fixture.findTask("user-1", "task-1")?.id).toBe("task-1");
+  });
+
+  it("loads a valid persisted task state", async () => {
+    sessionStorage.setItem(fixtureStorageKey, JSON.stringify([storedTask]));
+
+    const fixture = await import("./tasks");
+
+    expect(fixture.findTask("user-1", "stored-task")).toEqual(storedTask);
+  });
+
   it("restores the seed for malformed JSON", async () => {
     sessionStorage.setItem(fixtureStorageKey, "{");
 

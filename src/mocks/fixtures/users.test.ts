@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetTaskStore, findTask } from "./tasks";
 import {
   authenticateUser,
@@ -8,6 +8,68 @@ import {
   resetUserStore,
   updateStoredUser,
 } from "./users";
+
+const userFixtureStorageKey = "__taskflow_msw_user_fixture__";
+const storedUser = {
+  id: "user-41",
+  email: "stored@example.com",
+  password: "Password1",
+  name: "저장 사용자",
+  memo: "저장 경계 검증",
+} as const;
+
+describe("user fixture persistence", () => {
+  beforeEach(() => {
+    sessionStorage.removeItem(userFixtureStorageKey);
+    vi.resetModules();
+  });
+
+  afterEach(async () => {
+    const fixture = await import("./users");
+    fixture.resetUserStore();
+  });
+
+  it.each([
+    [
+      "duplicate IDs",
+      { sequence: 41, users: [storedUser, { ...storedUser, email: "other@example.com" }] },
+    ],
+    [
+      "a non-canonical email",
+      { sequence: 41, users: [{ ...storedUser, email: "Stored@example.com" }] },
+    ],
+    [
+      "duplicate canonical emails",
+      { sequence: 41, users: [storedUser, { ...storedUser, id: "user-other" }] },
+    ],
+    ["a sequence behind user IDs", { sequence: 40, users: [storedUser] }],
+  ])("restores the seed instead of accepting %s", async (_label, state) => {
+    sessionStorage.setItem(userFixtureStorageKey, JSON.stringify(state));
+
+    const fixture = await import("./users");
+
+    expect(fixture.findUser("user-41")).toBeNull();
+    expect(fixture.findUser("user-1")?.email).toBe("user@example.com");
+  });
+
+  it("loads valid persisted users and advances from the stored sequence", async () => {
+    sessionStorage.setItem(
+      userFixtureStorageKey,
+      JSON.stringify({ sequence: 41, users: [storedUser] }),
+    );
+
+    const fixture = await import("./users");
+
+    expect(fixture.findUser("user-41")).toEqual(storedUser);
+    expect(
+      fixture.createStoredUser({
+        email: "next@example.com",
+        password: "Password1",
+        name: "다음 사용자",
+      })?.id,
+    ).toBe("user-42");
+  });
+});
 
 describe("user fixture store", () => {
   beforeEach(() => {

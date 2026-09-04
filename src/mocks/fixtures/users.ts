@@ -52,12 +52,27 @@ function loadState(): UserStoreState {
     const raw = globalThis.sessionStorage?.getItem(fixtureStorageKey);
     if (!raw) return initialState();
     const parsed = JSON.parse(raw) as Partial<UserStoreState>;
-    return typeof parsed.sequence === "number" &&
-      Number.isInteger(parsed.sequence) &&
-      parsed.sequence >= 1 &&
-      Array.isArray(parsed.users) &&
-      parsed.users.every((user) => storedUserSchema.safeParse(user).success)
-      ? (structuredClone(parsed) as UserStoreState)
+    if (
+      typeof parsed.sequence !== "number" ||
+      !Number.isInteger(parsed.sequence) ||
+      parsed.sequence < 1 ||
+      !Array.isArray(parsed.users) ||
+      !parsed.users.every((user) => storedUserSchema.safeParse(user).success)
+    ) {
+      return initialState();
+    }
+    const users = parsed.users as StoredUser[];
+    const ids = new Set(users.map(({ id }) => id));
+    const emails = new Set(users.map(({ email }) => canonicalEmail(email)));
+    const maxSequence = Math.max(
+      0,
+      ...users.map(({ id }) => Number(/^user-(\d+)$/.exec(id)?.[1] ?? 0)),
+    );
+    return ids.size === users.length &&
+      emails.size === users.length &&
+      users.every(({ email }) => email === canonicalEmail(email)) &&
+      parsed.sequence >= maxSequence
+      ? { sequence: parsed.sequence, users: structuredClone(users) }
       : initialState();
   } catch {
     return initialState();
