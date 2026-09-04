@@ -93,7 +93,7 @@ pnpm verify quick
 ```bash
 pnpm exec vitest run src/entities/task/ui/task-card.test.tsx src/shared/api
 pnpm typecheck
-rg -n "acceptsBearer|CreateTaskValues|TaskStatusData|aria-label=\{`\$\{title\}" src
+rg -n 'acceptsBearer|CreateTaskValues|TaskStatusData|aria-label' src
 pnpm verify quick
 ```
 
@@ -115,6 +115,6 @@ python3 -m unittest tests/test_export_session.py tests/test_transcript_adapter.p
 pnpm verify quick
 pnpm verify full
 git diff --check
-git diff --exit-code HEAD~1 -- assignment-original docs/api/crud-openapi.yaml \
+git diff --exit-code main...HEAD -- assignment-original docs/api/crud-openapi.yaml \
   src/generated pnpm-lock.yaml package.json
 ```

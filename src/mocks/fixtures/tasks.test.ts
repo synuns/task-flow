@@ -63,6 +63,16 @@ describe("task fixture persistence", () => {
     expect(fixture.findTask("user-1", "task-1")?.id).toBe("task-1");
   });
 
+  it("restores the seed when the next numeric task ID cannot be represented safely", async () => {
+    const exhausted = { ...storedTask, id: `task-${Number.MAX_SAFE_INTEGER}` };
+    sessionStorage.setItem(fixtureStorageKey, JSON.stringify([exhausted]));
+
+    const fixture = await import("./tasks");
+
+    expect(fixture.findTask("user-1", exhausted.id)).toBeNull();
+    expect(fixture.findTask("user-1", "task-1")?.id).toBe("task-1");
+  });
+
   it("loads a valid persisted task state", async () => {
     sessionStorage.setItem(fixtureStorageKey, JSON.stringify([storedTask]));
 

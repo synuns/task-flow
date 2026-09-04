@@ -81,6 +81,9 @@ function loadTasks(): StoredTask[] {
     const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed) &&
       parsed.every(isStoredTask) &&
+      parsed.every(
+        ({ id }) => Number(/^task-(\d+)$/.exec(id)?.[1] ?? 0) < Number.MAX_SAFE_INTEGER,
+      ) &&
       new Set(parsed.map(({ id }) => id)).size === parsed.length
       ? structuredClone(parsed)
       : structuredClone(seed);

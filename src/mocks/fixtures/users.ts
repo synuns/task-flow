@@ -54,8 +54,9 @@ function loadState(): UserStoreState {
     const parsed = JSON.parse(raw) as Partial<UserStoreState>;
     if (
       typeof parsed.sequence !== "number" ||
-      !Number.isInteger(parsed.sequence) ||
+      !Number.isSafeInteger(parsed.sequence) ||
       parsed.sequence < 1 ||
+      parsed.sequence === Number.MAX_SAFE_INTEGER ||
       !Array.isArray(parsed.users) ||
       !parsed.users.every((user) => storedUserSchema.safeParse(user).success)
     ) {

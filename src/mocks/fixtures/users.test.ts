@@ -43,6 +43,13 @@ describe("user fixture persistence", () => {
       { sequence: 41, users: [storedUser, { ...storedUser, id: "user-other" }] },
     ],
     ["a sequence behind user IDs", { sequence: 40, users: [storedUser] }],
+    [
+      "an exhausted numeric sequence",
+      {
+        sequence: Number.MAX_SAFE_INTEGER,
+        users: [{ ...storedUser, id: `user-${Number.MAX_SAFE_INTEGER}` }],
+      },
+    ],
   ])("restores the seed instead of accepting %s", async (_label, state) => {
     sessionStorage.setItem(userFixtureStorageKey, JSON.stringify(state));
 
