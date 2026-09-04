@@ -14,6 +14,7 @@ type Props = {
   disabled: boolean;
   onStart(): void;
   onFinish(): void;
+  onPendingChange(pending: boolean): void;
 };
 
 function errorMessage(error: unknown): string {
@@ -31,6 +32,7 @@ export function UpdateTaskField({
   disabled,
   onStart,
   onFinish,
+  onPendingChange,
 }: Props) {
   const client = useApiClient();
   const queryClient = useQueryClient();
@@ -41,12 +43,14 @@ export function UpdateTaskField({
   const mutation = useMutation({
     mutationFn: (nextValue: string) =>
       updateTask(client, taskId, field === "title" ? { title: nextValue } : { memo: nextValue }),
+    onMutate: () => onPendingChange(true),
     onSuccess: async (task) => {
       queryClient.setQueryData(taskKeys.detail(taskId), task);
       await queryClient.invalidateQueries({ queryKey: taskKeys.all });
       onFinish();
       queueMicrotask(() => editButtonRef.current?.focus());
     },
+    onSettled: () => onPendingChange(false),
   });
 
   useEffect(() => {
@@ -73,7 +77,7 @@ export function UpdateTaskField({
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (invalid || normalized === value || mutation.isPending) return;
+    if (disabled || invalid || normalized === value || mutation.isPending) return;
     mutation.mutate(normalized);
   }
 
@@ -95,7 +99,7 @@ export function UpdateTaskField({
           />
           <Button
             aria-label={`${label} 수정 완료`}
-            disabled={invalid || normalized === value || mutation.isPending}
+            disabled={disabled || invalid || normalized === value || mutation.isPending}
             size="icon-lg"
             type="submit"
             variant="ghost"

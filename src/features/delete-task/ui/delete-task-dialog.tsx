@@ -29,11 +29,19 @@ type DialogState = { kind: "idle" } | { kind: "pending" } | DeleteResolution;
 
 export type DeleteTaskDialogProps = {
   taskId: string;
+  disabled: boolean;
   onSuccess(): Promise<void>;
   onAbsent(): Promise<void>;
+  onPendingChange(pending: boolean): void;
 };
 
-export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDialogProps) {
+export function DeleteTaskDialog({
+  taskId,
+  disabled,
+  onSuccess,
+  onAbsent,
+  onPendingChange,
+}: DeleteTaskDialogProps) {
   const client = useApiClient();
   const guardRef = useRef(createAttemptGuard());
   const [open, setOpen] = useState(false);
@@ -43,6 +51,7 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
 
   const resetAndClose = () => {
     if (pending) return;
+    onPendingChange(false);
     setOpen(false);
     setInput("");
     setState({ kind: "idle" });
@@ -67,10 +76,11 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (input !== taskId || state.kind === "absent") return;
+    if (disabled || input !== taskId || state.kind === "absent") return;
     const attemptId = guardRef.current.begin();
     if (attemptId === null) return;
     const previousState = state;
+    onPendingChange(true);
     setState({ kind: "pending" });
     try {
       const result = await resolveDeleteAttempt(client, taskId);
@@ -84,9 +94,11 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
   };
 
   const recheck = async () => {
+    if (disabled) return;
     const attemptId = guardRef.current.begin();
     if (attemptId === null) return;
     const previousState = state;
+    onPendingChange(true);
     setState({ kind: "pending" });
     try {
       const result = await recheckTaskPresence(client, taskId);
@@ -114,6 +126,7 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
     >
       <AlertDialogTrigger asChild>
         <Button
+          disabled={disabled}
           onClick={() => {
             setInput("");
             setState({ kind: "idle" });
@@ -161,7 +174,7 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
           {showRecovery && (
             <div className="flex flex-wrap gap-2">
               <Button
-                disabled={pending}
+                disabled={disabled || pending}
                 onClick={() => void recheck()}
                 type="button"
                 variant="outline"
@@ -177,7 +190,7 @@ export function DeleteTaskDialog({ taskId, onSuccess, onAbsent }: DeleteTaskDial
             <AlertDialogCancel disabled={pending} type="button">
               취소
             </AlertDialogCancel>
-            <Button disabled={submitDisabled} type="submit" variant="destructive">
+            <Button disabled={disabled || submitDisabled} type="submit" variant="destructive">
               삭제 확인
             </Button>
           </AlertDialogFooter>

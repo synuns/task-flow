@@ -16,11 +16,22 @@ function errorMessage(error: unknown): string {
     : "상태를 수정하지 못했습니다.";
 }
 
-export function TaskStatusControl({ taskId, status }: { taskId: string; status: TaskStatus }) {
+export function TaskStatusControl({
+  taskId,
+  status,
+  disabled,
+  onPendingChange,
+}: {
+  taskId: string;
+  status: TaskStatus;
+  disabled: boolean;
+  onPendingChange(pending: boolean): void;
+}) {
   const client = useApiClient();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (nextStatus: TaskStatus) => updateTask(client, taskId, { status: nextStatus }),
+    onMutate: () => onPendingChange(true),
     onSuccess: async (task) => {
       queryClient.setQueryData(taskKeys.detail(taskId), task);
       await Promise.all([
@@ -28,6 +39,7 @@ export function TaskStatusControl({ taskId, status }: { taskId: string; status: 
         queryClient.invalidateQueries({ queryKey: dashboardKeys.all }),
       ]);
     },
+    onSettled: () => onPendingChange(false),
   });
 
   return (
@@ -37,7 +49,7 @@ export function TaskStatusControl({ taskId, status }: { taskId: string; status: 
         {options.map((option) => (
           <Button
             aria-pressed={status === option.value}
-            disabled={mutation.isPending || status === option.value}
+            disabled={disabled || mutation.isPending || status === option.value}
             key={option.value}
             onClick={() => mutation.mutate(option.value)}
             type="button"

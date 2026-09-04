@@ -20,16 +20,23 @@ function asApiError(value: unknown): ApiError | null {
   return value && typeof value === "object" && "kind" in value ? (value as ApiError) : null;
 }
 
+type PendingOwner = EditableTaskField | "status" | "delete";
+
 export function TaskDetailPage() {
   const client = useApiClient();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { id = "" } = useParams();
   const [editingField, setEditingField] = useState<EditableTaskField | null>(null);
+  const [pendingOwner, setPendingOwner] = useState<PendingOwner | null>(null);
   const query = useQuery({
     queryKey: taskKeys.detail(id),
     queryFn: ({ signal }) => getTaskDetail(client, id, signal),
   });
+
+  const changePending = (owner: PendingOwner, pending: boolean) =>
+    setPendingOwner((current) => (pending ? owner : current === owner ? null : current));
+  const disabledFor = (owner: PendingOwner) => pendingOwner !== null && pendingOwner !== owner;
 
   if (query.isPending) {
     return (
@@ -76,26 +83,33 @@ export function TaskDetailPage() {
         </Link>
       </Button>
       <UpdateTaskField
-        disabled={editingField !== null && editingField !== "title"}
+        disabled={(editingField !== null && editingField !== "title") || disabledFor("title")}
         editing={editingField === "title"}
         field="title"
         label="제목"
         onFinish={() => setEditingField(null)}
+        onPendingChange={(pending) => changePending("title", pending)}
         onStart={() => setEditingField("title")}
         taskId={id}
         value={query.data.title}
       />
       <Card>
         <CardContent className="grid gap-6">
-          <TaskStatusControl status={query.data.status} taskId={id} />
+          <TaskStatusControl
+            disabled={disabledFor("status")}
+            onPendingChange={(pending) => changePending("status", pending)}
+            status={query.data.status}
+            taskId={id}
+          />
           <section>
             <h2 className="mb-2 font-medium text-muted-foreground text-sm">메모</h2>
             <UpdateTaskField
-              disabled={editingField !== null && editingField !== "memo"}
+              disabled={(editingField !== null && editingField !== "memo") || disabledFor("memo")}
               editing={editingField === "memo"}
               field="memo"
               label="메모"
               onFinish={() => setEditingField(null)}
+              onPendingChange={(pending) => changePending("memo", pending)}
               onStart={() => setEditingField("memo")}
               taskId={id}
               value={query.data.memo}
@@ -117,11 +131,13 @@ export function TaskDetailPage() {
           </dl>
           <div className="flex justify-end border-t pt-5">
             <DeleteTaskDialog
+              disabled={disabledFor("delete")}
               onAbsent={() => evictTaskSnapshots(queryClient)}
               onSuccess={async () => {
                 await evictTaskSnapshots(queryClient);
                 navigate("/task", { replace: true });
               }}
+              onPendingChange={(pending) => changePending("delete", pending)}
               taskId={id}
             />
           </div>

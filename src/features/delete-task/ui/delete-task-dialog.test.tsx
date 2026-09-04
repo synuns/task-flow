@@ -21,15 +21,26 @@ const client: ApiClient = {
   },
 };
 
-function renderDialog(taskId = "task-1", onSuccess = vi.fn(), onAbsent = vi.fn()) {
+function renderDialog(
+  taskId = "task-1",
+  onSuccess = vi.fn(),
+  onAbsent = vi.fn(),
+  onPendingChange = vi.fn(),
+) {
   render(
     <MemoryRouter>
       <ApiClientProvider client={client}>
-        <DeleteTaskDialog taskId={taskId} onSuccess={onSuccess} onAbsent={onAbsent} />
+        <DeleteTaskDialog
+          disabled={false}
+          onAbsent={onAbsent}
+          onPendingChange={onPendingChange}
+          onSuccess={onSuccess}
+          taskId={taskId}
+        />
       </ApiClientProvider>
     </MemoryRouter>,
   );
-  return { onSuccess, onAbsent };
+  return { onSuccess, onAbsent, onPendingChange };
 }
 
 afterEach(() => {

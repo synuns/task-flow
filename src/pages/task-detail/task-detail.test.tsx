@@ -175,6 +175,8 @@ describe("TaskDetailPage", () => {
 
     expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
     expect(screen.getByRole("button", { name: "제목 수정 완료" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "진행 중" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "할 일 삭제" })).toBeDisabled();
     expect(requests.at(-1)).toMatchObject({
       method: "PATCH",
       body: JSON.stringify({ title: "수정한 할 일" }),
@@ -259,6 +261,8 @@ describe("TaskDetailPage", () => {
     expect(inProgress).toHaveAttribute("aria-pressed", "false");
     expect(inProgress).toBeDisabled();
     expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
+    expect(screen.getByRole("button", { name: "제목 수정" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "할 일 삭제" })).toBeDisabled();
     expect(requests.at(-1)).toMatchObject({
       method: "PATCH",
       body: JSON.stringify({ status: "IN_PROGRESS" }),
@@ -266,6 +270,8 @@ describe("TaskDetailPage", () => {
     release();
 
     await waitFor(() => expect(inProgress).toHaveAttribute("aria-pressed", "true"));
+    expect(screen.getByRole("button", { name: "제목 수정" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "할 일 삭제" })).toBeEnabled();
     expect(queryClient.getQueryData(["task", "task-1"])).toEqual(updated);
     expect(queryClient.getQueryState(["tasks"])?.isInvalidated).toBe(true);
     expect(queryClient.getQueryState(["dashboard"])?.isInvalidated).toBe(true);
@@ -300,6 +306,8 @@ describe("TaskDetailPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("상태를 수정하지 못했습니다.");
     expect(screen.getByRole("button", { name: "할 일" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "완료" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "제목 수정" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "할 일 삭제" })).toBeEnabled();
     expect(queryClient.getQueryData(["task", "task-1"])).toEqual(initial);
     expect(queryClient.getQueryState(["dashboard"])?.isInvalidated).toBe(false);
   });
@@ -324,6 +332,10 @@ describe("TaskDetailPage", () => {
   it("evicts protected snapshots and navigates only after explicit delete success", async () => {
     const user = userEvent.setup();
     const methods: string[] = [];
+    let releaseDelete: () => void = () => undefined;
+    const deletePending = new Promise<void>((resolve) => {
+      releaseDelete = resolve;
+    });
     const client: ApiClient = {
       request: async <T,>(
         _input: RequestInfo | URL,
@@ -331,6 +343,7 @@ describe("TaskDetailPage", () => {
         isSuccess: (value: unknown) => value is T,
       ): Promise<T> => {
         methods.push(init.method ?? "GET");
+        if (init.method === "DELETE") await deletePending;
         const body: unknown =
           init.method === "DELETE"
             ? { success: true }
@@ -351,6 +364,10 @@ describe("TaskDetailPage", () => {
     await user.click(screen.getByRole("button", { name: "할 일 삭제" }));
     await user.type(screen.getByRole("textbox", { name: "할 일 ID" }), "task-1");
     await user.click(screen.getByRole("button", { name: "삭제 확인" }));
+
+    expect(screen.getByRole("button", { name: "제목 수정", hidden: true })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "진행 중", hidden: true })).toBeDisabled();
+    releaseDelete();
 
     expect(await screen.findByRole("heading", { name: "목록 도착" })).toBeInTheDocument();
     expect(methods).toEqual(["GET", "DELETE"]);
