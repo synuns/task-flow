@@ -1,5 +1,6 @@
 import { resetAuthFixture, startAuthSession } from "@/mocks/fixtures/auth";
 import { resetTaskStore } from "@/mocks/fixtures/tasks";
+import { testAccountIds } from "@/mocks/fixtures/test-accounts";
 import { server } from "@/mocks/server";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { taskHandlers } from "./tasks";
@@ -122,7 +123,7 @@ describe("task handlers", () => {
   });
 
   it("returns an empty list and zero dashboard for the empty-state account", async () => {
-    const token = startAuthSession("user-empty").accessToken;
+    const token = startAuthSession(testAccountIds.empty).accessToken;
 
     expect(await apiRequest("/api/task?page=1", "GET", token)).toEqual({
       status: 200,
@@ -132,6 +133,14 @@ describe("task handlers", () => {
       status: 200,
       body: { numOfTask: 0, numOfRestTask: 0, numOfDoneTask: 0 },
     });
+  });
+
+  it("fails every protected task read for the error-state account", async () => {
+    const token = startAuthSession(testAccountIds.error).accessToken;
+
+    await expect(apiRequest("/api/dashboard", "GET", token)).rejects.toThrow();
+    await expect(apiRequest("/api/task?page=1", "GET", token)).rejects.toThrow();
+    await expect(apiRequest("/api/task/task-1", "GET", token)).rejects.toThrow();
   });
 
   it("restores every record when the task store resets", async () => {

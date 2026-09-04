@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { z } from "zod";
 import { bearerUserId, revokeAuthSession } from "../fixtures/auth";
+import { testAccountIds } from "../fixtures/test-accounts";
 import {
   createStoredUser,
   findUser,
@@ -50,6 +51,7 @@ export const userHandlers = [
   }),
   http.get("/api/user", ({ request }) => {
     const userId = bearerUserId(request.headers.get("Authorization"));
+    if (userId === testAccountIds.error) return HttpResponse.error();
     const user = userId ? findUser(userId) : null;
     return user ? HttpResponse.json(responseUser(user)) : unauthorized();
   }),

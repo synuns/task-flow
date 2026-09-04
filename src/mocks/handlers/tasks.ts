@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { z } from "zod";
 import { bearerUserId } from "../fixtures/auth";
+import { testAccountIds } from "../fixtures/test-accounts";
 import {
   createStoredTask,
   findTask,
@@ -43,6 +44,7 @@ export const taskHandlers = [
   http.get("/api/task", ({ request }) => {
     const userId = bearerUserId(request.headers.get("Authorization"));
     if (!userId) return unauthorized();
+    if (userId === testAccountIds.error) return HttpResponse.error();
     const pageValue = new URL(request.url).searchParams.get("page");
     const page = Number(pageValue);
     if (pageValue === null || !Number.isInteger(page) || page < 1) return HttpResponse.error();
@@ -59,6 +61,7 @@ export const taskHandlers = [
   http.get("/api/task/:id", ({ params, request }) => {
     const userId = bearerUserId(request.headers.get("Authorization"));
     if (!userId) return unauthorized();
+    if (userId === testAccountIds.error) return HttpResponse.error();
     const task = findTask(userId, String(params.id));
     return task ? HttpResponse.json(taskDetail(task)) : missing();
   }),
@@ -81,6 +84,9 @@ export const taskHandlers = [
   }),
   http.get("/api/dashboard", ({ request }) => {
     const userId = bearerUserId(request.headers.get("Authorization"));
-    return userId ? HttpResponse.json(getDashboardMetrics(userId)) : unauthorized();
+    if (!userId) return unauthorized();
+    return userId === testAccountIds.error
+      ? HttpResponse.error()
+      : HttpResponse.json(getDashboardMetrics(userId));
   }),
 ];
