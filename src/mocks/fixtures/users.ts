@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { testAccountIds } from "./test-accounts";
 import { removeTasksByOwner } from "./tasks";
 
 const storedUserSchema = z.strictObject({
@@ -21,11 +22,25 @@ type UserStoreState = { sequence: number; users: StoredUser[] };
 const fixtureStorageKey = "__taskflow_msw_user_fixture__";
 const seed: StoredUser[] = [
   {
-    id: "user-1",
+    id: testAccountIds.primary,
     email: "user@example.com",
     password: "Password1",
     name: "김담당",
     memo: "오늘도 차근차근",
+  },
+  {
+    id: testAccountIds.empty,
+    email: "empty@example.com",
+    password: "Password1",
+    name: "빈 목록 사용자",
+    memo: "등록된 할 일이 없는 계정",
+  },
+  {
+    id: testAccountIds.error,
+    email: "error@example.com",
+    password: "Password1",
+    name: "오류 재현 사용자",
+    memo: "보호 조회 오류를 재현하는 계정",
   },
 ];
 

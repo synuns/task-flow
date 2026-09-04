@@ -1,5 +1,6 @@
 import { resetAuthFixture, startAuthSession } from "@/mocks/fixtures/auth";
 import { resetTaskStore } from "@/mocks/fixtures/tasks";
+import { testAccountIds } from "@/mocks/fixtures/test-accounts";
 import { resetUserStore } from "@/mocks/fixtures/users";
 import { server } from "@/mocks/server";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -65,6 +66,28 @@ describe("user handlers", () => {
       memo: "수정한 메모",
     });
     expect(invalid.response.status).toBe(400);
+  });
+
+  it("returns the empty-state test account profile", async () => {
+    const token = startAuthSession(testAccountIds.empty).accessToken;
+    const result = await apiRequest("/api/user", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    expect(result.response.status).toBe(200);
+    expect(result.body).toEqual({
+      email: "empty@example.com",
+      name: "빈 목록 사용자",
+      memo: "등록된 할 일이 없는 계정",
+    });
+  });
+
+  it("fails the protected profile read for the error-state account", async () => {
+    const token = startAuthSession(testAccountIds.error).accessToken;
+
+    await expect(
+      apiRequest("/api/user", { headers: { Authorization: `Bearer ${token}` } }),
+    ).rejects.toThrow();
   });
 
   it("preserves the account on wrong password and revokes it only after 200", async () => {

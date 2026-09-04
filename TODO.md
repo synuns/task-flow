@@ -3445,3 +3445,44 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   checkpoint 승인.
   Verdict: PASS. AI는 기존 artifact의 `human-reviewed` metadata를 변경하거나 새
   사람 승인을 주장하지 않음.
+
+## 12. MSW 테스트 계정 보완
+
+### [x] MSW-TEST-ACCOUNTS-01 기능 확인용 테스트 계정 fixture 보완
+
+- Requirements: `SYS-04`, `DASH-01`, `USER-01`, `TASK-LIST-01`~`TASK-LIST-04`,
+  `TASK-DETAIL-01`~`TASK-DETAIL-02`
+- Risk: MEDIUM — 여러 보호 route가 공유하는 mock 초기 상태와 실패 profile 변경
+- Depends on: `DOCS-README-01`
+- Deliverable: 긴 목록·빈 상태·조회 오류를 재현하는 세 MSW 테스트 계정과 안내·검증 근거
+- Acceptance: 기본 계정은 기존 핵심 Task를 보존한 30개 목록을 실제 scroll로 탐색하고,
+  빈 계정은 dashboard 0/0/0과 빈 목록을, 오류 계정은 로그인 후 모든 보호 GET의
+  network-error 복구 UI를 결정적으로 재현한다.
+- Automatic verification: fixture/handler Vitest, `pnpm verify quick`, mapped E2E,
+  `pnpm verify full`, `git diff --check`
+- Browser verification: 세 계정으로 `/`, `/user`, `/task`, `/task/:id` 상태와
+  scroll/retry/console/page error 확인
+- Status: AI_VERIFIED
+- Evidence: 2026-09-04 Codex `/root` task block owner; branch
+  `feat/msw-test-accounts`; approved design
+  `docs/superpowers/specs/2026-09-04-msw-test-account-fixtures-design.md`. Fixture/handler
+  TDD는 3→30 Task, 두 특수 계정 identity, 네 보호 GET transport failure의 RED를
+  확인한 뒤 GREEN 27/27, 24/24, 23/23을 기록함. `pnpm verify quick` PASS — hook 88,
+  verifier 20, Vitest 47 files/254 tests; mapped Chromium 7/7 PASS. agent-browser
+  `msw-primary`, `msw-primary-mobile`, `msw-empty`, `msw-error`에서 1280x720과 390x844
+  production preview를 확인함: 기본 30/20/10과 page 1~15 terminal/task-30, mobile
+  6 mounted rows·width 390/390, 빈 0/0/0·목록·profile, 오류 계정의 네 route alert와
+  retry를 재현했으며 page error 없음. Canonical `pnpm verify full` PASS — hook 88,
+  verifier 20, format/lint/typecheck, Vitest 47/254, build, core Chromium 9/9, verifier
+  regression 19/19; authoritative contract/generated/dependency/lockfile diff 0과
+  `git diff --check` PASS. Review target: `5bb9b83`. Reviewer: 구현 후 explicit
+  second-pass Codex `/root` (사용자가 인라인 실행 선택). Checks: 승인 spec/plan,
+  identity/distribution/pagination/ownership, GET-only scope, auth/delete/OpenAPI 보존,
+  weak test, browser/README/secret/unrelated diff. Findings: MEDIUM `TEST` 직접 URL로
+  기존 생성-link 검증을 약화함; LOW `TEST` virtual DOM 상한이 느슨함; mobile 수동
+  evidence 누락. Corrections: response-synchronized terminal page loading 뒤 실제 생성
+  Task link를 update/delete 전 두 번 열고 상한을 10 미만으로 강화했으며 mobile
+  evidence를 추가함. Rerun: corrected task-crud 2/2, task-discovery 1/1, mapped 7/7,
+  canonical full PASS. Verdict: PASS — unresolved HIGH/MEDIUM/LOW finding 없음.
+  상세 근거는 `docs/quality/evidence/msw-test-accounts.md`. 사용자의 설계 승인
+  checkpoint를 반영했지만 `HUMAN_APPROVED`나 최종 사람 acceptance를 주장하지 않음.

@@ -28,30 +28,39 @@ test("@core @task-discovery loads terminal pages into a bounded virtual list", a
   await expect(page.getByRole("heading", { name: "할 일", exact: true })).toBeVisible();
   await expect(page.getByText("첫 번째 할 일")).toBeVisible();
   await expect(page.getByText("삭제 검증 대상")).toBeVisible();
-  await expect(page.getByText("모든 할 일을 불러왔습니다.")).toBeVisible();
-  expect(taskRequests.map((request) => request.page)).toEqual(["1", "2"]);
   const mountedBeforeScroll = await page.locator("[data-task-row]").count();
   expect(mountedBeforeScroll).toBeGreaterThan(0);
-  expect(mountedBeforeScroll).toBeLessThan(3);
+  expect(mountedBeforeScroll).toBeLessThan(10);
 
-  await page.getByRole("region", { name: "할 일 목록" }).evaluate((element) => {
-    element.scrollTop = element.scrollHeight;
-    element.dispatchEvent(new Event("scroll"));
-  });
-  await page.getByRole("region", { name: "할 일 목록" }).evaluate((element) => {
-    element.scrollTop = element.scrollHeight;
-    element.dispatchEvent(new Event("scroll"));
-  });
-  await expect(page.getByText("완료한 일")).toBeVisible();
-  expect(await page.locator("[data-task-row]").count()).toBeLessThan(3);
-  expect(taskRequests.map((request) => request.page)).toEqual(["1", "2"]);
+  const list = page.getByRole("region", { name: "할 일 목록" });
+  for (let pageNumber = 2; pageNumber <= 15; pageNumber += 1) {
+    if (!taskRequests.some((request) => request.page === String(pageNumber))) {
+      await list.evaluate((element) => {
+        element.scrollTop = element.scrollHeight;
+        element.dispatchEvent(new Event("scroll"));
+      });
+    }
+    await expect
+      .poll(() => taskRequests.map((request) => request.page))
+      .toContain(String(pageNumber));
+  }
+  await expect(page.getByText("모든 할 일을 불러왔습니다.")).toBeVisible();
+  expect(await page.locator("[data-task-row]").count()).toBeLessThan(10);
+  expect(taskRequests.map((request) => request.page)).toEqual(
+    Array.from({ length: 15 }, (_, index) => String(index + 1)),
+  );
   expect(taskRequests.every((request) => request.authorization?.startsWith("Bearer "))).toBe(true);
   expect(signInRequests).toEqual([]);
 
+  await list.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+    element.dispatchEvent(new Event("scroll"));
+  });
+  await expect(page.getByRole("link", { name: /추가 할 일 30/ })).toBeVisible();
   const listScreenshot = await page.screenshot({ fullPage: true });
-  await page.getByRole("link", { name: /완료한 일/ }).click();
-  await expect(page).toHaveURL(/\/task\/task-3$/);
-  await expect(page.getByRole("heading", { name: "완료한 일" })).toBeVisible();
+  await page.getByRole("link", { name: /추가 할 일 30/ }).click();
+  await expect(page).toHaveURL(/\/task\/task-30$/);
+  await expect(page.getByRole("heading", { name: "추가 할 일 30" })).toBeVisible();
   expect(consoleErrors).toEqual([]);
   expect(pageErrors).toEqual([]);
 

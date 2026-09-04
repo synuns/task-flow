@@ -41,10 +41,11 @@ pnpm dev --host 127.0.0.1 --port 5173
 
 ### 3. Test Account
 
-| 항목     | 값                 |
-| -------- | ------------------ |
-| 이메일   | `user@example.com` |
-| 비밀번호 | `Password1`        |
+| 용도                  | 이메일              | 비밀번호    |
+| --------------------- | ------------------- | ----------- |
+| 기본·무한 스크롤      | `user@example.com`  | `Password1` |
+| 빈 목록               | `empty@example.com` | `Password1` |
+| 보호 조회 네트워크 오류 | `error@example.com` | `Password1` |
 
 > [!IMPORTANT]
 > User와 Task 변경 내용은 현재 탭의 `sessionStorage`에 저장됩니다. 초기화하려면 새
