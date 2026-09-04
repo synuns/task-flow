@@ -284,3 +284,28 @@ Correction: use the established page-local rejected-fetch technique and restore 
 retry; no product correction
 Rerun verdict: PASS — focused, quick, recoverable initial error, successful retry, terminal
 empty, unsupported-CTA absence, responsive width and console/page-error checks passed
+
+## REVIEW-TASK-RETRY-01 retained-data 재시도 교정
+
+Requirement/Journey: `TASK-LIST-01`, `TASK-LIST-04`; `task-discovery`
+Product target: `3a1a71a6601c225ac5d29161e9a2ece92e03898d`; integrated product target:
+`8582cb88d975255fbd6d7a352444c2d821db28ff`.
+
+RED/GREEN: 기존 next-page 실패 test를 page 2 재요청까지 확장하고 retained-data
+refetch 실패 test를 추가했다. RED는 1 file/13 tests 중 refetch retry 1건만 실패했고,
+`isFetchNextPageError`인 경우에만 `fetchNextPage()`, 나머지는 `refetch()`하도록 분기한
+뒤 13/13이 통과했다. Cycle 2 focused는 8 files/70 tests, quick은 hook 89,
+verifier 20, generated check/format/lint/typecheck와 Vitest 48 files/297 tests를 통과했다.
+Mapped production Chromium은 `task-discovery`, `task-resolution`, `task-crud` 4/4를
+통과했고 canonical full은 core Chromium 9/9와 verifier regression 19/19를 통과했다.
+
+Browser: named agent-browser `review-cycle2`, production preview
+`http://127.0.0.1:4273/task`, Chromium 1280x720. 정상 page 1을 보존한 상태에서
+SPA 재진입의 GET 한 번만 page-local fetch wrapper로 실패시켰다. 기존 task card와
+`네트워크 요청에 실패했습니다.` 및 `다시 불러오기`가 함께 남았고, wrapper의 다음
+호출을 통과시킨 retry 뒤 alert가 사라지고 다음 page action이 복구됐다. 예상된 로그인
+전 refresh 401 외 unexpected console error는 없고 `agent-browser errors`는 비어 있었다.
+Session과 preview를 종료했고 4173/4273 listener가 없음을 확인했다.
+
+Verdict: PASS — next-page와 retained-data refetch가 각자 실패한 operation을 다시
+실행하며 기존 data를 보존한다.

@@ -3492,7 +3492,7 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   hook 89, verifier 20, generated check/format/lint/typecheck, Vitest 48 files/297 tests.
   authoritative/generated/dependency diff 없음, `git diff --check` PASS.
 
-### [ ] REVIEW-TASK-API-JOURNEY-01 Task와 API correction 통합 검증·적대적 검토
+### [x] REVIEW-TASK-API-JOURNEY-01 Task와 API correction 통합 검증·적대적 검토
 
 - Requirements: `TASK-LIST-01`, `TASK-LIST-04`, `TASK-DETAIL-01`,
   `TASK-DETAIL-03`~`TASK-DETAIL-05`, `TASK-CRUD-02`, `TASK-CRUD-04`~`TASK-CRUD-07`,
@@ -3506,9 +3506,40 @@ src/mocks/handlers/user.test.ts`, `./scripts/verify quick`
   authoritative diff
 - Browser verification: production preview pending lock/failure recovery/refetch retry,
   console/page error
-- Status: IN_PROGRESS
+- Status: AI_VERIFIED
 - Evidence: 2026-09-04 Codex `/root` task block owner. 세 correction unit의 focused와
-  quick 통과 후 mapped Journey, production browser, full, fresh adversarial review 착수.
+  quick 통과 후 fresh Cycle 2 focused 8 files/70 tests, quick hook 89·verifier 20·Vitest
+  48 files/297 tests, mapped task-discovery/task-resolution/task-crud Chromium 4/4 PASS.
+  Named agent-browser `review-cycle2` production 1280x720에서 retained-data refetch 실패의
+  기존 data 보존과 retry 복구, PATCH pending 중 모든 mutation control disabled, 실패 뒤
+  lock 해제와 재시도 성공을 확인하고 session/4273 preview를 종료함. Canonical full PASS —
+  Vitest 297/297, build, core Chromium 9/9, verifier regression 19/19.
+  Review target: plan, listed Requirements/Journeys, initial `1e68099`, corrected
+  `7ae4c75`. Reviewer: runtime 정책상 별도 subagent 없이 `/root`가 frozen target의 명시적
+  read-only second pass를 수행했으며 독립성을 주장하지 않음. Checks: plan 누락, mutation
+  race/cache/delete, retry operation, strict OpenAPI 경계, negative/duplicate test, FSD/SOLID,
+  browser console/page error, 전체 diff/TODO/authoritative 불변. Findings: LOW `TEST/DOCS`
+  plan EOF blank line 1건, HIGH/MEDIUM 및 다른 LOW 없음. Corrections: `7ae4c75`에서 해당
+  공백만 제거. Rerun: focused 70, corrected-target quick 297, range diff check와
+  authoritative/generated/lockfile/package diff, 4173/4273 cleanup PASS. Verdict: PASS —
+  unresolved HIGH/MEDIUM/LOW 0. 상세:
+  `docs/quality/evidence/task-crud.md#review-task-api-journey-01-cycle-2-통합-검증과-적대적-검토`,
+  `docs/quality/evidence/task-discovery.md#review-task-retry-01-retained-data-재시도-교정`,
+  `docs/quality/evidence/task-resolution.md#review-task-lock-01-상세-mutation-상호-배제-교정`.
+
+### [ ] REVIEW-TASK-API-CHECKPOINT-01 Task와 API correction 사람 checkpoint
+
+- Requirements: `REVIEW-TASK-API-JOURNEY-01`의 listed Requirements/Journeys
+- Risk: MEDIUM — correction cycle의 사람 검토와 다음 cycle 진행 경계
+- Depends on: `REVIEW-TASK-API-JOURNEY-01`
+- Deliverable: mutation lock, retry operation, strict response validator와 검증 근거의
+  사람 checkpoint 결정
+- Acceptance: 사람이 Cycle 2 결과와 evidence를 검토하고 승인 또는 correction을 명시한다.
+- Automatic verification: `REVIEW-TASK-API-JOURNEY-01`의 focused/quick/mapped/full/review
+- Browser verification: named `review-cycle2` production record
+- Status: BLOCKED
+- Evidence: Cycle 2 구현·자동/브라우저 검증·plan-completion review 완료. 사람의 명시적
+  checkpoint 결정을 기다리며 AI가 승인 상태를 대신 기록하지 않음.
 
 ### [x] DOCS-README-01 프로젝트 안내와 아티팩트 인덱스 개선
 

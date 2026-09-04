@@ -405,3 +405,31 @@ verified product target did not change.
 Verdict: PASS — all prior final-review findings are resolved and no unresolved
 HIGH/MEDIUM/LOW finding remains. Human checkpoint approval remains pending; this is not
 `HUMAN_APPROVED`.
+
+## REVIEW-TASK-LOCK-01 상세 mutation 상호 배제 교정
+
+Requirement/Journey: `TASK-CRUD-05`~`TASK-CRUD-07`, `TASK-DETAIL-03`~`TASK-DETAIL-05`;
+`task-resolution`, `task-crud`
+Product target: `8328ca0094ced829296f75b749ffe07d52324b9c`; integrated product target:
+`8582cb88d975255fbd6d7a352444c2d821db28ff`.
+
+RED/GREEN: page RED 11건 중 title PATCH와 DELETE pending 사례 2건이 다른 mutation
+control 활성화를 재현했다. Page가 title/memo/status/delete owner 하나를 관리하고 각
+feature의 기존 mutation lifecycle이 이를 알리도록 수정했다. 구현 중 delete success
+cache eviction 뒤 owner 해제 rerender가 detail GET을 다시 만드는 결함을 찾아,
+destructive owner는 열린 modal 수명 동안 유지하고 닫을 때 해제했다. Modal 내부 retry는
+같은 owner이므로 계속 가능하고 배경은 inert다. 최종 focused 5 files/31 tests와 Cycle 2
+focused 8 files/70 tests가 통과했다. 비낙관 cache 갱신, 404/unknown resolution,
+GET-only reconciliation과 success-only navigation은 기존 test와 mapped Chromium으로
+보존됐다.
+
+Browser: named production session `review-cycle2`의 `/task/task-1`, 1280x720에서 status
+PATCH를 page-local deferred promise로 유지했다. Pending 동안 제목·메모·세 status·삭제
+control이 모두 disabled였고, 성공 해제 뒤 새 status만 pressed였다. 다음 PATCH 한 번을
+의도적으로 reject하자 기존 status와 error가 남고 제목·메모·삭제가 즉시 enabled로
+복구됐다. 같은 action 재시도는 200으로 완료됐다. Screenshot:
+`/tmp/taskflow-cycle2-task-detail.png` (1280x720). 예상된 bootstrap refresh 401 외
+unexpected console/page error는 없었다.
+
+Verdict: PASS — 상세 mutation은 하나만 진행되고 실패 뒤 retry 가능한 상태로 복구되며
+삭제의 기존 보수적 결과 해석과 cache 불변식을 유지한다.
